@@ -1,0 +1,54 @@
+/* Visual primitives only. React/Radix/Fumadocs supply interaction semantics. */
+.cp-admin-button {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: var(--cp-admin-control-height); padding: var(--cp-admin-space-2) var(--cp-admin-space-4);
+  gap: var(--cp-admin-space-2); border: var(--cp-admin-border-width) solid transparent;
+  border-radius: var(--cp-admin-radius-button); background: var(--cp-admin-color-action); color: var(--cp-admin-color-on-action);
+  font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-bold); line-height: var(--cp-admin-leading-ui);
+  text-align: center; text-decoration: none;
+  transition: background-color var(--cp-admin-duration-fast) var(--cp-admin-ease-out), transform var(--cp-admin-duration-fast) var(--cp-admin-ease-out);
+}
+.cp-admin-button:hover:not(:disabled) { background: var(--cp-admin-color-action-hover); }
+.cp-admin-button:active:not(:disabled) { transform: translateY(1px); }
+.cp-admin-button--dark { background: var(--cp-admin-color-strong); color: var(--cp-admin-color-text-inverse); }
+.cp-admin-button--dark:hover:not(:disabled) { background: var(--cp-admin-color-text); }
+.cp-admin-button--secondary { background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); border-color: var(--cp-admin-color-control-border); }
+.cp-admin-button--secondary:hover:not(:disabled) { background: var(--cp-admin-color-surface-muted); }
+.cp-admin-button:disabled { color: var(--cp-admin-color-text-muted); background: var(--cp-admin-color-surface-muted); border-color: var(--cp-admin-color-border); cursor: not-allowed; }
+.cp-admin-button[aria-busy="true"] { cursor: progress; }
+.cp-admin-icon-button { min-width: var(--cp-admin-control-height); padding: var(--cp-admin-space-2); }
+.cp-admin-icon { width: var(--cp-admin-icon-size); height: var(--cp-admin-icon-size); flex: none; }
+.cp-admin-field { display: grid; gap: var(--cp-admin-space-2); min-width: 0; font-size: var(--cp-admin-type-small); }
+.cp-admin-field > label, .cp-admin-field > span { font-weight: var(--cp-admin-weight-semibold); }
+.cp-admin-input {
+  width: 100%; min-width: 0; min-height: var(--cp-admin-control-height);
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-control);
+  padding: var(--cp-admin-space-2) var(--cp-admin-space-3); background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text);
+}
+.cp-admin-input::placeholder { color: var(--cp-admin-color-text-muted); opacity: 1; }
+.cp-admin-input[aria-invalid="true"] { border-color: var(--cp-admin-color-danger); }
+.cp-admin-input:disabled { background: var(--cp-admin-color-surface-muted); color: var(--cp-admin-color-text-muted); cursor: not-allowed; }
+.cp-admin-field-error { color: var(--cp-admin-color-danger); font-size: var(--cp-admin-type-small); }
+.cp-admin-panel { min-width: 0; border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-panel); background: var(--cp-admin-color-surface); box-shadow: var(--cp-admin-shadow-panel); }
+.cp-admin-panel-body { padding: var(--cp-admin-space-6); }
+.cp-admin-row { display: flex; align-items: center; flex-wrap: wrap; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-4) var(--cp-admin-space-6); }
+.cp-admin-row + .cp-admin-row { border-top: var(--cp-admin-border-width) solid var(--cp-admin-color-border); }
+.cp-admin-badge { display: inline-flex; align-items: center; gap: var(--cp-admin-space-1); padding: var(--cp-admin-space-1) var(--cp-admin-space-2); border-radius: var(--cp-admin-radius-sm); font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-bold); }
+.cp-admin-badge--success { color: var(--cp-admin-color-success); background: var(--cp-admin-color-success-bg); }
+.cp-admin-badge--danger { color: var(--cp-admin-color-danger); background: var(--cp-admin-color-danger-bg); }
+.cp-admin-inline-code { padding: .1em .3em; border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-sm); background: var(--cp-admin-color-surface-muted); font-family: var(--cp-admin-font-mono); font-size: .9em; overflow-wrap: anywhere; }
+.cp-admin-code { border-radius: var(--cp-admin-radius-control); padding: var(--cp-admin-space-5); background: var(--cp-admin-color-code-bg); color: var(--cp-admin-color-code-text); font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-small); line-height: 1.75; white-space: pre; overflow-x: auto; }
+.cp-admin-code:focus-visible { outline-color: var(--cp-admin-color-action); }
+.cp-admin-nav-link { display: inline-flex; align-items: center; min-height: var(--cp-admin-control-height); padding: var(--cp-admin-space-2) var(--cp-admin-space-3); border-radius: var(--cp-admin-radius-control); color: var(--cp-admin-color-text-muted); font-weight: var(--cp-admin-weight-semibold); text-decoration: none; }
+.cp-admin-nav-link:hover { background: var(--cp-admin-color-surface-muted); color: var(--cp-admin-color-text); }
+.cp-admin-nav-link[aria-current="page"] { background: var(--cp-admin-color-accent-soft); color: var(--cp-admin-color-accent-text); }
+.cp-admin-divider { margin: var(--cp-admin-space-6) 0; border: 0; border-top: var(--cp-admin-border-width) solid var(--cp-admin-color-border); }
+.cp-admin-dialog { max-width: min(var(--cp-admin-layout-dialog), calc(100vw - 2rem)); width: 100%; padding: var(--cp-admin-space-6); border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-dialog); background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); box-shadow: var(--cp-admin-shadow-dialog); max-height: calc(100dvh - 2rem); overflow-y: auto; }
+.cp-admin-dialog::backdrop { background: var(--cp-admin-color-overlay); }
+@media (pointer: coarse) {
+  .cp-admin-button, .cp-admin-input, .cp-admin-nav-link { min-height: var(--cp-admin-touch-height); }
+  .cp-admin-icon-button { min-width: var(--cp-admin-touch-height); }
+}
+
+.cp-admin-badge--warning { color: var(--cp-admin-color-warning); background: var(--cp-admin-color-warning-bg); }
+.cp-admin-dialog--wide { --cp-admin-layout-dialog: var(--cp-admin-layout-dialog-wide); }

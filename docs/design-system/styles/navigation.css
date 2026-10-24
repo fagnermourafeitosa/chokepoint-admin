@@ -1,0 +1,16 @@
+/* Header/footer specimens also provide reusable navigation styling. */
+.cp-admin-topbar--sample { position: static; border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-panel); }
+.cp-admin-topbar--sample .cp-admin-brand img { width: 8rem; }
+.cp-admin-shell-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--cp-admin-space-5); border-top: 1px solid var(--cp-admin-color-border); font-size: var(--cp-admin-type-small); color: var(--cp-admin-color-text-muted); }
+.cp-admin-footer-nav { display: flex; align-items: center; flex-wrap: wrap; gap: var(--cp-admin-space-4); }
+.cp-admin-footer-nav a { color: var(--cp-admin-color-text-muted); text-decoration: none; }
+.cp-admin-footer-nav a:hover { color: var(--cp-admin-color-accent-text); text-decoration: underline; }
+.cp-admin-shell-footer--sample { padding: var(--cp-admin-space-5); background: var(--cp-admin-color-surface); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-panel); }
+.cp-admin-status { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); }
+.cp-admin-status-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--cp-admin-color-success); flex: none; }
+
+.cp-admin-topbar--sample .cp-admin-topbar-inner { padding-inline: var(--cp-admin-space-4); }
+@media (max-width: 740px) {
+  .cp-admin-topbar--sample .cp-admin-topbar-inner { padding-block: var(--cp-admin-space-3); }
+  .cp-admin-topbar--sample .cp-admin-topbar-nav { flex-basis: 11.25rem; }
+}

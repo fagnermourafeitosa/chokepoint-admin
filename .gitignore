@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.next/
+out/
+.source/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+npm-debug.log*
+.DS_Store
+
+# Keep runnable documentation mocks with their source references.
+!docs/chokepoint-workbench/dist/
+!docs/chokepoint-workbench/dist/**

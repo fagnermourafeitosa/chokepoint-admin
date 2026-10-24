@@ -1,0 +1,8 @@
+{
+  "name": "chokepoint-developer-workbench",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Interactive React + TypeScript UX prototype for agent authorization",
+  "scripts": {"build": "tsc -p tsconfig.json"},
+  "license": "UNLICENSED"
+}

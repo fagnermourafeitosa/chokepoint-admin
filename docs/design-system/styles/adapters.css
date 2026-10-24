@@ -1,0 +1,23 @@
+/* Semantic bridge for shadcn components. Scoped to the admin body. */
+[data-cp-admin] {
+  --background: var(--cp-admin-color-canvas);
+  --foreground: var(--cp-admin-color-text);
+  --card: var(--cp-admin-color-surface);
+  --card-foreground: var(--cp-admin-color-text);
+  --popover: var(--cp-admin-color-surface);
+  --popover-foreground: var(--cp-admin-color-text);
+  --primary: var(--cp-admin-color-action);
+  --primary-foreground: var(--cp-admin-color-on-action);
+  --secondary: var(--cp-admin-color-surface-muted);
+  --secondary-foreground: var(--cp-admin-color-text);
+  --muted: var(--cp-admin-color-surface-muted);
+  --muted-foreground: var(--cp-admin-color-text-muted);
+  --accent: var(--cp-admin-color-accent-soft);
+  --accent-foreground: var(--cp-admin-color-accent-text);
+  --destructive: var(--cp-admin-color-danger);
+  --destructive-foreground: var(--cp-admin-color-text-inverse);
+  --border: var(--cp-admin-color-border);
+  --input: var(--cp-admin-color-control-border);
+  --ring: var(--cp-admin-color-focus);
+  --radius: var(--cp-admin-radius-control);
+}

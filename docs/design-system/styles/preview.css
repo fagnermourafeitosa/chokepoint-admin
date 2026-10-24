@@ -1,0 +1,9 @@
+/* Documentation-only specimen helpers. Not imported by styles/index.css. */
+.cp-admin-swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: var(--cp-admin-space-4); }
+.cp-admin-swatch { display: grid; gap: var(--cp-admin-space-2); min-width: 0; font-size: var(--cp-admin-type-small); }
+.cp-admin-swatch > span { display: block; height: 4rem; border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--swatch); }
+.cp-admin-swatch code { overflow-wrap: anywhere; font-size: var(--cp-admin-type-label); }
+.cp-admin-specimen-section { margin-block-start: var(--cp-admin-space-10); }
+.cp-admin-specimen-label { margin-block-end: var(--cp-admin-space-3); }
+.cp-admin-specimen-link { font-size: var(--cp-admin-type-small); }
+@media (max-width: 740px) { .cp-admin-specimen-meta { display: none; } }

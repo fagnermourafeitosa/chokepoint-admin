@@ -1,0 +1,10 @@
+/* Load once at the application root. Tailwind uses the same standard layers. */
+@layer theme, base, components, utilities;
+@import url("./fonts.css");
+@import url("./tokens.css") layer(theme);
+@import url("./adapters.css") layer(theme);
+@import url("./base.css") layer(base);
+@import url("./layout.css") layer(components);
+@import url("./components.css") layer(components);
+@import url("./controls.css") layer(components);
+@import url("./navigation.css") layer(components);

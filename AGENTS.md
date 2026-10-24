@@ -1,5 +1,13 @@
 # Project Guidelines
 
+## Module Responsibility
+
+This module is the React application for managing the Chokepoint platform. Platform management interfaces belong here. The public-facing page belongs in the separate `frontend` module.
+
+## Design System
+
+Before UI implementation or review, read [the module design system](docs/design-system/README.md), including its token and layout rules. Reuse `docs/design-system/styles/index.css` and the documented semantic tokens. Preserve this module’s separate visual system and the reference mocks.
+
 ## Language
 
 * Always write documentation, instructions, comments, specifications, identifiers, and project artifacts in English.
@@ -7,39 +15,15 @@
 
 ## Technology Baseline
 
-The current project baseline is:
+* React + Vite
 
-* Go `1.27.0`
-* Echo `github.com/labstack/echo/v5` `v5.3.1`
-* Go modules
-* Testify
+Use React with Vite for the platform management application. The admin consumes the Go backend APIs and uses client-side rendering.
 
+Do not silently change the selected stack or upgrade major dependencies.
 
----
+Use npm `10.9.8` with Node.js `22.23.1` (see `.nvmrc`). Keep dependencies, the lockfile, and `.env.local` isolated within this module. Use `npm ci` to reproduce the installed dependency tree. Keep environment files out of Git except `.env.example`.
 
-## Technology Baseline
-
-The current project baseline is:
-
-* Go `1.27.0`
-* Echo `github.com/labstack/echo/v5` `v5.3.1`
-* Go modules
-* OpenTelemetry
-* Testify
-
-Do not silently upgrade Go, Echo, or other major dependencies.
-
-For Go implementation and review, read and apply:
-
-```text
-.agents/skills/golang-best-practices/SKILL.md
-```
-
-For Echo-specific HTTP work, also read and apply:
-
-```text
-.agents/skills/golang-echo-framework/SKILL.md
-```
+For React implementation, review, and refactoring, read and apply the [Vercel React Best Practices skill](.agents/skills/react-best-practices/SKILL.md). Apply the React guidance relevant to this module; Next.js-specific rules do not apply to the Vite application.
 
 Project-specific architecture and explicit specifications take precedence over generic skill guidance.
 
