@@ -1,8 +1,8 @@
+import type { Environment } from '../../app/context/AdminEnvironmentContext';
 import { Check, ChevronDown } from 'lucide-react';
 import { Dropdown } from '../ui/dropdown/Dropdown';
 
 const environments = ['Sandbox', 'Production'] as const;
-export type Environment = (typeof environments)[number];
 
 type EnvironmentSelectorProps = {
   value: Environment;

@@ -1,0 +1,20 @@
+.admin-tooltip-trigger {
+  display: inline-flex;
+  border-radius: var(--cp-admin-radius-control);
+  cursor: help;
+}
+.admin-tooltip {
+  position: fixed;
+  z-index: var(--cp-admin-z-floating);
+  max-width: min(18rem, calc(100vw - 1.5rem));
+  padding: var(--cp-admin-space-3) var(--cp-admin-space-4);
+  border: 1px solid var(--cp-admin-color-border);
+  border-radius: var(--cp-admin-radius-control);
+  background: var(--cp-admin-color-strong);
+  color: var(--cp-admin-color-text-inverse);
+  box-shadow: var(--cp-admin-shadow-panel);
+  font-family: var(--cp-admin-font-body);
+  font-size: var(--cp-admin-type-small);
+  line-height: var(--cp-admin-leading-ui);
+  pointer-events: auto;
+}

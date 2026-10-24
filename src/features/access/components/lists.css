@@ -1,0 +1,37 @@
+.access-people-list,
+.access-change-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.access-people-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: var(--cp-admin-space-4);
+  border-bottom: 1px solid var(--cp-admin-color-border);
+  gap: var(--cp-admin-space-4);
+}
+
+.access-people-list li > div,
+.access-change-list li {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.access-people-list small,
+.access-change-list span {
+  color: var(--cp-admin-color-text-muted);
+  font-size: var(--cp-admin-type-small);
+}
+
+.access-people-list li > span {
+  font-size: var(--cp-admin-type-label);
+  color: var(--cp-admin-color-success);
+}
+
+.access-change-list li {
+  padding-block: var(--cp-admin-space-3);
+  border-bottom: 1px solid var(--cp-admin-color-border);
+}

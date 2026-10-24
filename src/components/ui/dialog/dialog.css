@@ -1,0 +1,49 @@
+.admin-dialog {
+  padding: 0;
+}
+.admin-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cp-admin-space-4);
+  padding: var(--cp-admin-space-6);
+  border-bottom: 1px solid var(--cp-admin-color-border);
+}
+.admin-dialog-header h2 {
+  font-family: var(--cp-admin-font-heading);
+  font-size: var(--cp-admin-type-section);
+}
+.admin-dialog-close {
+  display: grid;
+  place-items: center;
+  width: var(--cp-admin-control-height);
+  height: var(--cp-admin-control-height);
+  border: 0;
+  border-radius: var(--cp-admin-radius-control);
+  background: transparent;
+  color: var(--cp-admin-color-text-muted);
+}
+.admin-dialog-close:hover {
+  background: var(--cp-admin-color-row-hover);
+}
+.admin-dialog-body {
+  display: grid;
+  gap: var(--cp-admin-space-4);
+  padding: var(--cp-admin-space-6);
+}
+.admin-dialog-body label {
+  display: grid;
+  gap: var(--cp-admin-space-2);
+  font-size: var(--cp-admin-type-small);
+  font-weight: var(--cp-admin-weight-semibold);
+}
+.admin-dialog-body .cp-admin-input {
+  width: 100%;
+}
+.admin-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--cp-admin-space-3);
+  padding: var(--cp-admin-space-4) var(--cp-admin-space-6);
+  border-top: 1px solid var(--cp-admin-color-border);
+}

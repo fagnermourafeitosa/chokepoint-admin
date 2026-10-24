@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router';
 import logo from '../../assets/logo.png';
 import { EnvironmentSelector } from './EnvironmentSelector';
-import type { Environment } from './EnvironmentSelector';
+import type { Environment } from '../../app/context/AdminEnvironmentContext';
 import { PrimaryNavigation } from './PrimaryNavigation';
 import { ProfileMenu } from './ProfileMenu';
 import { WorkspaceSelector } from './WorkspaceSelector';

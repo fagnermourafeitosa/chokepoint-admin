@@ -1,0 +1,93 @@
+.access-agent-rail {
+  overflow: hidden;
+}
+
+.access-agent-search {
+  position: relative;
+  padding: var(--cp-admin-space-4);
+  border-bottom: var(--cp-admin-border-width) solid var(--cp-admin-color-border);
+}
+
+.access-agent-search > svg {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--cp-admin-space-4) + var(--cp-admin-space-3));
+  transform: translateY(-50%);
+  color: var(--cp-admin-color-text-muted);
+  pointer-events: none;
+}
+
+.access-agent-search .cp-admin-input {
+  width: 100%;
+  padding-inline-start: 2.25rem;
+}
+
+.access-agent-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.access-agent-rail-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--cp-admin-space-4) var(--cp-admin-space-4) 0;
+  color: var(--cp-admin-color-text-muted);
+  font-size: var(--cp-admin-type-label);
+  font-weight: var(--cp-admin-weight-bold);
+  letter-spacing: var(--cp-admin-tracking-label);
+  text-transform: uppercase;
+}
+
+.access-agent-count {
+  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--cp-admin-color-border);
+  border-radius: 0.375rem;
+  color: var(--cp-admin-color-text-muted);
+  letter-spacing: normal;
+}
+
+.access-agent-list {
+  padding: var(--cp-admin-space-2);
+}
+
+.access-agent-row {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-admin-space-3);
+  width: 100%;
+  border: 0;
+  border-radius: var(--cp-admin-radius-control);
+  background: transparent;
+  padding: var(--cp-admin-space-3) var(--cp-admin-space-2);
+  text-align: left;
+}
+
+.access-agent-row:hover {
+  background: var(--cp-admin-color-row-hover);
+}
+
+.access-agent-row[aria-pressed='true'] {
+  background: var(--cp-admin-color-row-selected);
+  color: var(--cp-admin-color-accent-text);
+}
+
+.access-agent-row-copy {
+  display: grid;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.access-agent-row-copy strong {
+  font-size: var(--cp-admin-type-small);
+}
+
+.access-agent-row-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--cp-admin-color-text-muted);
+  font-size: var(--cp-admin-type-label);
+}

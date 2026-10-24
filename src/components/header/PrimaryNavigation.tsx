@@ -8,7 +8,7 @@ export function PrimaryNavigation({ items }: PrimaryNavigationProps) {
   return (
     <nav className="cp-admin-topbar-nav admin-primary-nav" aria-label="Primary">
       {items.map(({ path, label }) => (
-        <NavLink key={path} to={path} end>{label}</NavLink>
+        <NavLink key={path} to={path} end={path === '/'}>{label}</NavLink>
       ))}
     </nav>
   );

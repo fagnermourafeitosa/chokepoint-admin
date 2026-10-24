@@ -1,0 +1,28 @@
+.admin-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cp-admin-space-3);
+  min-height: 12rem;
+  padding: var(--cp-admin-space-6);
+  text-align: center;
+}
+.admin-empty-state-icon {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--cp-admin-radius-panel);
+  background: var(--cp-admin-color-accent-soft);
+  color: var(--cp-admin-color-accent-text);
+}
+.admin-empty-state h3 {
+  font-size: var(--cp-admin-type-body);
+  font-weight: var(--cp-admin-weight-bold);
+}
+.admin-empty-state p {
+  max-width: 34ch;
+  font-size: var(--cp-admin-type-small);
+  color: var(--cp-admin-color-text-muted);
+}

@@ -1,0 +1,15 @@
+.access-workbench {
+  display: grid;
+  grid-template-columns: var(--cp-admin-layout-rail) minmax(0, 1fr);
+  gap: var(--cp-admin-layout-gap);
+  align-items: stretch;
+}
+
+.access-agent-rail,
+.access-agent-details {
+  min-height: 30rem;
+}
+
+.access-workbench > * {
+  min-width: 0;
+}

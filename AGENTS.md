@@ -39,20 +39,16 @@ The order is fixed. Every decision belongs to the user: at each one, stop and wa
 
 ```mermaid
 flowchart TD
-    G["/grilling on main<br/>until the user confirms a shared understanding"] --> S["/to-spec on main<br/>no branch for the specification"]
-    S --> A{"User approves<br/>the implementation?"}
+    G["/grilling on main<br/>until shared understanding"] --> S["/to-spec on main"]
+    S --> A{"User approves implementation?"}
     A -- no --> W1["Wait"]
-    A -- yes --> I["Implement with /tdd<br/>on its own branch, created from main"]
+    A -- yes --> I["Implement with /tdd<br/>on a dedicated branch from main"]
     I --> R["Formal Code Reviewer Gate"]
-    R --> C{"User confirms commit,<br/>push and pull request?"}
-    C -- no --> W2["Wait<br/>changes stay on the branch"]
-    C -- yes --> P["Commit, push, open the PR to main<br/>description written with the pr skill"]
-    P --> PR["Review the PR<br/>gh pr view, gh pr diff"]
-    PR --> V{"Relevant issues?"}
-    V -- yes --> Q["Report the findings<br/>ask whether to apply them"]
-    V -- no --> CM{"User confirms<br/>the merge?"}
-    CM -- no --> W3["Wait"]
-    CM -- yes --> M["Merge the PR<br/>gh pr merge --rebase --delete-branch"]
+    R --> C{"User approves the reviewed result?"}
+    C -- no --> W2["Wait with changes on the branch"]
+    C -- yes --> Commit["Commit approved changes"]
+    Commit --> Merge["Merge task branch into local main"]
+    Merge --> Push["Push main to origin"]
 ```
 
 ## Spec-Driven Execution
@@ -132,7 +128,6 @@ For new implementation work:
 3. use `/tdd` during implementation;
 4. use `/golang-best-practices` for Go work;
 5. use `/golang-echo-framework` for Echo framework code;
-6. use `/pr` before merging PRs.
 
 ---
 
@@ -278,7 +273,6 @@ For new implementation work:
 3. use `/tdd` during implementation;
 4. use `/golang-best-practices` for Go work;
 5. use `/golang-echo-framework` for Echo framework code;
-6. use `/pr` before merging PRs.
 
 ---
 
@@ -994,29 +988,26 @@ Specifications are written on `main`, together with their grilling; never create
 
 Markdown-only documentation changes do not require a new branch.
 
-## Commits and Pushes
+## Commits, Merge and Push
 
-Markdown-only changes go straight to `main`: a change that touches only Markdown files (README, `docs/`, `specs/`, `AGENTS.md`) is committed and pushed directly to `main`. NEVER open a pull request for it. A pull request is only for changes that include code, tests or configuration.
+The publication flow is: user approval, commit, merge into local `main`, push `main` to origin. Pull requests are not required. Do not open a pull request unless explicitly requested.
 
-Never commit automatically.
+User approval of the reviewed result authorizes this complete publication sequence; do not ask for separate approval at each step. Respect an explicitly narrower request, such as commit only or no push.
 
-Never push automatically.
+Before approval, keep implementation changes on their dedicated branch. Do not publish unapproved changes.
 
-Do not ask whether to commit after completing implementation.
+After approval:
 
-Leave completed changes in the working branch unless explicitly instructed otherwise.
+1. review and stage only the approved task changes, excluding secrets and unrelated files;
+2. commit the changes on the task branch;
+3. fetch origin and update local `main` without discarding local work;
+4. merge the task branch into `main`, preferring fast-forward when possible;
+5. push `main` to origin without force-pushing;
+6. report the commit and publication result.
 
-Commit only when explicitly requested by the user.
+Resolve routine merge conflicts while preserving both changes. Ask only when a conflict requires a product decision or would discard unrelated work. Never rewrite remote history to complete this flow.
 
-Push only when explicitly requested by the user.
-
-When explicitly instructed to push:
-
-1. push the task branch;
-2. open a pull request to `main`, writing its description with the `pr` skill (`.agents/skills/pr/SKILL.md`);
-3. review the pull request: read it back from GitHub (`gh pr view`, `gh pr diff`), run the Formal Code Reviewer Gate on its diff, and check that the description matches the diff;
-4. if the review finds no relevant issues, report it and ask the user to confirm the merge; only after the user confirms, merge the pull request with `gh pr merge --rebase --delete-branch` and update the local `main`; if a rebase merge is not possible, ask before choosing another merge strategy;
-5. if the review finds issues, do not merge: report them and ask whether they should be applied.
+Markdown-only changes can be committed and pushed directly on `main` under the same user approval, without an implementation branch or pull request.
 
 Before commit:
 
