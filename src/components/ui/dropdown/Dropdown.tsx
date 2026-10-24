@@ -1,14 +1,16 @@
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
+import './dropdown.css';
 
-type HeaderDropdownProps = {
+type DropdownProps = {
   label: string;
   trigger: ReactNode;
   triggerClassName: string;
   children: ReactNode;
+  group?: string;
 };
 
-export function HeaderDropdown({ label, trigger, triggerClassName, children }: HeaderDropdownProps) {
+export function Dropdown({ label, trigger, triggerClassName, children, group }: DropdownProps) {
   const disclosure = useRef<HTMLDetailsElement>(null);
 
   useEffect(() => {
@@ -32,7 +34,7 @@ export function HeaderDropdown({ label, trigger, triggerClassName, children }: H
   }, []);
 
   return (
-    <details ref={disclosure} name="admin-header" className="cp-admin-disclosure admin-header-dropdown">
+    <details ref={disclosure} name={group} className="cp-admin-disclosure admin-dropdown">
       <summary className={triggerClassName} aria-label={label}>{trigger}</summary>
       <div
         className="cp-admin-disclosure-panel admin-dropdown-panel"

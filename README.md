@@ -24,7 +24,7 @@ A local `.env.local` is prepared for this checkout and ignored by Git. For a new
 
 ## Application
 
-The admin shell follows the workbench reference layout. Overview, Access and Investigate have separate routes and entirely empty content areas. Navigation uses React Router and browser history. Workspace and profile controls open design-system dropdowns. The environment selector switches between Sandbox and Production in shell state. Search and audit are absent.
+The admin layout follows the workbench reference layout. Overview, Access and Investigate have separate routes and entirely empty content areas. Navigation uses React Router and browser history. Workspace and profile controls open design-system dropdowns. The environment selector switches between Sandbox and Production in layout state. Search and audit are absent.
 
 ```sh
 npm run dev
@@ -39,8 +39,24 @@ The development server binds to `127.0.0.1:5173`. Production hosting must serve 
 
 The application imports [the admin design system](docs/design-system/README.md), including its local fonts and semantic tokens. The [workbench mock](docs/chokepoint-workbench/README.md) remains a reference and is not modified.
 
+## Source Organization
+
+- `src/app`: application routing and navigation configuration.
+- `src/layouts`: shared page composition and selected environment state.
+- `src/components/header`: header, navigation, workspace/environment selectors and profile menu.
+- `src/components/ui/dropdown`: reusable disclosure behavior and styling, independent of page composition.
+- `src/pages`: separate empty page components.
+- `src/api`: backend HTTP transport and endpoint calls.
+
+## Backend HTTP Client
+
+`src/api/http-client.ts` exposes JSON fetch requests with a hardcoded local-development Bearer token, a ten-second timeout, cancellation and typed HTTP status errors. `src/api/ping.ts` exports `pingBackend()` for GET `/api/v1/ping`; the empty pages do not invoke it automatically.
+
+Run `GOTOOLCHAIN=go1.27.0 go run ./cmd/api` from the backend module. Vite forwards `/api` to `http://127.0.0.1:8081`. Production hosting would need equivalent API routing and real authentication; the fixed token is a development scaffold.
+
 ## Specifications
 
 | ID | Specification | Status |
 | :--- | :--- | :--- |
 | 001 | [Admin Shell](specs/001-2026-10-24-admin-shell.md) | Waiting Approve |
+| 002 | [Development HTTP Client](specs/002-2026-10-24-http-client.md) | Waiting Approve |

@@ -1,12 +1,12 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
-import { AdminShell } from './AdminShell';
+import { AdminLayout } from '../layouts/AdminLayout';
 import { navigation } from './navigation';
 
 export function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<AdminShell />}>
+        <Route element={<AdminLayout />}>
           {navigation.map(({ path, Page }) => (
             <Route key={path} path={path} element={<Page />} />
           ))}

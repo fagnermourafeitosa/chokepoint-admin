@@ -1,0 +1,4 @@
+.admin-layout { min-height: 100dvh; display: flex; flex-direction: column; }
+.admin-page { flex: 1; min-width: 0; }
+.admin-skip-link { position: fixed; inset-block-start: .5rem; inset-inline-start: .5rem; z-index: var(--cp-admin-z-overlay); padding: .75rem; transform: translateY(-200%); background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); }
+.admin-skip-link:focus { transform: translateY(0); }
