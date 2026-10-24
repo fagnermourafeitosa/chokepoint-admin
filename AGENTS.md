@@ -10,6 +10,7 @@ Before UI implementation or review, read [the module design system](docs/design-
 
 ## Language
 
+* Always use ASD-STE100 Simplified Technical English when explaining anything to the user.
 * Always write documentation, instructions, comments, specifications, identifiers, and project artifacts in English.
 * Follow existing domain terminology. Do not invent synonyms for established TrustBridge concepts.
 
