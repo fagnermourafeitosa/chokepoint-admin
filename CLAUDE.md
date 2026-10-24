@@ -1,0 +1,1 @@
+Read `AGENTS.md` at project root.
