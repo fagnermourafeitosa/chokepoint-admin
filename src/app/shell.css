@@ -1,0 +1,43 @@
+.admin-shell { min-height: 100dvh; display: flex; flex-direction: column; }
+.admin-page { flex: 1; min-width: 0; }
+.admin-topbar-inner { gap: 1.125rem; }
+.admin-nav-divider { height: 1.5rem; width: 1px; background: var(--cp-admin-color-border); }
+.admin-workspace { display: flex; align-items: center; gap: .625rem; font-size: var(--cp-admin-type-label); font-weight: 700; white-space: nowrap; }
+.admin-workspace > svg { color: var(--cp-admin-color-text-muted); }
+.admin-workspace-avatar { display: grid; place-items: center; width: 1.6875rem; height: 1.6875rem; border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-strong); color: var(--cp-admin-color-text-inverse); }
+.admin-environment { display: inline-flex; align-items: center; gap: .375rem; padding: .3125rem .5625rem; border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-success-bg); color: var(--cp-admin-color-success); font-size: var(--cp-admin-type-label); font-weight: 700; }
+.admin-primary-nav { display: flex; align-self: stretch; align-items: stretch; gap: .3125rem; margin-inline-start: 1.75rem; }
+.admin-primary-nav a { display: flex; align-items: center; min-height: var(--cp-admin-layout-header-height); padding-inline: 1.0625rem; border-bottom: 2px solid transparent; color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-small); font-weight: 700; text-decoration: none; white-space: nowrap; }
+.admin-primary-nav a:hover { background: var(--cp-admin-color-row-hover); color: var(--cp-admin-color-text); }
+.admin-primary-nav a[aria-current="page"] { color: var(--cp-admin-color-text); }
+.admin-primary-nav a[aria-current="page"] { border-bottom-color: var(--cp-admin-color-accent-text); }
+.admin-nav-actions { display: flex; align-items: center; gap: .8125rem; margin-inline-start: auto; }
+.admin-account { display: grid; place-items: center; width: 2.125rem; height: 2.125rem; border-radius: 50%; background: var(--cp-admin-color-surface-muted); font-size: var(--cp-admin-type-label); font-weight: 800; }
+.admin-footer { width: 100%; }
+.admin-footer-divider { margin-inline: .625rem; }
+.admin-skip-link { position: fixed; inset-block-start: .5rem; inset-inline-start: .5rem; z-index: var(--cp-admin-z-overlay); padding: .75rem; transform: translateY(-200%); background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); }
+.admin-skip-link:focus { transform: translateY(0); }
+@media (max-width: 1290px) { .admin-primary-nav { margin-inline-start: .25rem; } }
+@media (max-width: 1100px) {
+  .admin-topbar-inner { padding-block: .5rem; }
+  .admin-primary-nav { flex-basis: 100%; order: 1; }
+  .admin-primary-nav a { min-height: 2.75rem; }
+}
+@media (max-width: 740px) {
+  .admin-topbar-inner { gap: .625rem; }
+  .admin-nav-divider, .admin-workspace-avatar { display: none; }
+  .admin-workspace { font-size: var(--cp-admin-type-label); }
+  .admin-nav-actions { gap: .3125rem; }
+  .admin-primary-nav a { padding-inline: .875rem; }
+}
+@media (max-width: 420px) { .admin-workspace, .admin-environment { flex: 1 1 auto; } }
+
+.admin-header-dropdown { flex-shrink: 0; }
+.admin-header-dropdown > summary { min-height: var(--cp-admin-control-height); }
+.admin-dropdown-panel { min-width: 13rem; }
+.admin-workspace { border-radius: var(--cp-admin-radius-control); }
+.admin-dropdown-option { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-4); width: 100%; min-height: var(--cp-admin-control-height); padding: var(--cp-admin-space-2); border: 0; border-radius: var(--cp-admin-radius-sm); background: transparent; color: var(--cp-admin-color-text); font-size: var(--cp-admin-type-small); text-align: left; cursor: pointer; }
+.admin-dropdown-option:hover { background: var(--cp-admin-color-row-hover); }
+.admin-dropdown-option[aria-pressed="true"] { background: var(--cp-admin-color-row-selected); }
+.admin-profile { display: grid; gap: var(--cp-admin-space-2); padding: var(--cp-admin-space-3); font-size: var(--cp-admin-type-small); white-space: nowrap; }
+.admin-profile span { color: var(--cp-admin-color-text-muted); }

@@ -22,14 +22,25 @@ npm ci
 
 A local `.env.local` is prepared for this checkout and ignored by Git. For a new checkout, copy `.env.example` to `.env.local`. Environment variables will be added when the relevant integrations are defined. Variables prefixed with `VITE_` are exposed to the browser. Never store secrets in public variables.
 
-## Installed Dependencies
+## Application
 
-React, React DOM, React Router, TanStack Query, React Hook Form, Zod, Lucide, and UI composition helpers. Vite, TypeScript, Tailwind CSS, and the shadcn CLI are local development dependencies.
+The admin shell follows the workbench reference layout. Overview, Access and Investigate have separate routes and entirely empty content areas. Navigation uses React Router and browser history. Workspace and profile controls open design-system dropdowns. The environment selector switches between Sandbox and Production in shell state. Search and audit are absent.
 
-This setup installs dependencies only. Application entrypoints, routes, framework configuration, and UI components will be implemented separately.
+```sh
+npm run dev
+npm run check
+npm run build
+npm run preview
+```
 
-shadcn/ui components are added as project source when needed; installing the local CLI does not generate components. `@hookform/resolvers` is pinned to `5.9.2` because version `6.0.0` currently produces an optional-peer dependency conflict during installation with npm 10.
+The development server binds to `127.0.0.1:5173`. Production hosting must serve `index.html` for application routes such as `/access` and `/investigate`.
 
 ## Design System
 
-See the [module design system](docs/design-system/README.md) for tokens, page composition, reusable CSS, local fonts, and visual specimens.
+The application imports [the admin design system](docs/design-system/README.md), including its local fonts and semantic tokens. The [workbench mock](docs/chokepoint-workbench/README.md) remains a reference and is not modified.
+
+## Specifications
+
+| ID | Specification | Status |
+| :--- | :--- | :--- |
+| 001 | [Admin Shell](specs/001-2026-10-24-admin-shell.md) | Waiting Approve |
