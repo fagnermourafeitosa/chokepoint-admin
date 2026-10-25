@@ -1,53 +1,46 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAccessData } from './useAccessData';
-import type { AgentInput } from '../types';
+import { agentApi, agentKey } from '../agent-api';
+import type { AgentRecord, AgentScope } from '../agent-api';
+import { agentError } from './useAgentForm';
 
-export function useAgentWorkbench() {
-  const data = useAccessData();
+export function useAgentWorkbench(scope: AgentScope) {
+  const data = useAccessData(scope);
+  const client = useQueryClient();
   const [search, setSearch] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [dialog, setDialog] = useState<'new-agent' | 'review' | null>(null);
-  const selectedAgent =
-    data.agents.find((agent) => agent.id === selectedId) ?? data.agents[0] ?? null;
-  const visibleAgents = data.agents.filter((agent) =>
-    `${agent.name} ${agent.description}`.toLowerCase().includes(search.toLowerCase()),
-  );
+  const [dialog, setDialog] = useState<'new-agent' | 'edit-agent' | 'delete-agent' | 'review' | null>(null);
+  const [error, setError] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const alive = useRef(true);
+  const removing = useRef(false);
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
+  const currentId = selectedId ?? data.agents[0]?.id;
+  const details = useQuery({ queryKey: [...agentKey(scope), 'detail', currentId], queryFn: ({ signal }) => agentApi.get(scope, currentId!, signal), enabled: !!currentId, retry: false });
+  const selectedAgent = details.data;
+  const visibleAgents = data.agents.filter(agent => `${agent.name} ${agent.description}`.toLowerCase().includes(search.toLowerCase()));
 
-  function createAgent(input: AgentInput) {
-    setSelectedId(data.createAgent(input));
-    setSearch('');
-    setDialog(null);
+  function persisted(agent: AgentRecord) {
+    if (!alive.current) return;
+    client.setQueryData([...agentKey(scope), 'detail', agent.id], agent);
+    void data.refresh();
   }
-  function applyPreview() {
-    data.applyPreview();
-    setDialog(null);
+  function saved(agent: AgentRecord) {
+    if (!alive.current) return;
+    persisted(agent); setSelectedId(agent.id); setSearch(''); setDialog(null);
   }
-  function openNewAgent() {
-    setDialog('new-agent');
+  async function remove() {
+    if (!selectedAgent || removing.current) return;
+    removing.current = true; setDeleting(true); setError('');
+    try {
+      await agentApi.remove(scope, selectedAgent.id);
+      if (!alive.current) return;
+      client.removeQueries({ queryKey: [...agentKey(scope), 'detail', selectedAgent.id] });
+      client.removeQueries({ queryKey: [...agentKey(scope), 'image', selectedAgent.id] });
+      setSelectedId(null); setDialog(null); await data.refresh();
+    } catch (reason) { if (alive.current) setError(agentError(reason)); }
+    finally { removing.current = false; if (alive.current) setDeleting(false); }
   }
-  function openReview() {
-    setDialog('review');
-  }
-  function toggleSelectedTool(toolId: string) {
-    if (selectedAgent) data.toggleTool(selectedAgent.id, toolId);
-  }
-  function closeDialog() {
-    setDialog(null);
-  }
-
-  return {
-    ...data,
-    search,
-    setSearch,
-    selectedAgent,
-    visibleAgents,
-    selectAgent: setSelectedId,
-    dialog,
-    openNewAgent,
-    openReview,
-    toggleSelectedTool,
-    closeDialog,
-    createAgent,
-    applyPreview,
-  };
+  return { ...data, details, visibleAgents, selectedAgent, search, setSearch, selectAgent: setSelectedId, dialog, setDialog, persisted, saved, remove, error, deleting };
 }

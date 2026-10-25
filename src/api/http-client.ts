@@ -6,6 +6,8 @@ const requestTimeout = 10_000;
 
 type RequestOptions = Omit<RequestInit, "body" | "redirect"> & {
   json?: unknown;
+  form?: FormData;
+  responseType?: "json" | "blob";
 };
 
 export class HttpError extends Error {
@@ -23,9 +25,10 @@ export async function httpClient<T>(
     throw new TypeError("API paths must be relative to /api");
   }
 
-  const { json, signal, ...init } = options;
+  const { json, form, responseType = "json", signal, ...init } = options;
+  if (json !== undefined && form) throw new TypeError("Choose JSON or multipart");
   const headers = new Headers(init.headers);
-  headers.set("Accept", "application/json");
+  headers.set("Accept", responseType === "blob" ? "image/png" : "application/json");
   if (
     !["GET", "HEAD", "OPTIONS"].includes(
       (init.method ?? "GET").toUpperCase(),
@@ -40,7 +43,7 @@ export async function httpClient<T>(
     credentials: "same-origin",
     cache: "no-store",
     headers,
-    body: json === undefined ? undefined : JSON.stringify(json),
+    body: form ?? (json === undefined ? undefined : JSON.stringify(json)),
     redirect: "error",
     signal: signal
       ? AbortSignal.any([signal, AbortSignal.timeout(requestTimeout)])
@@ -51,5 +54,5 @@ export async function httpClient<T>(
     window.dispatchEvent(new Event("auth-expired"));
   if (!response.ok) throw new HttpError(response.status);
   if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
+  return (responseType === "blob" ? response.blob() : response.json()) as Promise<T>;
 }

@@ -1,27 +1,31 @@
 import './agent-details.css';
-import { Layers, Search, Users } from 'lucide-react';
+import { Layers, Search, Users, Pencil, Trash2 } from 'lucide-react';
 import { EmptyState } from '../../../components/ui/empty-state/EmptyState';
 import { useAgentDetails } from '../hooks/useAgentDetails';
 import { AgentPeople } from './AgentPeople';
 import { ToolGroup } from './ToolGroup';
-import type { AgentSummary } from '../types';
+import type { ToolSummary, PersonSummary } from '../types';
+import type { AgentRecord, AgentScope } from '../agent-api';
+import { AgentVisual } from './AgentVisual';
 
 type AgentDetailsProps = {
-  agent: AgentSummary;
-  onToggleTool: (id: string) => void;
+  agent: AgentRecord;
+  scope: AgentScope;
+  onEdit: () => void;
+  onDelete: () => void;
 };
 
-export function AgentDetails({ agent, onToggleTool }: AgentDetailsProps) {
-  const details = useAgentDetails(agent);
+export function AgentDetails({ agent, scope, onEdit, onDelete }: AgentDetailsProps) {
+  const tools: readonly ToolSummary[] = [];
+  const people: readonly PersonSummary[] = [];
+  const details = useAgentDetails({ tools, people });
   return (
     <section className="cp-admin-panel access-agent-details" aria-label="Selected agent">
       <div className="access-agent-heading">
-        <div>
+        <AgentVisual agent={agent} scope={scope} />
+        <div className="agent-detail-copy">
           <div className="access-agent-title">
             <h2>{agent.name}</h2>
-            <span className="access-status" data-status={agent.status}>
-              {agent.status}
-            </span>
           </div>
           <p>{agent.description}</p>
           <div className="access-agent-meta">
@@ -35,6 +39,10 @@ export function AgentDetails({ agent, onToggleTool }: AgentDetailsProps) {
             </span>
           </div>
         </div>
+        <div className="agent-detail-actions">
+          <button className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" type="button" onClick={onEdit}><Pencil size={15} aria-hidden="true" />Edit</button>
+          <button className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" type="button" onClick={onDelete}><Trash2 size={15} aria-hidden="true" />Delete</button>
+        </div>
       </div>
       <div className="access-detail-tabs" role="group" aria-label="Agent details">
         <button
@@ -42,14 +50,14 @@ export function AgentDetails({ agent, onToggleTool }: AgentDetailsProps) {
           aria-pressed={details.tab === 'tools'}
           onClick={() => details.setTab('tools')}
         >
-          Tools <span>{agent.tools.length}</span>
+          Tools <span>{tools.length}</span>
         </button>
         <button
           type="button"
           aria-pressed={details.tab === 'people'}
           onClick={() => details.setTab('people')}
         >
-          People <span>{agent.people.length}</span>
+          People <span>{people.length}</span>
         </button>
       </div>
       <div className="access-detail-content">
@@ -70,17 +78,17 @@ export function AgentDetails({ agent, onToggleTool }: AgentDetailsProps) {
             </div>
             {details.groups.length ? (
               details.groups.map((group) => (
-                <ToolGroup key={group.server} {...group} onToggle={onToggleTool} />
+                <ToolGroup key={group.server} {...group} onToggle={() => {}} />
               ))
             ) : (
               <EmptyState
                 icon={Layers}
-                title={agent.tools.length ? 'No matching tools' : 'No tools associated'}
+                title={tools.length ? 'No matching tools' : 'No tools associated'}
               />
             )}
           </>
         ) : (
-          <AgentPeople people={agent.people} />
+          <AgentPeople people={people} />
         )}
       </div>
     </section>

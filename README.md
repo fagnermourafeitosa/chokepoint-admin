@@ -87,3 +87,14 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 003 | [Access Workbench Layout](specs/003-2026-10-24-access-workbench-layout.md) | Implemented |
 | 004 | [Login and Authorized Workspace Selection](specs/004-2026-10-24-login-and-authorized-workspace-selection.md) | Implemented |
 | 005 | [First Workspace Onboarding](specs/005-2026-10-24-first-workspace-onboarding.md) | Implemented |
+| 006 | [Agent CRUD Integration](specs/006-2026-10-25-agent-crud-integration.md) | Implemented |
+
+## Persistent Agent Management
+
+The Access workbench uses the connected backend 005 API for agent lists, details, creation, editing and permanent deletion. Records belong to the authenticated workspace/environment selection. Query keys include user, workspace and environment; changing scope remounts the workbench, resets forms/selection and cancels private reads through the existing auth context. List filtering applies only to loaded records, and Load more agents requests the next 50 records.
+
+Names allow 1–50 Unicode code points after trimming; descriptions allow up to 200. Any active workspace member can manage agents while roles remain deferred. CRUD saves immediately: it does not pass through the previous local Review changes/Apply preview flow. Tool and people assignments and draft/active lifecycle are not fabricated from agent records.
+
+Create/edit supports a searchable 12-icon Lucide catalog or a small uploaded PNG/JPEG (256 KiB, at most 512×512). The backend re-encodes images as PNG and also limits that saved representation to 256 KiB. Files are sent using the existing authenticated same-origin client with CSRF. Protected image responses are fetched as blobs; temporary URLs are revoked and image caches remain scoped to the current identity/workspace/environment.
+
+For a new agent with an image, creation precedes image upload. If upload fails after creation, the dialog retains the saved identifier and offers Retry save; it reports the partial save and does not repeat POST. Canceling after a partial save leaves the already-created agent available. Returning to a library icon removes the image through backend metadata update/cleanup. Local disk storage, persistent volumes and the later migration debt are owned and documented by the backend.

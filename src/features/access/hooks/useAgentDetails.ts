@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { AgentSummary } from '../types';
 
-export function useAgentDetails(agent: AgentSummary) {
+export function useAgentDetails(agent: Pick<AgentSummary, 'tools' | 'people'>) {
   const [tab, setTab] = useState<'tools' | 'people'>('tools');
   const [search, setSearch] = useState('');
   const visibleTools = agent.tools.filter((tool) =>

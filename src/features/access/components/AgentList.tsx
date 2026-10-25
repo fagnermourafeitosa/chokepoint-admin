@@ -2,10 +2,11 @@ import './agent-list.css';
 import { Bot, Search } from 'lucide-react';
 import { EmptyState } from '../../../components/ui/empty-state/EmptyState';
 import { AgentRow } from './AgentRow';
-import type { AgentSummary } from '../types';
+import type { AgentRecord, AgentScope } from '../agent-api';
 
 type AgentListProps = {
-  agents: readonly AgentSummary[];
+  agents: readonly AgentRecord[];
+  scope: AgentScope;
   total: number;
   search: string;
   onSearch: (value: string) => void;
@@ -15,6 +16,7 @@ type AgentListProps = {
 
 export function AgentList({
   agents,
+  scope,
   total,
   search,
   onSearch,
@@ -34,8 +36,8 @@ export function AgentList({
         <input
           className="cp-admin-input"
           type="search"
-          aria-label="Find agent"
-          placeholder="Find an agent…"
+          aria-label="Filter loaded agents"
+          placeholder="Filter loaded agents…"
           value={search}
           onChange={(event) => onSearch(event.target.value)}
         />
@@ -45,6 +47,7 @@ export function AgentList({
           <AgentRow
             key={agent.id}
             agent={agent}
+            scope={scope}
             selected={selectedId === agent.id}
             onSelect={onSelect}
           />
