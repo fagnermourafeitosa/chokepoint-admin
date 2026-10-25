@@ -1,15 +1,21 @@
-import type { Environment } from '../../app/context/AdminEnvironmentContext';
-import { Check, ChevronDown } from 'lucide-react';
-import { Dropdown } from '../ui/dropdown/Dropdown';
-
-const environments = ['Sandbox', 'Production'] as const;
+import { useAuth } from "../../features/auth/AuthContext";
+import type { Environment } from "../../app/context/AdminEnvironmentContext";
+import { Check, ChevronDown } from "lucide-react";
+import { Dropdown } from "../ui/dropdown/Dropdown";
 
 type EnvironmentSelectorProps = {
   value: Environment;
   onChange: (environment: Environment) => void;
 };
 
-export function EnvironmentSelector({ value, onChange }: EnvironmentSelectorProps) {
+export function EnvironmentSelector({
+  value,
+  onChange,
+}: EnvironmentSelectorProps) {
+  const a = useAuth();
+  const environments = a.environments.map(
+    (e) => (e.name === "sandbox" ? "Sandbox" : "Production") as Environment,
+  );
   return (
     <Dropdown
       group="admin-header"

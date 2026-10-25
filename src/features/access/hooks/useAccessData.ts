@@ -1,11 +1,20 @@
-import { skipToken, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useAdminEnvironment } from '../../../app/context/useAdminEnvironment';
-import type { AccessData, AgentInput } from '../types';
+import { useAuth } from "../../auth/AuthContext";
+import { skipToken, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAdminEnvironment } from "../../../app/context/useAdminEnvironment";
+import type { AccessData, AgentInput } from "../types";
 
 export function useAccessData() {
   const environment = useAdminEnvironment();
   const queryClient = useQueryClient();
-  const queryKey = ['access', 'visual-preview', environment] as const;
+  const auth = useAuth();
+  const queryKey = [
+    "access",
+    "visual-preview",
+    auth.session?.user.id,
+    auth.workspace?.tenant_id,
+    auth.environment?.id,
+    environment,
+  ] as const;
   const { data } = useQuery<AccessData>({
     queryKey,
     queryFn: skipToken,
@@ -16,7 +25,7 @@ export function useAccessData() {
     const agent = {
       ...input,
       id: crypto.randomUUID(),
-      status: 'draft' as const,
+      status: "draft" as const,
       tools: [],
       people: [],
     };
@@ -27,7 +36,7 @@ export function useAccessData() {
         {
           id: agent.id,
           title: `New agent: ${agent.name}`,
-          detail: 'Draft created in the local preview',
+          detail: "Draft created in the local preview",
         },
       ],
     }));
@@ -44,14 +53,19 @@ export function useAccessData() {
             ? {
                 ...agent,
                 tools: agent.tools.map((tool) =>
-                  tool.id === toolId ? { ...tool, enabled: !tool.enabled } : tool,
+                  tool.id === toolId
+                    ? { ...tool, enabled: !tool.enabled }
+                    : tool,
                 ),
               }
             : agent,
         ),
         changes: current.changes.some((change) => change.id === id)
           ? current.changes.filter((change) => change.id !== id)
-          : [...current.changes, { id, title: 'Tool access changed', detail: toolId }],
+          : [
+              ...current.changes,
+              { id, title: "Tool access changed", detail: toolId },
+            ],
       };
     });
   }

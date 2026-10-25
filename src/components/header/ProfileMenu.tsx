@@ -1,10 +1,12 @@
-import { Dropdown } from '../ui/dropdown/Dropdown';
+import { useAuth } from "../../features/auth/AuthContext";
+import { Dropdown } from "../ui/dropdown/Dropdown";
 
 type ProfileMenuProps = {
   email: string;
 };
 
 export function ProfileMenu({ email }: ProfileMenuProps) {
+  const a = useAuth();
   return (
     <Dropdown
       group="admin-header"
@@ -16,6 +18,13 @@ export function ProfileMenu({ email }: ProfileMenuProps) {
         <strong>Account</strong>
         <span>{email}</span>
       </div>
+      <button
+        type="button"
+        className="admin-dropdown-option"
+        onClick={() => void a.logout()}
+      >
+        Sign out
+      </button>
     </Dropdown>
   );
 }

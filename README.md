@@ -24,7 +24,7 @@ A local `.env.local` is prepared for this checkout and ignored by Git. For a new
 
 ## Application
 
-The admin layout follows the workbench reference layout. Overview and Investigate retain empty pages. Access has Permissions, Context sources and Integrations child routes; its production initial collections remain empty. Development and production both start with empty collections. Representative records are confined to test fixtures. Navigation uses React Router and browser history. Workspace and profile controls open design-system dropdowns. The environment selector switches between Sandbox and Production in layout state. Search and audit are absent.
+The admin layout follows the workbench reference layout. Overview and Investigate retain empty pages. Access has Permissions, Context sources and Integrations child routes; its production initial collections remain empty. Development and production both start with empty collections. Representative records are confined to test fixtures. Navigation uses React Router and browser history. Workspace and profile controls show the authenticated identity and authorized backend workspace records. The environment selector uses the selected authorized workspace’s returned Sandbox and Production records. Search and audit are absent.
 
 ```sh
 npm run dev
@@ -50,21 +50,27 @@ The application imports [the admin design system](docs/design-system/README.md),
 - `src/features/access`: Access navigation, page components, agent rail and feature styles.
 - `src/api`: backend HTTP transport and endpoint calls.
 
-## Backend HTTP Client
+## Login and Backend Session
 
-`src/api/http-client.ts` exposes JSON fetch requests with a hardcoded local-development Bearer token, a ten-second timeout, cancellation and typed HTTP status errors. `src/api/ping.ts` exports `pingBackend()` for GET `/api/v1/ping`; the empty pages do not invoke it automatically.
+The admin has /login and /signup entry pages and a protected /onboarding/workspace page. Start local Keycloak/Mailpit from [dev-infra](../dev-infra/idps/keycloak/README.md), apply backend migrations and explicit seeds, start the Go API on 127.0.0.1:8081 and run npm run dev here. Open http://127.0.0.1:5173/login. The public frontend links to these admin destinations; it does not handle credentials.
 
-Run `GOTOOLCHAIN=go1.27.0 go run ./cmd/api` from the backend module. Vite forwards `/api` to `http://127.0.0.1:8081`. Production hosting would need equivalent API routing and real authentication; the fixed token is a development scaffold.
+The browser submits same-origin navigation forms to backend login/signup endpoints. The backend owns the OIDC exchange and HttpOnly cookie session. Keycloak's Chokepoint theme follows this module's fonts, tokens and logo; it processes credentials, verified email and MFA. The admin never sees passwords, provider tokens or session-cookie values. No static Bearer token remains in the client. Authenticated mutations use the in-memory session-bound CSRF token.
+
+Protected routes wait for session and authorized context. The real workspace list comes from active memberships; environments come from the authorized workspace. Multiple workspaces require selection. An enrolled new account can create its first workspace; a seeded no-access account cannot invent membership. Completed onboarding creates Sandbox and Production through the backend's atomic operation. Customer IdP onboarding and agent APIs remain separate scopes.
+
+Private query keys include user, workspace and environment. Switching context cancels/removes scoped data and local preview drafts; logout/expiry clears private state. API 401 returns to login, while service failures show retry. Local logout revokes the backend session; a failed logout hides private UI and does not claim revocation succeeded. There is no login persistence in browser storage.
+
+Production requires a reviewed same-origin admin/API host with TLS, secure cookie deployment and restrictive SPA security headers. Vite's local proxy is not a production deployment. The future local Caddy/mTLS simulator comes from dev-infra/serverhttps and is not configured here.
 
 ## Access Workbench
 
 Open `/access` for Permissions, `/access/context-sources` for Context sources or `/access/integrations` for Integrations. The shared Access navigation supports direct entry, active links and browser history. Permissions uses selectable agent rows, separate detail/tool/people components and reusable brown-icon no-data placeholders. The mock heading and Agents counter are restored. New agent and Review changes open native dialogs; changes affect only the explicitly labeled local preview. The rail People shortcut and Evaluation Lab stay absent. No demonstration records seed the application. The workbench mock remains unchanged.
 
-`npm test` runs eighteen rendered-behavior tests using Vitest and Testing Library with jsdom. Tests cover navigation, direct URLs, placeholders, selection/search, native-dialog lifecycle integration, draft/review changes, environment isolation and existing header controls. Desktop browser verification includes the visual preview at 1440×1000 and 1000×800; no mobile interface testing was performed.
+`npm test` runs twenty-two rendered-behavior tests using Vitest and Testing Library with jsdom. Tests cover navigation, direct URLs, placeholders, selection/search, native-dialog lifecycle integration, draft/review changes, environment isolation and existing header controls. Desktop browser verification includes the visual preview at 1440×1000 and 1000×800; no mobile interface testing was performed.
 
 ## State and Data Organization
 
-Custom hooks are separate from JSX: Access data/cache, selection/search, tool grouping, form handling, shared dropdown/dialog lifecycle and admin layout state each have a dedicated hook file. AppProviders owns the QueryClientProvider with a separate client factory and initialization hook. TanStack Query starts with empty data and holds only explicitly local UI drafts; query keys separate environments and no backend URLs are invented. Production builds do not seed the temporary sample records.
+Custom hooks are separate from JSX: Access data/cache, selection/search, tool grouping, form handling, shared dropdown/dialog lifecycle and admin layout state each have a dedicated hook file. AppProviders owns the QueryClientProvider with a separate client factory and initialization hook. TanStack Query holds session and authorized-context responses plus explicitly local Access drafts. Private Access keys include user, workspace and environment; login does not add real agent endpoints. Production builds do not seed the temporary sample records.
 
 ## MCP Tool Annotations
 
@@ -79,3 +85,5 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 001 | [Admin Shell](specs/001-2026-10-24-admin-shell.md) | Waiting Approve |
 | 002 | [Development HTTP Client](specs/002-2026-10-24-http-client.md) | Waiting Approve |
 | 003 | [Access Workbench Layout](specs/003-2026-10-24-access-workbench-layout.md) | Implemented |
+| 004 | [Login and Authorized Workspace Selection](specs/004-2026-10-24-login-and-authorized-workspace-selection.md) | Implemented |
+| 005 | [First Workspace Onboarding](specs/005-2026-10-24-first-workspace-onboarding.md) | Implemented |
