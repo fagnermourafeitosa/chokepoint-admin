@@ -43,7 +43,7 @@ flowchart TD
     G["/grilling on main<br/>until shared understanding"] --> S["/to-spec on main"]
     S --> A{"User approves implementation?"}
     A -- no --> W1["Wait"]
-    A -- yes --> I["Implement with /tdd<br/>on a dedicated branch from main"]
+    A -- yes --> I["Implement<br/>on a dedicated branch from main"]
     I --> R["Formal Code Reviewer Gate"]
     R --> C{"User approves the reviewed result?"}
     C -- no --> W2["Wait with changes on the branch"]
@@ -126,38 +126,8 @@ For new implementation work:
 
 1. use `/grilling` to challenge and refine the requirements;
 2. use `/to-spec` to create or maintain the specification;
-3. use `/tdd` during implementation;
-4. use `/golang-best-practices` for Go work;
-5. use `/golang-echo-framework` for Echo framework code;
-
----
-
-# TDD
-
-Implementation must follow Red-Green-Refactor.
-
-For a behavioral change:
-
-1. write the failing test;
-2. run it and confirm the expected failure;
-3. implement the minimum code necessary;
-4. run the test and make it pass;
-5. refactor without changing behavior.
-
-Do not modify implementation code before demonstrating the failing behavior when fixing:
-
-* bugs;
-* regressions;
-* edge cases;
-* incorrect behavior.
-
-Tests belong beside the implementation using:
-
-```text
-*_test.go
-```
-
-Do not create a generic repository-level `tests/` directory for ordinary Go package tests.
+3. use `/golang-best-practices` for Go work;
+4. use `/golang-echo-framework` for Echo framework code;
 
 ---
 
@@ -203,16 +173,15 @@ When implementation reaches `Waiting Approve`, report:
 
 * files created or changed;
 * implemented behavior;
-* tests executed;
 * quality checks executed;
 * relevant deviations from the specification.
 
 ### Formal Code Reviewer Gate
 
-Upon completing the implementation of any specification or code modification (with unit tests and quality checks passing), the agent **MUST** execute the formal Code Reviewer stage before requesting approval or awaiting further instructions. The workflow strictly follows these 4 steps:
+Upon completing the implementation of any specification or code modification (with applicable quality checks passing), the agent **MUST** execute the formal Code Reviewer stage before requesting approval or awaiting further instructions. The workflow strictly follows these 4 steps:
 
 1. **Implementation Report**:
-   Objectively report what was built (files created/modified, runtime behavior, and tests executed).
+   Objectively report what was built (files created/modified, runtime behavior, and checks performed).
 
 2. **Explicit Reviewer Role Transition**:
    Formally announce the transition of posture to the user:
@@ -240,7 +209,7 @@ The agent MUST actively counter its internal completion bias by enforcing the fo
 
 1. **Forbid Premature Closure & Approval Pushing**: The agent MUST NEVER push the user to approve a specification, ask "posso aprovar a spec?", or transition a specification to `Implemented` unless the user explicitly directs it. The agent must remain in an analytical, vigilant stance.
 2. **Skeptical Code Audit (Assume Flaws Exist)**: Rather than seeking to prove that the code works, the reviewer must actively search for how the code will break, drift, or silently degrade under stress. Identify edge cases, race conditions, resource leaks, unhandled error paths, and architectural contract violations.
-3. **No Decorative Checklist Stamping**: Checking acceptance criteria checkboxes (`[x]`) must never be a perfunctory act to conclude a turn. Every single criterion must be backed by an active, verified test.
+3. **No Decorative Checklist Stamping**: Checking acceptance criteria checkboxes (`[x]`) must never be a perfunctory act to conclude a turn. Every criterion must be backed by recorded evidence from an applicable build, static check, code inspection or manual browser check.
 4. **Deliberate Pace & Zero Urgency**: Architectural robustness, correctness, and critical scrutiny ALWAYS supersede speed or turn-count efficiency.
 
 #### Pragmatism & Anti-Pedantry Filter (Zero Hypotheticals)
@@ -271,38 +240,8 @@ For new implementation work:
 
 1. use `/grilling` to challenge and refine the requirements;
 2. use `/to-spec` to create or maintain the specification;
-3. use `/tdd` during implementation;
-4. use `/golang-best-practices` for Go work;
-5. use `/golang-echo-framework` for Echo framework code;
-
----
-
-# TDD
-
-Implementation must follow Red-Green-Refactor.
-
-For a behavioral change:
-
-1. write the failing test;
-2. run it and confirm the expected failure;
-3. implement the minimum code necessary;
-4. run the test and make it pass;
-5. refactor without changing behavior.
-
-Do not modify implementation code before demonstrating the failing behavior when fixing:
-
-* bugs;
-* regressions;
-* edge cases;
-* incorrect behavior.
-
-Tests belong beside the implementation using:
-
-```text
-*_test.go
-```
-
-Do not create a generic repository-level `tests/` directory for ordinary Go package tests.
+3. use `/golang-best-practices` for Go work;
+4. use `/golang-echo-framework` for Echo framework code;
 
 ---
 
@@ -348,16 +287,15 @@ When implementation reaches `Waiting Approve`, report:
 
 * files created or changed;
 * implemented behavior;
-* tests executed;
 * quality checks executed;
 * relevant deviations from the specification.
 
 ### Formal Code Reviewer Gate
 
-Upon completing the implementation of any specification or code modification (with unit tests and quality checks passing), the agent **MUST** execute the formal Code Reviewer stage before requesting approval or awaiting further instructions. The workflow strictly follows these 4 steps:
+Upon completing the implementation of any specification or code modification (with applicable quality checks passing), the agent **MUST** execute the formal Code Reviewer stage before requesting approval or awaiting further instructions. The workflow strictly follows these 4 steps:
 
 1. **Implementation Report**:
-   Objectively report what was built (files created/modified, runtime behavior, and tests executed).
+   Objectively report what was built (files created/modified, runtime behavior, and checks performed).
 
 2. **Explicit Reviewer Role Transition**:
    Formally announce the transition of posture to the user:
@@ -385,7 +323,7 @@ The agent MUST actively counter its internal completion bias by enforcing the fo
 
 1. **Forbid Premature Closure & Approval Pushing**: The agent MUST NEVER push the user to approve a specification, ask "posso aprovar a spec?", or transition a specification to `Implemented` unless the user explicitly directs it. The agent must remain in an analytical, vigilant stance.
 2. **Skeptical Code Audit (Assume Flaws Exist)**: Rather than seeking to prove that the code works, the reviewer must actively search for how the code will break, drift, or silently degrade under stress. Identify edge cases, race conditions, resource leaks, unhandled error paths, and architectural contract violations.
-3. **No Decorative Checklist Stamping**: Checking acceptance criteria checkboxes (`[x]`) must never be a perfunctory act to conclude a turn. Every single criterion must be backed by an active, verified test.
+3. **No Decorative Checklist Stamping**: Checking acceptance criteria checkboxes (`[x]`) must never be a perfunctory act to conclude a turn. Every criterion must be backed by recorded evidence from an applicable build, static check, code inspection or manual browser check.
 4. **Deliberate Pace & Zero Urgency**: Architectural robustness, correctness, and critical scrutiny ALWAYS supersede speed or turn-count efficiency.
 
 #### Pragmatism & Anti-Pedantry Filter (Zero Hypotheticals)
@@ -557,7 +495,6 @@ internal/policy/
     evaluator.go
     model.go
     errors.go
-    evaluator_test.go
 ```
 
 Another domain may require additional packages because its complexity actually justifies them.
@@ -607,8 +544,7 @@ Outside explicit architectural boundaries, introduce an interface only when it p
 * dependency inversion across a real boundary;
 * substitution required by the design;
 * multiple implementations;
-* behavior that must be isolated from a consumer;
-* a test seam that represents an actual architectural dependency.
+* behavior that must be isolated from a consumer.
 
 Do not create interfaces only for mocking.
 
@@ -842,44 +778,17 @@ Every goroutine must have:
 
 Prefer simple synchronous code unless concurrency solves a concrete requirement.
 
-Run race detection for concurrency-sensitive changes:
-
-```bash
-go test -race ./...
-```
-
 Follow the `golang-best-practices` skill for Go 1.25 concurrency conventions.
 
 ---
 
-# Testing
+# Testing Policy
 
-Use Go's standard `testing` package as the foundation.
+Do not use TDD in this module. Do not create automated tests, test suites, test fixtures or test infrastructure. Automated tests are not required for implementation, fixes, review or completion in this module.
 
-Existing project dependencies may be used where appropriate:
+Use applicable build, type checking, linting and manual browser checks to validate changes. Report only checks actually performed. Do not introduce test requirements through a skill, specification or review checklist.
 
-* `github.com/stretchr/testify/require`
-* `github.com/stretchr/testify/assert`
-
-Use:
-
-```text
-net/http/httptest
-```
-
-for HTTP tests.
-
-Use table-driven tests and `t.Run` when multiple cases exercise the same behavior.
-
-Avoid excessive mocking.
-
-Prefer small fakes for domain dependencies.
-
-Test the concrete controller client separately as an integration/transport concern.
-
-Use real infrastructure in integration tests when its actual behavior is relevant and practical.
-
-Do not mock internal implementation details.
+This policy applies to this module only. The backend has its own testing requirements.
 
 ---
 
@@ -892,19 +801,12 @@ At minimum:
 ```bash
 gofmt -w .
 go vet ./...
-go test ./...
 ```
 
 When compilation deserves explicit verification:
 
 ```bash
 go build ./...
-```
-
-For concurrency-sensitive code:
-
-```bash
-go test -race ./...
 ```
 
 When dependencies change:
