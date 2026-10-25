@@ -88,6 +88,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 004 | [Login and Authorized Workspace Selection](specs/004-2026-10-24-login-and-authorized-workspace-selection.md) | Implemented |
 | 005 | [First Workspace Onboarding](specs/005-2026-10-24-first-workspace-onboarding.md) | Implemented |
 | 006 | [Agent CRUD Integration](specs/006-2026-10-25-agent-crud-integration.md) | Implemented |
+| 007 | [MCP Server Management and Discovery Preview](specs/007-2026-10-25-mcp-server-management-and-discovery-preview.md) | Implemented |
 
 ## Persistent Agent Management
 
@@ -98,3 +99,13 @@ Names allow 1–50 Unicode code points after trimming; descriptions allow up to 
 Create/edit supports a searchable 12-icon Lucide catalog or a small uploaded PNG/JPEG (256 KiB, at most 512×512). The backend re-encodes images as PNG and also limits that saved representation to 256 KiB. Files are sent using the existing authenticated same-origin client with CSRF. Protected image responses are fetched as blobs; temporary URLs are revoked and image caches remain scoped to the current identity/workspace/environment.
 
 For a new agent with an image, creation precedes image upload. If upload fails after creation, the dialog retains the saved identifier and offers Retry save; it reports the partial save and does not repeat POST. Canceling after a partial save leaves the already-created agent available. Returning to a library icon removes the image through backend metadata update/cleanup. Local disk storage, persistent volumes and the later migration debt are owned and documented by the backend.
+
+## MCP Server Management
+
+Access → Integrations provides the MCP server catalog, friendly names, the default Lucide Server icon, connection/edit forms, backend discovery preview, and disable/re-enable. Identity providers have a separate future destination with no fake CRUD. Context sources retain their existing meaning.
+
+Streamable HTTP supports None or Bearer authentication. stdio is visibly unsupported. The browser uses only the existing same-origin authenticated API; MCP endpoints are contacted by the backend. Saved tokens are never returned or placed in query caches. Private list keys include user, workspace and environment, and forms/requests reset on scope changes. Search filters loaded server pages.
+
+All tools begin checked on initial discovery; users can select all or individual tools before registration. Empty discovery or selection blocks creation. Expandable metadata includes protocol schemas and raw annotations, with existing annotation badges/tooltips. Rediscovery highlights New, Changed and Removed rows; affected contracts have previous/current details. Changed/removed tools remain disabled until reviewed, while missing records are retained. Re-enable requires discovery/review. Disable keeps server and tool records. These are management states, not runtime policy enforcement.
+
+MCP verification: backend unit/race/vet/build checks and admin MCP unit checks (18 tests) plus production build passed. The full admin suite retains ten failures reproduced on the original HEAD; see the current MCP specification for exact evidence. No automated integration suite was run.

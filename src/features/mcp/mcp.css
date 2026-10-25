@@ -1,0 +1,54 @@
+.mcp-registry { display: grid; gap: var(--cp-admin-space-6); }
+.mcp-registry .access-page-heading { margin-bottom: 0; }
+.mcp-registry h1 { letter-spacing: -.03em; }
+.mcp-types { display: flex; flex-wrap: wrap; gap: var(--cp-admin-space-2); border-bottom: 1px solid var(--cp-admin-color-border); padding-bottom: var(--cp-admin-space-4); }
+.mcp-types > button { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); min-height: var(--cp-admin-control-height); border: 0; border-radius: var(--cp-admin-radius-control); padding: var(--cp-admin-space-2) var(--cp-admin-space-4); background: transparent; color: var(--cp-admin-color-text-muted); }
+.mcp-types > button[aria-pressed="true"] { background: var(--cp-admin-color-accent-soft); color: var(--cp-admin-color-accent-text); font-weight: var(--cp-admin-weight-bold); }
+.mcp-types > button:hover { background: var(--cp-admin-color-row-hover); }
+.mcp-toolbar { display: grid; gap: var(--cp-admin-space-2); max-width: 25rem; }
+.mcp-toolbar label { font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); }
+.mcp-servers th { text-align: left; }
+.mcp-server-name { display: flex; gap: var(--cp-admin-space-3); text-align: left; align-items: center; border: 0; background: none; color: inherit; padding: var(--cp-admin-space-2) 0; min-height: var(--cp-admin-control-height); }
+.mcp-server-name > svg { flex-shrink: 0; color: var(--cp-admin-color-accent-text); }
+.mcp-server-name > span { display: grid; gap: var(--cp-admin-space-1); }
+.mcp-server-name small { display: block; color: var(--cp-admin-color-text-muted); overflow-wrap: anywhere; max-width: 30rem; }
+.mcp-row-actions { white-space: nowrap; }
+.mcp-row-actions .cp-admin-button { margin: var(--cp-admin-space-1); }
+.mcp-badge { display: inline-flex; align-items: center; font-size: var(--cp-admin-type-label); line-height: 1.5; font-weight: var(--cp-admin-weight-semibold); padding: var(--cp-admin-space-1) var(--cp-admin-space-2); border-radius: var(--cp-admin-radius-sm); background: var(--cp-admin-color-surface-muted); color: var(--cp-admin-color-text-muted); }
+.mcp-badge[data-tone="success"] { background: var(--cp-admin-color-success-bg); color: var(--cp-admin-color-success); }
+.mcp-badge[data-tone="warning"] { background: var(--cp-admin-color-warning-bg); color: var(--cp-admin-color-warning); }
+.mcp-badge[data-tone="danger"] { background: var(--cp-admin-color-danger-bg); color: var(--cp-admin-color-danger); }
+.mcp-details { background: var(--cp-admin-color-surface); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-panel); padding: var(--cp-admin-space-6); }
+.mcp-details-heading, .mcp-preview-summary { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-4); }
+.mcp-details-heading { margin-bottom: var(--cp-admin-space-6); }
+.mcp-details h2 { font-family: var(--cp-admin-font-heading); font-size: var(--cp-admin-type-section); }
+.mcp-tool-list { display: grid; }
+.mcp-tool-row { padding: var(--cp-admin-space-5) var(--cp-admin-space-4); border-bottom: 1px solid var(--cp-admin-color-border); display: grid; gap: var(--cp-admin-space-3); min-width: 0; }
+.mcp-tool-row[data-change="new"], .mcp-tool-row[data-change="changed"] { background: var(--cp-admin-color-warning-bg); }
+.mcp-tool-row[data-change="removed"] { background: var(--cp-admin-color-danger-bg); }
+.mcp-tool-heading { display: flex; align-items: center; gap: var(--cp-admin-space-3); flex-wrap: wrap; }
+.mcp-tool-select input, .mcp-select-all > input { width: var(--cp-admin-choice-size); height: var(--cp-admin-choice-size); accent-color: var(--cp-admin-color-accent-text); flex-shrink: 0; }
+.mcp-tool-copy { display: grid; gap: var(--cp-admin-space-1); flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.mcp-tool-copy code { font-size: var(--cp-admin-type-label); }
+.mcp-tool-row > p { max-width: 70ch; overflow-wrap: anywhere; }
+.mcp-contract { min-width: 0; margin-top: var(--cp-admin-space-2); }
+.mcp-contract summary { cursor: pointer; min-height: var(--cp-admin-control-height); display: list-item; align-content: center; color: var(--cp-admin-color-accent-text); font-size: var(--cp-admin-type-small); }
+.mcp-contract pre { overflow: auto; max-height: 20rem; padding: var(--cp-admin-space-4); background: var(--cp-admin-color-surface-muted); border-radius: var(--cp-admin-radius-control); color: var(--cp-admin-color-text); font-size: var(--cp-admin-type-label); }
+.mcp-contract h4 { margin-block: var(--cp-admin-space-3); }
+.mcp-dialog { width: min(var(--cp-admin-layout-dialog-wide), calc(100vw - 2rem)); max-width: var(--cp-admin-layout-dialog-wide); max-height: calc(100dvh - 2rem); }
+.admin-dialog-body .mcp-select-all { display: flex; align-items: center; gap: var(--cp-admin-space-3); min-height: var(--cp-admin-control-height); }
+.mcp-dialog .admin-dialog-actions { position: sticky; bottom: 0; background: var(--cp-admin-color-surface); }
+.mcp-dialog .mcp-tool-list { border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); overflow: clip; }
+.mcp-footnote { font-size: var(--cp-admin-type-small); }
+@media (max-width: 740px) { .mcp-details-heading { align-items: flex-start; flex-direction: column; } .mcp-details { padding: var(--cp-admin-space-4); } .mcp-types > button { padding-inline: var(--cp-admin-space-2); } }
+@media (pointer: coarse) { .mcp-contract summary, .mcp-types > button, .mcp-server-name { min-height: var(--cp-admin-touch-height); } }
+.mcp-servers { min-width: 52rem; }
+.mcp-servers td:first-child { min-width: 16rem; }
+@media (max-width: 740px) {
+  .mcp-registry .access-page-heading { flex-direction: column; align-items: flex-start; gap: var(--cp-admin-space-4); }
+  .mcp-registry .access-page-heading > button { white-space: nowrap; }
+}
+.mcp-dialog { inset-block-start: 1rem; inset-block-end: auto; margin-block: 0; }
+
+.mcp-tool-select { display: grid; place-items: center; min-width: var(--cp-admin-control-height); min-height: var(--cp-admin-control-height); }
+@media (pointer: coarse) { .mcp-tool-select { min-width: var(--cp-admin-touch-height); min-height: var(--cp-admin-touch-height); } }

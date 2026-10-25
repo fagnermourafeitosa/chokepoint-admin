@@ -1,10 +1,8 @@
-import { Plug } from 'lucide-react';
-import { EmptyState } from '../../../components/ui/empty-state/EmptyState';
-
+import { useAuth } from '../../auth/AuthContext';
+import { MCPRegistry } from '../../mcp/MCPRegistry';
 export function IntegrationsPage() {
-  return (
-    <section aria-label="Integrations">
-      <EmptyState icon={Plug} title="No integrations yet" />
-    </section>
-  );
+ const auth = useAuth();
+ if (!auth.session || !auth.workspace || !auth.environment) return <p role="status">Select a workspace and environment.</p>;
+ const scope = { userId: auth.session.user.id, tenantId: auth.workspace.tenant_id, environmentId: auth.environment.id };
+ return <MCPRegistry key={`${scope.userId}:${scope.tenantId}:${scope.environmentId}`} scope={scope} />;
 }
