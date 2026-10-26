@@ -1,19 +1,23 @@
-import { useState } from 'react';
+import { useSearchParams } from 'react-router';
+import { IdentityRegistry } from '../identity/IdentityRegistry';
 import { Plus, Server, Users, RefreshCw, Pause } from 'lucide-react';
 import { EmptyState } from '../../components/ui/empty-state/EmptyState';
 import { MCPDialog } from './MCPDialog';
 import { ToolRows } from './ToolRows';
 import { useMCPRegistry } from './useMCPRegistry';
-import type { AgentScope } from '../access/agent-api';
+import type { EnvironmentScope } from '../access/environment-scope';
 import './mcp.css';
-export function MCPRegistry({ scope }: { scope: AgentScope }) {
+export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
  const registry = useMCPRegistry(scope);
- const [kind, setKind] = useState('mcp');
+ const [params, setParams] = useSearchParams();
+ const kind = params.get('type') === 'identity' ? 'idp' : 'mcp';
+ const setKind = (next: string) => setParams(next === 'idp' ? { type: 'identity' } : {});
  const server = registry.selected;
+ if (kind === 'idp') return <IdentityRegistry scope={scope} onMCP={() => setKind('mcp')} />;
  return <section aria-label="Integrations" className="mcp-registry">
   <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect services and review the tools available in this environment.</p></div>{kind === 'mcp' ? <button className="cp-admin-button" onClick={() => registry.setDialog('new')}><Plus size={16} />Connect MCP server</button> : null}</header>
-  <div className="mcp-types" role="group" aria-label="Integration type"><button aria-pressed={kind === 'mcp'} onClick={() => setKind('mcp')}><Server size={17} />MCP servers</button><button aria-pressed={kind === 'idp'} onClick={() => setKind('idp')}><Users size={17} />Identity providers<span className="mcp-badge">Coming later</span></button></div>
-  {kind === 'idp' ? <EmptyState icon={Users} title="Identity providers" description="Identity provider registration is not available yet." /> : <>
+  <div className="mcp-types" role="group" aria-label="Integration type"><button aria-pressed={kind === 'mcp'} onClick={() => setKind('mcp')}><Server size={17} />MCP servers</button><button aria-pressed={false} onClick={() => setKind('idp')}><Users size={17} />Identity providers</button></div>
+  {<>
    <div className="mcp-toolbar"><label htmlFor="mcp-search">Find a server</label><input id="mcp-search" type="search" className="cp-admin-input" placeholder="Search by name or endpoint" value={registry.search} onChange={e => registry.setSearch(e.target.value)} /></div>
    {registry.error ? <p role="alert" className="cp-admin-notice" data-tone="danger">{registry.error}</p> : null}
    {registry.isPending ? <p role="status">Loading MCP servers…</p> : registry.isError ? <div role="alert" className="cp-admin-notice">Could not load MCP servers. <button className="cp-admin-button cp-admin-button--ghost" onClick={() => void registry.refetch()}>Retry</button></div> : registry.servers.length ? <div className="cp-admin-table-scroll" role="region" aria-label="MCP servers table" tabIndex={0}><table className="cp-admin-table mcp-servers"><thead><tr><th>Server</th><th>Managed tools</th><th>Status</th><th>Actions</th></tr></thead><tbody>{registry.servers.map(item => <tr key={item.id} aria-selected={server?.id === item.id}>

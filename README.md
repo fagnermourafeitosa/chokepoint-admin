@@ -89,9 +89,9 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 005 | [First Workspace Onboarding](specs/005-2026-10-24-first-workspace-onboarding.md) | Implemented |
 | 006 | [Agent CRUD Integration](specs/006-2026-10-25-agent-crud-integration.md) | Implemented |
 | 007 | [MCP Server Management and Discovery Preview](specs/007-2026-10-25-mcp-server-management-and-discovery-preview.md) | Implemented |
-| 008 | [Customer OIDC Connection Management](specs/008-2026-10-25-customer-oidc-connection-management.md) | Waiting Approve |
+| 008 | [Customer OIDC Connection Management](specs/008-2026-10-25-customer-oidc-connection-management.md) | Implemented |
 
-The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Waiting Approve). Both contracts have implementations on the task branches and remain Waiting Approve. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
+The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 
 ## Persistent Agent Management
 
@@ -117,12 +117,12 @@ MCP verification: backend unit/race/vet/build checks and admin MCP unit checks (
 
 ## Customer OIDC Identity Connections
 
-This section describes the implementation on the task branches. The approved documentation-only publication does not add these source files to main. AuthZEN SARC is the PEP/PDP evaluation contract; COAZ-MCP mapping and the PDP call are still unwired.
+This section describes the implemented scope approved for publication to main. AuthZEN SARC is the PEP/PDP evaluation contract; COAZ-MCP mapping and the PDP call are still unwired.
 
-Customer IdPs are managed in Access → Integrations → Identity providers, per workspace/environment. Multiple distinct issuers are supported; Keycloak uses generic OIDC. The form configures name, exact issuer, accepted audiences, optional groups claim and enabled state. A configuration check verifies issuer metadata/public keys, not a complete user authentication flow. CRUD uses the existing administrative session, membership and CSRF protections. These changes are waiting for review/approval, not published.
+Customer IdPs are managed in Access → Integrations → Identity providers, per workspace/environment. Multiple distinct issuers are supported; Keycloak uses generic OIDC. The form configures name, exact issuer, accepted audiences, optional groups claim and enabled state. A configuration check verifies issuer metadata/public keys, not a complete user authentication flow. CRUD uses the existing administrative session, membership and CSRF protections. The user approved publication of these changes to main.
 
 Incoming MCP tool calls use signed JWT access tokens and separate header-aware/legacy decoders. Opaque-token introspection, ID-JAG and Token Exchange have named code boundaries that return not-implemented errors. Runtime validation alone cannot execute a tool: the current endpoint blocks with 501 until permission evaluation is provided. Agents remain reusable permission groups in the existing CRUD, not required identities in the incoming request.
 
 ### Documentation ownership and delivery status
 
-Stable decisions are maintained in [Backend Architecture](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress). [Admin 008](specs/008-2026-10-25-customer-oidc-connection-management.md) records the implemented management contract and UI checks; [Backend 007](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) records runtime validation and its tests. Both are Waiting Approve. The interface and validation code are implemented; policy evaluation and tool forwarding remain unavailable.
+Stable decisions are maintained in [Backend Architecture](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress). [Admin 008](specs/008-2026-10-25-customer-oidc-connection-management.md) records the implemented management contract and UI checks; [Backend 007](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) records runtime validation and its tests. Both are marked Implemented following user approval. The interface and validation code are implemented; policy evaluation and tool forwarding remain unavailable.

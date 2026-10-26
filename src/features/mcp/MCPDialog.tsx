@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { useDialog } from '../../components/ui/dialog/useDialog';
-import type { AgentScope } from '../access/agent-api';
+import type { EnvironmentScope } from '../access/environment-scope';
 import type { MCPServer } from './api';
 import { useMCPForm } from './useMCPForm';
 import { ToolRows } from './ToolRows';
 import '../../components/ui/dialog/dialog.css';
-export function MCPDialog({ scope, server, onClose, onRefresh, onSaved }: { scope: AgentScope; server?: MCPServer; onClose: () => void; onRefresh: () => void; onSaved: (server: MCPServer) => void }) {
+export function MCPDialog({ scope, server, onClose, onRefresh, onSaved }: { scope: EnvironmentScope; server?: MCPServer; onClose: () => void; onRefresh: () => void; onSaved: (server: MCPServer) => void }) {
  const { ref, titleId } = useDialog();
  const form = useMCPForm(scope, server, onRefresh, onSaved);
  const available = form.preview?.tools.filter(tool => tool.change !== 'removed') ?? [];

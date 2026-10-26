@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { mcpApi, mcpError, mcpKey } from './api';
 import type { MCPServer } from './api';
-import type { AgentScope } from '../access/agent-api';
-export function useMCPRegistry(scope: AgentScope) {
+import type { EnvironmentScope } from '../access/environment-scope';
+export function useMCPRegistry(scope: EnvironmentScope) {
  const client = useQueryClient();
  const query = useInfiniteQuery({ queryKey: mcpKey(scope), initialPageParam: 0, queryFn: ({pageParam, signal}) => mcpApi.list(scope, pageParam, signal), getNextPageParam: last => last.next_offset ?? undefined });
  const [dialog, setDialog] = useState<MCPServer | 'new' | null>(null);

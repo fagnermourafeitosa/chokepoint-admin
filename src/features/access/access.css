@@ -13,3 +13,6 @@
 .access-workbench > * {
   min-width: 0;
 }
+
+.access-page-heading{display:flex;align-items:center;justify-content:space-between;gap:var(--cp-admin-space-6);margin-block-end:var(--cp-admin-space-6)}
+@media(max-width:740px){.access-page-heading{align-items:flex-start;flex-direction:column;gap:var(--cp-admin-space-4)}}

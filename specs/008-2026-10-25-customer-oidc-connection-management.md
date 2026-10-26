@@ -3,7 +3,7 @@
 - **Specification ID**: 008
 - **Date**: 2026-10-25
 - **Slug**: customer-oidc-connection-management
-- **Status**: Waiting Approve
+- **Status**: Implemented
 - **Owner**: Admin and Backend; canonical management contract in Admin
 - **Related Specification**: [Backend 007 — MCP Request and Identity Validation](../../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md)
 - **Related Specifications**: [007 — MCP Server Management](007-2026-10-25-mcp-server-management-and-discovery-preview.md), [004 — Platform Login](004-2026-10-24-login-and-authorized-workspace-selection.md), [Backend 002 — Tenant Isolation](../../backend/specs/002-2026-10-24-postgres-migrations-and-tenant-isolation.md)
@@ -207,3 +207,7 @@ The user authorized both runtime review adjustments. Backend 007 now distinguish
 The user approved committing, merging and publishing the specifications first. This approval includes their README indexes and the durable architecture decisions. Implementation source, tests and migrations remain on the task branches and are excluded from this publication. Waiting Approve continues to describe the implementation lifecycle; it does not mean specification publication is unapproved.
 
 The latest clarification makes AuthZEN SARC the standard PEP/PDP evaluation contract and COAZ-MCP its mapping. Current Go identity/operation types are validation helpers only. The standard mapping and PDP communication are not implemented by this documentation publication.
+
+## Implementation Publication Approval — 2026-10-26
+
+After the documentation-only publication, the user explicitly directed all task changes to main. This approves the reviewed implementation and its two corrected findings, plus commit, merge and push in both modules. Status changes to Implemented for this specification's declared scope. AuthZEN projection/PDP communication, full MCP handshake/session support and tool execution remain outside this implementation; future identity capabilities still return not-implemented errors.
