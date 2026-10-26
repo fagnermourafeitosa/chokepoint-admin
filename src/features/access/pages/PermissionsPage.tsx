@@ -1,6 +1,4 @@
 import { Bot } from 'lucide-react';
-import { AccessActions } from '../components/AccessActions';
-import { ReviewChangesDialog } from '../components/ReviewChangesDialog';
 import { useAuth } from '../../auth/AuthContext';
 import { EmptyState } from '../../../components/ui/empty-state/EmptyState';
 import { Dialog } from '../../../components/ui/dialog/Dialog';
@@ -20,8 +18,8 @@ function AgentWorkbench({ scope }: { scope: AgentScope }) {
   const workbench = useAgentWorkbench(scope);
   return <section aria-label="Permissions">
     <div className="access-page-heading">
-      <div><span className="cp-admin-label">ACCESS WORKBENCH</span><h1 className="cp-admin-title">Configure. Teste. Publique.</h1></div>
-      <AccessActions onNewAgent={() => workbench.setDialog('new-agent')} onReview={() => workbench.setDialog('review')} changeCount={0} />
+      <div><span className="cp-admin-label">ACCESS WORKBENCH</span><h1 className="cp-admin-title">Configure user permissions</h1><p className="cp-admin-muted">Associate users with permission groups, grant server/tool access and apply fine-grained policies.</p></div>
+      <button className="cp-admin-button" onClick={() => workbench.setDialog('new-agent')}>New agent</button>
     </div>
     {workbench.isPending ? <p role="status" className="agent-inline-status">Loading agents…</p> : workbench.isError ? <div className="agent-inline-status" role="alert">Could not load agents in this environment. <button className="cp-admin-button cp-admin-button--ghost" onClick={() => void workbench.refetch()}>Retry</button></div> : <div className="access-workbench">
       <div>
@@ -34,9 +32,8 @@ function AgentWorkbench({ scope }: { scope: AgentScope }) {
     </div>}
     {workbench.isFetchNextPageError ? <p role="alert">Could not load the next page. Use Load more agents to retry.</p> : null}
     {workbench.dialog === 'new-agent' || workbench.dialog === 'edit-agent' && workbench.selectedAgent ? <NewAgentDialog key={workbench.dialog === 'new-agent' ? 'new' : workbench.selectedAgent!.id} scope={scope} agent={workbench.dialog === 'edit-agent' ? workbench.selectedAgent : undefined} onClose={() => workbench.setDialog(null)} onPersisted={workbench.persisted} onSaved={workbench.saved} /> : null}
-    {workbench.dialog === 'review' ? <ReviewChangesDialog changes={[]} onClose={() => workbench.setDialog(null)} onApply={() => workbench.setDialog(null)} /> : null}
     {workbench.dialog === 'delete-agent' && workbench.selectedAgent ? <Dialog title="Delete agent" onClose={() => { if (!workbench.deleting) workbench.setDialog(null); }}>
-      <div className="admin-dialog-body"><p>Delete “{workbench.selectedAgent.name}”? This permanently removes the agent and its image.</p>{workbench.error ? <p role="alert">{workbench.error}</p> : null}</div>
+      <div className="admin-dialog-body"><p>Delete “{workbench.selectedAgent.name}”? This permanently removes the grouping, its image, user associations, published permissions and saved permission draft.</p>{workbench.error ? <p role="alert">{workbench.error}</p> : null}</div>
       <div className="admin-dialog-actions"><button className="cp-admin-button cp-admin-button--secondary" disabled={workbench.deleting} onClick={() => workbench.setDialog(null)}>Cancel</button><button className="cp-admin-button cp-admin-button--danger" disabled={workbench.deleting} onClick={() => void workbench.remove()}>{workbench.deleting ? 'Deleting…' : 'Delete agent'}</button></div>
     </Dialog> : null}
   </section>;

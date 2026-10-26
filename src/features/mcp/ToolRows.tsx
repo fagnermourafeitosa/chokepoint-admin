@@ -1,13 +1,15 @@
 import { ToolAnnotations } from '../access/components/ToolAnnotations';
+import { sourceLabel } from "./mapping-fields";
 import type { ManagedTool } from './api';
 const labels = { new: 'New', changed: 'Changed', removed: 'Removed', unchanged: '' };
-export function ToolRows({ tools, selected, onToggle, disabled, serverEnabled = true }: { tools: ManagedTool[]; selected?: string[]; onToggle?: (name: string) => void; disabled?: boolean; serverEnabled?: boolean }) {
+export function ToolRows({ tools, selected, onToggle, disabled, serverEnabled = true, onMapping }: { tools: ManagedTool[]; selected?: string[]; onToggle?: (name: string) => void; disabled?: boolean; serverEnabled?: boolean; onMapping?: (tool: ManagedTool) => void }) {
  return <div className="mcp-tool-list">{tools.map(tool => <article key={tool.name} className="mcp-tool-row" data-change={tool.change}>
   <div className="mcp-tool-heading">
    {onToggle ? <label className="mcp-tool-select"><input type="checkbox" aria-label={`Manage ${tool.name}`} checked={selected?.includes(tool.name) ?? false} disabled={disabled || tool.change === 'removed'} onChange={() => onToggle(tool.name)} /></label> : null}
    <div className="mcp-tool-copy"><strong>{tool.contract.title || tool.name}</strong><code>{tool.name}</code></div>
    {tool.change !== 'unchanged' ? <span className="mcp-badge" data-tone={tool.change === 'removed' ? 'danger' : 'warning'}>{labels[tool.change]}</span> : null}
    {!onToggle ? <span className="mcp-badge">{serverEnabled && tool.enabled ? 'Enabled' : 'Disabled'}</span> : null}
+   {!onToggle && onMapping && tool.change !== 'removed' ? <div className="mapping-tool-action"><span className="mcp-badge">{sourceLabel(tool.local_mapping ? 'local' : typeof tool.contract.inputSchema === 'object' && tool.contract.inputSchema !== null && 'x-authzen-mapping' in tool.contract.inputSchema ? 'server' : 'default')}{tool.mapping_draft ? ' · Draft' : ''}</span><button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => onMapping(tool)}>Configure mapping</button></div> : null}
   </div>
   {tool.contract.description ? <p>{tool.contract.description}</p> : null}
   <ToolAnnotations annotations={tool.contract.annotations} />

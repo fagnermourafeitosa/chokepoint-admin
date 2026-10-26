@@ -64,7 +64,7 @@ Production requires a reviewed same-origin admin/API host with TLS, secure cooki
 
 ## Access Workbench
 
-Open `/access` for Permissions, `/access/context-sources` for Context sources or `/access/integrations` for Integrations. The shared Access navigation supports direct entry, active links and browser history. Permissions uses selectable agent rows, separate detail/tool/people components and reusable brown-icon no-data placeholders. The mock heading and Agents counter are restored. New agent and Review changes open native dialogs; changes affect only the explicitly labeled local preview. The rail People shortcut and Evaluation Lab stay absent. No demonstration records seed the application. The workbench mock remains unchanged.
+Open `/access` for Permissions, `/access/context-sources` for Context sources or `/access/integrations` for Integrations. Shared navigation supports direct entry, active links and browser history. Permissions uses the existing Agent rail and backend-connected people, server/tool and fine-grained policy editors. New Agent edits metadata; the selected grouping's permission editor saves an inactive draft and offers separate review/publication, discard and published-access revocation. The workbench mock remains unchanged; no demonstration records seed the application.
 
 `npm test` runs twenty-two rendered-behavior tests using Vitest and Testing Library with jsdom. Tests cover navigation, direct URLs, placeholders, selection/search, native-dialog lifecycle integration, draft/review changes, environment isolation and existing header controls. Desktop browser verification includes the visual preview at 1440×1000 and 1000×800; no mobile interface testing was performed.
 
@@ -90,6 +90,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 006 | [Agent CRUD Integration](specs/006-2026-10-25-agent-crud-integration.md) | Implemented |
 | 007 | [MCP Server Management and Discovery Preview](specs/007-2026-10-25-mcp-server-management-and-discovery-preview.md) | Implemented |
 | 008 | [Customer OIDC Connection Management](specs/008-2026-10-25-customer-oidc-connection-management.md) | Implemented |
+| 009 | [Authorization Management Workbench](specs/009-2026-10-26-authorization-management-workbench.md) | Implemented |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 
@@ -125,4 +126,32 @@ Incoming MCP tool calls use signed JWT access tokens and separate header-aware/l
 
 ### Documentation ownership and delivery status
 
-Stable decisions are maintained in [Backend Architecture](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress). [Admin 008](specs/008-2026-10-25-customer-oidc-connection-management.md) records the implemented management contract and UI checks; [Backend 007](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) records runtime validation and its tests. Both are marked Implemented following user approval. The interface and validation code are implemented; policy evaluation and tool forwarding remain unavailable.
+Stable decisions are maintained in [Backend Architecture](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress). Admin 008 and Backend 007 record the previously approved identity scope. Task-branch additions under Backend 008–011 now include COAZ projection, PIP enrichment, PAP permission management, fine-grained PDP decisions and authorized tool forwarding. They do not add a complete inbound MCP session proxy or public AuthZEN HTTP endpoint.
+
+
+## COAZ-MCP Mapping Management
+
+MCP server tool details show default/server/local mapping origin and open a field or JSON/CEL editor. The backend compiles and projects example arguments/claims; the UI never evaluates a second CEL implementation. Save creates an inactive draft, review approves a version and removal explicitly compares the next effective mapping. Discarding a draft leaves active configuration unchanged. Revision conflicts require a reload; scope changes abort requests. The same authenticated HTTP client, CSRF and private query scope are retained.
+
+Mapping and source previews were accepted before implementation. The user subsequently waived policy previews and directed immediate implementation. Type checks, production builds and manual local-backend browser checks cover these slices; no automated Admin tests were added or run. Backend 008 owns mapping API and runtime limits; Backend 009–011 own sources, policies and execution.
+
+
+## Trusted API Sources (Backend 009 / Admin 009)
+
+`/access/context-sources` manages workspace/environment-scoped API connections and attribute bindings. Credentials are write-only and remain in the backend. Source configuration is reviewed before saving; changed source settings invalidate existing binding approvals.
+
+Bindings can be configured as GET operations manually or proposed by importing OpenAPI 3 JSON/YAML (up to 1 MiB). Import follows local references only and never calls imported servers. The initial profile supports scalar path/query parameters, typed JSON response selection, bearer/API-key/no authentication, 100–3000 ms timeouts and TTL 0–300 seconds. Unsupported operations are reported; OpenAPI import is not a general API execution client.
+
+Drafts, approved bindings, sample extraction and activation review are separate. Binding retirement loads and displays published policy dependencies before confirmation. Sample extraction makes no API call or authorization decision. Runtime source failures stop dependent evaluations before the PDP, following the Cerbos Synapse enrichment reference. Backend 010 requires declared binding dependencies at evaluation; retiring a required binding blocks its policies.
+
+## Permission and Fine-grained Policy CRUD (Backend 010 / Admin 009)
+
+Each existing Agent is a permission grouping. Its editor associates exact issuer/subject users, enables explicit server access, selects individual qualified tools and creates/edits/removes named CEL restrictions. Server access alone grants no tools. Every applicable condition must pass, even when another grouping supplies a positive grant. The PDP defaults deny without explicit permission.
+
+The CEL editor exposes AuthZEN subject/action/resource/context and original arguments under `context.chokepoint.arguments`. It can insert typed PIP attributes and marks their bindings as required. Boolean compilation and publication dependency checks run in the backend. User/source catalogs are real scoped API results; there is no seeded directory or browser policy evaluator.
+
+The backend applies CEL's standard JSON numeric mapping: numbers are `double`. CEL integer-only operations require explicit conversion, for example `int(value) % 100 == 0`; mixed arithmetic is not promoted automatically.
+
+Nested changes use a revisioned draft under the selected Agent's permissions resource. Save draft is inactive; Review & publish shows current and proposed definitions. Revocation preserves an independent draft. Stale revisions return a reload conflict. Scope/group changes unmount the editor and abort requests. All private query keys include user/workspace/environment.
+
+No automated Admin tests were added or run. Use type checking, production build and manual browser checks for this slice. Its formal review and result approval are still pending.

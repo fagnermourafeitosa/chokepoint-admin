@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { ToolMappingManager } from './ToolMappingManager';
 import { useSearchParams } from 'react-router';
 import { IdentityRegistry } from '../identity/IdentityRegistry';
 import { Plus, Server, Users, RefreshCw, Pause } from 'lucide-react';
@@ -9,10 +11,12 @@ import type { EnvironmentScope } from '../access/environment-scope';
 import './mcp.css';
 export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
  const registry = useMCPRegistry(scope);
+ const [mapping, setMapping] = useState<{ serverId: string; serverName: string; toolName: string }>();
  const [params, setParams] = useSearchParams();
  const kind = params.get('type') === 'identity' ? 'idp' : 'mcp';
  const setKind = (next: string) => setParams(next === 'idp' ? { type: 'identity' } : {});
  const server = registry.selected;
+ if (mapping && kind !== 'idp') return <ToolMappingManager key={`${scope.userId}:${scope.tenantId}:${scope.environmentId}:${mapping.serverId}:${mapping.toolName}`} scope={scope} {...mapping} onClose={() => setMapping(undefined)} />;
  if (kind === 'idp') return <IdentityRegistry scope={scope} onMCP={() => setKind('mcp')} />;
  return <section aria-label="Integrations" className="mcp-registry">
   <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect services and review the tools available in this environment.</p></div>{kind === 'mcp' ? <button className="cp-admin-button" onClick={() => registry.setDialog('new')}><Plus size={16} />Connect MCP server</button> : null}</header>
@@ -28,7 +32,7 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
    </tr>)}</tbody></table></div> : <EmptyState icon={Server} title={registry.search ? 'No matching servers' : 'No MCP servers yet'} description={registry.search ? 'Try another name or endpoint.' : 'Connect an MCP server to discover and select its tools.'} />}
    {registry.hasNextPage ? <button className="cp-admin-button cp-admin-button--secondary" disabled={registry.isFetchingNextPage} onClick={() => void registry.fetchNextPage()}>{registry.isFetchingNextPage ? 'Loading…' : 'Load more servers'}</button> : null}
    {registry.isFetchNextPageError ? <p role="alert">Could not load the next page. Use Load more servers to retry.</p> : null}
-   {server ? <section id="mcp-server-details" className="mcp-details" aria-label={`${server.name} details`}><div className="mcp-details-heading"><div><h2>{server.name}</h2><p className="cp-admin-muted">Streamable HTTP · {server.auth_type === 'bearer' ? 'Bearer token configured' : 'No authentication'} · {server.enabled ? 'Enabled' : 'Disabled'}</p></div><button className="cp-admin-button cp-admin-button--secondary" onClick={() => registry.setDialog(server)}>Discover tools</button></div><ToolRows tools={server.tools} serverEnabled={server.enabled} /><details className="mcp-contract"><summary>Server metadata</summary><pre>{JSON.stringify(server.server_info, null, 2)}</pre></details></section> : null}
+   {server ? <section id="mcp-server-details" className="mcp-details" aria-label={`${server.name} details`}><div className="mcp-details-heading"><div><h2>{server.name}</h2><p className="cp-admin-muted">Streamable HTTP · {server.auth_type === 'bearer' ? 'Bearer token configured' : 'No authentication'} · {server.enabled ? 'Enabled' : 'Disabled'}</p></div><button className="cp-admin-button cp-admin-button--secondary" onClick={() => registry.setDialog(server)}>Discover tools</button></div><ToolRows tools={server.tools} serverEnabled={server.enabled} onMapping={tool => setMapping({ serverId: server.id, serverName: server.name, toolName: tool.name })} /><details className="mcp-contract"><summary>Server metadata</summary><pre>{JSON.stringify(server.server_info, null, 2)}</pre></details></section> : null}
    <p className="mcp-footnote cp-admin-muted">Connections and tools belong to this workspace and environment. Disabling a server keeps its saved tools and settings.</p>
   </>}
   {registry.dialog ? <MCPDialog key={registry.dialog === 'new' ? 'new' : registry.dialog.id} scope={scope} server={registry.dialog === 'new' ? undefined : registry.dialog} onClose={() => registry.setDialog(null)} onRefresh={() => void registry.refresh()} onSaved={saved => { registry.setDialog(null); registry.setSelectedId(saved.id); void registry.refresh(); }} /> : null}

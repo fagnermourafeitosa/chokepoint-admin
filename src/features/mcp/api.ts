@@ -2,7 +2,7 @@ import { httpClient, HttpError } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 import type { MCPToolAnnotations } from '../access/types';
 export type ToolContract = { name: string; title?: string; description?: string; annotations?: MCPToolAnnotations; inputSchema: unknown; outputSchema?: unknown; [key: string]: unknown };
-export type ManagedTool = { reviewed: boolean; name: string; contract: ToolContract; previous?: ToolContract; change: 'new' | 'changed' | 'removed' | 'unchanged'; selected: boolean; enabled: boolean };
+export type ManagedTool = { local_mapping?: import("./mapping-api").MappingVersion; mapping_draft?: import("./mapping-api").MappingVersion; reviewed: boolean; name: string; contract: ToolContract; previous?: ToolContract; change: 'new' | 'changed' | 'removed' | 'unchanged'; selected: boolean; enabled: boolean };
 export type MCPServer = { id: string; name: string; endpoint: string; transport: string; auth_type: 'none' | 'bearer'; token_configured: boolean; enabled: boolean; revision: number; server_info: unknown; tools: ManagedTool[] };
 export type Connection = { name: string; endpoint: string; transport: string; auth_type: 'none' | 'bearer'; token?: string; revision?: number };
 export type Preview = { preview_id: string; expires_at: string; server_info: unknown; tools: ManagedTool[]; revision: number };
