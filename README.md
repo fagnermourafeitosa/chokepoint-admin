@@ -89,8 +89,13 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 005 | [First Workspace Onboarding](specs/005-2026-10-24-first-workspace-onboarding.md) | Implemented |
 | 006 | [Agent CRUD Integration](specs/006-2026-10-25-agent-crud-integration.md) | Implemented |
 | 007 | [MCP Server Management and Discovery Preview](specs/007-2026-10-25-mcp-server-management-and-discovery-preview.md) | Implemented |
+| 008 | [Customer OIDC Connection Management](specs/008-2026-10-25-customer-oidc-connection-management.md) | Waiting Approve |
+
+The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Waiting Approve). Both contracts have implementations on the task branches and remain Waiting Approve. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 
 ## Persistent Agent Management
+
+Agents remain reusable permission groups. Group rules apply to associated users, while claim values belong to each individual user. An incoming MCP call does not need an authenticated agent name. This CRUD does not implement assignment persistence or permission evaluation; see [the canonical model](../backend/ARCHITECTURE.md#identity-and-permission-ownership).
 
 The Access workbench uses the connected backend 005 API for agent lists, details, creation, editing and permanent deletion. Records belong to the authenticated workspace/environment selection. Query keys include user, workspace and environment; changing scope remounts the workbench, resets forms/selection and cancels private reads through the existing auth context. List filtering applies only to loaded records, and Load more agents requests the next 50 records.
 
@@ -102,10 +107,22 @@ For a new agent with an image, creation precedes image upload. If upload fails a
 
 ## MCP Server Management
 
-Access → Integrations provides the MCP server catalog, friendly names, the default Lucide Server icon, connection/edit forms, backend discovery preview, and disable/re-enable. Identity providers have a separate future destination with no fake CRUD. Context sources retain their existing meaning.
+Access → Integrations provides the MCP server catalog, friendly names, the default Lucide Server icon, connection/edit forms, backend discovery preview, and disable/re-enable. Identity providers have their own implemented OIDC catalog and create/edit form, described below. Context sources retain their existing meaning.
 
 Streamable HTTP supports None or Bearer authentication. stdio is visibly unsupported. The browser uses only the existing same-origin authenticated API; MCP endpoints are contacted by the backend. Saved tokens are never returned or placed in query caches. Private list keys include user, workspace and environment, and forms/requests reset on scope changes. Search filters loaded server pages.
 
 All tools begin checked on initial discovery; users can select all or individual tools before registration. Empty discovery or selection blocks creation. Expandable metadata includes protocol schemas and raw annotations, with existing annotation badges/tooltips. Rediscovery highlights New, Changed and Removed rows; affected contracts have previous/current details. Changed/removed tools remain disabled until reviewed, while missing records are retained. Re-enable requires discovery/review. Disable keeps server and tool records. These are management states, not runtime policy enforcement.
 
 MCP verification: backend unit/race/vet/build checks and admin MCP unit checks (18 tests) plus production build passed. The full admin suite retains ten failures reproduced on the original HEAD; see the current MCP specification for exact evidence. No automated integration suite was run.
+
+## Customer OIDC Identity Connections
+
+This section describes the implementation on the task branches. The approved documentation-only publication does not add these source files to main. AuthZEN SARC is the PEP/PDP evaluation contract; COAZ-MCP mapping and the PDP call are still unwired.
+
+Customer IdPs are managed in Access → Integrations → Identity providers, per workspace/environment. Multiple distinct issuers are supported; Keycloak uses generic OIDC. The form configures name, exact issuer, accepted audiences, optional groups claim and enabled state. A configuration check verifies issuer metadata/public keys, not a complete user authentication flow. CRUD uses the existing administrative session, membership and CSRF protections. These changes are waiting for review/approval, not published.
+
+Incoming MCP tool calls use signed JWT access tokens and separate header-aware/legacy decoders. Opaque-token introspection, ID-JAG and Token Exchange have named code boundaries that return not-implemented errors. Runtime validation alone cannot execute a tool: the current endpoint blocks with 501 until permission evaluation is provided. Agents remain reusable permission groups in the existing CRUD, not required identities in the incoming request.
+
+### Documentation ownership and delivery status
+
+Stable decisions are maintained in [Backend Architecture](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress). [Admin 008](specs/008-2026-10-25-customer-oidc-connection-management.md) records the implemented management contract and UI checks; [Backend 007](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) records runtime validation and its tests. Both are Waiting Approve. The interface and validation code are implemented; policy evaluation and tool forwarding remain unavailable.
