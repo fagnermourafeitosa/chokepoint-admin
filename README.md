@@ -82,8 +82,8 @@ Agent initial-letter blocks and the repeated environment label in details are re
 
 | ID | Specification | Status |
 | :--- | :--- | :--- |
-| 001 | [Admin Shell](specs/001-2026-10-24-admin-shell.md) | Waiting Approve |
-| 002 | [Development HTTP Client](specs/002-2026-10-24-http-client.md) | Waiting Approve |
+| 001 | [Admin Shell](specs/001-2026-10-24-admin-shell.md) | Implemented |
+| 002 | [Development HTTP Client](specs/002-2026-10-24-http-client.md) | Implemented |
 | 003 | [Access Workbench Layout](specs/003-2026-10-24-access-workbench-layout.md) | Implemented |
 | 004 | [Login and Authorized Workspace Selection](specs/004-2026-10-24-login-and-authorized-workspace-selection.md) | Implemented |
 | 005 | [First Workspace Onboarding](specs/005-2026-10-24-first-workspace-onboarding.md) | Implemented |
