@@ -1,0 +1,33 @@
+.agent-graph { padding: var(--cp-admin-space-5); min-width: 0; }
+.agent-graph-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--cp-admin-space-3); margin-bottom: var(--cp-admin-space-5); }
+.agent-graph-heading h3 { font: var(--cp-admin-weight-bold) 1.125rem var(--cp-admin-font-heading); }
+.agent-graph-heading p, .agent-graph-notice { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-small); max-width: 70ch; }
+.agent-graph-notice { margin-bottom: var(--cp-admin-space-4); }
+.agent-graph-canvas { position: relative; border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background-color: var(--cp-admin-color-canvas); background-image: radial-gradient(var(--cp-admin-color-border) 1px, transparent 1px); background-size: 18px 18px; overflow: hidden; }
+.agent-graph-canvas > svg { display: block; width: 100%; height: 390px; touch-action: none; cursor: grab; }
+.agent-graph-canvas > svg:active { cursor: grabbing; }
+.agent-graph-node { display: flex; align-items: center; gap: 10px; width: calc(100% - 6px); height: calc(100% - 6px); margin: 3px; padding: 10px; background: var(--cp-admin-color-surface); border: 1px solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-control); text-align: left; color: var(--cp-admin-color-text); cursor: pointer; }
+.agent-graph-node:hover, .agent-graph-node[aria-pressed="true"] { background: var(--cp-admin-color-accent-soft); border-color: var(--cp-admin-color-accent-text); }
+.agent-graph-node-icon { color: var(--cp-admin-color-accent-text); display: flex; flex-shrink: 0; }
+.agent-graph-node-copy { min-width: 0; display: grid; gap: 3px; }
+.agent-graph-node-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+.agent-graph-node-copy small { font-size: 12px; line-height: 1.3; color: var(--cp-admin-color-text-muted); }
+.agent-graph-edge path { fill: none; stroke: var(--cp-admin-color-control-border); stroke-width: 1.5; }
+.agent-graph-edge[data-active="true"] path { stroke: var(--cp-admin-color-accent-text); stroke-width: 2; }
+.agent-graph-edge text { fill: var(--cp-admin-color-text-muted); font: 11px var(--cp-admin-font-body); paint-order: stroke; stroke: var(--cp-admin-color-canvas); stroke-width: 4px; stroke-linejoin: round; }
+.agent-graph-controls { position: absolute; inset-block-start: 10px; inset-inline-end: 10px; z-index: 1; display: flex; background: var(--cp-admin-color-surface); border-radius: var(--cp-admin-radius-control); }
+.agent-graph-controls button { padding-inline: 10px; }
+.agent-graph-pan-hint { position: absolute; inset-inline-start: 12px; inset-block-end: 10px; color: var(--cp-admin-color-text-muted); background: var(--cp-admin-color-canvas); font-size: var(--cp-admin-type-label); pointer-events: none; }
+.agent-graph-details { padding-block: var(--cp-admin-space-5); display: flex; align-items: start; flex-wrap: wrap; gap: var(--cp-admin-space-3); }
+.agent-graph-details h4, .agent-graph-details > p, .agent-graph-details > strong, .agent-graph-details > ul { flex-basis: 100%; margin: 0; overflow-wrap: anywhere; }
+.agent-graph-details > p { max-width: 70ch; }
+.agent-graph-details > ul { display: flex; flex-wrap: wrap; gap: 6px 18px; padding-inline-start: 20px; }
+.agent-graph-member { display: grid; gap: var(--cp-admin-space-1); width: 100%; overflow-wrap: anywhere; }
+.agent-graph-member small { color: var(--cp-admin-color-text-muted); }
+.agent-graph-empty { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--cp-admin-space-3); margin-bottom: var(--cp-admin-space-4); }
+@media(max-width:740px) { .agent-graph { padding: var(--cp-admin-space-4); } .agent-graph-canvas > svg { height: 480px; } }
+
+.agent-graph-title { display: flex; align-items: center; gap: var(--cp-admin-space-2); }
+.agent-graph-title .admin-tooltip-trigger { color: var(--cp-admin-color-text-muted); padding: var(--cp-admin-space-1); }
+.agent-graph-node--anchor { cursor: default; }
+.agent-graph-node--anchor:hover { background: var(--cp-admin-color-surface); border-color: var(--cp-admin-color-control-border); }

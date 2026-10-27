@@ -2,8 +2,12 @@ import type { ReactNode } from "react";
 import { Navigate, Outlet } from "react-router";
 import { AuthContext, useAuth } from "./AuthContext";
 import { useAuthState } from "./useAuthState";
+import { PendingChangesProvider } from "./pending/PendingChanges";
 import { AuthStatus } from "./AuthPages";
 export function AuthProvider({ children }: { children: ReactNode }) {
+  return <PendingChangesProvider><SessionProvider>{children}</SessionProvider></PendingChangesProvider>;
+}
+function SessionProvider({ children }: { children: ReactNode }) {
   const auth = useAuthState();
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 }

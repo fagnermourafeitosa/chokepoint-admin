@@ -1,3 +1,4 @@
+import { usePendingChanges } from "../../auth/pending/PendingChanges";
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { HttpError } from '../../../api/http-client';
@@ -31,6 +32,7 @@ export function useAgentForm({ scope, agent, onPersisted, onSaved }: Options) {
   const alive = useRef(true);
   const submitting = useRef(false);
   const fileSequence = useRef(0);
+  usePendingChanges(pending || name !== (persisted?.name ?? '') || description !== (persisted?.description ?? '') || appearance.mode !== (persisted?.visual_kind ?? 'icon') || appearance.icon !== (persisted?.icon_key ?? 'bot') || !!appearance.file);
   useEffect(() => { alive.current = true; return () => { alive.current = false; fileSequence.current++; }; }, []);
 
   async function chooseFile(file: File) {

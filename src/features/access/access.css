@@ -16,3 +16,12 @@
 
 .access-page-heading{display:flex;align-items:center;justify-content:space-between;gap:var(--cp-admin-space-6);margin-block-end:var(--cp-admin-space-6)}
 @media(max-width:740px){.access-page-heading{align-items:flex-start;flex-direction:column;gap:var(--cp-admin-space-4)}}
+@media(max-width:740px) {
+  .access-workbench { grid-template-columns: minmax(0, 1fr); }
+  .access-agent-rail { min-height: 0; }
+  .access-agent-list { display: flex; overflow-x: auto; gap: var(--cp-admin-space-2); }
+  .access-agent-list > li { flex: 0 0 12rem; }
+  .access-agent-heading { flex-wrap: wrap; padding: var(--cp-admin-space-4); }
+  .access-agent-heading .agent-detail-copy { flex-basis: calc(100% - 5rem); }
+  .agent-detail-actions { margin-inline-start: auto; }
+}

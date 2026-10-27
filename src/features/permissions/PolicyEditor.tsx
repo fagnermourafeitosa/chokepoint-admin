@@ -1,3 +1,4 @@
+import { usePendingChanges } from "../auth/pending/PendingChanges";
 import { useState, type FormEvent } from 'react';
 import type { MCPServer } from '../mcp/api';
 import type { Source } from '../sources/api';
@@ -5,6 +6,8 @@ import type { Policy } from './api';
 
 export function PolicyEditor({ policy, servers, sources, onSave, onCancel }: { policy?: Policy; servers: MCPServer[]; sources: Source[]; onSave: (policy: Policy) => void; onCancel: () => void }) {
   const [value, setValue] = useState<Policy>(() => policy ? structuredClone(policy) : { id: crypto.randomUUID(), name: '', server_id: '', tool_name: '', expression: '', required_bindings: [] });
+  const [initial] = useState(() => JSON.stringify(value));
+  usePendingChanges(JSON.stringify(value) !== initial);
   const server = servers.find(s => s.id === value.server_id);
   const selectedTool = server?.tools.find(t => t.name === value.tool_name);
   const schema = selectedTool?.contract.inputSchema as { properties?: Record<string, unknown> } | undefined;

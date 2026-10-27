@@ -1,3 +1,4 @@
+import { usePendingChanges } from "../auth/pending/PendingChanges";
 import { useState } from 'react';
 import { ArrowLeft, Plus, X } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
@@ -11,6 +12,9 @@ export function IdentityConnectionForm({ connection, pending, error, onSave, onC
  const [audiences, setAudiences] = useState(connection?.audiences ?? ['']);
  const [groups, setGroups] = useState(connection?.groups_claim ?? '');
  const [enabled, setEnabled] = useState(connection?.enabled ?? true);
+ const currentFields = JSON.stringify({ name, issuer, audiences, groups, enabled });
+ const [initialFields] = useState(currentFields);
+ usePendingChanges(pending || currentFields !== initialFields);
  const [checked, setChecked] = useState(false);
  const [localError, setLocalError] = useState('');
  const environment = auth.environment?.name === 'production' ? 'Production' : 'Sandbox';

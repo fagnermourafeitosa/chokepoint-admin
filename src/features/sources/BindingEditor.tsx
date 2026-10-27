@@ -1,3 +1,4 @@
+import { usePendingChanges } from "../auth/pending/PendingChanges";
 import { useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { mcpApi, mcpKey } from '../mcp/api';
@@ -14,6 +15,8 @@ function configFrom(binding:Binding|undefined):BindingConfig{
 }
 export function BindingEditor({source,binding,scope,actions,onClose}:{source:Source;binding?:Binding;scope:EnvironmentScope;actions:SourceActions;onClose:()=>void}){
  const [config,setConfig]=useState(()=>configFrom(binding)),[sample,setSample]=useState('{}'),[preview,setPreview]=useState<unknown>(),[sampleError,setSampleError]=useState('');
+ const [initialConfig]=useState(()=>JSON.stringify(config));
+ usePendingChanges(actions.busy || JSON.stringify(config)!==initialConfig || sample!=='{}');
  const servers=useInfiniteQuery({queryKey:mcpKey(scope),queryFn:({signal,pageParam})=>mcpApi.list(scope,pageParam,signal),initialPageParam:0,getNextPageParam:last=>last.next_offset??undefined});
  const items=servers.data?.pages.flatMap(p=>p.items)??[];const selectedServer=items.find(s=>s.id===config.server_id);
  function choose(operation:Operation){setConfig({...config,name:config.name||operation.operation_id||'API attributes',path:operation.path,parameters:operation.parameters.map(p=>({name:p.name,in:p.in,from:config.entity==='subject'?'subject_id':'resource_id'})),attributes:operation.fields.slice(0,32).map((field,i)=>({name:(field.pointer.split('/').at(-1)||`attribute_${i+1}`).replace(/[^A-Za-z0-9_]/g,'_').replace(/^[^A-Za-z]/,'a_'),pointer:field.pointer,type:field.type}))});setPreview(undefined)}

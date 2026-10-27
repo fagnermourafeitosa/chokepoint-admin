@@ -1,3 +1,4 @@
+import { usePendingChanges } from "../auth/pending/PendingChanges";
 import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { HttpError } from '../../api/http-client';
@@ -26,6 +27,7 @@ export function usePermissions(scope: AgentScope, agentId: string) {
   useEffect(() => () => controller.current?.abort(), []);
   const configuration = query.data;
   const document = edited?.document ?? configuration?.draft ?? configuration?.published ?? emptyDocument();
+  usePendingChanges(edited !== undefined || busy);
   const conflict = edited !== undefined && configuration !== undefined && edited.revision !== configuration.revision;
   function edit(next: PermissionDocument) { setEdited({ revision: edited?.revision ?? configuration?.revision ?? 0, document: next }); setError(''); }
   async function change(action: 'draft' | 'publish' | 'discard' | 'revoke') {

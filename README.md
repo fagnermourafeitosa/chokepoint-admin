@@ -91,6 +91,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 007 | [MCP Server Management and Discovery Preview](specs/007-2026-10-25-mcp-server-management-and-discovery-preview.md) | Implemented |
 | 008 | [Customer OIDC Connection Management](specs/008-2026-10-25-customer-oidc-connection-management.md) | Implemented |
 | 009 | [Authorization Management Workbench](specs/009-2026-10-26-authorization-management-workbench.md) | Implemented |
+| 010 | [Enterprise and Custom MCP Connections](specs/010-2026-10-27-enterprise-and-custom-mcp-connections.md) | Implemented |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 
@@ -155,3 +156,13 @@ The backend applies CEL's standard JSON numeric mapping: numbers are `double`. C
 Nested changes use a revisioned draft under the selected Agent's permissions resource. Save draft is inactive; Review & publish shows current and proposed definitions. Revocation preserves an independent draft. Stale revisions return a reload conflict. Scope/group changes unmount the editor and abort requests. All private query keys include user/workspace/environment.
 
 No automated Admin tests were added or run. Use type checking, production build and manual browser checks for this slice. Its formal review and result approval are still pending.
+
+## Enterprise MCP Connections and Agent Graph (Admin 010)
+
+Integrations separates Enterprise MCPs from Custom MCPs. The GitHub button uses the official local brand asset and the backend's availability metadata. The endpoint is fixed by the provider; each customer saves its application credentials through Admin. OAuth returns to an account/tool review before registration.
+
+Agent details include a connection graph based on published associations and grants, with MCP node details, tool counts, contextual help, zoom/fit and a vertical narrow-screen layout. Existing permission controls remain available, and changing graph/permission tabs preserves mounted editor state. The graph shows configuration, not live traffic or guaranteed runtime permits. See specification 010 and its review evidence for the resolved review findings and verification limits.
+
+The GitHub provider offers a numbered setup guide with official documentation links before the customer’s Client ID and secret form. Configure GitHub stores the application within the selected workspace/environment. Connect GitHub is disabled with a setup helper until the scoped application configuration is saved, then uses that customer’s application for OAuth. No global GitHub credentials or API restart is required. The Agent graph omits the implicit Chokepoint enforcement node, duplicate relationship list and repeated permission actions; runtime authorization context is available through the heading help tooltip.
+
+Enterprise MCPs show one connection per provider in the provider block, with account, status, tools and actions. Search, connection tables and pagination apply only to Custom MCPs.

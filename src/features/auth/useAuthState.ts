@@ -1,3 +1,4 @@
+import { usePendingChangesGuard } from "./pending/PendingChanges";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { httpClient, HttpError, setCSRFToken } from "../../api/http-client";
@@ -10,6 +11,7 @@ import type {
 
 export function useAuthState(): AuthState {
   const client = useQueryClient();
+  const { confirmSwitch } = usePendingChangesGuard();
   const [workspaceId, setWorkspaceId] = useState<string>();
   const [environmentId, setEnvironmentId] = useState<string>();
   const [logoutFailed, setLogoutFailed] = useState(false);
@@ -102,6 +104,7 @@ export function useAuthState(): AuthState {
   };
   function chooseWorkspace(value: Workspace) {
     if (value.tenant_id === workspace?.tenant_id) return;
+    if (!confirmSwitch("workspace")) return;
     clearPrivate();
     void client.cancelQueries({ queryKey: ["auth", "environments"] });
     client.removeQueries({ queryKey: ["auth", "environments"] });
@@ -110,6 +113,7 @@ export function useAuthState(): AuthState {
   }
   function chooseEnvironment(id: string) {
     if (id === environment?.id) return;
+    if (!confirmSwitch("environment")) return;
     clearPrivate();
     setEnvironmentId(id);
   }

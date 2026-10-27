@@ -1,3 +1,4 @@
+import { usePendingChanges } from "../auth/pending/PendingChanges";
 import { useState } from 'react';
 import { sourceApi, type Source, type SourceConfig } from './api';
 import type { EnvironmentScope } from '../access/environment-scope';
@@ -7,6 +8,8 @@ type Props={scope:EnvironmentScope;source?:Source;actions:SourceActions;onSaved:
 export function SourceConnection({scope,source,actions,onSaved}:Props){
  const [config,setConfig]=useState<SourceConfig>(source?{name:source.name,base_url:source.base_url,auth_type:source.auth_type,api_key_header:source.api_key_header,timeout_millis:source.timeout_millis,cache_ttl_seconds:source.cache_ttl_seconds,enabled:source.enabled}:{name:'',base_url:'',auth_type:'bearer',timeout_millis:1000,cache_ttl_seconds:0,enabled:true});
  const [credential,setCredential]=useState(''),[review,setReview]=useState(false);
+ const [initialConfig]=useState(()=>JSON.stringify(config));
+ usePendingChanges(actions.busy || !!credential || JSON.stringify(config)!==initialConfig);
  function field<K extends keyof SourceConfig>(key:K,value:SourceConfig[K]){setConfig({...config,[key]:value});setReview(false)}
  async function save(){const result=await actions.run(signal=>sourceApi.save(scope,source?.id,{...config,revision:source?.revision??0,...(credential?{credential}:{})},signal));if(result){setCredential('');actions.saved(result);onSaved(result)}}
  return <div className="source-columns"><form className="cp-admin-panel source-form" onSubmit={e=>{e.preventDefault();setReview(true)}}><h2>Connection details</h2><fieldset disabled={actions.busy}>

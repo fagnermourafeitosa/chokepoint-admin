@@ -1,3 +1,4 @@
+import { usePendingChanges } from "../auth/pending/PendingChanges";
 import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { HttpError } from '../../api/http-client';
@@ -24,6 +25,7 @@ export function useMappingEditor(scope: EnvironmentScope, serverId: string, tool
  const [notice, setNotice] = useState('');
  const [pending, setPending] = useState(false);
  const [conflict, setConflict] = useState(false);
+ usePendingChanges(pending || (!!view && text !== JSON.stringify(view.draft?.document ?? view.effective, null, 2)));
  const request = useRef<AbortController | null>(null);
  const load = (next: MappingView) => { setView(next); setText(JSON.stringify(next.draft?.document ?? next.effective, null, 2)); setPreview(undefined); setConflict(false); };
  useEffect(() => { if (query.data && !view) load(query.data); }, [query.data, view]);
