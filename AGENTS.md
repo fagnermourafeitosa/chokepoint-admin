@@ -172,6 +172,7 @@ Do not mark a specification as `Implemented` automatically.
 When implementation reaches `Waiting Approve`, report:
 
 * files created or changed;
+* mark all `Acceptance Criteria` checkboxes
 * implemented behavior;
 * quality checks executed;
 * relevant deviations from the specification.

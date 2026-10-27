@@ -9,7 +9,7 @@
 - **Related Specifications**: [007 — MCP Server Management](007-2026-10-25-mcp-server-management-and-discovery-preview.md), [004 — Platform Login](004-2026-10-24-login-and-authorized-workspace-selection.md), [Backend 002 — Tenant Isolation](../../backend/specs/002-2026-10-24-postgres-migrations-and-tenant-isolation.md)
 - **Related Mock Contract**: [Admin design system](../docs/design-system/README.md)
 
-> Implemented on the task branches after explicit user authorization; status is Waiting Approve. The implemented contract and verification records below supersede the initial draft proposals. Stable architecture decisions are consolidated in [Backend Architecture](../../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
+> Implemented after explicit user authorization. The implemented contract and verification records below supersede the initial draft proposals. Stable architecture decisions are consolidated in [Backend Architecture](../../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 
 ## Context & Background
 
