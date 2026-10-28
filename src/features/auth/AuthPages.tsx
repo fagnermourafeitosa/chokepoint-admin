@@ -7,11 +7,11 @@ import { useAuth } from "./AuthContext";
 
 import "./auth.css";
 
-export function AuthFrame({ children }: { children: ReactNode }) {
+export function AuthFrame({ children, publicEntry = false }: { children: ReactNode; publicEntry?: boolean }) {
   return (
-    <main className="auth-page">
+    <main className={publicEntry ? "auth-page auth-page--public" : "auth-page"}>
       <div className="auth-region">
-        <img className="auth-logo" src={logo} alt="Chokepoint" />
+        {publicEntry ? <span className="auth-public-logo">CHOKEPOINT</span> : <img className="auth-logo" src={logo} alt="Chokepoint" />}
         {children}
       </div>
     </main>
@@ -58,7 +58,7 @@ export function LoginPage({ signup = false }: { signup?: boolean }) {
     return <AuthStatus />;
   if (a.session) return <Navigate to="/workspaces" replace />;
   return (
-    <AuthFrame>
+    <AuthFrame publicEntry>
       <h1>{signup ? "Create your account" : "Sign in to Chokepoint"}</h1>
       <p>
         {signup
