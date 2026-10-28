@@ -22,7 +22,7 @@ The public site links to Admin sign-in and signup. Admin initiates the backend-o
 - Preserve provider-owned credential handling, backend OIDC, verified email, MFA and the existing same-tab navigation.
 - Keep other provider pages and authentication behavior outside this visual change.
 - Verify login and registration presentation and form behavior at practical viewport sizes.
-- The local Keycloak theme is unversioned development infrastructure; document this limit explicitly.
+- The local Keycloak theme is in the separate versioned dev-infra repository; document its development-only deployment scope.
 
 ## Acceptance criteria
 
@@ -39,4 +39,4 @@ Changing customer identity providers, implementing a password grant or custom cr
 
 ## Verification so far
 
-The local Keycloak login and registration pages rendered with the selected theme in the in-app browser. Existing form templates and their actions were preserved. The Admin and backend services were not available for an end-to-end session or signup check, so the remaining criteria stay open. The Keycloak theme is in unversioned local infrastructure.
+The local Keycloak login and registration pages rendered with the selected theme in the in-app browser. Existing form templates and their actions were preserved. The Admin and backend services were not available for an end-to-end session or signup check, so the remaining criteria stay open. The Keycloak theme is in the separate dev-infra repository. The Admin and backend were later started, and navigation from Admin signup to the Keycloak registration form was verified.
