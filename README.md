@@ -92,9 +92,10 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 008 | [Customer OIDC Connection Management](specs/008-2026-10-25-customer-oidc-connection-management.md) | Implemented |
 | 009 | [Authorization Management Workbench](specs/009-2026-10-26-authorization-management-workbench.md) | Implemented |
 | 010 | [Enterprise and Custom MCP Connections](specs/010-2026-10-27-enterprise-and-custom-mcp-connections.md) | Implemented |
-| 011 | [Keycloak Authentication Experience](specs/011-2026-10-28-keycloak-authentication-experience.md) | In Progress |
-| 012 | [SCIM People Selection for Agent Permissions](specs/012-2026-10-28-scim-people-selection.md) | In Progress |
+| 011 | [Keycloak Authentication Experience](specs/011-2026-10-28-keycloak-authentication-experience.md) | Implemented |
+| 012 | [SCIM People Selection for Agent Permissions](specs/012-2026-10-28-scim-people-selection.md) | Implemented |
 |      013|      [Okta and Auth0 People Selection and Provider Configuration](specs/013-2026-10-28-okta-auth0-people-selection-and-provider-configuration.md)|      Proposed|
+| 014 | [Keycloak Administrative Access Warning](specs/014-2026-10-28-keycloak-administrative-access-warning.md) | Implemented |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 

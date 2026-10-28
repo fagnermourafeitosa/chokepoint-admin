@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, MoreHorizontal, Plus, Server, Shield, Users } from 'lucide-react';
+import { Building2, Check, MoreHorizontal, Plus, Server, Shield, Users } from 'lucide-react';
 import { EmptyState } from '../../components/ui/empty-state/EmptyState';
 import { Dialog } from '../../components/ui/dialog/Dialog';
 import type { EnvironmentScope } from '../access/environment-scope';
@@ -8,7 +8,7 @@ import { identityApi } from './api';
 import { IdentityConnectionForm } from './IdentityConnectionForm';
 import { useIdentityConnections } from './useIdentityConnections';
 import './identity.css';
-export function IdentityRegistry({ scope, onMCP }: { scope: EnvironmentScope; onMCP: () => void }) {
+export function IdentityRegistry({ scope, onEnterprise, onCustom }: { scope: EnvironmentScope; onEnterprise: () => void; onCustom: () => void }) {
  const registry = useIdentityConnections(scope);
  const auth = useAuth();
  const [search, setSearch] = useState('');
@@ -20,7 +20,7 @@ export function IdentityRegistry({ scope, onMCP }: { scope: EnvironmentScope; on
  }
  return <section aria-label="Identity providers" className="identity-registry">
   <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect services to this environment.</p></div><button className="cp-admin-button" disabled={registry.pending} onClick={() => registry.setEditor('new')}><Plus size={16} />Connect identity provider</button></header>
-  <div className="mcp-types" role="group" aria-label="Integration type"><button onClick={onMCP} aria-pressed="false"><Server size={17} />MCP servers</button><button aria-pressed="true"><Users size={17} />Identity providers</button></div>
+  <div className="mcp-types" role="group" aria-label="Integration type"><button onClick={onEnterprise} aria-pressed="false"><Building2 size={17} />Enterprise MCPs</button><button onClick={onCustom} aria-pressed="false"><Server size={17} />Custom MCPs</button><button aria-pressed="true"><Users size={17} />Identity providers</button></div>
   <div className="identity-list-title"><h2>Identity providers</h2><span className="cp-admin-muted">{registry.connections.length} {registry.hasNextPage ? 'loaded ' : ''}connection{registry.connections.length === 1 ? '' : 's'}</span></div>
   <div className="identity-list-toolbar"><label><span className="identity-sr-only">Search identity connections</span><input type="search" className="cp-admin-input" placeholder="Search by name or issuer" value={search} onChange={e => setSearch(e.target.value)} /></label><label><span className="identity-sr-only">Connection status</span><select className="cp-admin-input" value={status} onChange={e => setStatus(e.target.value)}><option value="all">All statuses</option><option value="enabled">Enabled</option><option value="disabled">Disabled</option></select></label></div>
   {registry.error ? <p className="cp-admin-notice cp-admin-notice--danger" role="alert">{registry.error}</p> : null}

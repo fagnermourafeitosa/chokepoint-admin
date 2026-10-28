@@ -38,7 +38,7 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
   const servers = registry.servers.filter(s => kind === 'enterprise' ? s.connection_type === 'enterprise' : s.connection_type !== 'enterprise');
   const preview = params.get('preview');
   const correctScope = params.get('tenant') === scope.tenantId && params.get('environment') === scope.environmentId;
-  if (kind === 'identity') return <IdentityRegistry scope={scope} onMCP={() => setParams({ type: 'enterprise' })} />;
+  if (kind === 'identity') return <IdentityRegistry scope={scope} onEnterprise={() => setParams({ type: 'enterprise' })} onCustom={() => setParams({ type: 'custom' })} />;
   if (mapping) return <ToolMappingManager key={`${scope.userId}:${scope.tenantId}:${scope.environmentId}:${mapping.serverId}:${mapping.toolName}`} scope={scope} {...mapping} onClose={() => setMapping(undefined)} />;
   return <section aria-label="Integrations" className="mcp-registry">
     <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect platforms and custom MCPs, then manage agent access.</p></div>{kind === 'custom' ? <button className="cp-admin-button" onClick={() => registry.setDialog('new')}><Plus size={16} />Connect custom MCP</button> : null}</header>

@@ -3,7 +3,7 @@
 - **Specification ID**: 012
 - **Date**: 2026-10-28
 - **Slug**: scim-people-selection
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Access and Permissions
 - **Related Specification**: [Admin 009 — Authorization Management Workbench](009-2026-10-26-authorization-management-workbench.md)
 - **Related Specification**: [Backend 015 — SCIM User Directory](../../backend/specs/015-2026-10-28-scim-user-directory.md)
@@ -116,6 +116,10 @@ Do not persist directory responses, popup data or selections in localStorage, se
 ## Testing Decisions
 
 Follow the admin module's current policy: no new automated tests. Run applicable type/lint/build checks and validate the real rendered desktop flow with a configured local Keycloak directory and backend. Check list loading, search, 20-user pagination, multi-selection, details popup, draft and publication, errors, and scope changes. Coordinate the real issuer/subject evidence and integration checks with Backend 015. Apply design-system guidance and inspect accessible interaction states.
+
+On 2026-10-28, the Admin type check and production build passed. Backend 015 records a local Keycloak check of search, details, multi-user association, publication and permitted/denied tool calls. This does not establish every desktop acceptance criterion, including pagination, failure and scope-change states.
+
+The user subsequently confirmed that the implementation and its validation were already complete and directed completed specifications to be closed. Individual results for the other desktop checks were not recorded here. The separate Backend 015 identity-mapping limitation remains documented there and in the Admin warning.
 
 ## Acceptance Criteria
 

@@ -23,3 +23,5 @@
 @media(max-width:740px){.identity-form-section{grid-template-columns:1fr;gap:1rem}.identity-two-fields{grid-template-columns:1fr}.identity-provider-choice{width:calc((100% - 1.5rem)/3);min-width:6rem}}
 .identity-mapping-warning { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); color: var(--cp-admin-color-warning); }
 .identity-mapping-warning svg { flex: none; }
+.identity-info { background: oklch(97% .015 250); border-color: oklch(55% .12 250); color: oklch(38% .1 250); }
+.identity-info svg { flex: none; }

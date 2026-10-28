@@ -1,7 +1,7 @@
 import { httpClient, HttpError } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 
-export type DirectorySettings = { base_url: string; token_url: string; client_id: string; client_secret?: string; has_secret: boolean; check_status: 'not_checked' | 'verified' | 'failed'; checked_at: string | null };
+export type DirectorySettings = { base_url: string; token_url: string; client_id: string; issuing_client_id: string; client_secret?: string; has_secret: boolean; check_status: 'not_checked' | 'verified' | 'failed'; checked_at: string | null };
 export type IdentityFields = { provider: string; name: string; issuer: string; audiences: string[]; groups_claim: string; enabled: boolean; revision: number; directory: DirectorySettings | null };
 export type IdentityConnection = IdentityFields & { id: string; created_at: string; updated_at: string; checked_at: string | null; check_status: 'not_checked' | 'verified' | 'failed' };
 export type IdentityPage = { items: IdentityConnection[]; next_offset: number | null };
@@ -23,6 +23,7 @@ export const identityApi = {
 };
 export function identityError(error: unknown): string {
  if (error instanceof HttpError) {
+  if (error.status === 422) return 'Cannot verify Keycloak directory and administrative access. Check the connection and network, grant the service account the realm-management roles view-users and view-clients (or equivalent), and ensure the directory contains a user.';
   if (error.status === 400) return 'Check the connection and directory fields.';
   if (error.status === 404) return 'This connection or user is no longer available.';
   if (error.status === 409) return 'The connection changed, or this issuer is already registered. Reload and retry.';

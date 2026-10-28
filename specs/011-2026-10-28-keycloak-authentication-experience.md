@@ -2,7 +2,7 @@
 
 - **Specification ID**: 011
 - **Date**: 2026-10-28
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin authentication experience and platform Keycloak theme
 - **Related specifications**: [Admin 004 — Login](004-2026-10-24-login-and-authorized-workspace-selection.md), [Admin 005 — Onboarding](005-2026-10-24-first-workspace-onboarding.md), [Frontend 002 — Public Sign-in and Signup](../../frontend/specs/002-2026-10-24-public-signin-and-signup.md), [Backend 003 — Login](../../backend/specs/003-2026-10-24-admin-login-and-workspace-access.md), [Backend 004 — Signup](../../backend/specs/004-2026-10-24-public-signup-and-workspace-bootstrap.md)
 
@@ -27,11 +27,11 @@ The public site links to Admin sign-in and signup. Admin initiates the backend-o
 ## Acceptance criteria
 
 - [x] The public home design is applied to Keycloak login and registration.
-- [ ] Existing sign-in and signup form actions and navigation remain unchanged.
-- [ ] Existing localization remains intact.
-- [ ] The established backend OIDC, session and onboarding contracts remain intact, except for explicitly approved changes.
-- [ ] Keyboard access, focus, errors and responsive layouts are verified.
-- [ ] The implementation and deployment location for the Keycloak theme is documented; local fixtures are not represented as a production deployment.
+- [x] Existing sign-in and signup form actions and navigation remain unchanged.
+- [x] Existing localization remains intact.
+- [x] The established backend OIDC, session and onboarding contracts remain intact, except for explicitly approved changes.
+- [x] Keyboard access, focus, errors and responsive layouts are verified.
+- [x] The implementation and deployment location for the Keycloak theme is documented; local fixtures are not represented as a production deployment.
 
 ## Out of scope
 
@@ -40,3 +40,7 @@ Changing customer identity providers, implementing a password grant or custom cr
 ## Verification so far
 
 The local Keycloak login and registration pages rendered with the selected theme in the in-app browser. Existing form templates and their actions were preserved. The Admin and backend services were not available for an end-to-end session or signup check, so the remaining criteria stay open. The Keycloak theme is in the separate dev-infra repository. The Admin and backend were later started, and navigation from Admin signup to the Keycloak registration form was verified.
+
+On 2026-10-28, the Admin type check and production build passed. The dev-infra Keycloak README documents the theme location, development mounts and the distinction from production deployment. The Admin server was not running during this review; the remaining browser and end-to-end criteria were not reverified.
+
+The user subsequently confirmed that the outstanding validation had already been performed and directed completed specifications to be closed. The individual results of those earlier checks are not recorded in this document; closure relies on that confirmation.
