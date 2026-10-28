@@ -8,6 +8,14 @@ This module is the React application for managing the Chokepoint platform. Platf
 
 Before UI implementation or review, read [the module design system](docs/design-system/README.md), including its token and layout rules. Reuse `docs/design-system/styles/index.css` and the documented semantic tokens. Preserve this module’s separate visual system and the reference mocks.
 
+## Temporary Implementation Warnings
+
+When a feature has an implementation limitation or caveat, show a temporary warning in the relevant admin screen, close to the action or information it affects. State the limitation in plain language, explain its practical effect, and tell the user what to do when action is needed. Record the limitation in the relevant specification.
+
+Use the same warning presentation as the identity-provider and People warnings: `cp-admin-notice`, warning background and border tokens, a leading `TriangleAlert` icon, a title, and explanatory text. Reuse a shared warning component when available; otherwise follow the existing implementations in `src/features/identity/IdentityConnectionForm.tsx` and `src/features/permissions/PeopleEditor.tsx`.
+
+Warnings are temporary and informational. Do not block a workflow unless its approved requirements require it. Update or remove each warning when its limitation changes or is resolved; displaying a warning does not resolve the limitation.
+
 ## Language
 
 * Always use ASD-STE100 Simplified Technical English when explaining anything to the user.
@@ -37,6 +45,8 @@ Project-specific architecture and explicit specifications take precedence over g
 ## Development Flow
 
 The order is fixed. Every decision belongs to the user: at each one, stop and wait for an explicit answer.
+
+During grilling, present multiple meaningful, distinct options for each decision, explain their consequences, and give a recommendation. Allow the user to propose another option. If only one viable option exists, explain why; do not invent alternatives.
 
 ```mermaid
 flowchart TD
