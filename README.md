@@ -107,6 +107,9 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 016 | [Remove Automated Interface Tests](specs/016-2026-10-29-remove-automated-interface-tests.md) | Implemented |
 | 017 | [Simplified Keycloak Connection Form](specs/017-2026-10-29-simplified-keycloak-connection-form.md) | Implemented |
 | 018 | [Attention Signals Inbox](specs/018-2026-10-29-attention-signals-inbox.md) | Implemented |
+| 019 | [Contextual Access Navigation](specs/019-2026-10-29-contextual-access-navigation.md) | Not Implemented |
+| 020 | [Investigate Problems and Decisions](specs/020-2026-10-29-investigate-problems-and-decisions.md) | Not Implemented |
+| 021 | [Overview Dashboard](specs/021-2026-10-29-overview-dashboard.md) | Not Implemented |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 
