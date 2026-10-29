@@ -9,3 +9,6 @@
 .people-editor{display:grid;gap:1rem}.people-editor h4{margin:1rem 0 0}.people-directory-toolbar{display:flex;gap:1rem;flex-wrap:wrap}.people-directory-toolbar label{display:grid;gap:.4rem;min-width:14rem;flex:1}.people-directory-table td small{display:block;color:var(--cp-admin-color-text-muted);margin-top:.2rem}.people-directory-footer,.people-directory-footer>div{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}.people-directory-footer{justify-content:space-between}.people-user-link{padding:0;border:0;background:none;color:var(--cp-admin-color-accent-text);font:inherit;font-weight:600;cursor:pointer;text-align:left}.people-user-link:hover{text-decoration:underline}.people-user-details{display:grid;grid-template-columns:auto 1fr;gap:.75rem 1.5rem}.people-user-details dt{font-weight:600}.people-user-details dd{margin:0;overflow-wrap:anywhere}
 .people-lifecycle-warning { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); color: var(--cp-admin-color-warning); }
 .people-lifecycle-warning svg { flex: none; }
+
+/* Associated user: name above its subject identifier. */
+.people-editor td small{display:block;color:var(--cp-admin-color-text-muted);font-size:var(--cp-admin-type-small)}

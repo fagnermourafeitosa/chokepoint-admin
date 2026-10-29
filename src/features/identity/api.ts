@@ -12,6 +12,8 @@ export type ProviderCapability = { provider: string; name: string; available: bo
 export type DirectoryIdentity = { issuer: string; subject: string };
 export type DirectoryUser = { identity: DirectoryIdentity; id: string; user_name: string; display_name: string; email?: string; given_name?: string; family_name?: string; active: boolean | null };
 export type DirectoryPage = { items: DirectoryUser[]; total: number; start_index: number; next_start: number | null };
+// Retained lifecycle state from Backend 016. Identities without events are absent.
+export type LifecycleUserState = DirectoryIdentity & { display_name?: string; user_name?: string; email?: string; disabled: boolean; disabled_at: string | null; source_deleted: boolean; updated_at: string };
 export const identityKey = (s: EnvironmentScope) => ['identity-connections', s.userId, s.tenantId, s.environmentId] as const;
 const path = (s: EnvironmentScope): `/v1/${string}` => `/v1/workspaces/${encodeURIComponent(s.tenantId)}/environments/${encodeURIComponent(s.environmentId)}/identity-connections`;
 export const identityApi = {
@@ -22,6 +24,7 @@ export const identityApi = {
  directoryCheck: (s: EnvironmentScope, id: string | undefined, input: IdentityFields, signal: AbortSignal) => httpClient<DirectoryCheck>(`${path(s)}${id ? `/${encodeURIComponent(id)}` : ''}/directory-check`, { method: 'POST', json: input, signal }),
  users: (s: EnvironmentScope, id: string, search: string, start: number, signal: AbortSignal) => httpClient<DirectoryPage>(`${path(s)}/${encodeURIComponent(id)}/users?${new URLSearchParams({ q: search, start: String(start) })}`, { signal }),
  user: (s: EnvironmentScope, id: string, user: string, signal: AbortSignal) => httpClient<DirectoryUser>(`${path(s)}/${encodeURIComponent(id)}/users/${encodeURIComponent(user)}`, { signal }),
+ lifecycleUsers: (s: EnvironmentScope, identities: DirectoryIdentity[], signal: AbortSignal) => httpClient<{ items: LifecycleUserState[] }>(`/v1/workspaces/${encodeURIComponent(s.tenantId)}/environments/${encodeURIComponent(s.environmentId)}/identity-lifecycle-users/lookup`, { method: 'POST', json: { identities }, signal }),
  remove: (s: EnvironmentScope, c: IdentityConnection, signal: AbortSignal) => httpClient<void>(`${path(s)}/${encodeURIComponent(c.id)}`, { method: 'DELETE', json: { revision: c.revision }, signal }),
 };
 export function identityError(error: unknown): string {
