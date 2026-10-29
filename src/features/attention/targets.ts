@@ -9,7 +9,23 @@ const routes: Record<string, string> = {
 };
 
 export function targetPath(signal: Signal): string | undefined {
+  // A tool-discovery signal names its server and connection type, so the action
+  // opens the matching integrations tab with that server selected. Any other
+  // connection type keeps the Custom MCP tab.
+  if (signal.target_route === 'tool-catalog' && signal.target_params.server_id) {
+    const type = signal.target_params.connection_type === 'enterprise' ? 'enterprise' : 'custom';
+    return `/access/integrations?${new URLSearchParams({ type, server: signal.target_params.server_id })}`;
+  }
   return routes[signal.target_route];
+}
+
+// discoveryCounts lists the tool changes above zero, for example
+// "2 changed · 1 removed".
+function discoveryCounts(c: Record<string, string>): string {
+  return [
+    Number(c.changed) > 0 ? `${c.changed} changed` : '',
+    Number(c.removed) > 0 ? `${c.removed} removed` : '',
+  ].filter(Boolean).join(' · ');
 }
 
 // contextLines builds the two context lines of an Inbox row from the fixed keys
@@ -18,7 +34,7 @@ export function contextLines(signal: Signal): [string, string] {
   const c = signal.context;
   switch (signal.type) {
     case 'tool-discovery':
-      return [c.tool ?? '', c.server ?? ''];
+      return [c.server ?? '', discoveryCounts(c)];
     case 'requests-denied':
       return [c.tool ?? '', [c.agent, c.count ? `${c.count} requests` : ''].filter(Boolean).join(' · ')];
     case 'idp-user-disable':
