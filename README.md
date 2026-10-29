@@ -10,6 +10,14 @@ Development instructions are in [AGENTS.md](AGENTS.md), including the [Vercel Re
 
 Use React with Vite for the platform management application. The admin consumes the Go backend APIs and uses client-side rendering.
 
+## Quick start
+
+`dev.sh` installs the dependencies when needed and starts the development server at http://127.0.0.1:5173. Start the backend first with `../backend/dev.sh`.
+
+```sh
+./dev.sh
+```
+
 ## Local Environment
 
 Use Node.js `22.23.1` and npm `10.9.8`. Each module has its own `package.json`, `package-lock.json`, and local `node_modules`; run package-manager commands from the module directory.
