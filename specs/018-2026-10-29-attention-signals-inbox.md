@@ -34,7 +34,7 @@ Backend 020 adds a module that stores attention signals. A signal says that an a
 
 Build the Overview from real data:
 
-1. Two counters in a row above the Inbox: **Pending** and **Tools without review**.
+1. Three counters in a row above the Inbox: **Pending**, **Requests denied today** and **Tools without review**.
 2. An **Inbox** table of unreviewed signals, 5 rows for each page, with a type filter.
 3. No block of recent changes. See Deferred Decisions.
 4. No page title, no search button in the top bar, no "New agent" button on this page.
@@ -47,7 +47,7 @@ The Admin only consumes the backend. It does not create or change signals, excep
 
 The user made these decisions on 2026-10-29.
 
-1. **Scope**: Inbox and two counters that have a real source. A counter "Requests denied today" is out of scope. It needs the decision trace, which has no specification yet.
+1. **Scope**: Inbox and the counters that have a real source. The counter "Requests denied today" was added on 2026-10-29, after Backend 021 (decision trace) provided its source.
 2. **Recent changes**: Removed from the Overview for now. The user changed an earlier decision on 2026-10-29 (a block of recently reviewed signals) and will decide later.
 3. **Inbox list**: The Inbox shows only unreviewed signals. A signal leaves the Inbox when the administrator opens its target.
 
@@ -81,6 +81,8 @@ The Admin reads the backend 020 API. The Admin shows these fields of a signal: `
 
 The Admin keeps a fixed map from `target_route` to an Admin route. A route name that is not in the map is not shown as a link. The Admin never builds a link from a full URL.
 
+**`requests-denied` signals** (Backend 021): the first context line is the tool. The second line is the agent and the count, for example "agent-app · 1 request" or "agent-app · 3 requests".
+
 **`tool-discovery` signals** (Backend 020, Tool Discovery Producer; decided by the user on 2026-10-29):
 
 - Context keys: `server`, `changed` and `removed`. The first context line is the server name. The second line lists the counts that are above zero, for example "2 changed · 1 removed".
@@ -91,6 +93,7 @@ The Admin keeps a fixed map from `target_route` to an Admin route. A route name 
 | Counter | Source | Opens |
 |---|---|---|
 | Pending | Backend 020 counters: number of unreviewed signals | Scrolls to the Inbox |
+| Requests denied today | Backend 021 counters: `denied_today`, the denied calls since 00:00 UTC | Filters the Inbox to `requests-denied` signals and scrolls to it |
 | Tools without review | Existing MCP registry data (backend 006): managed tools in the review-required state | The MCP tool catalog, filtered to tools that need review |
 
 The Admin adds no new backend endpoint for the second counter. If the existing registry responses do not give this count, the implementation must stop and ask the user.
@@ -107,7 +110,7 @@ The Admin adds no new backend endpoint for the second counter. If the existing r
 6. **After review**, the Admin refreshes the Inbox and the Pending counter.
 7. **Empty states.** No unreviewed signals: "Nothing needs your attention." No match for the filter: "No signals for this type."
 8. **Loading and errors.** Show a loading state for each block. A failed block shows a short message and a retry action. One failed block does not hide the others. Do not show raw error text.
-9. **Temporary warning.** Use the `cp-admin-notice` warning presentation, as `AGENTS.md` requires. Place it above the Inbox. Title: "Signals are not fully implemented". Text: signals for denied requests are not implemented yet, so the Inbox can look empty while those items exist. Remove it when that source exists. Record this limitation in this specification.
+9. **Temporary warning.** Removed on 2026-10-29: the `tool-discovery` producer (Backend 020) and the `requests-denied` producer (Backend 021) exist. A future limitation of this page uses the `cp-admin-notice` warning presentation, as `AGENTS.md` requires.
 10. **Responsive.** On narrow screens the Inbox shows the type, the subject and the action. The context and time columns are hidden. The counters stack in one column.
 11. **No automated tests.** Admin specification 016 removes them. Do not add them.
 12. **File size.** Split a file when it reaches 300 lines and the split has a clear responsibility.
@@ -131,11 +134,11 @@ Manual checks:
 
 ## Acceptance Criteria
 
-- [ ] 1. The Overview shows the Pending and Tools without review counters with real values.
+- [ ] 1. The Overview shows the Pending, Requests denied today and Tools without review counters with real values.
 - [ ] 2. The Inbox shows only unreviewed signals, 5 for each page, with a type filter and a pager.
 - [ ] 3. The action of a row marks the signal as reviewed and opens its target.
 - [ ] 4. No link is built from a full URL. Unknown route names are not linked.
-- [ ] 5. The temporary warning is shown, and the limitation is recorded in this specification.
+- [ ] 5. No temporary warning is shown, because both signal producers exist.
 - [ ] 6. The Overview has no page title, no "New agent" button, no top bar search button, and no block of recent changes.
 - [ ] 7. `npm run check` and `npm run build` pass, and the manual checks pass.
 
@@ -143,21 +146,19 @@ Manual checks:
 
 ## Known Limitations and Pending Implementation
 
-These items are not implemented. The temporary warning above the Inbox (Implementation Decision 9) tells the administrator about them.
+These items are not implemented.
 
 | Pending item | Why it is missing | What removes the limitation |
 |---|---|---|
-| Producer for `requests-denied` | The backend does not store authorization decisions. | A specification for the decision trace, and a job that raises one signal for each tool and agent in a time window. |
-| Counter "Requests denied today" | It has the same missing source as the signal above. | The same decision trace. |
+| Admin page for the `decision-detail` target | The Investigate page has no decision list or detail yet. The route opens `/investigate`. | A decision list API and an Admin specification for the Investigate page. |
 | Admin pages for `person-detail` and `tool-catalog` targets | The Admin has no detail pages yet. The routes open `/access` and the integrations tab of the signal's connection type, with the server selected. | Detail pages in a later specification. Update `src/features/attention/targets.ts`. |
 
-The `tool-discovery` producer exists (Backend 020). Remove the warning when the `requests-denied` producer exists. Update this section when any item changes.
+Update this section when any item changes.
 
 ---
 
 ## Out of Scope
 
-- The "Requests denied today" counter and the denied-request signals. They need the decision trace.
 - A history block (recent changes or recently reviewed signals) and a "view all" page for reviewed signals.
 - Creating signals from the Admin.
 - A per-user review state.
