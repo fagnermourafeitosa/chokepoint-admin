@@ -24,12 +24,11 @@ A local `.env.local` is prepared for this checkout and ignored by Git. For a new
 
 ## Application
 
-The admin layout follows the workbench reference layout. Overview and Investigate retain empty pages. Access has Permissions, Context sources and Integrations child routes; its production initial collections remain empty. Development and production both start with empty collections. Representative records are confined to test fixtures. Navigation uses React Router and browser history. Workspace and profile controls show the authenticated identity and authorized backend workspace records. The environment selector uses the selected authorized workspace’s returned Sandbox and Production records. Search and audit are absent.
+The admin layout follows the workbench reference layout. Overview and Investigate retain empty pages. Access has Permissions, Context sources and Integrations child routes; its production initial collections remain empty. Development and production both start with empty collections. Navigation uses React Router and browser history. Workspace and profile controls show the authenticated identity and authorized backend workspace records. The environment selector uses the selected authorized workspace’s returned Sandbox and Production records. Search and audit are absent.
 
 ```sh
 npm run dev
 npm run check
-npm test
 npm run build
 npm run preview
 ```
@@ -58,7 +57,7 @@ The browser submits same-origin navigation forms to backend login/signup endpoin
 
 Protected routes wait for session and authorized context. The real workspace list comes from active memberships; environments come from the authorized workspace. Multiple workspaces require selection. An enrolled new account can create its first workspace; a seeded no-access account cannot invent membership. Completed onboarding creates Sandbox and Production through the backend's atomic operation. Customer IdP onboarding and agent APIs remain separate scopes.
 
-Private query keys include user, workspace and environment. Switching context cancels/removes scoped data and local preview drafts; logout/expiry clears private state. API 401 returns to login, while service failures show retry. Local logout revokes the backend session; a failed logout hides private UI and does not claim revocation succeeded. There is no login persistence in browser storage.
+Private query keys include user, workspace and environment. Switching context cancels/removes scoped data, and the pending-changes guard asks before it discards unsaved edits; logout/expiry clears private state. API 401 returns to login, while service failures show retry. Local logout revokes the backend session; a failed logout hides private UI and does not claim revocation succeeded. There is no login persistence in browser storage.
 
 Production requires a reviewed same-origin admin/API host with TLS, secure cookie deployment and restrictive SPA security headers. Vite's local proxy is not a production deployment. The future local Caddy/mTLS simulator comes from dev-infra/serverhttps and is not configured here.
 
@@ -66,11 +65,11 @@ Production requires a reviewed same-origin admin/API host with TLS, secure cooki
 
 Open `/access` for Permissions, `/access/context-sources` for Context sources or `/access/integrations` for Integrations. Shared navigation supports direct entry, active links and browser history. Permissions uses the existing Agent rail and backend-connected people, server/tool and fine-grained policy editors. New Agent edits metadata; the selected grouping's permission editor saves an inactive draft and offers separate review/publication, discard and published-access revocation. The workbench mock remains unchanged; no demonstration records seed the application.
 
-`npm test` runs twenty-two rendered-behavior tests using Vitest and Testing Library with jsdom. Tests cover navigation, direct URLs, placeholders, selection/search, native-dialog lifecycle integration, draft/review changes, environment isolation and existing header controls. Desktop browser verification includes the visual preview at 1440×1000 and 1000×800; no mobile interface testing was performed.
+This module has no automated interface tests; see the Testing Policy in `AGENTS.md`. Validate changes with `npm run check`, `npm run build` and manual desktop browser checks.
 
 ## State and Data Organization
 
-Custom hooks are separate from JSX: Access data/cache, selection/search, tool grouping, form handling, shared dropdown/dialog lifecycle and admin layout state each have a dedicated hook file. AppProviders owns the QueryClientProvider with a separate client factory and initialization hook. TanStack Query holds session and authorized-context responses plus explicitly local Access drafts. Private Access keys include user, workspace and environment; login does not add real agent endpoints. Production builds do not seed the temporary sample records.
+Custom hooks are separate from JSX: Access data/cache, agent workbench selection/search, form handling, shared dropdown/dialog lifecycle and admin layout state each have a dedicated hook file. AppProviders owns the QueryClientProvider with a separate client factory and initialization hook. TanStack Query holds session, authorized-context and backend Access responses. Private Access keys include user, workspace and environment. No sample records are seeded.
 
 ## MCP Tool Annotations
 
@@ -96,6 +95,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 012 | [SCIM People Selection for Agent Permissions](specs/012-2026-10-28-scim-people-selection.md) | Implemented |
 |      013|      [Okta and Auth0 People Selection and Provider Configuration](specs/013-2026-10-28-okta-auth0-people-selection-and-provider-configuration.md)|      Proposed|
 | 014 | [Keycloak Administrative Access Warning](specs/014-2026-10-28-keycloak-administrative-access-warning.md) | Implemented |
+| 016 | [Remove Automated Interface Tests](specs/016-2026-10-29-remove-automated-interface-tests.md) | Implemented |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 

@@ -1,3 +1,4 @@
+import './tool-annotations.css';
 import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
 import { toolAnnotationLabels } from '../tool-annotations';
 import type { MCPToolAnnotations } from '../types';
