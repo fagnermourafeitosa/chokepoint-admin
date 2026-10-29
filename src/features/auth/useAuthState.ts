@@ -144,7 +144,10 @@ export function useAuthState(): AuthState {
   }
   return {
     session: session.data,
-    loading: session.isPending || session.isFetching,
+    // Only the first session load blocks the routes. A background refetch keeps
+    // mounted pages and their unsaved state; its result still redirects to
+    // sign-in (no session) or clears private data (different user).
+    loading: session.isPending,
     failed: session.isError,
     retry: () => {
       void session.refetch();

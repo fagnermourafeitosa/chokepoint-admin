@@ -33,3 +33,19 @@ export function identityError(error: unknown): string {
  }
  return 'The request could not be completed. Retry when the service is available.';
 }
+// Lifecycle receiver state from Backend 016. The secret is present only in the
+// create and rotate responses; rotation evidence only while a rotation runs.
+export type LifecycleConfiguration = {
+ configured: boolean; enabled: boolean; receiver_url?: string; rotation_in_progress: boolean; secret?: string;
+ last_committed_at: string | null; last_failure_at: string | null; last_failure_code?: string;
+ previous_secret_last_accepted_at?: string; current_secret_first_accepted_at?: string;
+};
+const lifecyclePath = (s: EnvironmentScope, id: string): `/v1/${string}` => `${path(s)}/${encodeURIComponent(id)}/lifecycle`;
+export const lifecycleKey = (s: EnvironmentScope, id: string) => [...identityKey(s), id, 'lifecycle'] as const;
+export const lifecycleApi = {
+ get: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<LifecycleConfiguration>(lifecyclePath(s, id), { signal }),
+ create: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<LifecycleConfiguration>(lifecyclePath(s, id), { method: 'POST', signal }),
+ rotate: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<LifecycleConfiguration>(`${lifecyclePath(s, id)}/rotate-secret`, { method: 'POST', signal }),
+ complete: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<LifecycleConfiguration>(`${lifecyclePath(s, id)}/complete-rotation`, { method: 'POST', signal }),
+ remove: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<LifecycleConfiguration>(lifecyclePath(s, id), { method: 'DELETE', signal }),
+};
