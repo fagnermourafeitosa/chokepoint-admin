@@ -62,6 +62,18 @@ flowchart TD
     Merge --> Push["Push main to origin"]
 ```
 
+## Local Functional Test
+
+Run functional tests by hand in the built-in browser, where the user can watch. Do not automate them. Use these local development credentials:
+
+1. Open `http://127.0.0.1:5173` and click **Continue to sign in**. The sign-in page is the Keycloak realm `chokepoint-platform` on `127.0.0.1:8180`.
+2. Use the user `admin-a`. It has access to Workspace A, which holds the local identity connections.
+3. For the password, read `CP_SEED_PASSWORD` in `dev-infra/idps/keycloak/.env`: `sed -n 's/^CP_SEED_PASSWORD=//p' .env`.
+4. For the one-time code, run the script under "To generate the current one-time code" in `dev-infra/idps/keycloak/README.md` from `dev-infra/idps/keycloak`. The code is valid for 30 seconds, so type it immediately.
+5. To reach identity connections, go to **Access**, then **Integrations**, then **Identity providers**.
+
+Click each field and type into it. The built-in browser does not show native `confirm()` dialogs. It answers them with "cancel" and logs `Page dialog suppressed` in the console.
+
 ## Spec-Driven Execution
 
 All code creation and behavioral changes MUST be based on an approved specification.
@@ -179,6 +191,8 @@ Waiting Approve -> Implemented
 
 Do not mark a specification as `Implemented` automatically.
 
+Mark each checkbox (`[x]`) in the specification as soon as its item is complete and verified: user stories, acceptance criteria and any task list. Do this in the same turn that completes the item. Do not leave all checkboxes for the end. A checkbox that stays unchecked means the item is not done, so write next to it what is still missing.
+
 When implementation reaches `Waiting Approve`, report:
 
 * files created or changed;
@@ -293,6 +307,8 @@ Waiting Approve -> Implemented
 ```
 
 Do not mark a specification as `Implemented` automatically.
+
+Mark each checkbox (`[x]`) in the specification as soon as its item is complete and verified: user stories, acceptance criteria and any task list. Do this in the same turn that completes the item. Do not leave all checkboxes for the end. A checkbox that stays unchecked means the item is not done, so write next to it what is still missing.
 
 When implementation reaches `Waiting Approve`, report:
 
