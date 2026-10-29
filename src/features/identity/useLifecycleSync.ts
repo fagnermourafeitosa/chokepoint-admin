@@ -44,7 +44,7 @@ export function rotationRisk(state: LifecycleConfiguration, now = Date.now()): R
 }
 
 const lifecycleNotices: Record<LifecycleAction, string> = {
- create: 'Lifecycle sync enabled. Copy the secret and create the Keycloak webhook.',
+ create: 'Auto sync enabled. Copy the secret and create the Keycloak webhook.',
  rotate: 'New secret created. Update the Keycloak webhook secret, then complete the rotation.',
  complete: 'Rotation completed. Chokepoint now rejects the previous secret.',
  remove: 'Lifecycle receiver removed.',
@@ -53,12 +53,12 @@ const lifecycleNotices: Record<LifecycleAction, string> = {
 export function lifecycleError(action: LifecycleAction, error: unknown): string {
  if (error instanceof HttpError) {
   if (error.status === 409) {
-   if (action === 'create') return 'Lifecycle sync is already enabled for this connection. The current state was reloaded.';
+   if (action === 'create') return 'Auto sync is already enabled for this connection. The current state was reloaded.';
    if (action === 'rotate') return 'A secret rotation is already in progress. Complete it before you start another one.';
    if (action === 'complete') return 'No secret rotation is in progress. The current state was reloaded.';
   }
-  if (error.status === 404) return 'Lifecycle sync is not configured for this connection anymore. The current state was reloaded.';
-  if (error.status === 400 || error.status === 501) return 'Lifecycle sync requires an enabled Keycloak connection with a user directory.';
+  if (error.status === 404) return 'Auto sync is not configured for this connection anymore. The current state was reloaded.';
+  if (error.status === 400 || error.status === 501) return 'Auto sync requires an enabled Keycloak connection with a user directory.';
  }
  return 'The request could not be completed. Retry when the service is available.';
 }

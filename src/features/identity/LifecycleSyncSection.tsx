@@ -65,6 +65,25 @@ function SecretPanel({ revealed, onDone }: { revealed: RevealedSecret; onDone: (
  </section>;
 }
 
+// SetupSteps explains why the receiver URL exists and where to use it. Step 3
+// is marked done once a delivery has been stored.
+function SetupSteps({ state }: { state: LifecycleConfiguration }) {
+ const delivered = !!state.last_committed_at;
+ return <ol className="lifecycle-steps" aria-label="Connect Keycloak to Chokepoint">
+  <li><span className="lifecycle-step-bubble" aria-hidden="true">1</span><div><strong>Copy the receiver URL</strong><span>This is the address where Chokepoint listens. Keycloak sends user changes to it.</span></div></li>
+  <li><span className="lifecycle-step-bubble" aria-hidden="true">2</span><div><strong>Paste it in Keycloak</strong><span>In the customer realm, create a webhook with this URL, the secret, and the event types. Use the Phase Two webhooks API (<code>POST /realms/&lt;realm&gt;/webhooks</code>). Chokepoint shows the secret and a ready body once, when you enable or rotate.</span></div></li>
+  <li data-done={delivered || undefined}><span className="lifecycle-step-bubble" aria-hidden="true">{delivered ? <Check size={14} /> : 3}</span><div><strong>{delivered ? 'Keycloak is delivering' : 'Check the delivery'}</strong><span>{delivered ? 'Chokepoint received a user change. Last delivery is shown below.' : 'Change a user in Keycloak. Last delivery below shows a time when Chokepoint receives it.'}</span></div></li>
+ </ol>;
+}
+
+// SecretHint tells the user that the secret was copied once and cannot be shown
+// again, and how to get a new one.
+function SecretHint({ rotating }: { rotating: boolean }) {
+ return <div className="cp-admin-notice identity-info"><Info size={18} aria-hidden="true" /><div><strong>{rotating ? 'Secret rotation in progress' : 'The secret was already shown'}</strong>{rotating
+  ? <span>Chokepoint accepts the previous secret and the new one. Update the secret of the Keycloak webhook to the new one. When "First accepted with new secret" shows a time, select Complete rotation. After that, the previous secret stops working. The secret was shown only once. To see a new one: 1. Select Complete rotation. 2. Select Rotate secret. 3. Copy the new secret and update the Keycloak webhook.</span>
+  : <span>Chokepoint shows the secret only once, so it cannot be displayed again. To see a new one: 1. Select Rotate secret. 2. Copy the new secret. 3. Update the secret of the Keycloak webhook.</span>}</div></div>;
+}
+
 function Health({ state }: { state: LifecycleConfiguration }) {
  return <dl className="lifecycle-health">
   <div><dt>Receiver URL</dt><dd className="lifecycle-url"><code>{state.receiver_url}</code>{state.receiver_url ? <CopyButton value={state.receiver_url} label="receiver URL" /> : null}</dd></div>
@@ -92,14 +111,16 @@ function LifecycleSync({ scope, connectionId, onSecretVisibleChange }: { scope: 
   try { if (await sync.run(action)) setConfirm(null); } finally { setActive(null); }
  }
  return <div className="identity-form-section lifecycle-section">
-  <div className="identity-section-heading"><h2>Lifecycle sync <Help label="Delivery limitations" text={deliveryLimitations} /></h2><p>Receive user changes from Keycloak as they happen.</p></div>
+  <div className="identity-section-heading"><h2>Auto sync users <Help label="Delivery limitations" text={deliveryLimitations} /></h2><p>Receive user changes from Keycloak as they happen.</p></div>
   <div className="identity-form-fields">
    {sync.error ? <p className="cp-admin-notice cp-admin-notice--danger" role="alert">{sync.error}</p> : null}
    {sync.notice ? <p className="cp-admin-notice" role="status">{sync.notice}</p> : null}
-   {sync.isPending ? <p role="status">Loading lifecycle sync…</p> : sync.isError || !state ? <div className="cp-admin-notice" role="alert">Could not load lifecycle sync. <button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => void sync.refetch()}>Retry</button></div> : <>
+   {sync.isPending ? <p role="status">Loading auto sync…</p> : sync.isError || !state ? <div className="cp-admin-notice" role="alert">Could not load auto sync. <button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => void sync.refetch()}>Retry</button></div> : <>
     {sync.revealed ? <SecretPanel revealed={sync.revealed} onDone={sync.dismissSecret} /> : null}
     {state.configured ? <>
      <div className="lifecycle-status"><span className="mcp-badge" data-tone="success">Enabled</span>{state.rotation_in_progress ? <span className="mcp-badge">Rotation in progress</span> : null}</div>
+     <SetupSteps state={state} />
+     {sync.revealed ? null : <SecretHint rotating={state.rotation_in_progress} />}
      <Health state={state} />
      <div className="lifecycle-actions">
       {state.rotation_in_progress
@@ -109,7 +130,7 @@ function LifecycleSync({ scope, connectionId, onSecretVisibleChange }: { scope: 
      </div>
     </> : !sync.revealed ? <div className="lifecycle-empty">
      <div className="cp-admin-notice identity-info"><Info size={18} aria-hidden="true" /><div><strong>How it works</strong><span>Chokepoint creates a receiver URL and a secret. Keycloak sends signed user events to that URL, and Chokepoint reads the user's current state from the directory before it stores the change.</span></div></div>
-     <div><button type="button" className="cp-admin-button cp-admin-button--secondary" disabled={sync.pending} onClick={() => void act('create')}>{active === 'create' ? 'Enabling…' : 'Enable lifecycle sync'}</button></div>
+     <div><button type="button" className="cp-admin-button cp-admin-button--secondary" disabled={sync.pending} onClick={() => void act('create')}>{active === 'create' ? 'Enabling…' : 'Enable auto sync'}</button></div>
     </div> : null}
    </>}
   </div>
@@ -121,7 +142,7 @@ function LifecycleSync({ scope, connectionId, onSecretVisibleChange }: { scope: 
    </div>
    <div className="admin-dialog-actions"><button type="button" className="cp-admin-button cp-admin-button--secondary" disabled={sync.pending} onClick={() => setConfirm(null)}>Wait</button><button type="button" className="cp-admin-button" disabled={sync.pending} onClick={() => void act('complete')}>{sync.pending ? 'Completing…' : 'Complete anyway'}</button></div>
   </Dialog> : null}
-  {confirm === 'remove' ? <Dialog title="Remove lifecycle receiver?" onClose={() => { if (!sync.pending) setConfirm(null); }}>
+  {confirm === 'remove' ? <Dialog title="Remove auto sync receiver?" onClose={() => { if (!sync.pending) setConfirm(null); }}>
    <div className="admin-dialog-body">
     <p>Chokepoint deletes the receiver URL and its secrets. The Keycloak webhook stops working, and later user changes are not received. Stored users and their history stay.</p>
     {sync.error ? <p role="alert">{sync.error}</p> : null}

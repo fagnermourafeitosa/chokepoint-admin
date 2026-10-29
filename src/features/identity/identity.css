@@ -27,6 +27,10 @@
 .identity-info svg { flex: none; }
 .lifecycle-section .identity-form-fields>.lifecycle-empty{display:grid;gap:var(--cp-admin-space-4)}
 .lifecycle-status{display:flex;gap:.5rem;flex-wrap:wrap}
+.lifecycle-steps{display:grid;gap:var(--cp-admin-space-4);margin:0;padding:0;list-style:none}.lifecycle-steps li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--cp-admin-space-3);align-items:start}
+.lifecycle-steps li>div{display:grid;gap:.15rem}.lifecycle-steps li>div span{color:var(--cp-admin-color-text-muted);font-size:var(--cp-admin-type-small)}.lifecycle-steps code{font-family:var(--cp-admin-font-mono);font-size:var(--cp-admin-type-label)}
+.lifecycle-step-bubble{display:inline-flex;align-items:center;justify-content:center;width:1.75rem;height:1.75rem;border-radius:var(--cp-admin-radius-pill);background:var(--cp-admin-color-accent-soft);color:var(--cp-admin-color-accent-text);font-weight:var(--cp-admin-weight-bold);font-size:var(--cp-admin-type-small)}
+.lifecycle-steps li[data-done] .lifecycle-step-bubble{background:var(--cp-admin-color-accent-text);color:var(--cp-admin-color-text-inverse)}
 .lifecycle-health{display:grid;gap:var(--cp-admin-space-3);margin:0}.lifecycle-health>div{display:grid;grid-template-columns:minmax(9rem,13rem) minmax(0,1fr);gap:var(--cp-admin-space-3);align-items:baseline}
 .lifecycle-health dt{font-weight:600}.lifecycle-health dd{margin:0;min-width:0;font-variant-numeric:tabular-nums}.lifecycle-health dd small{display:block}
 .lifecycle-url{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}.lifecycle-url code,.lifecycle-value code{font-family:var(--cp-admin-font-mono);font-size:var(--cp-admin-type-label);overflow-wrap:anywhere}
