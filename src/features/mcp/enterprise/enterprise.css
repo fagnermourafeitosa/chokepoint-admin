@@ -29,3 +29,9 @@
 .github-application { display: grid; gap: var(--cp-admin-space-5); }
 .github-application-form { padding: var(--cp-admin-space-6); display: grid; gap: var(--cp-admin-space-4); }
 .github-application-form fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: var(--cp-admin-space-4); max-width: 42rem; }
+.github-callback { display: grid; gap: var(--cp-admin-space-2); max-width: 42rem; }
+.github-callback-label { font-weight: var(--cp-admin-weight-semibold); }
+.github-callback-row { display: flex; align-items: center; gap: var(--cp-admin-space-3); }
+.github-callback-row .github-setup-value { flex: 1; margin: 0; }
+.github-secret-row { display: flex; gap: var(--cp-admin-space-2); align-items: flex-start; }
+.github-secret-row .cp-admin-input { flex: 1; }

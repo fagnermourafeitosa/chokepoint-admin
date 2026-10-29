@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowUpRight, KeyRound } from 'lucide-react';
-import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
 import { ProviderMark } from '../ProviderMark';
 import type { MCPServer } from '../api';
 import { enterpriseApi, type Provider } from './api';
@@ -23,11 +22,13 @@ export function EnterpriseProvider({ provider, state, pending, onSelect, onDisab
         {query.isPending ? <small role="status">Loading connection…</small> : query.isError ? <small role="alert">Could not load the connection. <button className="cp-admin-button cp-admin-button--ghost" onClick={() => void query.refetch()}>Retry</button></small> : connection ? <small>{connection.account || 'Account unavailable'} · {connection.authentication_status === 'reauthorization_required' ? 'Reconnect required' : connection.enabled ? 'Enabled' : 'Disabled'} · {connection.tools.filter(tool => tool.selected && tool.change !== 'removed').length} managed tools</small> : <small><KeyRound size={14} aria-hidden="true" />Secure browser authorization</small>}
       </div>
       <div className="enterprise-provider-action">
-        {!provider.available && !busy ? <Tooltip content={`Enter and save your ${provider.name} App Client ID and Client secret in Configure ${provider.name} first.`}>{connectButton}</Tooltip> : connectButton}
+        {provider.id === 'github' && !provider.available
+          ? <button className="cp-admin-button" disabled={state.busy} onClick={() => setConfiguration(value => !value)}>Set up {provider.name}</button>
+          : connectButton}
         {connection ? <button className="cp-admin-button cp-admin-button--ghost" onClick={() => onSelect(connection.id)}>View tools</button> : null}
         {connection?.enabled ? <button className="cp-admin-button cp-admin-button--ghost" disabled={busy} onClick={() => onDisable(connection)}>Disable connection</button> : null}
-        {provider.id === 'github' ? <button className="cp-admin-button cp-admin-button--ghost" disabled={state.busy} onClick={() => setConfiguration(value => !value)}>Configure {provider.name}</button> : null}
-        {!provider.available ? <small>Set up your {provider.name} App to connect this account.</small> : null}
+        {provider.id === 'github' && provider.available ? <button className="cp-admin-button cp-admin-button--ghost" disabled={state.busy} onClick={() => setConfiguration(value => !value)}>Configure {provider.name}</button> : null}
+        {!provider.available ? <small>Set up your {provider.name} App first, then connect this account.</small> : null}
       </div>
     </article>
     {provider.id === 'github' && configuration ? <GitHubApplication scope={scope} onClose={() => setConfiguration(false)} onSaved={async () => { await state.providers.refetch(); setConfiguration(false); }} /> : null}
