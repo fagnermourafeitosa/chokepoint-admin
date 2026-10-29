@@ -81,6 +81,11 @@ The Admin reads the backend 020 API. The Admin shows these fields of a signal: `
 
 The Admin keeps a fixed map from `target_route` to an Admin route. A route name that is not in the map is not shown as a link. The Admin never builds a link from a full URL.
 
+**`tool-discovery` signals** (Backend 020, Tool Discovery Producer; decided by the user on 2026-10-29):
+
+- Context keys: `server`, `changed` and `removed`. The first context line is the server name. The second line lists the counts that are above zero, for example "2 changed · 1 removed".
+- Target: `tool-catalog` with the parameters `server_id` and `connection_type` (`custom` or `enterprise`). The Admin opens `/access/integrations?type=<connection_type>`. Another value of `connection_type` opens the Custom MCP tab.
+
 ### 3. Counters
 
 | Counter | Source | Opens |
@@ -102,7 +107,7 @@ The Admin adds no new backend endpoint for the second counter. If the existing r
 6. **After review**, the Admin refreshes the Inbox and the Pending counter.
 7. **Empty states.** No unreviewed signals: "Nothing needs your attention." No match for the filter: "No signals for this type."
 8. **Loading and errors.** Show a loading state for each block. A failed block shows a short message and a retry action. One failed block does not hide the others. Do not show raw error text.
-9. **Temporary warning.** Use the `cp-admin-notice` warning presentation, as `AGENTS.md` requires. Place it above the Inbox. Title: "Signals are not fully implemented". Text: only identity user signals work today; signals for new tools and denied requests are not implemented yet, so the Inbox can look empty while those items exist. Remove it when those sources exist. Record this limitation in this specification.
+9. **Temporary warning.** Use the `cp-admin-notice` warning presentation, as `AGENTS.md` requires. Place it above the Inbox. Title: "Signals are not fully implemented". Text: signals for denied requests are not implemented yet, so the Inbox can look empty while those items exist. Remove it when that source exists. Record this limitation in this specification.
 10. **Responsive.** On narrow screens the Inbox shows the type, the subject and the action. The context and time columns are hidden. The counters stack in one column.
 11. **No automated tests.** Admin specification 016 removes them. Do not add them.
 12. **File size.** Split a file when it reaches 300 lines and the split has a clear responsibility.
@@ -142,12 +147,11 @@ These items are not implemented. The temporary warning above the Inbox (Implemen
 
 | Pending item | Why it is missing | What removes the limitation |
 |---|---|---|
-| Producer for `tool-discovery` | Rediscovery is manual. No code raises a signal when a tool is new or changed. | A backend change that calls `RaiseEvent` after rediscovery (Backend 006 and 020). |
 | Producer for `requests-denied` | The backend does not store authorization decisions. | A specification for the decision trace, and a job that raises one signal for each tool and agent in a time window. |
 | Counter "Requests denied today" | It has the same missing source as the signal above. | The same decision trace. |
-| Admin pages for `person-detail` and `tool-catalog` targets | The Admin has no detail pages yet. The routes open `/access` and `/access/integrations?type=custom`. | Detail pages in a later specification. Update `src/features/attention/targets.ts`. |
+| Admin pages for `person-detail` and `tool-catalog` targets | The Admin has no detail pages yet. The routes open `/access` and the integrations tab of the signal's connection type. They do not select the server. | Detail pages in a later specification. Update `src/features/attention/targets.ts`. |
 
-Remove the warning when both producers exist. Update this section when any item changes.
+The `tool-discovery` producer exists (Backend 020). Remove the warning when the `requests-denied` producer exists. Update this section when any item changes.
 
 ---
 
@@ -163,5 +167,5 @@ Remove the warning when both producers exist. Update this section when any item 
 
 ## Further Notes
 
-- The prototype in `docs/chokepoint-workbench` shows the target layout, but its sample data does not describe real producers. Today only the identity lifecycle receiver creates a signal (`idp-user-disable`).
+- The prototype in `docs/chokepoint-workbench` shows the target layout, but its sample data does not describe real producers. Today the identity lifecycle receiver creates `idp-user-disable` signals, and a rediscovery of an existing MCP server creates `tool-discovery` signals.
 - The prototype shows reviewed rows dimmed in the Inbox. This specification removes reviewed rows from the Inbox (Decision 3).
