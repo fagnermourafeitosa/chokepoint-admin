@@ -334,3 +334,5 @@
 .dash-status .planned-tag,.dash-card-head .planned-tag{margin-left:0}
 @media(max-width:1000px){.metric-row--4{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-mid{grid-template-columns:1fr}}
 @media(max-width:760px){.metric-row--4{grid-template-columns:1fr}}
+
+.head-left{display:flex;align-items:center;gap:10px}
