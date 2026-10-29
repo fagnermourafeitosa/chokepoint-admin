@@ -1201,6 +1201,7 @@ class App extends React.Component {
                                 x.type === 'requests-denied' && differs("In the Admin, this line shows the agent identifier and the request count, for example finance · 3 requests. The mock shows the agent name.")),
                             React.createElement("span", { className: "inbox-when" },
                                 x.at,
+                                " UTC",
                                 statusOf(x) !== 'open' && React.createElement("small", { className: "status-chip planned-chip", tabIndex: 0, "data-tip": 'Planned · 2026-10-29\nReviewed: an administrator opened the item. Resolved: the cause is fixed. Resolved items leave the default list.' }, statusOf(x) === 'resolved' ? 'Resolved' : 'Reviewed')),
                             React.createElement("span", { className: "issue-action" },
                                 React.createElement("span", { className: "issue-action-label" },
