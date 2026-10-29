@@ -8,7 +8,7 @@ The [workbench mock](../chokepoint-workbench/dist/index.html) is the visual spec
 2. **Start from stored data.** Before you propose or draw an element, check that the backend stores its data. Read the backend specification and the code. Do not propose an element from data that is not stored.
 3. **Warn before an increment.** An element that needs data or behavior beyond what the backend stores today is an increment. Tell the user before you suggest it, and say what the backend must add.
 4. **Mark what is not implemented.** Add the [Planned tag](#planned-tag) to each element that the backend or the Admin does not implement yet. The date is the day you add the tag.
-5. **Do not explain in the mock.** The mock shows no text such as "data not available" or "needs the signal". The tag and its date are the only marker. Put the reason in the specification.
+5. **Say what was intended, not what is missing.** The mock shows no text such as "data not available" or "needs the signal". A Planned tag has a hover (and keyboard focus) tooltip of one or two sentences that say what the element is for. Put the reason that it is missing in the specification.
 6. **Remove the tag at implementation.** When the element is implemented, remove its tag from the mock in the same change.
 
 The Planned tag is for the mock only. The real Admin does not use it. A limitation of the real Admin uses the temporary warning that [AGENTS.md](../../AGENTS.md) describes.
@@ -29,7 +29,8 @@ Use `Differs · YYYY-MM-DD` when the real Admin already has the element but beha
 A Differs tag has a hover (and keyboard focus) tooltip that says what differs: what the real Admin does and what the mock shows. Put the text in `data-tip` and add `tabindex="0"`.
 
 ```html
-<span class="planned-tag">Planned · 2026-10-29</span>
+<span class="planned-tag" tabindex="0"
+  data-tip="Ranks each problem so the most urgent are read first.">Planned · 2026-10-29</span>
 <span class="planned-tag planned-tag--differs" tabindex="0"
   data-tip="In the Admin, a reviewed signal leaves the Inbox. The mock keeps it, dimmed.">Differs · 2026-10-29</span>
 ```
