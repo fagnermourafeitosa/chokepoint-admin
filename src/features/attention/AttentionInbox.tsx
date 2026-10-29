@@ -42,7 +42,7 @@ export function AttentionInbox({ inbox, headingId }: { inbox: Inbox; headingId: 
       </header>
       <div className="cp-admin-notice attention-notice">
         <TriangleAlert size={18} aria-hidden="true" />
-        <div><strong>Signals are not fully implemented</strong><span>Only identity user signals work today. Signals for new tools and denied requests are not implemented yet, so the Inbox can look empty while those items exist.</span></div>
+        <div><strong>Signals are not fully implemented</strong><span>Signals for denied requests are not implemented yet, so the Inbox can look empty while those items exist.</span></div>
       </div>
       {inbox.reviewFailed ? <div className="cp-admin-notice cp-admin-notice--danger" role="alert"><div><strong>A signal could not be marked as reviewed</strong><span>It stays in the Inbox. Open it again to retry.</span></div><button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" onClick={inbox.dismissReviewFailed}>Dismiss</button></div> : null}
       {list.isError ? <div className="cp-admin-notice cp-admin-notice--danger" role="alert"><div><strong>The Inbox could not be loaded</strong><span>Check your connection and try again.</span></div><button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" onClick={() => void list.refetch()}>Retry</button></div> : null}
