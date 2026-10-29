@@ -19,7 +19,7 @@ function GitHubApplicationForm({ scope, initial, onClose, onSaved }: Props & { i
   const [busy, setBusy] = useState(false), [error, setError] = useState('');
   // A stored secret is shown masked until the user chooses to replace it.
   const [changingSecret, setChangingSecret] = useState(false), [copied, setCopied] = useState(false);
-  const callback = `${window.location.origin}/api/v1/mcp-oauth/callback`;
+  const callback = initial.callback_url;
   async function copyCallback() { try { await navigator.clipboard.writeText(callback); setCopied(true); window.setTimeout(() => setCopied(false), 2500); } catch { setError('Copy failed. Select the callback URL and copy it manually.'); } }
   const request = useRef<AbortController | null>(null);
   useEffect(() => () => request.current?.abort(), []);
@@ -41,12 +41,12 @@ function GitHubApplicationForm({ scope, initial, onClose, onSaved }: Props & { i
     }
   }
   return <section className="github-application" aria-label="Configure GitHub App">
-    <GitHubSetupGuide />
+    <GitHubSetupGuide callback={initial.callback_url} />
     <form className="github-application-form cp-admin-panel" onSubmit={event => { event.preventDefault(); void save(); }}>
       <h3>Your GitHub App</h3>
       <p className="cp-admin-muted">Saved only for the selected workspace and environment. Each customer uses its own GitHub App.</p>
       {initial.configured ? <div className="cp-admin-notice identity-info"><Info size={18} aria-hidden="true" /><div><strong>Replacing needs both credentials</strong><span>Enter the Client ID and a new client secret. Existing connections can require authorization again when their tokens expire.</span></div></div> : null}
-      <div className="github-callback"><span className="github-callback-label">Callback URL</span><div className="github-callback-row"><code className="github-setup-value">{callback}</code><button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => void copyCallback()}>{copied ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}{copied ? 'Copied' : 'Copy'}</button></div><small>Paste this in your GitHub App, in the field "Callback URL". Use your deployed Chokepoint address in production.</small></div>
+      <div className="github-callback"><span className="github-callback-label">Callback URL</span><div className="github-callback-row"><code className="github-setup-value">{callback}</code><button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => void copyCallback()}>{copied ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}{copied ? 'Copied' : 'Copy'}</button></div><small>Paste this in your GitHub App, in the field "Callback URL". The backend sets this address.</small></div>
       <fieldset disabled={busy}>
         <label className="cp-admin-field">Client ID<input className="cp-admin-input" autoComplete="off" required maxLength={200} value={clientID} onChange={event => setClientID(event.target.value)} /><small>In GitHub: Settings, Developer settings, GitHub Apps, select your app, then General. Copy the Client ID, not the App ID.</small></label>
         <label className="cp-admin-field">Client secret{initial.configured && !changingSecret

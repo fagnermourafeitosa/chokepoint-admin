@@ -2,7 +2,7 @@ import { httpClient } from '../../../api/http-client';
 import type { EnvironmentScope } from '../../access/environment-scope';
 import type { MCPServer, Preview } from '../api';
 export type Provider = { id: string; name: string; description: string; available: boolean };
-export type ApplicationStatus = { client_id: string; configured: boolean; revision: number };
+export type ApplicationStatus = { client_id: string; configured: boolean; revision: number; callback_url: string };
 export type ApplicationInput = { client_id: string; client_secret: string; revision: number };
 export type EnterprisePreview = { server: MCPServer; preview: Preview; existing_id?: string };
 export type ConnectionSummary = Pick<MCPServer, 'id' | 'name' | 'endpoint' | 'connection_type' | 'provider_id' | 'account' | 'authentication_status' | 'enabled' | 'revision'> & { review_required: boolean };
