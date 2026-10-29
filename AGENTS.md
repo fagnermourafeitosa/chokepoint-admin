@@ -25,6 +25,15 @@ For React work, read and apply the [Vercel React Best Practices skill](.agents/s
 
 Before you implement or review an interface, read [the module design system](docs/design-system/README.md), including its token and layout rules. Reuse `docs/design-system/styles/index.css` and the documented semantic tokens. Keep this module's own visual system and the reference mocks.
 
+## Visual Specification (Mock)
+
+The workbench mock in `docs/chokepoint-workbench` is the visual specification of the ideal interface. Follow [the visual specification rules](docs/design-system/visual-specification.md).
+
+* A mock change needs no formal specification, but only the user asks for it.
+* Propose and draw only from data that the backend stores today. Tell the user before you suggest an element that needs more.
+* Mark each element that is not implemented with the Planned tag and its date. Do not write "data not available" or similar text in the mock.
+* Remove the tag when the element is implemented.
+
 ## Temporary Implementation Warnings
 
 When a feature has a limitation, show a temporary warning in the screen that it affects, near the action or information. In plain language, state the limitation, its practical effect and, when needed, what the administrator must do. Record the limitation in the specification.

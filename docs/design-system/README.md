@@ -15,6 +15,8 @@ Reusable visual tokens, CSS primitives, and page composition rules for the React
 
 - [Controls and navigation](components.md): reusable control appearances, header/footer patterns, and local demonstrations.
 
+- [Visual specification in the mock](visual-specification.md): how to draw the ideal screen and mark elements that are not implemented.
+
 ## Source and scope
 
 Derived from [workbench CSS](../chokepoint-workbench/styles.css) and [React screen structure](../chokepoint-workbench/src/app.tsx). The runnable source mock is [dist/index.html](../chokepoint-workbench/dist/index.html); its parent index references an absent `app.js`.
