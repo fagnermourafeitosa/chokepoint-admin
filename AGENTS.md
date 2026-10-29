@@ -1,962 +1,214 @@
-# Project Guidelines
+# Admin Agent Guidelines
 
-## Module Responsibility
+This module is the React application that manages the Chokepoint platform. Platform management interfaces belong here. Public pages and developer documentation belong in `frontend`. Backend services and business rules belong in `backend`.
 
-This module is the React application for managing the Chokepoint platform. Platform management interfaces belong here. The public-facing page belongs in the separate `frontend` module.
+---
 
-## Design System
-
-Before UI implementation or review, read [the module design system](docs/design-system/README.md), including its token and layout rules. Reuse `docs/design-system/styles/index.css` and the documented semantic tokens. Preserve this module’s separate visual system and the reference mocks.
-
-## Temporary Implementation Warnings
-
-When a feature has an implementation limitation or caveat, show a temporary warning in the relevant admin screen, close to the action or information it affects. State the limitation in plain language, explain its practical effect, and tell the user what to do when action is needed. Record the limitation in the relevant specification.
-
-Use the same warning presentation as the identity-provider and People warnings: `cp-admin-notice`, warning background and border tokens, a leading `TriangleAlert` icon, a title, and explanatory text. Reuse a shared warning component when available; otherwise follow the existing implementations in `src/features/identity/IdentityConnectionForm.tsx` and `src/features/permissions/PeopleEditor.tsx`.
-
-Warnings are temporary and informational. Do not block a workflow unless its approved requirements require it. Update or remove each warning when its limitation changes or is resolved; displaying a warning does not resolve the limitation.
+# Basics
 
 ## Language
 
-* Always use ASD-STE100 Simplified Technical English when explaining anything to the user.
-* Always write documentation, instructions, comments, specifications, identifiers, and project artifacts in English.
-* Follow existing domain terminology. Do not invent synonyms for established TrustBridge concepts.
+* Use ASD-STE100 Simplified Technical English when you explain anything to the user.
+* Write documentation, instructions, comments, specifications, identifiers and project artifacts in English.
+* Use the existing Chokepoint domain terms. Do not invent synonyms.
 
 ## Technology Baseline
 
-* React + Vite
+* React with Vite, client-side rendering. The Admin consumes the Go backend APIs.
+* npm `10.9.8` with Node.js `22.23.1` (see `.nvmrc`). Keep dependencies, the lockfile and `.env.local` in this module. Use `npm ci` to reproduce the dependency tree. Keep environment files out of Git, except `.env.example`.
 
-Use React with Vite for the platform management application. The admin consumes the Go backend APIs and uses client-side rendering.
+Do not silently change the stack or upgrade major dependencies.
 
-Do not silently change the selected stack or upgrade major dependencies.
+For React work, read and apply the [Vercel React Best Practices skill](.agents/skills/react-best-practices/SKILL.md). Its Next.js rules do not apply to this Vite application. Project rules and approved specifications take precedence over generic skill guidance.
 
-Use npm `10.9.8` with Node.js `22.23.1` (see `.nvmrc`). Keep dependencies, the lockfile, and `.env.local` isolated within this module. Use `npm ci` to reproduce the installed dependency tree. Keep environment files out of Git except `.env.example`.
+## Design System
 
-For React implementation, review, and refactoring, read and apply the [Vercel React Best Practices skill](.agents/skills/react-best-practices/SKILL.md). Apply the React guidance relevant to this module; Next.js-specific rules do not apply to the Vite application.
+Before you implement or review an interface, read [the module design system](docs/design-system/README.md), including its token and layout rules. Reuse `docs/design-system/styles/index.css` and the documented semantic tokens. Keep this module's own visual system and the reference mocks.
 
-Project-specific architecture and explicit specifications take precedence over generic skill guidance.
+## Temporary Implementation Warnings
+
+When a feature has a limitation, show a temporary warning in the screen that it affects, near the action or information. In plain language, state the limitation, its practical effect and, when needed, what the administrator must do. Record the limitation in the specification.
+
+* Presentation: `cp-admin-notice`, the warning background and border tokens, a leading `TriangleAlert` icon, a title and an explanation. Use a shared warning component when one exists. Otherwise follow `src/features/identity/IdentityConnectionForm.tsx` and `src/features/permissions/PeopleEditor.tsx`.
+* A warning informs. It does not block a workflow unless the approved requirements say so.
+* Update or remove the warning when its limitation changes or is resolved. A warning does not resolve the limitation.
 
 ---
 
----
+# Development Workflow
 
-# Code Creation Workflow
+## Flow
 
-## Development Flow
-
-The order is fixed. Every decision belongs to the user: at each one, stop and wait for an explicit answer.
-
-During grilling, present multiple meaningful, distinct options for each decision, explain their consequences, and give a recommendation. Allow the user to propose another option. If only one viable option exists, explain why; do not invent alternatives.
+The order is fixed. Each decision in this flow belongs to the user: stop and wait for an explicit answer.
 
 ```mermaid
 flowchart TD
     G["/grilling on main<br/>until shared understanding"] --> S["/to-spec on main"]
     S --> A{"User approves implementation?"}
     A -- no --> W1["Wait"]
-    A -- yes --> I["Implement<br/>on a dedicated branch from main"]
-    I --> R["Formal Code Reviewer Gate"]
+    A -- yes --> P["Status In Progress<br/>create the task branch from main"]
+    P --> I["Implement on the task branch"]
+    I --> V["npm run check, npm run build,<br/>functional test in the browser"]
+    V --> R["Formal Code Review Gate<br/>status Waiting Approve"]
     R --> C{"User approves the reviewed result?"}
-    C -- no --> W2["Wait with changes on the branch"]
-    C -- yes --> Commit["Commit approved changes"]
-    Commit --> Merge["Merge task branch into local main"]
-    Merge --> Push["Push main to origin"]
+    C -- no --> W2["Wait with the changes on the branch"]
+    C -- yes --> D["Status Implemented<br/>commit on the task branch"]
+    D --> M["Merge the task branch into local main"]
+    M --> U["Push main to origin"]
 ```
 
-## Local Functional Test
+## Decisions
 
-Run functional tests by hand in the built-in browser, where the user can watch. Do not automate them. Use these local development credentials:
+* **Grilling.** For each decision, give several real, different options, their consequences and a recommendation. The user can propose another option. If only one option is possible, explain why. Do not invent alternatives.
+* **Trivial choices.** Do not ask about choices that a one-line edit can change later, such as wording, order or labels. Apply the recommendation and say in one line what you chose. Ask only about architecture, contracts, scope, data and security.
+* **Zero guesswork.** Do not invent requirements, domain concepts, state transitions, APIs, validation rules or backend behavior. When the specification and the code do not define something, ask.
+* **Scope.** Do not expand a task because another change looks useful. Name it as a follow-up.
+* **No fallbacks.** The project is in initial development and is not in production. Do not write shims, legacy adapters, dual paths or fallbacks for earlier internal versions. Replace a changed contract cleanly. Ask the user before you add a compatibility layer.
 
-1. Open `http://127.0.0.1:5173` and click **Continue to sign in**. The sign-in page is the Keycloak realm `chokepoint-platform` on `127.0.0.1:8180`.
-2. Use the user `admin-a`. It has access to Workspace A, which holds the local identity connections.
-3. For the password, read `CP_SEED_PASSWORD` in `dev-infra/idps/keycloak/.env`: `sed -n 's/^CP_SEED_PASSWORD=//p' .env`.
-4. For the one-time code, run `dev-infra/idps/keycloak/totp.sh`. It prints the current code of `admin-a`, which is valid for 30 seconds, so type it immediately.
-5. To reach identity connections, go to **Access**, then **Integrations**, then **Identity providers**.
+## Specifications
 
-Click each field and type into it. The built-in browser does not show native `confirm()` dialogs. It answers them with "cancel" and logs `Page dialog suppressed` in the console.
+All code creation and behavior changes start from an approved specification. Do not create or use native `Walkthrough` or `Implementation Plan` artifacts.
 
-## Spec-Driven Execution
+* Location: `specs/<ID>-YYYY-MM-DD-<slug>.md`, from the template `specs/000-YYYY-MM-DD-template.md`.
+* Write a specification and its grilling on `main`. Never create a branch to write a specification.
+* Register each specification in the `## Specifications` table at the end of `README.md`.
+* A specification that consumes a backend API links the backend specification that defines it.
 
-All code creation and behavioral changes MUST be based on an approved specification.
+### Reading Specifications
 
-Do not create or use native `Walkthrough` or `Implementation Plan` artifacts.
+* Before you implement or change behavior, read the active specification. When the work depends on an existing feature, also read its earlier specifications.
+* When specifications conflict, the most recent one prevails (by the date in its file name, then by ID). Do not read an older specification as current behavior without a check of the newer specifications and the code.
+* Do not infer relevance from files that are open in the IDE.
+* Sources, in order of authority: explicit user instructions, approved specifications, repository code, project documentation, project skills.
 
-Specifications live under:
+## Specification Lifecycle
 
-```text
-specs/
-```
+A specification has exactly one status: `Proposed`, `Not Implemented`, `In Progress`, `Waiting Approve` or `Implemented`.
 
-and follow:
+The status changes only at the events in this table. At each event, change the status in the specification header **and** in the `README.md` index in the same step.
 
-```text
-<ID>-YYYY-MM-DD-<slug>.md
-```
+| Event | Status change | In the same step |
+| :--- | :--- | :--- |
+| The user approves the specification for implementation. | `Proposed` or `Not Implemented` → `In Progress` | Commit the status on `main`, then create the task branch from `main`. |
+| The code is complete, all checks pass, and the Formal Code Review Gate is reported. | `In Progress` → `Waiting Approve` | Mark each met checkbox (`[x]`). Next to each unmet checkbox, write what is missing. |
+| The user approves the reviewed result. | `Waiting Approve` → `Implemented` | Change the status and the index in the commit on the task branch, before the merge. |
 
-Use:
+Rules:
 
-```text
-specs/000-YYYY-MM-DD-template.md
-```
-
-as the specification template.
-
-### Branching Policy
-
-Specifications are written on `main`, together with their grilling; never create a branch to write a specification. The implementation of a specification/task that modifies code MUST have its own dedicated branch, created from `main` when implementation begins.
-
-Modifying markdown documentation only does not require creating a new branch.
-
-## Zero Guesswork
-
-Do not invent:
-
-* requirements;
-* domain concepts;
-* state transitions;
-* APIs;
-* package boundaries;
-* infrastructure dependencies;
-* validation rules;
-* protocol behavior.
-
-If implementation requires information that is not defined by the specification or existing code, ask for clarification instead of silently creating a design assumption.
-
-Do not expand the scope of a task because another change appears useful.
-
-## No Fallbacks & Zero Retrocompatibility (Pre-Production Stage)
-
-This project is in active initial development and is NOT in production.
-
-* **Avoid fallbacks and shims**: Do NOT write temporary bridges, legacy adapters, dual-stack endpoints, or ceremonial fallbacks to preserve backwards compatibility with previous internal iterations.
-* **Refactor cleanly**: When modifying an architectural boundary, contract, or package responsibility, replace it cleanly, decisively, and directly.
-* **When in doubt**: Ask the user before introducing compatibility layers, but the default directive is zero backwards compatibility.
-
----
-
-
-## Required Skills
-
-Project skills are located in:
-
-```text
-.agents/skills/
-```
-
-Inspect this directory before declaring a skill unavailable.
-
-For new implementation work:
-
-1. use `/grilling` to challenge and refine the requirements;
-2. use `/to-spec` to create or maintain the specification;
-3. use `/golang-best-practices` for Go work;
-4. use `/golang-echo-framework` for Echo framework code;
-
----
-
-# Specification Lifecycle
-
-Every specification must use exactly one of:
-
-```text
-Proposed
-Not Implemented
-In Progress
-Waiting Approve
-Implemented
-```
-
-`Proposed` marks a specification that is written but on hold until an external decision is made (for example, the production topology). It states that decision in a notice right below its header. It is not implemented, and only the user moves it on:
-
-```text
-Proposed -> Not Implemented
-```
-
-When implementation begins:
-
-```text
-Not Implemented -> In Progress
-```
-
-When code is complete and all required verification passes:
-
-```text
-In Progress -> Waiting Approve
-```
-
-Only after explicit user approval:
-
-```text
-Waiting Approve -> Implemented
-```
-
-Do not mark a specification as `Implemented` automatically.
-
-Mark each checkbox (`[x]`) in the specification as soon as its item is complete and verified: user stories, acceptance criteria and any task list. Do this in the same turn that completes the item. Do not leave all checkboxes for the end. A checkbox that stays unchecked means the item is not done, so write next to it what is still missing.
-
-When implementation reaches `Waiting Approve`, report:
-
-* files created or changed;
-* mark all `Acceptance Criteria` checkboxes
-* implemented behavior;
-* quality checks executed;
-* relevant deviations from the specification.
-
-### Formal Code Reviewer Gate
-
-Upon completing the implementation of any specification or code modification (with applicable quality checks passing), the agent **MUST** execute the formal Code Reviewer stage before requesting approval or awaiting further instructions. The workflow strictly follows these 4 steps:
-
-1. **Implementation Report**:
-   Objectively report what was built (files created/modified, runtime behavior, and checks performed).
-
-2. **Explicit Reviewer Role Transition**:
-   Formally announce the transition of posture to the user:
-   > *"As a code reviewer, I will critically analyze the generated implementation to identify vulnerabilities, concurrency/resource leaks, edge cases, contracts, and technical optimization opportunities."*
-
-3. **Descriptive Diagnosis and Comparative Table**:
-   Perform an in-depth code analysis and present findings in two mandatory formats:
-   - **Descriptive**: detailed technical explanation of each observed fragility or opportunity.
-   - **Comparative Table**:
-     | HOW IT WAS IMPLEMENTED | ISSUE | IMPROVEMENT (GAIN) |
-     | :--- | :--- | :--- |
-     | [Current code/pattern] | [Technical risk/edge case/leak] | [Proposed change and positive impact] |
-
-4. **Self-Correction Lockdown & User Query**:
-   - **AUTOMATIC CORRECTION FORBIDDEN**: The agent **MUST NOT** apply any code corrections or changes autonomously during this stage.
-   - **MANDATORY QUERY**: The agent must conclude the turn by explicitly asking the user whether they want the adjustments identified in the review to be applied.
-
-### Anti-Completion Bias & Authentic Review Mandate (Zero Rubber-Stamping)
-
-LLM agents possess an intrinsic training bias (RLHF task-completion bias) that subconsciously drives them to declare tasks finished, stamp code as "ready for approval", and conduct superficial reviews simply to terminate the trajectory.
-
-In this repository, **rubber-stamp reviews are strictly classified as a severe engineering failure**.
-
-The agent MUST actively counter its internal completion bias by enforcing the following behavioral constraints:
-
-1. **Forbid Premature Closure & Approval Pushing**: The agent MUST NEVER push the user to approve a specification, ask "posso aprovar a spec?", or transition a specification to `Implemented` unless the user explicitly directs it. The agent must remain in an analytical, vigilant stance.
-2. **Skeptical Code Audit (Assume Flaws Exist)**: Rather than seeking to prove that the code works, the reviewer must actively search for how the code will break, drift, or silently degrade under stress. Identify edge cases, race conditions, resource leaks, unhandled error paths, and architectural contract violations.
-3. **No Decorative Checklist Stamping**: Checking acceptance criteria checkboxes (`[x]`) must never be a perfunctory act to conclude a turn. Every criterion must be backed by recorded evidence from an applicable build, static check, code inspection or manual browser check.
-4. **Deliberate Pace & Zero Urgency**: Architectural robustness, correctness, and critical scrutiny ALWAYS supersede speed or turn-count efficiency.
-
-#### Pragmatism & Anti-Pedantry Filter (Zero Hypotheticals)
-
-To prevent theoretical pedantry and speculative overengineering during reviews, the reviewer MUST adhere to the following evaluation boundaries:
-
-* **Execution Reality over Speculative Scenarios**: Evaluate the code strictly against its active runtime execution path and documented contract. It is strictly FORBIDDEN to raise risks based on hypothetical future usages outside the active contract.
-* **YAGNI & KISS (Accidental Complexity Prohibition)**: Do NOT propose additional concurrency, channels, background workers, synchronization primitives, or defensive abstractions if the standard library, runtime, or operating system already sufficiently handles the condition.
-* **Concrete Failure Criteria**: Findings MUST correspond to demonstrable bugs, specification violations, reproducible race conditions, genuine resource leaks, or project architecture rule violations.
-* **Strict Audit Verdict Policy**: If after thorough, adversarial investigation no flaws exist, the reviewer may declare:
-  > *"No actionable defects or boundary violations found after rigorous audit."*
-  Do NOT fabricate low-value or academic remarks simply to populate a comparative table.
-
----
-
-
-## Required Skills
-
-Project skills are located in:
-
-```text
-.agents/skills/
-```
-
-Inspect this directory before declaring a skill unavailable.
-
-For new implementation work:
-
-1. use `/grilling` to challenge and refine the requirements;
-2. use `/to-spec` to create or maintain the specification;
-3. use `/golang-best-practices` for Go work;
-4. use `/golang-echo-framework` for Echo framework code;
-
----
-
-# Specification Lifecycle
-
-Every specification must use exactly one of:
-
-```text
-Proposed
-Not Implemented
-In Progress
-Waiting Approve
-Implemented
-```
-
-`Proposed` marks a specification that is written but on hold until an external decision is made (for example, the production topology). It states that decision in a notice right below its header. It is not implemented, and only the user moves it on:
-
-```text
-Proposed -> Not Implemented
-```
-
-When implementation begins:
-
-```text
-Not Implemented -> In Progress
-```
-
-When code is complete and all required verification passes:
-
-```text
-In Progress -> Waiting Approve
-```
-
-Only after explicit user approval:
-
-```text
-Waiting Approve -> Implemented
-```
-
-Do not mark a specification as `Implemented` automatically.
-
-Mark each checkbox (`[x]`) in the specification as soon as its item is complete and verified: user stories, acceptance criteria and any task list. Do this in the same turn that completes the item. Do not leave all checkboxes for the end. A checkbox that stays unchecked means the item is not done, so write next to it what is still missing.
-
-When implementation reaches `Waiting Approve`, report:
-
-* files created or changed;
-* implemented behavior;
-* quality checks executed;
-* relevant deviations from the specification.
-
-### Formal Code Reviewer Gate
-
-Upon completing the implementation of any specification or code modification (with applicable quality checks passing), the agent **MUST** execute the formal Code Reviewer stage before requesting approval or awaiting further instructions. The workflow strictly follows these 4 steps:
-
-1. **Implementation Report**:
-   Objectively report what was built (files created/modified, runtime behavior, and checks performed).
-
-2. **Explicit Reviewer Role Transition**:
-   Formally announce the transition of posture to the user:
-   > *"As a code reviewer, I will critically analyze the generated implementation to identify vulnerabilities, concurrency/resource leaks, edge cases, contracts, and technical optimization opportunities."*
-
-3. **Descriptive Diagnosis and Comparative Table**:
-   Perform an in-depth code analysis and present findings in two mandatory formats:
-   - **Descriptive**: detailed technical explanation of each observed fragility or opportunity.
-   - **Comparative Table**:
-     | HOW IT WAS IMPLEMENTED | ISSUE | IMPROVEMENT (GAIN) |
-     | :--- | :--- | :--- |
-     | [Current code/pattern] | [Technical risk/edge case/leak] | [Proposed change and positive impact] |
-
-4. **Self-Correction Lockdown & User Query**:
-   - **AUTOMATIC CORRECTION FORBIDDEN**: The agent **MUST NOT** apply any code corrections or changes autonomously during this stage.
-   - **MANDATORY QUERY**: The agent must conclude the turn by explicitly asking the user whether they want the adjustments identified in the review to be applied.
-
-### Anti-Completion Bias & Authentic Review Mandate (Zero Rubber-Stamping)
-
-LLM agents possess an intrinsic training bias (RLHF task-completion bias) that subconsciously drives them to declare tasks finished, stamp code as "ready for approval", and conduct superficial reviews simply to terminate the trajectory.
-
-In this repository, **rubber-stamp reviews are strictly classified as a severe engineering failure**.
-
-The agent MUST actively counter its internal completion bias by enforcing the following behavioral constraints:
-
-1. **Forbid Premature Closure & Approval Pushing**: The agent MUST NEVER push the user to approve a specification, ask "posso aprovar a spec?", or transition a specification to `Implemented` unless the user explicitly directs it. The agent must remain in an analytical, vigilant stance.
-2. **Skeptical Code Audit (Assume Flaws Exist)**: Rather than seeking to prove that the code works, the reviewer must actively search for how the code will break, drift, or silently degrade under stress. Identify edge cases, race conditions, resource leaks, unhandled error paths, and architectural contract violations.
-3. **No Decorative Checklist Stamping**: Checking acceptance criteria checkboxes (`[x]`) must never be a perfunctory act to conclude a turn. Every criterion must be backed by recorded evidence from an applicable build, static check, code inspection or manual browser check.
-4. **Deliberate Pace & Zero Urgency**: Architectural robustness, correctness, and critical scrutiny ALWAYS supersede speed or turn-count efficiency.
-
-#### Pragmatism & Anti-Pedantry Filter (Zero Hypotheticals)
-
-To prevent theoretical pedantry and speculative overengineering during reviews, the reviewer MUST adhere to the following evaluation boundaries:
-
-* **Execution Reality over Speculative Scenarios**: Evaluate the code strictly against its active runtime execution path and documented contract. It is strictly FORBIDDEN to raise risks based on hypothetical future usages outside the active contract.
-* **YAGNI & KISS (Accidental Complexity Prohibition)**: Do NOT propose additional concurrency, channels, background workers, synchronization primitives, or defensive abstractions if the standard library, runtime, or operating system already sufficiently handles the condition.
-* **Concrete Failure Criteria**: Findings MUST correspond to demonstrable bugs, specification violations, reproducible race conditions, genuine resource leaks, or project architecture rule violations.
-* **Strict Audit Verdict Policy**: If after thorough, adversarial investigation no flaws exist, the reviewer may declare:
-  > *"No actionable defects or boundary violations found after rigorous audit."*
-  Do NOT fabricate low-value or academic remarks simply to populate a comparative table.
-
-### Approval Review: Development Cockpit and README
-
-1. **`README.md` of this repository**: descriptions, Mermaid diagrams, commands, versions and the specifications index match the code after the change.
-
-
-### Specifications Index in README.md
-Whenever a specification is created, updated, or transitions in lifecycle (especially upon reaching `Implemented`), it MUST be registered or updated in the `## Specifications` table at the end of `README.md`.
-
----
-
-# Flow and Architecture Documentation
-
-Always use Mermaid diagrams (`mermaid` code blocks) when documenting flows, system architectures, sequences, or topologies.
-
-Do not use ASCII art or text boxes to draw flows or architecture.
-
-Every architectural flow, interaction sequence, or topology in specifications, documentation, and READMEs must be rendered using standard Mermaid syntax (e.g., `flowchart`, `sequenceDiagram`, `stateDiagram-v2`).
-
----
-
-# Reading Specifications
-
-Before implementing or modifying behavior, read the active specification.
-
-When the work changes or depends on an existing subsystem, also read the relevant historical specifications.
-
-When specifications conflict, the most recent one (by the date in its file name, then by ID) prevails, whether or not it names the earlier one. An older specification is never read as current behavior without checking the newer specifications and the code.
-
-An `Implemented` specification is a historical record and is never edited. A behavior change goes in a new specification that supersedes it; new context goes in the documentation (README, `docs/`).
-
-Do not infer relevance from files merely being open in the IDE.
-
-The authoritative sources are:
-
-1. explicit user instructions;
-2. approved specifications;
-3. current repository code;
-4. project documentation;
-5. project skills.
-
----
-
-# Architecture Principles
-
-## Go First
-
-Use idiomatic Go package design.
-
-Do not mechanically apply architecture patterns originating from Java, C#, enterprise frameworks, or generic Clean Architecture templates.
-
-Prefer:
-
-* explicit dependencies;
-* small packages;
-* clear ownership;
-* simple structs;
-* concrete types;
-* package-level boundaries;
-* composition;
-* standard library primitives.
-
-Avoid abstraction that does not represent a real boundary or behavior.
-
-Do not create code merely to satisfy an architectural diagram.
-
----
-
-# Domain Boundaries
-
-TrustBridge must maintain strong domain boundaries.
-
-A domain boundary represents a cohesive responsibility, model, vocabulary, and set of invariants.
-
-Examples of concepts that may belong to distinct boundaries include:
-
-```text
-Verifier
-Presentation
-Verification
-Verification Session
-Policy
-Purpose
-Claims
-Verified Result
-```
-
-This list is illustrative, not a predefined package structure.
-
-The specification must determine the actual boundaries.
-
-## Boundary Rules
-
-A domain boundary must:
-
-* have a clear responsibility;
-* own its domain terminology;
-* own its invariants;
-* expose a small explicit API;
-* avoid leaking internal implementation details;
-* avoid depending on unrelated domain internals.
-
-Do not place unrelated behavior into generic packages merely because the concepts participate in the same workflow.
-
-Do not create catch-all packages such as:
-
-```text
-common
-shared
-core
-utils
-helpers
-misc
-models
-services
-managers
-```
-
-unless there is a concrete and documented responsibility that justifies the package.
-
-## Feature Is Not Automatically a Boundary
-
-A feature does not automatically create a new bounded context or package.
-
-Determine whether functionality:
-
-* belongs to an existing domain boundary;
-* introduces a genuinely new domain responsibility;
-* introduces distinct invariants or lifecycle;
-* requires an explicit integration boundary.
-
-Do not create boundaries solely because a specification represents a new feature.
-
-Conversely, do not collapse distinct domain responsibilities merely because they participate in the same request flow.
-
----
-
-# No Mandatory Layer Tree
-
-Do NOT require every domain boundary to contain:
-
-```text
-domain/
-application/
-infrastructure/
-presentation/
-```
-
-Do NOT generate this structure mechanically.
-
-This project does not use mandatory per-feature Clean Architecture layering.
-
-A simple boundary may legitimately look like:
-
-```text
-internal/policy/
-    evaluator.go
-    model.go
-    errors.go
-```
-
-Another domain may require additional packages because its complexity actually justifies them.
-
-The structure must emerge from responsibility and dependency needs.
-
-Do not add directories that only forward calls between other directories.
-
----
-
-# Package Design
-
-Packages are primary architecture boundaries in Go.
-
-Each package must have one clear responsibility.
-
-Prefer cohesive packages over artificial layer separation.
-
-A package API should expose the minimum required behavior.
-
-Do not export identifiers without a consumer.
-
-Avoid cyclic conceptual ownership even when Go prevents literal import cycles.
-
-When adding a package, the specification must make its ownership clear.
-
-Before creating a new package, answer:
-
-1. What responsibility does it own?
-2. Which domain boundary owns it?
-3. What public behavior must it expose?
-4. Which packages are allowed to depend on it?
-5. Why does this require a package instead of extending an existing cohesive package?
-
-If these questions do not have concrete answers, do not create the package.
-
----
-
-# Interfaces
-
-## General Rule
-
-Do not create interfaces for every service, repository, struct, or package.
-
-Outside explicit architectural boundaries, introduce an interface only when it provides concrete value, such as:
-
-* dependency inversion across a real boundary;
-* substitution required by the design;
-* multiple implementations;
-* behavior that must be isolated from a consumer.
-
-Do not create interfaces only for mocking.
-
-Prefer:
-
-```go
-type Service struct {
-    store *Store
-}
-```
-
-over:
-
-```go
-type StoreInterface interface {
-    ...
-}
-```
-
-when no architectural boundary requires abstraction.
-
-Define interfaces near the consumer when practical.
-
-Prefer small behavior-oriented interfaces.
-
-Accept interfaces and return concrete types by default.
-
----
-
----
-
-# HTTP and Echo
-
-Echo is an HTTP transport dependency.
-
-Echo-specific behavior belongs at the HTTP boundary.
-
-Do not propagate:
-
-```go
-*echo.Context
-```
-
-into domain packages.
-
-Extract standard Go values at the transport boundary.
-
-For request-scoped cancellation and deadlines, propagate:
-
-```go
-context.Context
-```
-
-using the request context.
-
-For example:
-
-```go
-ctx := c.Request().Context()
-```
-
-Handlers should primarily:
-
-1. decode transport input;
-2. perform transport-level validation;
-3. invoke the appropriate domain/application behavior;
-4. map errors to HTTP responses;
-5. encode the response.
-
-Do not put domain rules directly inside Echo handlers.
-
-Do not let HTTP DTOs become universal project models.
-
-HTTP route organization should follow domain ownership where practical rather than becoming a monolithic controller package.
-
-Use the `golang-echo-framework` skill for framework-specific conventions.
-
----
-
-# Composition Root
-
-The executable entrypoint is:
-
-```text
-cmd/api/
-```
-
-`cmd/api` is the composition root.
-
-It may:
-
-* load configuration;
-* initialize observability;
-* construct concrete infrastructure;
-* wire interfaces to implementations;
-* initialize HTTP handlers;
-* register routes and middleware;
-* start and stop the application.
-
-It must not own business rules.
-
-Concrete dependencies should normally be assembled here instead of hidden behind package globals.
-
----
-
-# Dependency Direction
-
-Dependencies should follow responsibility boundaries rather than a mandatory layered architecture.
-
-Domain packages must not depend on Echo or transport-specific types.
-
-Integration details must not leak into domain models.
-
-The controller concrete implementation depends on its consumer contract, not the reverse.
-
-Avoid packages depending on implementation details of unrelated domains.
-
-Do not create a generic abstraction layer merely to force every dependency to point through an interface.
-
-Use dependency inversion where there is a real architectural boundary.
-
----
-
-# Models and DTOs
-
-Do not create a global `models` package.
-
-Each domain boundary owns its own types.
-
-Transport DTOs belong to the transport boundary.
-
-Controller transport types belong to the controller integration.
-
-Domain models must represent TrustBridge concepts rather than external API payloads.
-
-Translate between models at boundaries when their semantics differ.
-
-Do not create mapping layers when the types are genuinely identical and no boundary is being protected.
-
----
-
-# Files and Responsibilities
-
-Every file should have one primary responsibility.
-
-### File Length Guideline (300-Line Threshold)
-* **Threshold as Code Smell**: Files exceeding **300 lines** represent a strong code smell of excessive responsibilities and low cohesion.
-* **Non-Rigid / Alert & Question**: This threshold is not a rigid blocker, but when a file exceeds or is about to exceed 300 lines, the agent/developer MUST **alert and question the user**, pointing out the smell of responsibility overload and proposing a cohesive split.
-* **Cohesive Splitting**: Split code when doing so produces a meaningful responsibility or package boundary. Do not split code artificially without a coherent architectural reason.
-
----
-
-# Configuration
-
-Configuration belongs to:
-
-```text
-internal/config
-```
-
-unless an approved specification establishes a more specific owner.
-
-Load environment variables at the application boundary.
-
-Do not call `os.Getenv` throughout domain code.
-
-Use typed configuration.
-
-Do not hardcode secrets.
-
----
-
-
-# Error Handling
-
-Use idiomatic Go errors.
-
-Add meaningful context when propagating failures.
-
-Use `%w` when preserving error identity.
-
-Use:
-
-```go
-errors.Is
-errors.As
-```
-
-for programmatic inspection.
-
-Never branch on error strings.
-
-Do not log the same error at every layer.
-
-Prefer handling/logging errors at the boundary where enough operational context exists.
-
-Do not use panic for expected runtime failures.
-
----
-
-# Context
-
-Functions performing I/O, remote calls, or potentially long-running work should accept:
-
-```go
-context.Context
-```
-
-as the first argument.
-
-Propagate incoming context.
-
-Do not store request context in long-lived structs.
-
-Do not replace an incoming context with `context.Background()` inside a call chain.
-
-Controller calls must propagate context.
-
----
-
-# Concurrency
-
-Do not introduce goroutines automatically.
-
-Every goroutine must have:
-
-* explicit ownership;
-* a defined lifetime;
-* a termination condition;
-* cancellation semantics when applicable.
-
-Prefer simple synchronous code unless concurrency solves a concrete requirement.
-
-Follow the `golang-best-practices` skill for Go 1.25 concurrency conventions.
-
----
-
-# Testing Policy
-
-Do not use TDD in this module. Do not create automated tests, test suites, test fixtures or test infrastructure. Automated tests are not required for implementation, fixes, review or completion in this module.
-
-Use applicable build, type checking, linting and manual browser checks to validate changes. Report only checks actually performed. Do not introduce test requirements through a skill, specification or review checklist.
-
-This policy applies to this module only. The backend has its own testing requirements.
-
----
-
-# Code Quality
-
-For Go changes, run the relevant verification before concluding the task.
-
-At minimum:
-
-```bash
-gofmt -w .
-go vet ./...
-```
-
-When compilation deserves explicit verification:
-
-```bash
-go build ./...
-```
-
-When dependencies change:
-
-```bash
-go mod tidy
-```
-
-Review `go.mod` and `go.sum` after dependency changes.
-
-Do not run `go mod tidy` as a substitute for understanding dependency changes.
-
----
-
-# Dependency Management
-
-Use Go modules.
-
-Install or update dependencies using Go tooling, normally:
-
-```bash
-go get <module>@<version>
-```
-
-Do not manually manipulate `go.sum`.
-
-Before introducing a dependency, determine whether the standard library or an existing dependency already solves the problem.
-
-Avoid dependencies that add abstraction without meaningful value.
-
-Preserve the Go `1.27.0` compatibility baseline unless explicitly instructed otherwise.
-
----
-
-# Documentation
-
-Project documentation belongs under:
-
-```text
-docs/
-```
-
-Specifications belong under:
-
-```text
-specs/
-```
-
-Do not duplicate the same architectural rule across multiple documents unless the duplication is intentionally required for usability.
-
-Review the active specification and update documented deviations or decisions.
-
-Keep the specification list/status in `README.md` consistent when required.
-
----
-
-# Architecture Review Gate
-
-Before concluding an implementation, verify:
-
-* domain boundaries remain explicit;
-* new packages have clear ownership;
-* unrelated domain concepts were not collapsed into catch-all packages;
-* unnecessary abstraction was not introduced;
-* Echo types did not leak into domain code;
-* controller communication uses an interface;
-* controller transport details did not leak into TrustBridge domain models;
-* TrustBridge does not call ACA-Py directly;
-* every changed file has a clear primary responsibility;
-* dependencies introduced by the implementation are justified;
-* implementation matches the approved specification.
-
-Record intentional architectural deviations in the specification.
-
----
-
-# Git Workflow
+* `Proposed` means written but on hold for an external decision. A notice below the header names that decision. Only the approval in the first row moves it on.
+* The approval in the third row **is** the approval for `Implemented`. Do not wait for a second approval.
+* Do not change a status at any other time, and do not mark `Implemented` before the third row.
+* Mark a checkbox only with evidence: a build or type check that you ran, a code inspection, or a manual browser check. Do not mark checkboxes only to end a turn.
+* Before each push to `main`, check that each specification whose code is in `main` is `Implemented`, in its header and in the `README.md` index.
+* Change the content of a specification (decisions, rules, contracts) on `main`. Status and checkbox changes go with the code, on the task branch.
+* An `Implemented` specification is a historical record. Do not edit it. A behavior change goes in a new specification that supersedes it. New context goes in the documentation (`README.md`, `docs/`).
 
 ## Branching
 
-Specifications are written on `main`, together with their grilling; never create a branch to write a specification. The implementation of a specification/task that modifies code must have its own dedicated branch, created from `main` when implementation begins.
+* The implementation of a specification or task that changes code has its own branch, created from `main` when implementation begins. Name it `feat/<specification ID>-<slug>`, for example `feat/018-requests-denied-inbox`.
+* When the local `main` checkout holds work of another task, create the branch in a separate `git worktree`.
+* A change to Markdown files only needs no branch.
 
-Markdown-only documentation changes do not require a new branch.
+## Required Skills
 
-## Commits, Merge and Push
+Project skills are in `.agents/skills/`. Look there before you say that a skill is not available.
 
-The publication flow is: user approval, commit, merge into local `main`, push `main` to origin. Pull requests are not required. Do not open a pull request unless explicitly requested.
+1. `/grilling` to challenge and refine the requirements;
+2. `/to-spec` to write or update the specification;
+3. `react-best-practices` for React work.
 
-User approval of the reviewed result authorizes this complete publication sequence; do not ask for separate approval at each step. Respect an explicitly narrower request, such as commit only or no push.
+## Verification
 
-Before approval, keep implementation changes on their dedicated branch. Do not publish unapproved changes.
+This module has no automated tests. Do not use TDD, and do not create tests, test suites, test fixtures or test infrastructure. Do not add a test requirement through a skill, a specification or a review checklist. The backend has its own testing rules.
+
+Verify each change with:
+
+```bash
+npm run check
+npm run build
+```
+
+and a functional test in the built-in browser. Report only the checks that you ran.
+
+### Local Functional Test
+
+Run functional tests by hand in the built-in browser, where the user can watch. Do not automate them.
+
+1. Open `http://127.0.0.1:5173` and click **Continue to sign in**. The sign-in page is the Keycloak realm `chokepoint-platform` on `127.0.0.1:8180`.
+2. Sign in as `admin-a`. It has access to Workspace A, which holds the local identity connections.
+3. Password: `CP_SEED_PASSWORD` in `dev-infra/idps/keycloak/.env` (`sed -n 's/^CP_SEED_PASSWORD=//p' .env`). Do not print it in a reply.
+4. One-time code: run `dev-infra/idps/keycloak/totp.sh`. The code is valid for 30 seconds, so type it at once.
+5. Identity connections are in **Access**, **Integrations**, **Identity providers**.
+
+Click each field and type into it. The built-in browser does not show native `confirm()` dialogs: it answers "cancel" and logs `Page dialog suppressed` in the console.
+
+## Formal Code Review Gate
+
+When an implementation is complete and its checks pass, do these four steps before you ask for approval:
+
+1. **Implementation report.** State what you built: files created or changed, runtime behavior, and the checks that you ran. Mark the met checkboxes (see Specification Lifecycle).
+2. **Reviewer posture.** Announce the change of posture:
+   > *"As a code reviewer, I will critically analyze the generated implementation to identify vulnerabilities, concurrency/resource leaks, edge cases, contracts, and technical optimization opportunities."*
+3. **Diagnosis.** Give a description of each finding, and this table:
+
+   | HOW IT WAS IMPLEMENTED | ISSUE | IMPROVEMENT (GAIN) |
+   | :--- | :--- | :--- |
+   | [Current code or pattern] | [Risk, edge case or leak] | [Proposed change and its gain] |
+
+4. **No automatic correction.** Do not apply a correction during this step. End the turn with a question: which adjustments must be applied.
+
+### Review Discipline
+
+* **Assume flaws exist.** Look for how the interface breaks, drifts or degrades: edge cases, stale data, race conditions between requests, unhandled error and loading states, and contract violations. A superficial review is a severe failure.
+* **Real findings only.** A finding is a demonstrable bug, a specification violation, a reproducible race condition or a violation of a project rule. Do not raise risks from hypothetical uses outside the active contract.
+* **YAGNI and KISS.** Do not propose extra state, effects or defensive abstractions when React, the router or the query library already handles the condition.
+* **No findings is a valid result.** After a thorough audit without flaws, say: *"No actionable defects or boundary violations found after rigorous audit."* Do not invent remarks to fill the table.
+* **No approval pressure.** Do not ask the user to approve while a criterion is unmet. Correctness takes precedence over speed and turn count.
+
+## Publication: Commit, Merge and Push
+
+The user's approval of the reviewed result authorizes the full sequence below. Do not ask again at each step. Obey a narrower request, such as "commit only" or "no push".
+
+Before approval, keep the changes on the task branch. Do not publish unapproved changes. Pull requests are not required; open one only when the user asks.
 
 After approval:
 
-1. review and stage only the approved task changes, excluding secrets and unrelated files;
-2. commit the changes on the task branch;
-3. fetch origin and update local `main` without discarding local work;
-4. merge the task branch into `main`, preferring fast-forward when possible;
-5. push `main` to origin without force-pushing;
-6. report the commit and publication result.
+1. set the specification to `Implemented` and update the `README.md` index (Specification Lifecycle, third row);
+2. review and stage only the approved task changes, without secrets or unrelated files;
+3. commit on the task branch;
+4. fetch origin and update the local `main` without discarding local work;
+5. merge the task branch into `main`;
+6. run `npm run check` and `npm run build` on the merged `main`;
+7. push `main` to origin, without force-push;
+8. report the commits and the publication result.
 
-Resolve routine merge conflicts while preserving both changes. Ask only when a conflict requires a product decision or would discard unrelated work. Never rewrite remote history to complete this flow.
+Resolve routine merge conflicts and keep both changes. Ask only when a conflict needs a product decision or would discard unrelated work. Never rewrite remote history.
 
-Markdown-only changes can be committed and pushed directly on `main` under the same user approval, without an implementation branch or pull request.
+A change to Markdown files only is committed and pushed directly on `main` under the same approval.
 
-Before commit:
+---
 
-* review the active specification;
-* review specification status;
-* ensure `README.md` specification status is consistent when applicable.
+# Engineering Rules
+
+## Documentation
+
+* Project documentation belongs in `docs/`. Specifications belong in `specs/`.
+* Draw flows, architectures, sequences and topologies with Mermaid (`flowchart`, `sequenceDiagram`, `stateDiagram-v2`). Do not use ASCII art.
+* The `README.md` descriptions, Mermaid diagrams, commands, versions and specification index must match the code after each change.
+
+## Files and Responsibilities
+
+* Each file has one primary responsibility.
+* A file near or over 300 lines is a sign of too many responsibilities. Tell the user, explain the overload and propose a cohesive split. The limit is not a hard block, and it does not justify an artificial split.
+* Keep each feature's API client, data hooks and components in its folder under `src/features/`.
+
+## Dependencies
+
+* Before you add a dependency, check whether the platform, React or an existing dependency already solves the problem. Do not add dependencies that only add abstraction.
+* Add dependencies with npm in this module only, and commit the lockfile.
 
 ---
 
 # Final Principle
 
-**Be concise. Be brief.** Remove filler and repetition. Preserve relevant reasoning, trade-offs, caveats and uncertainty. Do not reduce investigation or verification to make the response shorter.
-
-Preserve strong domain boundaries without turning the codebase into an architecture framework.
-
-Use Go packages to model ownership.
-
-Use abstractions where boundaries are real.
-
-Do not create equivalent abstractions everywhere else merely for symmetry.
-
-Prefer explicit, cohesive, idiomatic Go over ceremonial layers.
+**Be concise.** Remove filler and repetition. Keep the relevant reasoning, trade-offs, caveats and uncertainty. Do not reduce investigation or verification to make a response shorter.
