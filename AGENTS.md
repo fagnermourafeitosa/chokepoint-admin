@@ -69,7 +69,7 @@ Run functional tests by hand in the built-in browser, where the user can watch. 
 1. Open `http://127.0.0.1:5173` and click **Continue to sign in**. The sign-in page is the Keycloak realm `chokepoint-platform` on `127.0.0.1:8180`.
 2. Use the user `admin-a`. It has access to Workspace A, which holds the local identity connections.
 3. For the password, read `CP_SEED_PASSWORD` in `dev-infra/idps/keycloak/.env`: `sed -n 's/^CP_SEED_PASSWORD=//p' .env`.
-4. For the one-time code, run the script under "To generate the current one-time code" in `dev-infra/idps/keycloak/README.md` from `dev-infra/idps/keycloak`. The code is valid for 30 seconds, so type it immediately.
+4. For the one-time code, run `dev-infra/idps/keycloak/totp.sh`. It prints the current code of `admin-a`, which is valid for 30 seconds, so type it immediately.
 5. To reach identity connections, go to **Access**, then **Integrations**, then **Identity providers**.
 
 Click each field and type into it. The built-in browser does not show native `confirm()` dialogs. It answers them with "cancel" and logs `Page dialog suppressed` in the console.
