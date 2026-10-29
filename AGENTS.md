@@ -32,7 +32,8 @@ The workbench mock in `docs/chokepoint-workbench` is the visual specification of
 * A mock change needs no formal specification, but only the user asks for it.
 * Propose and draw only from data that the backend stores today. Tell the user before you suggest an element that needs more.
 * Mark each element that is not implemented with the Planned tag and its date. Do not write "data not available" or similar text in the mock.
-* Remove the tag when the element is implemented.
+* Mark each element that the real Admin already has, but with a different behavior or content, with the Differs tag and its date. Do not use Planned for it.
+* Remove the tag when the element is implemented or when the real Admin matches the mock.
 
 ## Temporary Implementation Warnings
 
