@@ -305,3 +305,32 @@
 .inbox-when .planned-tag[data-tip]:hover::after,.issue-action .planned-tag[data-tip]:hover::after,.decision-toolbar .planned-tag[data-tip]:hover::after,.inbox-filters .planned-tag[data-tip]:hover::after{left:auto;right:0}
 .planned-chip:hover::after,.planned-chip:focus-visible::after,.dt-reason--planned:hover::after,.dt-reason--planned:focus-visible::after{white-space:pre-line;max-width:260px}
 .auth-intent{display:block;margin-top:6px;font-size:10px;color:#c9ccc5;line-height:1.5;white-space:normal}
+
+.metric-row--4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.metric-row--4 .metric-card strong{font-size:36px}
+.metric-card .spark{width:100%;height:28px;display:block}
+.metric-card .meter{display:block;height:6px;border-radius:3px;background:#eceee9;overflow:hidden}
+.metric-card .meter i{display:block;height:100%;background:#8995a0;border-radius:3px}
+.dash-status{display:flex;align-items:center;gap:10px;margin:0 0 16px;font-size:13px;font-weight:700;flex-wrap:wrap}
+.dash-dot{width:10px;height:10px;border-radius:50%}.dash-ok{background:#288359}.dash-warn{background:#d9892f}
+.dash-mid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:14px;margin-bottom:18px}
+.dash-card{background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);padding:20px 24px;min-width:0}
+.dash-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.dash-card-head h2{font-size:18px;margin-top:6px}
+.traffic-legend{display:flex;gap:16px;font-size:11px;color:#6f736b;margin-bottom:6px}
+.traffic-legend span{display:inline-flex;align-items:center;gap:6px}
+.lg-allowed,.lg-denied{display:inline-block;width:10px;height:10px;border-radius:3px}
+.lg-allowed{background:#8995a0}.lg-denied{background:#c0584f}
+.traffic-plot{position:relative}.traffic-plot svg{width:100%;height:auto;display:block}
+.traffic-tip{position:absolute;top:0;transform:translateX(-50%);z-index:10;pointer-events:none;background:#1f211e;color:#fff;border-radius:8px;padding:8px 10px;font-size:11px;display:grid;gap:3px;white-space:nowrap}
+.traffic-tip small{color:#c9ccc5;font-size:10px}.traffic-tip i{margin-right:6px}.traffic-tip strong{font-size:12px}
+.traffic-table{margin-top:10px;font-size:11px;color:#6f736b}.traffic-table summary{cursor:pointer}
+.traffic-table table{margin-top:8px;border-collapse:collapse;width:100%}.traffic-table th,.traffic-table td{text-align:left;padding:3px 8px 3px 0;font-weight:500}
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;padding:11px 0;border-top:1px solid #f0f1ed}
+.top-row:hover{background:#fbfbf9}.top-row span{display:grid;gap:3px;min-width:0}.top-row code{font-weight:700;font-size:11px}.top-row small{font-size:10px;color:#9ba098}.top-row strong{font-size:14px;color:#b95f54}
+.unused{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid #f0f1ed}
+.unused strong{font-size:28px}.unused span{font-size:11px;color:#6f736b}.unused .planned-tag{grid-column:1/-1;width:max-content}
+.dash-right .planned-tag[data-tip]:hover::after{left:auto;right:0}
+.dash-status .planned-tag,.dash-card-head .planned-tag{margin-left:0}
+@media(max-width:1000px){.metric-row--4{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-mid{grid-template-columns:1fr}}
+@media(max-width:760px){.metric-row--4{grid-template-columns:1fr}}
