@@ -1,5 +1,5 @@
 .attention-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.attention-counters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--cp-admin-space-4); margin-block-end: var(--cp-admin-space-6); }
+.attention-counters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--cp-admin-space-4); margin-block-end: var(--cp-admin-space-6); }
 .attention-counter { display: grid; gap: var(--cp-admin-space-2); padding: var(--cp-admin-space-5) var(--cp-admin-space-6); text-align: start; border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-panel); background: var(--cp-admin-color-surface); color: inherit; cursor: pointer; }
 .attention-counter:hover { background: var(--cp-admin-color-row-hover); }
 .attention-counter-label { font-size: .6875rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--cp-admin-color-text-muted); }
@@ -9,8 +9,6 @@
 .attention-inbox-header { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-4); padding: var(--cp-admin-space-5) var(--cp-admin-space-6) var(--cp-admin-space-3); }
 .attention-inbox-header h2 { margin: 0; font: 700 1.25rem var(--cp-admin-font-heading); }
 .attention-kicker { display: block; margin-block-end: var(--cp-admin-space-1); font-size: .6875rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--cp-admin-color-text-muted); }
-.attention-notice { margin: 0 var(--cp-admin-space-6) var(--cp-admin-space-3); background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); color: var(--cp-admin-color-warning); }
-.attention-notice svg { flex: none; }
 .attention-status { padding: var(--cp-admin-space-4) var(--cp-admin-space-6); margin: 0; }
 .attention-row { display: grid; grid-template-columns: 11rem minmax(0, 1.3fr) minmax(0, 1.1fr) 8rem 7rem; gap: var(--cp-admin-space-4); align-items: center; padding: var(--cp-admin-space-4) var(--cp-admin-space-6); border-top: var(--cp-admin-border-width) solid var(--cp-admin-color-border); }
 .attention-head { padding-block: var(--cp-admin-space-3); font-size: .6875rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--cp-admin-color-text-muted); }
