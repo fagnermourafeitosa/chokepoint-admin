@@ -84,7 +84,7 @@ The Admin keeps a fixed map from `target_route` to an Admin route. A route name 
 **`tool-discovery` signals** (Backend 020, Tool Discovery Producer; decided by the user on 2026-10-29):
 
 - Context keys: `server`, `changed` and `removed`. The first context line is the server name. The second line lists the counts that are above zero, for example "2 changed · 1 removed".
-- Target: `tool-catalog` with the parameters `server_id` and `connection_type` (`custom` or `enterprise`). The Admin opens `/access/integrations?type=<connection_type>`. Another value of `connection_type` opens the Custom MCP tab.
+- Target: `tool-catalog` with the parameters `server_id` and `connection_type` (`custom` or `enterprise`). The Admin opens `/access/integrations?type=<connection_type>&server=<server_id>`, which selects that connection. Another value of `connection_type` opens the Custom MCP tab.
 
 ### 3. Counters
 
@@ -149,7 +149,7 @@ These items are not implemented. The temporary warning above the Inbox (Implemen
 |---|---|---|
 | Producer for `requests-denied` | The backend does not store authorization decisions. | A specification for the decision trace, and a job that raises one signal for each tool and agent in a time window. |
 | Counter "Requests denied today" | It has the same missing source as the signal above. | The same decision trace. |
-| Admin pages for `person-detail` and `tool-catalog` targets | The Admin has no detail pages yet. The routes open `/access` and the integrations tab of the signal's connection type. They do not select the server. | Detail pages in a later specification. Update `src/features/attention/targets.ts`. |
+| Admin pages for `person-detail` and `tool-catalog` targets | The Admin has no detail pages yet. The routes open `/access` and the integrations tab of the signal's connection type, with the server selected. | Detail pages in a later specification. Update `src/features/attention/targets.ts`. |
 
 The `tool-discovery` producer exists (Backend 020). Remove the warning when the `requests-denied` producer exists. Update this section when any item changes.
 
