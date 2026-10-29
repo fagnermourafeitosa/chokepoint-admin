@@ -3,12 +3,12 @@
 - **Specification ID**: 018
 - **Date**: 2026-10-29
 - **Slug**: attention-signals-inbox
-- **Status**: Proposed
+- **Status**: Implemented
 - **Owner**: Admin — Overview page
 - **Related Specification**: [Backend 020 — Attention Signals](../../backend/specs/020-2026-10-29-attention-signals.md)
 - **Related Specification**: [Admin 016 — Remove Automated Interface Tests](016-2026-10-29-remove-automated-interface-tests.md)
 
-> Approved for implementation by the user on 2026-10-29. The scope decisions below were made by the user on 2026-10-29.
+> Approved for implementation by the user on 2026-10-29. The scope decisions below were made by the user on 2026-10-29. Implemented and merged on 2026-10-29.
 >
 > **Pending decision (2026-10-29):** the history block on the Overview (recent changes or recently reviewed signals) is on hold. The user will decide later. Do not implement any history block from this specification. See Deferred Decisions.
 
@@ -60,10 +60,10 @@ The user made these decisions on 2026-10-29.
 
 ## User Stories
 
-- [ ] 1. As an administrator, I want to see how many signals wait for me, so that I know the state at a glance.
-- [ ] 2. As an administrator, I want to see how many tools have no review, so that I know how much of the catalog is not classified.
-- [ ] 3. As an administrator, I want a table of unreviewed signals with type, subject, context, time and one action, so that I can act without opening each item.
-- [ ] 4. As an administrator, I want to filter the table by type and move between pages, so that I can work through a long list.
+- [x] 1. As an administrator, I want to see how many signals wait for me, so that I know the state at a glance.
+- [x] 2. As an administrator, I want to see how many tools have no review, so that I know how much of the catalog is not classified.
+- [x] 3. As an administrator, I want a table of unreviewed signals with type, subject, context, time and one action, so that I can act without opening each item.
+- [x] 4. As an administrator, I want to filter the table by type and move between pages, so that I can work through a long list.
 
 ---
 
@@ -134,13 +134,13 @@ Manual checks:
 
 ## Acceptance Criteria
 
-- [ ] 1. The Overview shows the Pending, Requests denied today and Tools without review counters with real values.
-- [ ] 2. The Inbox shows only unreviewed signals, 5 for each page, with a type filter and a pager.
-- [ ] 3. The action of a row marks the signal as reviewed and opens its target.
-- [ ] 4. No link is built from a full URL. Unknown route names are not linked.
-- [ ] 5. No temporary warning is shown, because both signal producers exist.
-- [ ] 6. The Overview has no page title, no "New agent" button, no top bar search button, and no block of recent changes.
-- [ ] 7. `npm run check` and `npm run build` pass, and the manual checks pass.
+- [x] 1. The Overview shows the Pending, Requests denied today and Tools without review counters with real values.
+- [x] 2. The Inbox shows only unreviewed signals, 5 for each page, with a type filter and a pager.
+- [x] 3. The action of a row marks the signal as reviewed and opens its target.
+- [x] 4. No link is built from a full URL. Unknown route names are not linked.
+- [x] 5. No temporary warning is shown, because both signal producers exist.
+- [x] 6. The Overview has no page title, no "New agent" button, no top bar search button, and no block of recent changes.
+- [x] 7. `npm run check` and `npm run build` pass, and the manual checks pass.
 
 ---
 
