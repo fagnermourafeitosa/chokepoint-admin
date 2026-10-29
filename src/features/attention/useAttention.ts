@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { attentionApi, attentionKey } from './api';
+import { attentionApi, attentionKey, decisionTraceApi, deniedKey } from './api';
 import type { Signal, SignalType } from './api';
 import { mcpApi, mcpKey } from '../mcp/api';
 import type { MCPServer } from '../mcp/api';
@@ -44,6 +44,20 @@ export function useInbox(scope: EnvironmentScope) {
     setType: (next: SignalType | 'all') => { setType(next); setPage(1); },
     setPage,
   };
+}
+
+// deniedRefresh is how often the open Overview reads the denied count again
+// (Admin 018, Counters). New denials arrive without any Admin action.
+const deniedRefresh = 60_000;
+
+// useDeniedToday reads the denied calls since 00:00 UTC (backend 021).
+export function useDeniedToday(scope: EnvironmentScope) {
+  return useQuery({
+    queryKey: [...deniedKey(scope), 'counts'],
+    queryFn: ({ signal }) => decisionTraceApi.counts(scope, signal),
+    select: counts => counts.denied_today,
+    refetchInterval: deniedRefresh,
+  });
 }
 
 const maxServerPages = 50;

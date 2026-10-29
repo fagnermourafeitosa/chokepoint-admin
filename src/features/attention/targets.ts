@@ -36,7 +36,7 @@ export function contextLines(signal: Signal): [string, string] {
     case 'tool-discovery':
       return [c.server ?? '', discoveryCounts(c)];
     case 'requests-denied':
-      return [c.tool ?? '', [c.agent, c.count ? `${c.count} requests` : ''].filter(Boolean).join(' · ')];
+      return [c.tool ?? '', [c.agent, c.count ? `${c.count} ${c.count === '1' ? 'request' : 'requests'}` : ''].filter(Boolean).join(' · ')];
     case 'idp-user-disable':
       return [c.subject ?? '', ''];
     default:

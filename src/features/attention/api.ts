@@ -34,6 +34,18 @@ const base = (s: EnvironmentScope): `/v1/${string}` =>
 // Keys include the scope, so a workspace or environment change never shows old data.
 export const attentionKey = (s: EnvironmentScope) => ['attention-signals', s.userId, s.tenantId, s.environmentId] as const;
 
+// DeniedCounts mirrors the backend 021 decision trace counters.
+export type DeniedCounts = { denied_today: number };
+
+// deniedKey holds the decision trace counters. It sits outside attentionKey,
+// because a review does not change the denied count.
+export const deniedKey = (s: EnvironmentScope) => ['decision-trace', s.userId, s.tenantId, s.environmentId] as const;
+
+export const decisionTraceApi = {
+  counts: (s: EnvironmentScope, signal: AbortSignal) =>
+    httpClient<DeniedCounts>(`/v1/workspaces/${s.tenantId}/environments/${s.environmentId}/decision-trace/counts`, { signal }),
+};
+
 export const attentionApi = {
   list: (s: EnvironmentScope, type: SignalType | 'all', page: number, signal: AbortSignal) => {
     const query = new URLSearchParams({ page: String(page), page_size: String(pageSize) });
