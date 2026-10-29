@@ -1,7 +1,10 @@
 import { httpClient, HttpError } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 
-export type DirectorySettings = { base_url: string; token_url: string; client_id: string; issuing_client_id: string; client_secret?: string; has_secret: boolean; check_status: 'not_checked' | 'verified' | 'failed'; checked_at: string | null };
+export type DirectorySettings = { client_id: string; issuing_client_id: string; client_secret?: string; has_secret: boolean; check_status: 'not_checked' | 'verified' | 'failed'; checked_at: string | null };
+export type IssuingClient = { client_id: string; name?: string };
+// The directory check result lists the Keycloak clients that can issue user tokens (Backend 019).
+export type DirectoryCheck = DirectorySettings & { issuing_clients?: IssuingClient[]; truncated?: boolean };
 export type IdentityFields = { provider: string; name: string; issuer: string; audiences: string[]; groups_claim: string; enabled: boolean; revision: number; directory: DirectorySettings | null };
 export type IdentityConnection = IdentityFields & { id: string; created_at: string; updated_at: string; checked_at: string | null; check_status: 'not_checked' | 'verified' | 'failed' };
 export type IdentityPage = { items: IdentityConnection[]; next_offset: number | null };
@@ -16,13 +19,14 @@ export const identityApi = {
  providers: (s: EnvironmentScope, signal: AbortSignal) => httpClient<ProviderCapability[]>(`${path(s)}/providers`, { signal }),
  save: (s: EnvironmentScope, id: string | undefined, input: IdentityFields, signal: AbortSignal) => httpClient<IdentityConnection>(`${path(s)}${id ? `/${encodeURIComponent(id)}` : ''}`, { method: id ? 'PUT' : 'POST', json: input, signal }),
  check: (s: EnvironmentScope, id: string | undefined, input: IdentityFields, signal: AbortSignal) => httpClient<IdentityConnection>(`${path(s)}${id ? `/${encodeURIComponent(id)}` : ''}/check`, { method: 'POST', json: input, signal }),
- directoryCheck: (s: EnvironmentScope, id: string | undefined, input: IdentityFields, signal: AbortSignal) => httpClient<DirectorySettings>(`${path(s)}${id ? `/${encodeURIComponent(id)}` : ''}/directory-check`, { method: 'POST', json: input, signal }),
+ directoryCheck: (s: EnvironmentScope, id: string | undefined, input: IdentityFields, signal: AbortSignal) => httpClient<DirectoryCheck>(`${path(s)}${id ? `/${encodeURIComponent(id)}` : ''}/directory-check`, { method: 'POST', json: input, signal }),
  users: (s: EnvironmentScope, id: string, search: string, start: number, signal: AbortSignal) => httpClient<DirectoryPage>(`${path(s)}/${encodeURIComponent(id)}/users?${new URLSearchParams({ q: search, start: String(start) })}`, { signal }),
  user: (s: EnvironmentScope, id: string, user: string, signal: AbortSignal) => httpClient<DirectoryUser>(`${path(s)}/${encodeURIComponent(id)}/users/${encodeURIComponent(user)}`, { signal }),
  remove: (s: EnvironmentScope, c: IdentityConnection, signal: AbortSignal) => httpClient<void>(`${path(s)}/${encodeURIComponent(c.id)}`, { method: 'DELETE', json: { revision: c.revision }, signal }),
 };
 export function identityError(error: unknown): string {
  if (error instanceof HttpError) {
+  if (error.status === 422 && error.code === 'clients_unavailable') return 'Cannot read the Keycloak clients. Grant the service account the realm-management role view-clients, then check the connection again.';
   if (error.status === 422) return 'Cannot verify Keycloak directory and administrative access. Check the connection and network, grant the service account the realm-management roles view-users and view-clients (or equivalent), and ensure the directory contains a user.';
   if (error.status === 400) return 'Check the connection and directory fields.';
   if (error.status === 404) return 'This connection or user is no longer available.';

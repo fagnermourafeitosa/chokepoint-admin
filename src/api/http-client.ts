@@ -11,9 +11,19 @@ type RequestOptions = Omit<RequestInit, "body" | "redirect"> & {
 };
 
 export class HttpError extends Error {
-  constructor(readonly status: number) {
+  constructor(readonly status: number, readonly code?: string) {
     super(`Backend request failed (${status})`);
     this.name = "HttpError";
+  }
+}
+
+// errorCode reads the backend error code, when the error body has one.
+async function errorCode(response: Response): Promise<string | undefined> {
+  try {
+    const body: unknown = await response.json();
+    return typeof body === "object" && body !== null && "code" in body && typeof body.code === "string" ? body.code : undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -52,7 +62,7 @@ export async function httpClient<T>(
 
   if (response.status === 401 && path !== "/v1/auth/session")
     window.dispatchEvent(new Event("auth-expired"));
-  if (!response.ok) throw new HttpError(response.status);
+  if (!response.ok) throw new HttpError(response.status, await errorCode(response));
   if (response.status === 204) return undefined as T;
   return (responseType === "blob" ? response.blob() : response.json()) as Promise<T>;
 }

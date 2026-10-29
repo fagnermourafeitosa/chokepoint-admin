@@ -4,6 +4,7 @@ import { Dialog } from '../../components/ui/dialog/Dialog';
 import type { EnvironmentScope } from '../access/environment-scope';
 import { usePendingChanges } from '../auth/pending/PendingChanges';
 import type { IdentityConnection, LifecycleConfiguration } from './api';
+import { Help } from './Help';
 import { rotationRisk, useLifecycleSync, useSecretLeaveGuard } from './useLifecycleSync';
 import type { LifecycleAction, RevealedSecret } from './useLifecycleSync';
 
@@ -15,6 +16,7 @@ const failureLabels: Record<string, string> = {
  deadline_exceeded: 'Processing timed out', rate_limited: 'Rate limit reached', contention: 'Concurrent changes to the same user',
  unavailable: 'Directory or database unavailable',
 };
+const deliveryLimitations = 'Keycloak drops an event when it cannot reach Chokepoint, and pending retries are lost when Keycloak restarts.\n\nThere is no periodic reconciliation, so a lost change stays missing until the user changes again.\n\nCreate the Keycloak webhook yourself with the values shown when you enable or rotate.';
 const when = (value?: string | null) => (value ? new Date(value).toLocaleString() : 'None yet');
 
 type Props = { scope: EnvironmentScope; connection?: IdentityConnection; onSecretVisibleChange?: (visible: boolean) => void };
@@ -90,9 +92,8 @@ function LifecycleSync({ scope, connectionId, onSecretVisibleChange }: { scope: 
   try { if (await sync.run(action)) setConfirm(null); } finally { setActive(null); }
  }
  return <div className="identity-form-section lifecycle-section">
-  <div className="identity-section-heading"><h2>Lifecycle sync</h2><p>Receive user changes from Keycloak as they happen.</p></div>
+  <div className="identity-section-heading"><h2>Lifecycle sync <Help label="Delivery limitations" text={deliveryLimitations} /></h2><p>Receive user changes from Keycloak as they happen.</p></div>
   <div className="identity-form-fields">
-   <div className="cp-admin-notice identity-mapping-warning"><TriangleAlert size={18} aria-hidden="true" /><div><strong>Delivery limitations</strong><span>Keycloak drops an event when it cannot reach Chokepoint, and pending retries are lost when Keycloak restarts. There is no periodic reconciliation, so a lost change stays missing until the user changes again. Create the Keycloak webhook yourself with the values shown when you enable or rotate.</span></div></div>
    {sync.error ? <p className="cp-admin-notice cp-admin-notice--danger" role="alert">{sync.error}</p> : null}
    {sync.notice ? <p className="cp-admin-notice" role="status">{sync.notice}</p> : null}
    {sync.isPending ? <p role="status">Loading lifecycle sync…</p> : sync.isError || !state ? <div className="cp-admin-notice" role="alert">Could not load lifecycle sync. <button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => void sync.refetch()}>Retry</button></div> : <>
