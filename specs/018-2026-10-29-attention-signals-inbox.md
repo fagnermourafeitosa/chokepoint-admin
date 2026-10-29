@@ -92,8 +92,8 @@ The Admin keeps a fixed map from `target_route` to an Admin route. A route name 
 
 | Counter | Source | Opens |
 |---|---|---|
-| Pending | Backend 020 counters: number of unreviewed signals | Scrolls to the Inbox |
-| Requests denied today | Backend 021 counters: `denied_today`, the denied calls since 00:00 UTC | Filters the Inbox to `requests-denied` signals and scrolls to it |
+| Pending | Backend 020 counters: number of unreviewed signals | Resets the type filter to all types and scrolls to the Inbox |
+| Requests denied today | Backend 021 counters: `denied_today`, the denied calls since 00:00 UTC. The Admin reads it again every 60 seconds while the page is open. | Filters the Inbox to `requests-denied` signals and scrolls to it |
 | Tools without review | Existing MCP registry data (backend 006): managed tools in the review-required state | The MCP tool catalog, filtered to tools that need review |
 
 The Admin adds no new backend endpoint for the second counter. If the existing registry responses do not give this count, the implementation must stop and ask the user.
@@ -150,6 +150,7 @@ These items are not implemented.
 
 | Pending item | Why it is missing | What removes the limitation |
 |---|---|---|
+| Local day for "Requests denied today" | Backend 021 counts from 00:00 UTC. In UTC-3 the counter resets at 21:00 local time. | A backend change that counts from the workspace's local midnight. |
 | Admin page for the `decision-detail` target | The Investigate page has no decision list or detail yet. The route opens `/investigate`. | A decision list API and an Admin specification for the Investigate page. |
 | Admin pages for `person-detail` and `tool-catalog` targets | The Admin has no detail pages yet. The routes open `/access` and the integrations tab of the signal's connection type, with the server selected. | Detail pages in a later specification. Update `src/features/attention/targets.ts`. |
 
