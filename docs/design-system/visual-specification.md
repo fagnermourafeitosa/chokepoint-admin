@@ -26,9 +26,12 @@ Text: `Planned · YYYY-MM-DD`. The date is the day of marking.
 
 Use `Differs · YYYY-MM-DD` when the real Admin already has the element but behaves in another way, for example a counter that opens another screen. Use Planned only for an element that does not exist yet. Use the modifier `planned-tag--differs` (blue) on the same badge.
 
+A Differs tag has a hover (and keyboard focus) tooltip that says what differs: what the real Admin does and what the mock shows. Put the text in `data-tip` and add `tabindex="0"`.
+
 ```html
 <span class="planned-tag">Planned · 2026-10-29</span>
-<span class="planned-tag planned-tag--differs">Differs · 2026-10-29</span>
+<span class="planned-tag planned-tag--differs" tabindex="0"
+  data-tip="In the Admin, a reviewed signal leaves the Inbox. The mock keeps it, dimmed.">Differs · 2026-10-29</span>
 ```
 
 ```css
