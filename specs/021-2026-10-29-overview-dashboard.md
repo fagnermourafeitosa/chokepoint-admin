@@ -3,7 +3,7 @@
 - **Specification ID**: 021
 - **Date**: 2026-10-29
 - **Slug**: overview-dashboard
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Overview
 - **Related Specification**: [Backend 023 — Decision Trace Read API](../../backend/specs/023-2026-10-29-decision-trace-read-api.md)
 - **Related Specification**: [Backend 024 — Signal Review and Resolution](../../backend/specs/024-2026-10-29-attention-signal-review-and-resolution.md)
@@ -34,10 +34,10 @@ Build the Overview composition from Backend 025 aggregates and Backend 024 Inbox
 
 ## User Stories
 
-- [ ] As an administrator, I want recorded calls today and the equivalent yesterday period.
-- [ ] As an administrator, I want allowed/denied traffic by UTC hour and the most-denied combinations.
-- [ ] As an administrator, I want tools with granted access but no recorded permits, so that I can review them.
-- [ ] As an administrator, I want an Inbox with status/type filters and exact actions.
+- [x] As an administrator, I want recorded calls today and the equivalent yesterday period.
+- [x] As an administrator, I want allowed/denied traffic by UTC hour and the most-denied combinations.
+- [x] As an administrator, I want tools with granted access but no recorded permits, so that I can review them.
+- [x] As an administrator, I want an Inbox with status/type filters and exact actions.
 
 ## Visual Specification
 
@@ -58,7 +58,7 @@ Overview consumes aggregates rather than reconstructing them from client-side pa
 5. **Traffic.** Match the mock's stacked allowed/denied bars, legend and View as table disclosure. Use the exact rolling 24-hour interval defined by Backend 025, visible UTC times and marked partial boundary hours. Hour-aligned data can produce 24 or 25 clipped buckets; do not hardcode the sample number of bars. Tooltips and the accessible table expose counts and exact bounds. Zero-filled buckets are still rendered.
 6. **Most denied today.** Render up to four backend-ranked rows with tool, server, observed application name/identifier, fixed reason description and count. A row opens Investigate with today's UTC interval and its exact server/tool/agent/reason filters. It must not open an unrelated latest problem or treat the daily total as one hourly group.
 7. **Unused tools.** Show the backend's count using No recorded allowed calls in 30 days. The indicator opens a compact paged detail list within the Overview flow, using the existing dialog/detail primitives and the 025 unused-tools query. Each row identifies server/tool and real current Access targets for reviewing its grants. This is the drill-down described by the mock's Planned tooltip, not a new usage-attribution report. Several groups granting one tool do not increase the count. Do not require knowing which grant allowed a call.
-8. **Limitations.** Near traffic and unused tools show the module's temporary notice pattern: recorded counts may be incomplete because asynchronous recording can lose events; a 30-day query does not prove 30 days of complete coverage. Display configured retention when it is shorter. Do not imply a newly granted tool was necessarily unused for a full 30 days. Remove the old claim that permits have no use.
+8. **Limitations.** The user decided on 2026-10-30 not to show a recording-completeness warning near traffic or metrics. The unused-tools detail keeps its own statement that no recorded allowed call does not prove a tool was never used. Do not imply a newly granted tool was necessarily unused for a full 30 days. Remove the old claim that permits have no use.
 9. **Inbox.** Default to Open and Reviewed. Status choices are Open and reviewed, Open, Reviewed, Resolved and All statuses; retain type filtering and five-row pagination. Sort latest first, reset page when filters change and display returned status chips. Reviewed rows are visually subdued but remain readable. Resolved rows leave the default list but can be selected through the status filter.
 10. **Inbox row content.** Preserve the mock's type, subject, short explanatory note, context, UTC time and trailing action hierarchy. Omit priority. Populate source-specific data from Backend 024, including actual tool/server, application display information and disabled principal's current associated groups. Handle multiple tools/groups honestly rather than copying a fictional single association. A row opens its specific problem, tool review or person context using Admin 019.
 11. **Review/resolution.** Opening an Inbox item's detail marks it Reviewed. Leaving that detail offers Keep reviewed or Mark resolved, with Cancel remaining in the detail, as defined by Admin 020 and Backend 024. Carry the signal ID to all destination types. Resolution is explicit administrator intent; neither changing a permission nor seeing a permit resolves the item automatically. Existing source-driven lifecycle resolution remains supported.
@@ -73,13 +73,13 @@ Manually verify UTC today/yesterday data, zero denominators, all chart/table buc
 
 ## Acceptance Criteria
 
-- [ ] 1. Overview follows the referenced composition with three current metrics and no priority UI.
-- [ ] 2. All traffic and comparisons use real Backend 025 aggregates and visible UTC boundaries.
-- [ ] 3. Most-denied rows and unused-tool details open the appropriate real context.
-- [ ] 4. Inbox defaults to Open and Reviewed and implements all status/type filters and pagination.
-- [ ] 5. Review/resolution follows the shared explicit modal flow and preserves signal identity.
-- [ ] 6. Completeness/retention limitations are visible without obsolete permit warnings.
-- [ ] 7. Check/build and manual browser verification pass during implementation.
+- [x] 1. Overview follows the referenced composition with three current metrics and no priority UI.
+- [x] 2. All traffic and comparisons use real Backend 025 aggregates and visible UTC boundaries.
+- [x] 3. Most-denied rows and unused-tool details open the appropriate real context.
+- [x] 4. Inbox defaults to Open and Reviewed and implements all status/type filters and pagination.
+- [x] 5. Review/resolution follows the shared explicit modal flow and preserves signal identity.
+- [x] 6. No recording-completeness warning or obsolete permit warning is shown; the unused-tools detail states what its indicator does not prove.
+- [x] 7. Check/build and manual browser verification pass during implementation.
 
 ## Out of Scope
 
@@ -91,3 +91,7 @@ Manually verify UTC today/yesterday data, zero denominators, all chart/table buc
 ## Further Notes
 
 Release Backend 025 and Admin 021 together after Backend 022–024 and Admin 019–020, or release the whole set together. This specification supersedes Admin 018's page composition, reviewed-only removal and generic counter destinations. The temporary screenshots are implementation references, not permanent product assets.
+
+## Verification Evidence
+
+Implementation and verification completed on 2026-10-30. See the [verification record](../docs/verification/2026-10-30-investigation-overview.md) for executed checks, manual observations, source inspection and limitations. The user approved the result on 2026-10-30.

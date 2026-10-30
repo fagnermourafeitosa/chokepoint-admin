@@ -3,7 +3,7 @@
 - **Specification ID**: 019
 - **Date**: 2026-10-29
 - **Slug**: contextual-access-navigation
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Access navigation
 - **Related Specification**: [Backend 023 — Decision Trace Read API](../../backend/specs/023-2026-10-29-decision-trace-read-api.md)
 - **Related Specification**: [Backend 024 — Signal Review and Resolution](../../backend/specs/024-2026-10-29-attention-signal-review-and-resolution.md)
@@ -35,9 +35,9 @@ Extend existing Access route handling and signal target mapping with validated s
 
 ## User Stories
 
-- [ ] As an administrator, I want Adjust permissions to focus the relevant existing group/tool, so that I can work on the recorded problem.
-- [ ] As an administrator, I want a tool-review or person action to open the actual object, so that I do not search again.
-- [ ] As an administrator, I want return navigation to retain my filters and page.
+- [x] As an administrator, I want Adjust permissions to focus the relevant existing group/tool, so that I can work on the recorded problem.
+- [x] As an administrator, I want a tool-review or person action to open the actual object, so that I do not search again.
+- [x] As an administrator, I want return navigation to retain my filters and page.
 
 ## Visual Specification
 
@@ -70,12 +70,12 @@ Manually open a real condition deny, a missing-grant call, an unreviewed tool an
 
 ## Acceptance Criteria
 
-- [ ] 1. Known actual group/policy IDs open the correct existing editor and server-qualified tool.
-- [ ] 2. Person and tool-review targets retain exact scoped context.
-- [ ] 3. No token client_id is treated as an Agent UUID or a new configuration requirement.
-- [ ] 4. Deep links work after refresh and on a requested group outside the first page.
-- [ ] 5. Originating signal state and list return context survive navigation without duplicate modals.
-- [ ] 6. Check/build and manual browser verification pass during implementation.
+- [x] 1. Known actual group/policy IDs open the correct existing editor and server-qualified tool.
+- [x] 2. Person and tool-review targets retain exact scoped context.
+- [x] 3. No token client_id is treated as an Agent UUID or a new configuration requirement.
+- [x] 4. Deep links work after refresh and on a requested group outside the first page.
+- [x] 5. Originating signal state and list return context survive navigation without duplicate modals.
+- [x] 6. Check/build and manual browser verification pass during implementation.
 
 ## Out of Scope
 
@@ -86,3 +86,7 @@ Manually open a real condition deny, a missing-grant call, an unreviewed tool an
 ## Further Notes
 
 Deliver with Backend 022–024 and Admin 020. Admin 021 reuses these targets. The screenshot is temporary; remove it only when its implementation is approved and update image references at the same time.
+
+## Verification Evidence
+
+Implementation and verification completed on 2026-10-30. See the [verification record](../docs/verification/2026-10-30-investigation-overview.md) for executed checks, manual observations, source inspection and limitations. The user approved the result on 2026-10-30.

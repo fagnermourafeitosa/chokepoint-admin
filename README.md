@@ -107,9 +107,9 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 016 | [Remove Automated Interface Tests](specs/016-2026-10-29-remove-automated-interface-tests.md) | Implemented |
 | 017 | [Simplified Keycloak Connection Form](specs/017-2026-10-29-simplified-keycloak-connection-form.md) | Implemented |
 | 018 | [Attention Signals Inbox](specs/018-2026-10-29-attention-signals-inbox.md) | Implemented |
-| 019 | [Contextual Access Navigation](specs/019-2026-10-29-contextual-access-navigation.md) | In Progress |
-| 020 | [Investigate Problems and Decisions](specs/020-2026-10-29-investigate-problems-and-decisions.md) | In Progress |
-| 021 | [Overview Dashboard](specs/021-2026-10-29-overview-dashboard.md) | In Progress |
+| 019 | [Contextual Access Navigation](specs/019-2026-10-29-contextual-access-navigation.md) | Implemented |
+| 020 | [Investigate Problems and Decisions](specs/020-2026-10-29-investigate-problems-and-decisions.md) | Implemented |
+| 021 | [Overview Dashboard](specs/021-2026-10-29-overview-dashboard.md) | Implemented |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 
@@ -184,3 +184,15 @@ Agent details include a connection graph based on published associations and gra
 The GitHub provider offers a numbered setup guide with official documentation links before the customer’s Client ID and secret form. Configure GitHub stores the application within the selected workspace/environment. Connect GitHub is disabled with a setup helper until the scoped application configuration is saved, then uses that customer’s application for OAuth. No global GitHub credentials or API restart is required. The Agent graph omits the implicit Chokepoint enforcement node, duplicate relationship list and repeated permission actions; runtime authorization context is available through the heading help tooltip.
 
 Enterprise MCPs show one connection per provider in the provider block, with account, status, tools and actions. Search, connection tables and pagination apply only to Custom MCPs.
+
+## Investigation and Overview (Admin 019–021)
+
+The coordinated implementation consumes Backend 022–025. Investigate has paged By problem and All decisions views with exact filters, retained UTC periods and historical evidence. The inspector displays recorded path states and configured condition expressions, never actual arguments or source values. Contextual actions use real permission-group, server, tool and policy references; an OAuth application identifier is not an Agent UUID.
+
+Overview uses backend UTC aggregates for daily comparisons, allowed/denied hourly traffic, most-denied combinations, tool review coverage and distinct granted tools without recorded allowed calls in 30 days. View as table exposes chart values. The unused-tool indicator opens a paged review list. Both Custom and Enterprise tools are reachable through the review catalog.
+
+The Inbox defaults to Open and Reviewed. Opening an item's detail records Reviewed. Leaving the detail asks whether to keep Reviewed or mark Resolved; cancellation keeps the detail open and failed status writes can be retried. This shared navigation guard uses the React Router data router and applies to Investigate and signal-targeted Access/Integrations details. Individual calls have no workflow status. Missing signals do not trap navigation. Browser termination preserves the already saved review but cannot guarantee a custom exit modal.
+
+Access routes select actual groups outside the first rail page, open the relevant permission section and highlight the affected server-qualified tool, policy or exact principal. Missing or ambiguous group evidence is explained rather than replaced with an invented application/group relationship. Navigation never changes or publishes permissions.
+
+Priority remains future Intelligence work. No post-adjustment watcher is implemented. The UI explains asynchronous record loss and retention limits near activity metrics and history. Temporary reference screenshots remain in docs/spec-references until implementation approval. Functional browser verification is reported separately; build checks do not prove authenticated runtime behavior.

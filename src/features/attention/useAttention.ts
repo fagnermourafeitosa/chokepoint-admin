@@ -1,85 +1,18 @@
 import { useEffect, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { attentionApi, attentionKey, decisionTraceApi, deniedKey } from './api';
-import type { Signal, SignalType } from './api';
-import { mcpApi, mcpKey } from '../mcp/api';
-import type { MCPServer } from '../mcp/api';
+import { useQuery } from '@tanstack/react-query';
+import { attentionApi, attentionKey } from './api';
+import type { SignalType, StatusFilter } from './api';
 import type { EnvironmentScope } from '../access/environment-scope';
-
-// useInbox loads one page of unreviewed signals and the counters. Reviewing a
-// signal refreshes both, so the Inbox and the Pending counter always match.
 export function useInbox(scope: EnvironmentScope) {
-  const client = useQueryClient();
   const [type, setType] = useState<SignalType | 'all'>('all');
+  const [status, setStatus] = useState<StatusFilter>('active');
   const [page, setPage] = useState(1);
-  const list = useQuery({
-    queryKey: [...attentionKey(scope), 'list', type, page],
-    queryFn: ({ signal }) => attentionApi.list(scope, type, page, signal),
-    placeholderData: previous => previous,
-  });
-  const counts = useQuery({
-    queryKey: [...attentionKey(scope), 'counts'],
-    queryFn: ({ signal }) => attentionApi.counts(scope, signal),
-  });
-  // The failure flag lives in the query cache, so it survives the navigation
-  // that follows a review click and the Inbox can still show it on return.
-  // Its key sits outside attentionKey, so the refresh after a review does not reset it.
-  const failedKey = ['attention-review-failed', scope.userId, scope.tenantId, scope.environmentId] as const;
-  const reviewFailed = useQuery({ queryKey: failedKey, queryFn: () => false, initialData: false, staleTime: Infinity });
-  const lastPage = Math.max(1, Math.ceil((list.data?.total ?? 0) / (list.data?.page_size ?? 5)));
-  // A review on the last page can remove that page. Move back to the new last page.
+  const list = useQuery({ queryKey: [...attentionKey(scope), 'list', type, status, page], queryFn: ({ signal }) => attentionApi.list(scope, type, page, status, signal) });
+  const counts = useQuery({ queryKey: [...attentionKey(scope), 'counts'], queryFn: ({ signal }) => attentionApi.counts(scope, signal) });
+  const lastPage = Math.max(1, Math.ceil((list.data?.total || 0) / (list.data?.page_size || 5)));
   useEffect(() => { if (list.data && page > lastPage) setPage(lastPage); }, [list.data, page, lastPage]);
-  // markReviewed never blocks the caller. A failure sets the flag and the signal stays in the Inbox.
-  function markReviewed(signal: Signal) {
-    client.setQueryData(failedKey, false);
-    void attentionApi.review(scope, signal.id)
-      .catch(() => { client.setQueryData(failedKey, true); })
-      .finally(() => client.invalidateQueries({ queryKey: attentionKey(scope) }));
-  }
-  return {
-    list, counts, markReviewed, lastPage, page,
-    reviewFailed: reviewFailed.data,
-    dismissReviewFailed: () => client.setQueryData(failedKey, false),
-    type,
-    setType: (next: SignalType | 'all') => { setType(next); setPage(1); },
-    setPage,
+  return { list, counts, lastPage, page, setPage, type, status,
+    setType: (value: SignalType | 'all') => { setType(value); setPage(1); },
+    setStatus: (value: StatusFilter) => { setStatus(value); setPage(1); },
   };
-}
-
-// deniedRefresh is how often the open Overview reads the denied count again
-// (Admin 018, Counters). New denials arrive without any Admin action.
-const deniedRefresh = 60_000;
-
-// useDeniedToday reads the denied calls since 00:00 UTC (backend 021).
-export function useDeniedToday(scope: EnvironmentScope) {
-  return useQuery({
-    queryKey: [...deniedKey(scope), 'counts'],
-    queryFn: ({ signal }) => decisionTraceApi.counts(scope, signal),
-    select: counts => counts.denied_today,
-    refetchInterval: deniedRefresh,
-  });
-}
-
-const maxServerPages = 50;
-
-// loadAllServers reads every page of the MCP registry list, so the count does not stop at the first page.
-async function loadAllServers(scope: EnvironmentScope, signal: AbortSignal): Promise<MCPServer[]> {
-  const servers: MCPServer[] = [];
-  let offset: number | null = 0;
-  for (let i = 0; i < maxServerPages && offset !== null; i++) {
-    const next = await mcpApi.list(scope, offset, signal);
-    servers.push(...next.items);
-    offset = next.next_offset;
-  }
-  return servers;
-}
-
-// useToolsWithoutReview counts managed tools that wait for review. It reads the
-// existing MCP registry list and adds no endpoint (Admin 018, Counters).
-export function useToolsWithoutReview(scope: EnvironmentScope) {
-  return useQuery({
-    queryKey: [...mcpKey(scope), 'overview-review-count'],
-    queryFn: ({ signal }) => loadAllServers(scope, signal),
-    select: servers => servers.flatMap(server => server.tools).filter(tool => !tool.reviewed && tool.change !== 'unchanged').length,
-  });
 }

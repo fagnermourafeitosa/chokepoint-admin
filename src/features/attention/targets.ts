@@ -1,46 +1,26 @@
 import type { Signal } from './api';
-
-// Each backend route name maps to one Admin path. A route name that is not in
-// this map has no link. The Admin never builds a link from a full URL.
-const routes: Record<string, string> = {
-  'tool-catalog': '/access/integrations?type=custom',
-  'person-detail': '/access',
-  'decision-detail': '/investigate',
-};
-
+import { actionPath } from '../access/target-context';
 export function targetPath(signal: Signal): string | undefined {
-  // A tool-discovery signal names its server and connection type, so the action
-  // opens the matching integrations tab with that server selected. Any other
-  // connection type keeps the Custom MCP tab.
-  if (signal.target_route === 'tool-catalog' && signal.target_params.server_id) {
-    const type = signal.target_params.connection_type === 'enterprise' ? 'enterprise' : 'custom';
-    return `/access/integrations?${new URLSearchParams({ type, server: signal.target_params.server_id })}`;
+  if (signal.target_route === 'decision-detail') {
+    const p = signal.target_params;
+    if (!p.server_id || !p.tool || !p.agent || !p.reason || !p.window_start) return `/investigate?${new URLSearchParams({ signal_id: signal.id, return_to: '/' })}`;
+    return `/investigate?${new URLSearchParams({ server_id: p.server_id, tool: p.tool, agent: p.agent, reason: p.reason, window_start: p.window_start, signal_id: signal.id, return_to: '/' })}`;
   }
-  return routes[signal.target_route];
+  if (signal.target_route === 'tool-catalog' || signal.target_route === 'person-detail') {
+    const path = actionPath({ label: signal.target_label, route: signal.target_route, params: signal.target_params, available: true }, signal.id, '/');
+    return path;
+  }
+  return undefined;
 }
-
-// discoveryCounts lists the tool changes above zero, for example
-// "2 changed · 1 removed".
 function discoveryCounts(c: Record<string, string>): string {
-  return [
-    Number(c.changed) > 0 ? `${c.changed} changed` : '',
-    Number(c.removed) > 0 ? `${c.removed} removed` : '',
-  ].filter(Boolean).join(' · ');
+  return [Number(c.changed) > 0 ? `${c.changed} changed` : '', Number(c.removed) > 0 ? `${c.removed} removed` : ''].filter(Boolean).join(' · ');
 }
-
-// contextLines builds the two context lines of an Inbox row from the fixed keys
-// of each signal type.
 export function contextLines(signal: Signal): [string, string] {
   const c = signal.context;
   switch (signal.type) {
-    case 'tool-discovery':
-      return [c.server ?? '', discoveryCounts(c)];
-    case 'requests-denied':
-      return [c.tool ?? '', [c.agent, c.count ? `${c.count} ${c.count === '1' ? 'request' : 'requests'}` : ''].filter(Boolean).join(' · ')];
-    case 'idp-user-disable':
-      return [c.subject ?? '', ''];
-    default:
-      // A type added in the backend before this Admin version knows it.
-      return [Object.values(c)[0] ?? '', ''];
+    case 'tool-discovery': return [c.tool || c.server || '', c.tool ? c.server || '' : discoveryCounts(c)];
+    case 'requests-denied': return [c.tool || '', c.agent_name || c.agent || ''];
+    case 'idp-user-disable': return [signal.principal?.name || signal.principal?.subject || c.subject || '', c.groups || c.agent || ''];
+    default: return ['', ''];
   }
 }

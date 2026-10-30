@@ -3,7 +3,7 @@
 - **Specification ID**: 020
 - **Date**: 2026-10-29
 - **Slug**: investigate-problems-and-decisions
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Investigate
 - **Related Specification**: [Backend 022 — Decision Trace Evidence](../../backend/specs/022-2026-10-29-decision-trace-evidence.md)
 - **Related Specification**: [Backend 023 — Decision Trace Read API](../../backend/specs/023-2026-10-29-decision-trace-read-api.md)
@@ -34,10 +34,10 @@ Implement the mock's list/inspector composition using Backend 022–024, real pa
 
 ## User Stories
 
-- [ ] As an administrator, I want grouped problems and individual decisions, so that I can choose the right level of detail.
-- [ ] As an administrator, I want filters, UTC periods and pagination, so that I can inspect retained history.
-- [ ] As an administrator, I want recorded rules and path steps without real argument/source values.
-- [ ] As an administrator, I want exact corrective actions and a review/resolution choice when leaving an Inbox detail.
+- [x] As an administrator, I want grouped problems and individual decisions, so that I can choose the right level of detail.
+- [x] As an administrator, I want filters, UTC periods and pagination, so that I can inspect retained history.
+- [x] As an administrator, I want recorded rules and path steps without real argument/source values.
+- [x] As an administrator, I want exact corrective actions and a review/resolution choice when leaving an Inbox detail.
 
 ## Visual Specification
 
@@ -94,7 +94,7 @@ A status failure remains visible with retry; do not navigate while falsely showi
 
 Preserve list geometry while loading. Distinguish no denials, no retained history, no filter matches, expired history and request failure. A failure retains filters and offers Retry. Do not say Nothing is blocked right now merely because retained data contains no denials.
 
-Use the module's temporary warning component (notice tokens, TriangleAlert, title and explanation) near history for approximate/incomplete recording. Old records without path/condition evidence show that absence explicitly. Remove the mock warning claiming permits have no use: permits feed the dashboard and unused-tool indicator. Names come from current directory reads and may be unavailable.
+The user decided on 2026-10-30 not to show a recording-completeness warning in Investigate. Old records without path/condition evidence show that absence explicitly. Remove the mock warning claiming permits have no use: permits feed the dashboard and unused-tool indicator. Names come from current directory reads and may be unavailable.
 
 ### Layout and accessibility
 
@@ -108,13 +108,13 @@ Manually cover both views, all filters, pagination and exact row filters; two re
 
 ## Acceptance Criteria
 
-- [ ] 1. Both views consume real filtered/paged APIs and preserve list state.
-- [ ] 2. Problem identity and all repetition counts include the reason and UTC window.
-- [ ] 3. The inspector renders recorded path/rule evidence and no actual source/argument values.
-- [ ] 4. Contextual actions open real targets and preserve origin context.
-- [ ] 5. Opening an Inbox detail reviews it; leaving offers the specified modal and explicit resolution.
-- [ ] 6. Priority and Watching this problem are absent; current trace limitations are explained.
-- [ ] 7. Check/build and manual browser verification pass during implementation.
+- [x] 1. Both views consume real filtered/paged APIs and preserve list state.
+- [x] 2. Problem identity and all repetition counts include the reason and UTC window.
+- [x] 3. The inspector renders recorded path/rule evidence and no actual source/argument values.
+- [x] 4. Contextual actions open real targets and preserve origin context.
+- [x] 5. Opening an Inbox detail reviews it; leaving offers the specified modal and explicit resolution.
+- [x] 6. Priority and Watching this problem are absent; no recording-completeness warning is shown.
+- [x] 7. Check/build and manual browser verification pass during implementation.
 
 ## Out of Scope
 
@@ -126,3 +126,7 @@ Manually cover both views, all filters, pagination and exact row filters; two re
 ## Further Notes
 
 Release with Backend 022–024 and Admin 019 after individual specification approvals. Admin 021 depends on this Investigate destination. Temporary screenshots remain until implementation approval; update/remove their links with their cleanup.
+
+## Verification Evidence
+
+Implementation and verification completed on 2026-10-30. See the [verification record](../docs/verification/2026-10-30-investigation-overview.md) for executed checks, manual observations, source inspection and limitations. The user approved the result on 2026-10-30.
