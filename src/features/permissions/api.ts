@@ -1,7 +1,11 @@
 import { httpClient } from '../../api/http-client';
 import type { AgentScope } from '../access/agent-api';
 
-export type Member = { issuer: string; subject: string };
+export type MemberKind = 'person' | 'service';
+// The kind labels a member; its identity is the issuer and subject.
+export type Member = { issuer: string; subject: string; kind: MemberKind };
+// A member is identified by issuer and subject alone; places that only look one up do not need its kind.
+export type MemberIdentity = Pick<Member, 'issuer' | 'subject'>;
 export type Grant = { server_id: string; tools: string[] };
 export type Policy = { id: string; name: string; server_id: string; tool_name?: string; expression: string; required_bindings: string[] };
 export type PermissionDocument = { members: Member[]; grants: Grant[]; policies: Policy[] };

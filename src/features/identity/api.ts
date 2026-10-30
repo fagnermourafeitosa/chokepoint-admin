@@ -10,8 +10,11 @@ export type IdentityConnection = IdentityFields & { id: string; created_at: stri
 export type IdentityPage = { items: IdentityConnection[]; next_offset: number | null };
 export type ProviderCapability = { provider: string; name: string; available: boolean; directory: boolean; runtime_identity: boolean; lifecycle: boolean };
 export type DirectoryIdentity = { issuer: string; subject: string };
-export type DirectoryUser = { identity: DirectoryIdentity; id: string; user_name: string; display_name: string; email?: string; given_name?: string; family_name?: string; active: boolean | null };
-export type DirectoryPage = { items: DirectoryUser[]; total: number; start_index: number; next_start: number | null };
+export type DirectoryUser = { kind: 'person' | 'service'; identity: DirectoryIdentity; id: string; user_name: string; display_name: string; email?: string; given_name?: string; family_name?: string; active: boolean | null };
+// Service principals of one connection (Backend 027), for example Keycloak clients with service accounts. truncated means the provider has more.
+export type ServicePage = { items: DirectoryUser[]; truncated: boolean };
+// total is null when the provider reports none (Google). next_cursor is opaque and null on the last page (Backend 026).
+export type DirectoryPage = { items: DirectoryUser[]; total: number | null; next_cursor: string | null };
 // Retained lifecycle state from Backend 016. Identities without events are absent.
 export type LifecycleUserState = DirectoryIdentity & { display_name?: string; user_name?: string; email?: string; disabled: boolean; disabled_at: string | null; source_deleted: boolean; updated_at: string };
 export const identityKey = (s: EnvironmentScope) => ['identity-connections', s.userId, s.tenantId, s.environmentId] as const;
@@ -22,7 +25,8 @@ export const identityApi = {
  save: (s: EnvironmentScope, id: string | undefined, input: IdentityFields, signal: AbortSignal) => httpClient<IdentityConnection>(`${path(s)}${id ? `/${encodeURIComponent(id)}` : ''}`, { method: id ? 'PUT' : 'POST', json: input, signal }),
  check: (s: EnvironmentScope, id: string | undefined, input: IdentityFields, signal: AbortSignal) => httpClient<IdentityConnection>(`${path(s)}${id ? `/${encodeURIComponent(id)}` : ''}/check`, { method: 'POST', json: input, signal }),
  directoryCheck: (s: EnvironmentScope, id: string | undefined, input: IdentityFields, signal: AbortSignal) => httpClient<DirectoryCheck>(`${path(s)}${id ? `/${encodeURIComponent(id)}` : ''}/directory-check`, { method: 'POST', json: input, signal }),
- users: (s: EnvironmentScope, id: string, search: string, start: number, signal: AbortSignal) => httpClient<DirectoryPage>(`${path(s)}/${encodeURIComponent(id)}/users?${new URLSearchParams({ q: search, start: String(start) })}`, { signal }),
+ users: (s: EnvironmentScope, id: string, search: string, cursor: string, signal: AbortSignal) => httpClient<DirectoryPage>(`${path(s)}/${encodeURIComponent(id)}/users?${new URLSearchParams(cursor ? { q: search, cursor } : { q: search })}`, { signal }),
+ services: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<ServicePage>(`${path(s)}/${encodeURIComponent(id)}/services`, { signal }),
  user: (s: EnvironmentScope, id: string, user: string, signal: AbortSignal) => httpClient<DirectoryUser>(`${path(s)}/${encodeURIComponent(id)}/users/${encodeURIComponent(user)}`, { signal }),
  lifecycleUsers: (s: EnvironmentScope, identities: DirectoryIdentity[], signal: AbortSignal) => httpClient<{ items: LifecycleUserState[] }>(`/v1/workspaces/${encodeURIComponent(s.tenantId)}/environments/${encodeURIComponent(s.environmentId)}/identity-lifecycle-users/lookup`, { method: 'POST', json: { identities }, signal }),
  remove: (s: EnvironmentScope, c: IdentityConnection, signal: AbortSignal) => httpClient<void>(`${path(s)}/${encodeURIComponent(c.id)}`, { method: 'DELETE', json: { revision: c.revision }, signal }),
