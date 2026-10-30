@@ -1,3 +1,4 @@
+import { SignalDetailGuard } from '../features/attention/SignalDetailGuard';
 import { useAuth } from "../features/auth/AuthContext";
 import { Outlet } from "react-router";
 import { AdminHeader } from "../components/header/AdminHeader";
@@ -26,6 +27,7 @@ export function AdminLayout() {
           navigation={navigation}
           accountEmail={auth.session?.user.display_name ?? ""}
         />
+        {auth.session && auth.workspace && auth.environment ? <SignalDetailGuard key={`${auth.session.user.id}:${auth.workspace.tenant_id}:${auth.environment.id}`} scope={{ userId: auth.session.user.id, tenantId: auth.workspace.tenant_id, environmentId: auth.environment.id }} /> : null}
         <Outlet />
       </div>
     </AdminEnvironmentContext.Provider>

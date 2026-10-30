@@ -1,0 +1,173 @@
+.overview-traffic h2 {
+  margin: 8px 0 16px;
+  font-size: 1.375rem;
+}
+.overview-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  color: var(--cp-admin-color-text-muted);
+  font-size: 0.75rem;
+}
+.overview-legend > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.overview-legend i {
+  width: 9px;
+  height: 9px;
+  display: block;
+  border-radius: 2px;
+  background: var(--cp-admin-color-text-muted);
+}
+.overview-legend > span:nth-child(2) i {
+  background: var(--cp-admin-color-danger);
+}
+.overview-legend > small {
+  margin-left: auto;
+  font-size: 0.6875rem;
+}
+.overview-chart {
+  height: 225px;
+  margin: 22px 0 14px;
+  display: flex;
+  gap: 10px;
+}
+.overview-chart-scale {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 25px;
+  width: 25px;
+  color: var(--cp-admin-color-text-muted);
+  font-size: 0.6875rem;
+  text-align: right;
+}
+.overview-bars {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  background: repeating-linear-gradient(
+    to top,
+    transparent 0,
+    transparent calc(25% - 1px),
+    var(--cp-admin-color-border) calc(25% - 1px),
+    var(--cp-admin-color-border) 25%
+  );
+  background-size: 100% calc(100% - 25px);
+  background-repeat: no-repeat;
+}
+.overview-hour {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  height: 100%;
+  padding-bottom: 25px;
+}
+.overview-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 1px;
+}
+.overview-bar > span {
+  width: 100%;
+  min-height: 0;
+}
+.overview-bar-allowed {
+  background: #8995a0;
+  border-radius: 3px 3px 0 0;
+}
+.overview-bar-denied {
+  background: var(--cp-admin-color-danger);
+  border-radius: 3px 3px 0 0;
+}
+.overview-hour {
+  border-radius: var(--cp-admin-radius-sm);
+  cursor: default;
+}
+.overview-hour--active {
+  background: var(--cp-admin-color-row-hover);
+}
+.overview-hour:focus-visible {
+  outline: 2px solid var(--cp-admin-color-accent-text);
+  outline-offset: 1px;
+}
+.overview-traffic-tip {
+  position: absolute;
+  top: 0;
+  /* Keep the tip inside the plot at the first and last hours. */
+  left: clamp(64px, var(--tip-left, 50%), calc(100% - 64px));
+  transform: translateX(-50%);
+  z-index: var(--cp-admin-z-floating);
+  display: grid;
+  gap: 3px;
+  padding: var(--cp-admin-space-2) var(--cp-admin-space-3);
+  border-radius: var(--cp-admin-radius-control);
+  background: var(--cp-admin-color-strong);
+  color: var(--cp-admin-color-text-inverse);
+  box-shadow: var(--cp-admin-shadow-panel);
+  font-size: 0.6875rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.overview-traffic-tip small {
+  font-size: 0.625rem;
+  opacity: 0.75;
+}
+.overview-traffic-tip span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.overview-traffic-tip strong {
+  font-size: 0.75rem;
+}
+.overview-traffic-tip i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: #8995a0;
+}
+.overview-traffic-tip i.overview-tip-denied {
+  background: var(--cp-admin-color-danger);
+}
+.overview-hour small {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.625rem;
+  color: var(--cp-admin-color-text-muted);
+}
+.overview-traffic-table {
+  color: var(--cp-admin-color-text-muted);
+  font-size: 0.75rem;
+}
+.overview-traffic-table summary {
+  cursor: pointer;
+  padding: 6px 0;
+}
+.overview-traffic-table table {
+  font-size: 0.75rem;
+}
+@media (max-width: 740px) {
+  .overview-chart {
+    height: 190px;
+  }
+  .overview-bars {
+    gap: 3px;
+  }
+  .overview-hour small {
+    font-size: 0.5625rem;
+  }
+  .overview-legend > small {
+    margin-left: 0;
+  }
+}

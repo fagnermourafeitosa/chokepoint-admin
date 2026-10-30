@@ -12,3 +12,6 @@
 
 /* Associated user: name above its subject identifier. */
 .people-editor td small{display:block;color:var(--cp-admin-color-text-muted);font-size:var(--cp-admin-type-small)}
+
+[data-context-target=true] { background:var(--cp-admin-color-warning-bg); outline:1px solid var(--cp-admin-color-warning); outline-offset:4px; border-radius:6px; scroll-margin-top:100px; }
+.access-target-context { display:flex; gap:12px; flex-wrap:wrap; padding:14px 18px; border:1px solid var(--cp-admin-color-border); border-radius:8px; margin:0 0 20px; font-size:.8125rem; }.access-target-context span { color:var(--cp-admin-color-text-muted); }

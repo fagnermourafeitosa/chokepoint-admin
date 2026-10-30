@@ -1,9 +1,12 @@
+import { useEffect, useRef } from 'react';
 import { ToolAnnotations } from '../access/components/ToolAnnotations';
 import { sourceLabel } from "./mapping-fields";
 import type { ManagedTool } from './api';
 const labels = { new: 'New', changed: 'Changed', removed: 'Removed', unchanged: '' };
-export function ToolRows({ tools, selected, onToggle, disabled, serverEnabled = true, onMapping }: { tools: ManagedTool[]; selected?: string[]; onToggle?: (name: string) => void; disabled?: boolean; serverEnabled?: boolean; onMapping?: (tool: ManagedTool) => void }) {
- return <div className="mcp-tool-list">{tools.map(tool => <article key={tool.name} className="mcp-tool-row" data-change={tool.change}>
+export function ToolRows({ tools, selected, onToggle, disabled, serverEnabled = true, onMapping, focusTool }: { tools: ManagedTool[]; focusTool?: string; selected?: string[]; onToggle?: (name: string) => void; disabled?: boolean; serverEnabled?: boolean; onMapping?: (tool: ManagedTool) => void }) {
+ const ref = useRef<HTMLDivElement>(null);
+ useEffect(() => { const el = ref.current?.querySelector<HTMLElement>('[data-context-target=true]'); if (el) { el.scrollIntoView({ block: 'center' }); el.focus({ preventScroll: true }); } }, [focusTool, tools]);
+ return <div ref={ref} className="mcp-tool-list">{tools.map(tool => <article key={tool.name} className="mcp-tool-row" tabIndex={focusTool === tool.name ? -1 : undefined} data-context-target={focusTool === tool.name} data-change={tool.change}>
   <div className="mcp-tool-heading">
    {onToggle ? <label className="mcp-tool-select"><input type="checkbox" aria-label={`Manage ${tool.name}`} checked={selected?.includes(tool.name) ?? false} disabled={disabled || tool.change === 'removed'} onChange={() => onToggle(tool.name)} /></label> : null}
    <div className="mcp-tool-copy"><strong>{tool.contract.title || tool.name}</strong><code>{tool.name}</code></div>

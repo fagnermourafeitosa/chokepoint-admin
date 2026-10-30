@@ -78,8 +78,11 @@ export function useAuthState(): AuthState {
   }, [session.data]);
   useEffect(() => {
     const clear = () => {
-      void client.cancelQueries();
-      client.clear();
+      // Keep the observed session query so its null result unmounts private routes.
+      // Removing it first leaves mounted observers attached to an obsolete query.
+      const privateQuery = (q: { queryKey: readonly unknown[] }) =>
+        q.queryKey[0] !== "auth" || q.queryKey[1] !== "session";
+      void client.cancelQueries({ predicate: privateQuery });
       setCSRFToken(undefined);
       setWorkspaceId(undefined);
       setEnvironmentId(undefined);
@@ -127,8 +130,7 @@ export function useAuthState(): AuthState {
     client.removeQueries({ predicate: privateQuery });
     try {
       await httpClient("/v1/auth/logout", { method: "POST" });
-      await client.cancelQueries();
-      client.clear();
+      await client.cancelQueries({ predicate: privateQuery });
       client.setQueryData(["auth", "session"], null);
       setCSRFToken(undefined);
       setWorkspaceId(undefined);

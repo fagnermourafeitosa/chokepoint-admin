@@ -1,6 +1,7 @@
+import { ToolReviewCatalog } from './ToolReviewCatalog';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { Plus, Server, Users, Building2 } from 'lucide-react';
 import { ToolMappingManager } from './ToolMappingManager';
 import { IdentityRegistry } from '../identity/IdentityRegistry';
@@ -24,6 +25,8 @@ const oauthErrors: Record<string, string> = {
 };
 export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
   const [params, setParams] = useSearchParams();
+  const back = params.get('return_to');
+  const returnTo = back && (back === '/' || back.startsWith('/investigate?')) ? back : undefined;
   const kind = params.get('type') === 'identity' ? 'identity' : params.get('type') === 'custom' ? 'custom' : 'enterprise';
   const registry = useMCPRegistry(scope, kind === 'custom');
   const enterprise = useEnterpriseConnection(scope);
@@ -38,9 +41,11 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
   const servers = registry.servers.filter(s => kind === 'enterprise' ? s.connection_type === 'enterprise' : s.connection_type !== 'enterprise');
   const preview = params.get('preview');
   const correctScope = params.get('tenant') === scope.tenantId && params.get('environment') === scope.environmentId;
+  if (params.get('review') === 'tools') return <ToolReviewCatalog scope={scope} />;
   if (kind === 'identity') return <IdentityRegistry scope={scope} onEnterprise={() => setParams({ type: 'enterprise' })} onCustom={() => setParams({ type: 'custom' })} />;
   if (mapping) return <ToolMappingManager key={`${scope.userId}:${scope.tenantId}:${scope.environmentId}:${mapping.serverId}:${mapping.toolName}`} scope={scope} {...mapping} onClose={() => setMapping(undefined)} />;
   return <section aria-label="Integrations" className="mcp-registry">
+    {returnTo ? <Link className="cp-admin-button cp-admin-button--secondary trace-back" to={returnTo}>Back to {returnTo === '/' ? 'Overview' : 'Investigate'}</Link> : null}
     <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect platforms and custom MCPs, then manage agent access.</p></div>{kind === 'custom' ? <button className="cp-admin-button" onClick={() => registry.setDialog('new')}><Plus size={16} />Connect custom MCP</button> : null}</header>
     <div className="mcp-types" role="group" aria-label="Integration type"><button aria-pressed={kind === 'enterprise'} onClick={() => setParams({ type: 'enterprise' })}><Building2 size={17} />Enterprise MCPs</button><button aria-pressed={kind === 'custom'} onClick={() => setParams({ type: 'custom' })}><Server size={17} />Custom MCPs</button><button aria-pressed={false} onClick={() => setParams({ type: 'identity' })}><Users size={17} />Identity providers</button></div>
     {preview && !correctScope ? <p role="alert" className="cp-admin-notice">This authorization belongs to another workspace or environment. Select its original context to review it.</p> : preview ? <EnterpriseReview key={preview} scope={scope} id={preview} onClose={() => setParams({ type: 'enterprise' })} onSaved={saved} /> : <>
@@ -53,7 +58,7 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
       </> : null}
       {registry.error ? <p role="alert" className="cp-admin-notice" data-tone="danger">{registry.error}</p> : null}
       {selectedId && details.isError ? <p role="alert">Connection details are unavailable. <button className="cp-admin-button cp-admin-button--ghost" onClick={() => void details.refetch()}>Retry</button></p> : null}
-      {server ? <section id="mcp-server-details" className="mcp-details" aria-label={`${server.name} details`}><header className="mcp-details-heading"><div><h2>{server.name}</h2><p className="cp-admin-muted">{server.connection_type === 'enterprise' ? `Enterprise MCP · ${server.account || 'Account unavailable'}` : 'Custom MCP'} · {server.transport} · {server.enabled ? 'Enabled' : 'Disabled'}</p></div><button className="cp-admin-button cp-admin-button--secondary" disabled={enterprise.busy} onClick={() => connect(server)}>{server.connection_type === 'enterprise' ? 'Reconnect & review tools' : 'Discover tools'}</button></header><ToolRows tools={server.tools} serverEnabled={server.enabled} onMapping={tool => setMapping({ serverId: server.id, serverName: server.name, toolName: tool.name })} /></section> : null}
+      {server ? <section id="mcp-server-details" className="mcp-details" aria-label={`${server.name} details`}><header className="mcp-details-heading"><div><h2>{server.name}</h2><p className="cp-admin-muted">{server.connection_type === 'enterprise' ? `Enterprise MCP · ${server.account || 'Account unavailable'}` : 'Custom MCP'} · {server.transport} · {server.enabled ? 'Enabled' : 'Disabled'}</p></div><button className="cp-admin-button cp-admin-button--secondary" disabled={enterprise.busy} onClick={() => connect(server)}>{server.connection_type === 'enterprise' ? 'Reconnect & review tools' : 'Discover tools'}</button></header><ToolRows tools={server.tools} focusTool={params.get('tool') || undefined} serverEnabled={server.enabled} onMapping={tool => setMapping({ serverId: server.id, serverName: server.name, toolName: tool.name })} /></section> : null}
     </>}
     <p className="mcp-footnote cp-admin-muted">Connections belong to this workspace and environment. Agent permissions determine who can use their tools.</p>
     {registry.dialog ? <MCPDialog key={registry.dialog === 'new' ? 'new' : registry.dialog.id} scope={scope} server={registry.dialog === 'new' ? undefined : registry.dialog} onClose={() => registry.setDialog(null)} onRefresh={() => void registry.refresh()} onSaved={saved} /> : null}
