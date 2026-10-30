@@ -25,7 +25,11 @@ The People selection lists only directory users. A Keycloak client or a Google s
 2. **Keycloak.** Services come from the backend list (clients with service accounts on). The row shows the client ID.
 3. **Google.** Manual entry (Backend 027 Resolved Decision A). A small form takes the service account e-mail and unique ID, with help text that says where to copy them in the Google Cloud console and that Chokepoint cannot check the account before its first call.
 4. **Group detail.** Members list people and services together. Each member shows its kind as a chip, "Person" or "Service", from the `kind` that Backend 027 Resolved Decision D stores on the member. The picker rows show the same chip. A member saved without a kind is not accepted; there is no fallback label.
-5. **Help text.** A service acts by itself with its own token (client credentials in Keycloak, a service account ID token in Google). An application ID in the decision trace is not a member and grants nothing.
+5. **Selection per view.** Switching between People and Services clears the selection, so one view never associates what the other view selected.
+6. **Members without a kind.** A saved member that has no kind (a draft from before the kind existed) shows no chip. A warning near the group list says that the member must be selected again and that the draft cannot be saved until then. The warning informs; it does not block. There is no fallback label.
+7. **Service names in the group list.** For each connection that has service members, the Admin reads the service list of that connection and shows the service name next to the member. When the name cannot be read, the member shows its subject only.
+8. **Services error.** A provider without a service list answers HTTP 501; the Admin shows "This identity provider does not list services" from the status, not from error text.
+9. **Help text.** A service acts by itself with its own token (client credentials in Keycloak, a service account ID token in Google). An application ID in the decision trace is not a member and grants nothing.
 
 ## User Stories
 
@@ -49,6 +53,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build` wh
 - [ ] 2. A selected service is saved as a member with kind `service` and appears in the group with its chip. A selected person is saved with kind `person`.
 - [ ] 3. A Google service account is registered by e-mail and unique ID; the e-mail is shown, the unique ID is the member subject.
 - [ ] 4. People selection behaves as before.
+- [ ] 4a. Switching views clears the selection; a member without a kind shows the warning; a service member shows its name when the list can be read.
 - [ ] 5. `npm run check` and `npm run build` pass.
 - [ ] 6. The user confirms the interface test.
 
