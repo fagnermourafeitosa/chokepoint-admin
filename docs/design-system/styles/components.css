@@ -2,19 +2,19 @@
 .cp-admin-button {
   display: inline-flex; align-items: center; justify-content: center;
   min-height: var(--cp-admin-control-height); padding: var(--cp-admin-space-2) var(--cp-admin-space-4);
-  gap: var(--cp-admin-space-2); border: var(--cp-admin-border-width) solid transparent;
+  gap: var(--cp-admin-space-2); border: 2px solid var(--cp-admin-color-text);
   border-radius: var(--cp-admin-radius-button); background: var(--cp-admin-color-action); color: var(--cp-admin-color-on-action);
   font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-bold); line-height: var(--cp-admin-leading-ui);
-  text-align: center; text-decoration: none;
+  text-align: center; text-decoration: none; box-shadow: 3px 3px 0 var(--cp-admin-color-text);
   transition: background-color var(--cp-admin-duration-fast) var(--cp-admin-ease-out), transform var(--cp-admin-duration-fast) var(--cp-admin-ease-out);
 }
 .cp-admin-button:hover:not(:disabled) { background: var(--cp-admin-color-action-hover); }
 .cp-admin-button:active:not(:disabled) { transform: translateY(1px); }
-.cp-admin-button--dark { background: var(--cp-admin-color-strong); color: var(--cp-admin-color-text-inverse); }
+.cp-admin-button--dark { box-shadow: none; background: var(--cp-admin-color-strong); color: var(--cp-admin-color-text-inverse); }
 .cp-admin-button--dark:hover:not(:disabled) { background: var(--cp-admin-color-text); }
-.cp-admin-button--secondary { background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); border-color: var(--cp-admin-color-control-border); }
+.cp-admin-button--secondary { box-shadow: none; background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); border-color: var(--cp-admin-color-control-border); }
 .cp-admin-button--secondary:hover:not(:disabled) { background: var(--cp-admin-color-surface-muted); }
-.cp-admin-button:disabled { color: var(--cp-admin-color-text-muted); background: var(--cp-admin-color-surface-muted); border-color: var(--cp-admin-color-border); cursor: not-allowed; }
+.cp-admin-button:disabled { box-shadow: none; color: var(--cp-admin-color-text-muted); background: var(--cp-admin-color-surface-muted); border-color: var(--cp-admin-color-border); cursor: not-allowed; }
 .cp-admin-button[aria-busy="true"] { cursor: progress; }
 .cp-admin-icon-button { min-width: var(--cp-admin-control-height); padding: var(--cp-admin-space-2); }
 .cp-admin-icon { width: var(--cp-admin-icon-size); height: var(--cp-admin-icon-size); flex: none; }

@@ -8,3 +8,5 @@
 @import url("./components.css") layer(components);
 @import url("./controls.css") layer(components);
 @import url("./navigation.css") layer(components);
+
+@import url("./tabs.css");

@@ -1,68 +1,17 @@
----
-name: Chokepoint Admin
-description: Visual language extracted from the supplied Chokepoint mocks.
-colors:
-  canvas: "#f8f9f6"
-  surface: "#ffffff"
-  ink: "#242624"
-  primary: "#ecae83"
-  link: "#9c4f20"
-  success: "#257a58"
-  danger: "#a53f36"
-typography:
-  body:
-    fontFamily: "DM Sans, Manrope, system-ui, sans-serif"
-    fontSize: "0.875rem"
-    lineHeight: 1.5
-rounded:
-  control: "8px"
-  button: "9px"
-  panel: "15px"
-spacing:
-  small: "8px"
-  medium: "16px"
-  panel: "24px"
----
-
 # Chokepoint Admin Design System
 
-## Overview
+The [reference image](../../specs/assets/022-admin-design-system/reference.png) defines the direction for the admin. The system uses a warm canvas, quiet surfaces, dark ink, yellow navigation and selection, and pink primary actions. Semantic success, warning and danger colors are distinct and accompanied by text. [Tokens](tokens.md) provide exact values.
 
-An operator works through permissions and decisions in a light workspace, switching between related tasks without losing the selected agent. The reference is the supplied workbench: warm grey canvas, white panels, charcoal text, peach primary actions, compact controls, and visible structure. The operational UI has a restrained accent strategy.
+## Typography and brand
 
-Use [tokens](tokens.md) for exact values and [layouts](layouts.md) for geometry. The CSS is the canonical source; this frontmatter is a concise summary.
-
-## Colors
-
-Peach marks primary actions and selected context. It is distinct from semantic green ALLOW, red DENY, and warm pending/review states. Main text is charcoal. Secondary text is normalized to a darker grey than the mock. Decorative separators remain faint; input boundaries use a stronger tone.
-
-A source orange is not a readable small-text color by default. Use the dedicated link and status foregrounds.
-
-## Typography
-
-DM Sans carries body copy, labels, controls, and tables. Manrope carries headings. JetBrains Mono carries tool names, code, identifiers, and CEL. Variable WOFF2 files are self-hosted and licensed.
-
-Page headings are 39px, detail titles 32px, section headings 23px, body 14px, secondary copy 13px, and labels at least 12px. Mobile page titles are 28px. Use weight 800 for headings and 600–700 for control emphasis. Do not copy the mock’s isolated 9px labels.
-
-## Elevation
-
-Most structure comes from surface contrast, 1px separators, and 15px corners. Panel shadow is `0 12px 35px rgba(33,35,32,.035)`. Dialogs use a stronger shadow and a dim backdrop. No decorative glass layer is part of the extracted system. Focus is an explicit 2px outline with 3px offset.
+Barlow Condensed Bold is used for page and section titles. IBM Plex Sans is used for interface copy and controls. IBM Plex Mono is used for code, identifiers and technical data. The home wordmark uses Anton in a yellow box with a dark border and offset shadow. Fonts are local; see [assets and licenses](fonts/README.md).
 
 ## Components
 
-Buttons use 9px corners and a 40px minimum height; fields use 8px corners. Panels use 24px padding, reduced to 16px on mobile. Badges have readable state text. The central workbench is a composition of rail, editor, and inspector, not a generic card list.
+Reuse [the shared CSS](styles/index.css) for buttons, fields, panels, tables, badges, notices, menus, tabs and navigation. Use compact spacing and clear boundaries. Primary buttons have dark borders and short solid shadows; panels have lighter borders and subtle corners. Selected navigation uses yellow. Controls need visible focus, disabled and hover states, and states must not rely on color alone. Layouts must retain keyboard access, readable text, narrow-screen overflow handling and reduced-motion support.
 
-Use [reusable CSS](styles/index.css) and the [shadcn bridge](styles/adapters.css). The static [specimen](preview.html) exercises the same CSS. Loading, errors, keyboard interaction, and dialog focus belong to the implemented components. State feedback uses 130/220ms transitions; reduced-motion disables them.
+The [specimen](preview.html) demonstrates reusable styles. [Layouts](layouts.md) and [components](components.md) describe composition and controls.
 
-The [control and navigation reference](components.md) covers selection controls, fields, feedback, dialogs, and header/footer specimens.
+## Navigation patterns
 
-## Do's and Don'ts
-
-- Do reuse semantic variables instead of copying literals from individual mock selectors.
-- Do preserve the shared shell, selected context, and per-screen composition.
-- Do use a mono font for identifiers and keep them inside their own layout region.
-- Do label decisions explicitly and keep keyboard focus visible.
-- Don’t use brand orange to mean DENY or ALLOW.
-- Don’t introduce dark mode, new fonts, or a frontend-style hero into management screens.
-- Don’t collapse essential actions out of the mobile experience.
-- Don’t treat CSS or a visual simulator as an authorization boundary.
+Inner tabs share a divider: the active tab has a light surface and yellow underline; inactive tabs use a muted surface. Section navigation joins icon and label items in a dark outlined group, with yellow for the active item. The primary navigation uses compact uppercase labels and a yellow outlined active item with a short offset shadow. Hover highlights inactive items without obscuring selection; keyboard focus remains visible. See the reference images in [specification 022](../../specs/022-2026-10-30-admin-design-system.md).
