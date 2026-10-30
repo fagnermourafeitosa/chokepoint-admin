@@ -5,6 +5,7 @@ import { usePendingChanges } from '../auth/pending/PendingChanges';
 import { useAuth } from '../auth/AuthContext';
 import type { EnvironmentScope } from '../access/environment-scope';
 import type { DirectoryCheck, DirectorySettings, IdentityConnection, IdentityFields, IssuingClient, ProviderCapability } from './api';
+import { GoogleConnectionForm } from './GoogleConnectionForm';
 import { Help } from './Help';
 import { LifecycleSyncSection } from './LifecycleSyncSection';
 import { secretLeaveMessage } from './useLifecycleSync';
@@ -75,18 +76,25 @@ export function IdentityConnectionForm({ scope, connection, providers, providerE
   } finally { setChecking(false); }
  }
  const clientOptions = clients?.items ?? (directory.issuing_client_id ? [{ client_id: directory.issuing_client_id }] : []);
+ const choice = (item: ProviderCapability) => <span key={item.provider} className="identity-provider-slot" data-tip={item.available ? undefined : 'Not available yet'}><button type="button" className="identity-provider-choice" data-selected={provider === item.provider || undefined} aria-pressed={provider === item.provider} disabled={pending || !item.available || (lockedProvider && item.provider !== connection?.provider)} onClick={() => { setProvider(item.provider); changedCredentials(); }}>
+    {provider === item.provider ? <Check className="identity-provider-tick" size={16} aria-hidden="true" /> : null}
+    <img src={`/idp-icons/${item.provider}.svg`} alt="" width="24" height="24" /><strong>{item.name}</strong>
+   </button></span>;
  return <section className="identity-editor" aria-label={connection ? 'Edit identity provider' : 'Connect identity provider'}>
   <button className="identity-back" type="button" onClick={leave} disabled={pending}><ArrowLeft size={16} />Identity providers</button>
   <header><h1 className="cp-admin-title">{connection ? 'Edit identity provider' : 'Connect identity provider'}</h1><p className="cp-admin-muted">Choose a provider to configure authentication and user access.</p></header>
   {providerError ? <p role="alert" className="cp-admin-notice cp-admin-notice--danger">Provider capabilities are unavailable. Reload and try again.</p> : null}
-  <div className="identity-provider-choices" role="group" aria-label="Identity provider">
-   {providers.map(item => <button key={item.provider} type="button" className="identity-provider-choice" data-selected={provider === item.provider || undefined} aria-pressed={provider === item.provider} disabled={pending || (lockedProvider && item.provider !== connection?.provider)} onClick={() => { setProvider(item.provider); changedCredentials(); }}>
-    {provider === item.provider ? <Check className="identity-provider-tick" size={16} aria-hidden="true" /> : null}
-    <img src={`/idp-icons/${item.provider}.svg`} alt="" width="36" height="36" /><strong>{item.name}</strong>{!item.available ? <small>Not available yet</small> : null}
-   </button>)}
+  <div className="identity-provider-groups">
+   <div className="identity-provider-choices" role="group" aria-label="Identity provider">
+    {providers.filter(item => item.provider !== 'google').map(item => choice(item))}
+   </div>
+   {providers.some(item => item.provider === 'google') ? <div className="identity-provider-category"><span className="identity-field-label">OIDC integrations</span>
+    <div className="identity-provider-choices" role="group" aria-label="OIDC integration">{providers.filter(item => item.provider === 'google').map(item => choice(item))}</div>
+   </div> : null}
   </div>
   {provider && selected && !selected.available ? <p className="cp-admin-notice" role="status">{selected.name} is not available yet.</p> : null}
-  {selected?.available ? <form className="cp-admin-panel identity-form identity-form-redesign" onSubmit={event => { event.preventDefault(); if (validate()) { void onSave(fields()); } }}>
+  {provider === 'google' && selected?.available ? <GoogleConnectionForm key={connection?.id ?? 'new'} connection={connection} workspaceLabel={`${auth.workspace?.name} / ${auth.environment?.name === 'production' ? 'Production' : 'Sandbox'}`} pending={pending} error={error} onSave={onSave} onCheck={onCheck} onDirectoryCheck={onDirectoryCheck} onCancel={leave} /> : null}
+  {selected?.available && provider !== 'google' ? <form className="cp-admin-panel identity-form identity-form-redesign" onSubmit={event => { event.preventDefault(); if (validate()) { void onSave(fields()); } }}>
    <fieldset disabled={pending || checking}>
     <div className="identity-form-section"><SectionHeading title="Connection" description="Identify this connection in your workspace." help="The connection belongs to the selected workspace and environment." /><div className="identity-form-fields"><label className="cp-admin-field">Connection name<input className="cp-admin-input" required maxLength={80} value={name} onChange={e => { setName(e.target.value); changedAuthentication(); }} /></label><small>{auth.workspace?.name} / {auth.environment?.name === 'production' ? 'Production' : 'Sandbox'}</small>
      <label className="cp-admin-choice identity-enable"><input className="cp-admin-switch" type="checkbox" role="switch" checked={enabled} onChange={e => setEnabled(e.target.checked)} /><span className="cp-admin-choice-copy"><strong>Enable connection</strong><small>Accept valid access tokens from this issuer in the selected environment.</small></span></label></div></div>
