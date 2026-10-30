@@ -27,6 +27,21 @@
   padding: var(--cp-admin-space-2) var(--cp-admin-space-3); background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text);
   font-weight: var(--cp-admin-weight-regular);
 }
+/* Selects drop the platform chrome and use the design-system chevron. Data URIs
+   cannot read tokens, so the stroke repeats --cp-admin-color-text (#15161b). */
+select.cp-admin-input {
+  appearance: none;
+  padding-inline-end: calc(var(--cp-admin-space-3) * 2 + var(--cp-admin-icon-size));
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2315161b' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--cp-admin-space-3) center;
+  background-size: var(--cp-admin-icon-size);
+  font-size: var(--cp-admin-type-small);
+  font-weight: var(--cp-admin-weight-semibold);
+  cursor: pointer;
+}
+select.cp-admin-input:hover:not(:disabled) { background-color: var(--cp-admin-color-hover); }
+select.cp-admin-input:disabled { opacity: .7; }
 .cp-admin-input::placeholder { color: var(--cp-admin-color-text-muted); opacity: 1; }
 .cp-admin-input[aria-invalid="true"] { border-color: var(--cp-admin-color-danger); }
 .cp-admin-input:disabled { background: var(--cp-admin-color-surface-muted); color: var(--cp-admin-color-text-muted); cursor: not-allowed; }

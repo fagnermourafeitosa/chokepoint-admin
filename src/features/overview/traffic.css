@@ -1,54 +1,70 @@
+/* Brand palette: allowed is the brand yellow, denied the action pink, both
+   outlined in ink like buttons and navigation. Chart, legend, tooltip and
+   sparklines share these tokens. */
+.overview-traffic,
+.overview-metrics {
+  --overview-allowed: var(--cp-admin-color-brand);
+  --overview-denied: var(--cp-admin-color-action);
+}
 .overview-traffic h2 {
-  margin: 8px 0 16px;
-  font-size: 1.375rem;
+  margin: var(--cp-admin-space-1) 0 var(--cp-admin-space-4);
+  font-family: var(--cp-admin-font-heading);
+  font-size: var(--cp-admin-type-section);
+  font-weight: var(--cp-admin-weight-heavy);
+  line-height: 1.3;
+  letter-spacing: var(--cp-admin-tracking-heading);
 }
 .overview-legend {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
+  gap: var(--cp-admin-space-4);
   color: var(--cp-admin-color-text-muted);
-  font-size: 0.75rem;
+  font-size: var(--cp-admin-type-label);
 }
 .overview-legend > span {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--cp-admin-space-2);
 }
-.overview-legend i {
-  width: 9px;
-  height: 9px;
+.overview-legend i,
+.overview-traffic-tip i {
+  width: .625rem;
+  height: .625rem;
   display: block;
-  border-radius: 2px;
-  background: var(--cp-admin-color-text-muted);
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-text);
+  border-radius: var(--cp-admin-radius-button);
+  background: var(--overview-allowed);
 }
-.overview-legend > span:nth-child(2) i {
-  background: var(--cp-admin-color-danger);
+.overview-legend > span:nth-child(2) i,
+.overview-traffic-tip i.overview-tip-denied {
+  background: var(--overview-denied);
 }
 .overview-legend > small {
   margin-left: auto;
-  font-size: 0.6875rem;
+  font-size: var(--cp-admin-type-label);
 }
 .overview-chart {
   height: 225px;
-  margin: 22px 0 14px;
+  margin: var(--cp-admin-space-6) 0 var(--cp-admin-space-3);
   display: flex;
-  gap: 10px;
+  gap: var(--cp-admin-space-3);
 }
 .overview-chart-scale {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding-bottom: 25px;
-  width: 25px;
+  width: 1.75rem;
   color: var(--cp-admin-color-text-muted);
-  font-size: 0.6875rem;
+  font-size: var(--cp-admin-type-label);
+  font-variant-numeric: tabular-nums;
   text-align: right;
 }
 .overview-bars {
   position: relative;
   display: flex;
-  gap: 4px;
+  gap: var(--cp-admin-space-1);
   width: 100%;
   min-width: 0;
   background: repeating-linear-gradient(
@@ -67,6 +83,12 @@
   position: relative;
   height: 100%;
   padding-bottom: 25px;
+  border-radius: var(--cp-admin-radius-sm);
+  cursor: default;
+  transition: background-color var(--cp-admin-duration-fast) var(--cp-admin-ease-out);
+}
+.overview-hour--active {
+  background: var(--cp-admin-color-hover);
 }
 .overview-bar {
   display: flex;
@@ -79,63 +101,56 @@
   width: 100%;
   min-height: 0;
 }
+.overview-bar-allowed,
+.overview-bar-denied {
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-text);
+  border-radius: var(--cp-admin-radius-button) var(--cp-admin-radius-button) 0 0;
+}
 .overview-bar-allowed {
-  background: #8995a0;
-  border-radius: 3px 3px 0 0;
+  background: var(--overview-allowed);
 }
 .overview-bar-denied {
-  background: var(--cp-admin-color-danger);
-  border-radius: 3px 3px 0 0;
+  background: var(--overview-denied);
 }
-.overview-hour {
-  border-radius: var(--cp-admin-radius-sm);
-  cursor: default;
+/* An empty segment draws no outline. */
+.overview-bar > span[style*="height: 0%"] {
+  border: 0;
 }
-.overview-hour--active {
-  background: var(--cp-admin-color-row-hover);
-}
-.overview-hour:focus-visible {
-  outline: 2px solid var(--cp-admin-color-accent-text);
-  outline-offset: 1px;
-}
+/* Same treatment as the design-system tooltip. */
 .overview-traffic-tip {
   position: absolute;
   top: 0;
   /* Keep the tip inside the plot at the first and last hours. */
-  left: clamp(64px, var(--tip-left, 50%), calc(100% - 64px));
+  left: clamp(72px, var(--tip-left, 50%), calc(100% - 72px));
   transform: translateX(-50%);
   z-index: var(--cp-admin-z-floating);
   display: grid;
-  gap: 3px;
-  padding: var(--cp-admin-space-2) var(--cp-admin-space-3);
+  gap: var(--cp-admin-space-1);
+  padding: var(--cp-admin-space-3) var(--cp-admin-space-4);
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-border);
   border-radius: var(--cp-admin-radius-control);
   background: var(--cp-admin-color-strong);
   color: var(--cp-admin-color-text-inverse);
   box-shadow: var(--cp-admin-shadow-panel);
-  font-size: 0.6875rem;
+  font-size: var(--cp-admin-type-small);
+  line-height: var(--cp-admin-leading-ui);
   white-space: nowrap;
   pointer-events: none;
 }
 .overview-traffic-tip small {
-  font-size: 0.625rem;
-  opacity: 0.75;
+  font-size: var(--cp-admin-type-label);
+  opacity: .8;
 }
 .overview-traffic-tip span {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--cp-admin-space-2);
 }
 .overview-traffic-tip strong {
-  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
 }
 .overview-traffic-tip i {
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  background: #8995a0;
-}
-.overview-traffic-tip i.overview-tip-denied {
-  background: var(--cp-admin-color-danger);
+  border-color: var(--cp-admin-color-text-inverse);
 }
 .overview-hour small {
   position: absolute;
@@ -143,29 +158,32 @@
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
-  font-size: 0.625rem;
+  font-size: var(--cp-admin-type-label);
+  font-variant-numeric: tabular-nums;
   color: var(--cp-admin-color-text-muted);
 }
 .overview-traffic-table {
   color: var(--cp-admin-color-text-muted);
-  font-size: 0.75rem;
+  font-size: var(--cp-admin-type-small);
 }
 .overview-traffic-table summary {
   cursor: pointer;
-  padding: 6px 0;
+  padding: var(--cp-admin-space-2) 0;
+  font-weight: var(--cp-admin-weight-semibold);
 }
 .overview-traffic-table table {
-  font-size: 0.75rem;
+  font-size: var(--cp-admin-type-small);
+  font-variant-numeric: tabular-nums;
 }
 @media (max-width: 740px) {
   .overview-chart {
     height: 190px;
   }
   .overview-bars {
-    gap: 3px;
+    gap: 2px;
   }
   .overview-hour small {
-    font-size: 0.5625rem;
+    font-size: .625rem;
   }
   .overview-legend > small {
     margin-left: 0;

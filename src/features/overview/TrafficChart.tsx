@@ -24,7 +24,7 @@ export function Sparkline({ values, denied = false }: { values: number[]; denied
     >
       {series.length ? (
         <>
-          <polygon points={`0,30 ${points} 100,30`} fill="currentColor" opacity="0.1" />
+          <polygon points={`0,30 ${points} 100,30`} />
           <polyline
             points={points}
             fill="none"

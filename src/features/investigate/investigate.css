@@ -24,25 +24,36 @@
 .trace-toolbar .cp-admin-input {
   min-height: 40px;
 }
+/* View switch: an ink-outlined group like section navigation; the current view is yellow. */
 .trace-segments {
   display: flex;
-  border: 1px solid var(--cp-admin-color-border);
-  border-radius: var(--cp-admin-radius-control);
+  border: 2px solid var(--cp-admin-color-text);
+  border-radius: 0;
   overflow: hidden;
   flex: none;
 }
 .trace-segments button {
   border: 0;
   background: var(--cp-admin-color-surface);
-  color: inherit;
-  font: 600 0.75rem var(--cp-admin-font-body);
-  min-height: 40px;
-  padding: 8px 14px;
+  color: var(--cp-admin-color-text);
+  font-family: var(--cp-admin-font-body);
+  font-size: var(--cp-admin-type-small);
+  font-weight: var(--cp-admin-weight-semibold);
+  min-height: var(--cp-admin-control-height);
+  padding: var(--cp-admin-space-2) var(--cp-admin-space-4);
   cursor: pointer;
+  transition: background-color var(--cp-admin-duration-fast) var(--cp-admin-ease-out);
+}
+.trace-segments button + button {
+  border-left: var(--cp-admin-border-width) solid var(--cp-admin-color-text);
+}
+.trace-segments button:hover:not([aria-pressed='true']) {
+  background: var(--cp-admin-color-hover);
+  box-shadow: inset 0 -3px 0 var(--cp-admin-color-text);
 }
 .trace-segments button[aria-pressed='true'] {
-  background: var(--cp-admin-color-text);
-  color: var(--cp-admin-color-text-inverse);
+  background: var(--cp-admin-color-brand);
+  box-shadow: inset 0 -2px 0 var(--cp-admin-color-text);
 }
 .trace-search {
   display: flex;
@@ -113,21 +124,24 @@
   font-size: 0.75rem;
   font-weight: 600;
 }
+/* Outcome chips match the Inbox tags: ink outline, deny in action pink, allow in brand yellow. */
 .trace-outcome {
   display: inline-flex;
-  gap: 7px;
+  gap: var(--cp-admin-space-2);
   align-items: center;
-  padding: 5px 8px;
-  border-radius: 5px;
-  font: 700 0.6875rem var(--cp-admin-font-mono);
+  padding: var(--cp-admin-space-1) var(--cp-admin-space-2);
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-text);
+  border-radius: var(--cp-admin-radius-button);
+  color: var(--cp-admin-color-text);
+  font-family: var(--cp-admin-font-mono);
+  font-size: var(--cp-admin-type-label);
+  font-weight: var(--cp-admin-weight-bold);
 }
 .trace-deny {
-  color: var(--cp-admin-color-danger);
-  background: var(--cp-admin-color-danger-bg);
+  background: var(--cp-admin-color-action);
 }
 .trace-allow {
-  color: var(--cp-admin-color-success);
-  background: var(--cp-admin-color-success-bg);
+  background: var(--cp-admin-color-brand);
 }
 .trace-list-row .trace-reason {
   margin-top: 5px;

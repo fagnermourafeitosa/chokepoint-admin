@@ -26,9 +26,11 @@
   overflow-wrap: anywhere;
 }
 .trace-outcome-large {
-  font: 700 0.8125rem var(--cp-admin-font-body);
-  padding: 9px 12px;
-  border: 1px solid currentColor;
+  padding: var(--cp-admin-space-2) var(--cp-admin-space-3);
+  border-width: 2px;
+  box-shadow: var(--cp-admin-shadow-offset);
+  font-family: var(--cp-admin-font-body);
+  font-size: var(--cp-admin-type-small);
 }
 .trace-path {
   display: flex;
@@ -53,20 +55,20 @@
   color: var(--cp-admin-color-text-muted);
   font-size: 0.6875rem;
 }
+/* Path states use the outcome palette; the state label beside each dot carries the meaning. */
 .trace-path-dot {
   width: 12px;
   height: 12px;
   flex: none;
-  border: 1px solid var(--cp-admin-color-text-muted);
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-text);
   border-radius: 50%;
+  background: var(--cp-admin-color-surface);
 }
 .trace-path [data-state='passed'] .trace-path-dot {
-  background: var(--cp-admin-color-success);
-  border-color: var(--cp-admin-color-success);
+  background: var(--cp-admin-color-brand);
 }
 .trace-path [data-state='failed'] .trace-path-dot {
-  background: var(--cp-admin-color-danger);
-  border-color: var(--cp-admin-color-danger);
+  background: var(--cp-admin-color-action);
 }
 .trace-path [data-state='not_evaluated'] .trace-path-dot {
   border-style: dashed;
@@ -76,13 +78,15 @@
   position: absolute;
   top: 100%;
   left: 0;
-  padding: 10px;
-  border: 1px solid var(--cp-admin-color-border);
-  border-radius: 8px;
-  background: var(--cp-admin-color-surface);
-  z-index: 2;
+  padding: var(--cp-admin-space-3) var(--cp-admin-space-4);
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-border);
+  border-radius: var(--cp-admin-radius-control);
+  background: var(--cp-admin-color-strong);
+  color: var(--cp-admin-color-text-inverse);
+  z-index: var(--cp-admin-z-floating);
   min-width: 180px;
-  box-shadow: 0 8px 24px #24262412;
+  box-shadow: var(--cp-admin-shadow-panel);
+  font-size: var(--cp-admin-type-small);
 }
 .trace-path li:hover .trace-path-detail,
 .trace-path li:focus .trace-path-detail {
@@ -127,11 +131,23 @@
   overflow-wrap: anywhere;
   margin: 5px 0;
 }
-.trace-policy-pass {
-  color: var(--cp-admin-color-success);
+/* Condition result chips, same family as the outcome chips. */
+.trace-policy > .trace-policy-pass,
+.trace-policy > .trace-policy-fail {
+  display: inline-block;
+  padding: var(--cp-admin-space-1) var(--cp-admin-space-2);
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-text);
+  border-radius: var(--cp-admin-radius-button);
+  color: var(--cp-admin-color-text);
+  font-family: var(--cp-admin-font-mono);
+  font-size: var(--cp-admin-type-label);
+  font-weight: var(--cp-admin-weight-bold);
 }
-.trace-policy-fail {
-  color: var(--cp-admin-color-danger);
+.trace-policy > .trace-policy-pass {
+  background: var(--cp-admin-color-brand);
+}
+.trace-policy > .trace-policy-fail {
+  background: var(--cp-admin-color-action);
 }
 .trace-actions {
   display: flex;

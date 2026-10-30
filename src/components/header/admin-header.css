@@ -1,9 +1,9 @@
 .admin-topbar-inner { gap: 1.125rem; }
 .admin-nav-divider { height: 1.5rem; width: 1px; background: var(--cp-admin-color-border); }
-.admin-workspace { display: flex; align-items: center; gap: .625rem; font-size: var(--cp-admin-type-label); font-weight: 700; white-space: nowrap; }
+.admin-workspace { display: flex; align-items: center; gap: .625rem; font-family: var(--cp-admin-font-body); font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); white-space: nowrap; }
 .admin-workspace > svg { color: var(--cp-admin-color-text-muted); }
 .admin-workspace-avatar { display: grid; place-items: center; width: 1.6875rem; height: 1.6875rem; border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-strong); color: var(--cp-admin-color-text-inverse); }
-.admin-environment { display: inline-flex; align-items: center; gap: .375rem; padding: .3125rem .5625rem; border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-success-bg); color: var(--cp-admin-color-success); font-size: var(--cp-admin-type-label); font-weight: 700; }
+.admin-environment { display: inline-flex; align-items: center; gap: .375rem; padding: .3125rem .5625rem; border: var(--cp-admin-border-width) solid var(--cp-admin-color-text); border-radius: var(--cp-admin-radius-button); background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); font-family: var(--cp-admin-font-body); font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); }
 /* Header placement only; .cp-admin-primary-nav in the design system owns the item treatment. */
 .admin-primary-nav { margin-inline-start: 1.75rem; }
 .admin-nav-actions { display: flex; align-items: center; gap: .8125rem; margin-inline-start: auto; }

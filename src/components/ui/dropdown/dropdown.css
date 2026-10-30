@@ -6,6 +6,31 @@
 }
 .admin-dropdown-panel {
   min-width: 13rem;
+  max-height: 20rem;
+  overflow-y: auto;
+}
+/* Filter menus share the header environment selector's outlined trigger. */
+.admin-select {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cp-admin-space-2);
+  min-width: 9rem;
+  padding: var(--cp-admin-space-1) var(--cp-admin-space-3);
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-text);
+  border-radius: var(--cp-admin-radius-button);
+  background: var(--cp-admin-color-surface);
+  color: var(--cp-admin-color-text);
+  font-family: var(--cp-admin-font-body);
+  font-size: var(--cp-admin-type-small);
+  font-weight: var(--cp-admin-weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--cp-admin-duration-fast) var(--cp-admin-ease-out);
+}
+.admin-select:hover,
+.admin-environment:hover {
+  background: var(--cp-admin-color-hover);
 }
 .admin-dropdown-option {
   display: flex;

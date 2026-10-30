@@ -1,9 +1,9 @@
 .overview-status {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 22px;
-  font-size: 0.8125rem;
+  gap: var(--cp-admin-space-2);
+  margin: 0 0 var(--cp-admin-space-6);
+  font-size: var(--cp-admin-type-small);
   flex-wrap: wrap;
 }
 .overview-status strong {
@@ -18,16 +18,16 @@
 .overview-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: var(--cp-admin-layout-gap);
+  margin-bottom: var(--cp-admin-space-6);
 }
 .overview-metric {
-  padding: 22px 24px;
+  padding: var(--cp-admin-space-6);
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  border: 1px solid var(--cp-admin-color-border);
+  gap: var(--cp-admin-space-3);
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-border);
   border-radius: var(--cp-admin-radius-panel);
   background: var(--cp-admin-color-surface);
   color: inherit;
@@ -37,135 +37,181 @@
 button.overview-metric {
   cursor: pointer;
 }
+button.overview-metric {
+  transition: background-color var(--cp-admin-duration-fast) var(--cp-admin-ease-out);
+}
 button.overview-metric:hover {
-  background: var(--cp-admin-color-row-hover);
+  background: var(--cp-admin-color-hover);
 }
+/* Design-system label: the metric name. */
 .overview-metric > span {
-  text-transform: uppercase;
-  letter-spacing: 0.075em;
-  font-size: 0.6875rem;
-  font-weight: 700;
   color: var(--cp-admin-color-text-muted);
+  font-size: var(--cp-admin-type-label);
+  font-weight: var(--cp-admin-weight-bold);
+  letter-spacing: var(--cp-admin-tracking-label);
+  text-transform: uppercase;
 }
+/* The figure uses the heading face, like page titles, with aligned digits. */
 .overview-metric > strong {
-  font: 800 2.75rem/1.15 var(--cp-admin-font-heading);
-  letter-spacing: -0.045em;
+  font-family: var(--cp-admin-font-heading);
+  font-size: var(--cp-admin-type-page);
+  font-weight: var(--cp-admin-weight-heavy);
+  line-height: var(--cp-admin-leading-heading);
+  letter-spacing: var(--cp-admin-tracking-heading);
+  font-variant-numeric: tabular-nums;
 }
 .overview-metric em {
-  font-size: 1.5rem;
+  margin-inline-start: var(--cp-admin-space-1);
+  color: var(--cp-admin-color-text-muted);
+  font-family: var(--cp-admin-font-body);
+  font-size: var(--cp-admin-type-lead);
   font-style: normal;
-  font-weight: 600;
+  font-weight: var(--cp-admin-weight-semibold);
+  letter-spacing: 0;
 }
 .overview-metric--denied > strong {
-  color: var(--cp-admin-color-danger);
+  color: var(--cp-admin-color-text);
 }
 .overview-metric > small {
   display: flex;
-  gap: 6px;
+  gap: var(--cp-admin-space-2);
   align-items: center;
   color: var(--cp-admin-color-text-muted);
-  font-size: 0.75rem;
-  line-height: 1.5;
+  font-size: var(--cp-admin-type-small);
+  line-height: var(--cp-admin-leading-ui);
 }
+/* Coverage meter: brand yellow inside an ink outline. */
 .overview-metric meter {
+  appearance: none;
   width: 100%;
-  height: 8px;
-  margin: 12px 0;
-  accent-color: var(--cp-admin-color-success);
+  height: .75rem;
+  margin: var(--cp-admin-space-3) 0;
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-text);
+  border-radius: var(--cp-admin-radius-button);
+  background: var(--cp-admin-color-surface);
 }
 .overview-metric meter::-webkit-meter-bar {
-  background: var(--cp-admin-color-surface-muted);
+  height: 100%;
   border: 0;
+  border-radius: 0;
+  background: var(--cp-admin-color-surface);
 }
-.overview-metric meter::-webkit-meter-optimum-value {
-  background: var(--cp-admin-color-success);
+.overview-metric meter::-webkit-meter-optimum-value,
+.overview-metric meter::-webkit-meter-suboptimum-value,
+.overview-metric meter::-webkit-meter-even-less-good-value {
+  background: var(--cp-admin-color-brand);
 }
+.overview-metric meter::-moz-meter-bar {
+  background: var(--cp-admin-color-brand);
+}
+/* Sparklines: an ink line over a brand-color area. */
 .overview-spark {
   width: 100%;
   height: 38px;
   margin-top: auto;
-  color: var(--cp-admin-color-text-muted);
+  color: var(--cp-admin-color-text);
 }
-.overview-spark--denied {
-  color: var(--cp-admin-color-danger);
+.overview-spark polygon {
+  fill: var(--overview-allowed);
+}
+.overview-spark--denied polygon {
+  fill: var(--overview-denied);
 }
 .overview-middle {
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
-  gap: 18px;
+  gap: var(--cp-admin-layout-gap);
 }
 .overview-traffic,
 .overview-most-denied {
-  padding: 24px;
+  padding: var(--cp-admin-space-6);
   min-width: 0;
 }
 .overview-most-denied > .attention-kicker {
-  margin-bottom: 18px;
+  margin-bottom: var(--cp-admin-space-3);
 }
+/* Rows with separators and the neutral row hover, as in design-system lists. */
 .overview-top-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   border: 0;
-  border-bottom: 1px solid var(--cp-admin-color-border);
+  border-bottom: var(--cp-admin-border-width) solid var(--cp-admin-color-border);
   background: none;
   color: inherit;
-  padding: 13px 0;
-  gap: 12px;
+  padding: var(--cp-admin-space-3) var(--cp-admin-space-2);
+  gap: var(--cp-admin-space-3);
   text-align: left;
   cursor: pointer;
+  transition: background-color var(--cp-admin-duration-fast) var(--cp-admin-ease-out);
 }
 .overview-top-row:hover {
   background: var(--cp-admin-color-row-hover);
 }
 .overview-top-row > span {
+  display: grid;
+  gap: var(--cp-admin-space-1);
   min-width: 0;
 }
 .overview-top-row code {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-family: var(--cp-admin-font-mono);
+  font-size: var(--cp-admin-type-small);
+  font-weight: var(--cp-admin-weight-semibold);
   overflow-wrap: anywhere;
 }
 .overview-top-row small {
-  display: block;
-  margin-top: 5px;
-  font-size: 0.6875rem;
+  font-size: var(--cp-admin-type-label);
   color: var(--cp-admin-color-text-muted);
   overflow-wrap: anywhere;
 }
+/* Denied count: an ink-outlined action-pink badge with the short offset shadow. */
 .overview-top-row > strong {
-  color: var(--cp-admin-color-danger);
-  font: 700 0.875rem var(--cp-admin-font-mono);
+  flex: none;
+  padding: var(--cp-admin-space-1) var(--cp-admin-space-2);
+  border: 2px solid var(--cp-admin-color-text);
+  border-radius: var(--cp-admin-radius-button);
+  background: var(--cp-admin-color-action);
+  color: var(--cp-admin-color-on-action);
+  box-shadow: var(--cp-admin-shadow-offset);
+  font-family: var(--cp-admin-font-mono);
+  font-size: var(--cp-admin-type-label);
+  font-weight: var(--cp-admin-weight-bold);
+  font-variant-numeric: tabular-nums;
 }
 .overview-unused {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--cp-admin-space-4);
   width: 100%;
-  margin-top: 20px;
-  padding: 16px 0 0;
+  margin-top: var(--cp-admin-space-4);
+  padding: var(--cp-admin-space-4) var(--cp-admin-space-2) var(--cp-admin-space-2);
   border: 0;
   background: none;
   color: inherit;
   text-align: left;
   cursor: pointer;
+  transition: background-color var(--cp-admin-duration-fast) var(--cp-admin-ease-out);
+}
+.overview-unused:hover {
+  background: var(--cp-admin-color-row-hover);
 }
 .overview-unused > strong {
-  font: 800 2rem var(--cp-admin-font-heading);
+  font-family: var(--cp-admin-font-heading);
+  font-size: var(--cp-admin-type-detail);
+  font-weight: var(--cp-admin-weight-heavy);
+  line-height: var(--cp-admin-leading-heading);
+  letter-spacing: var(--cp-admin-tracking-heading);
+  font-variant-numeric: tabular-nums;
 }
 .overview-unused > span {
   color: var(--cp-admin-color-text-muted);
-  font-size: 0.8125rem;
-}
-.overview-unused:hover span {
-  text-decoration: underline;
+  font-size: var(--cp-admin-type-small);
 }
 .overview-observed {
-  margin: 10px 0 28px;
+  margin: var(--cp-admin-space-3) 0 var(--cp-admin-space-8);
   color: var(--cp-admin-color-text-muted);
-  font-size: 0.6875rem;
+  font-size: var(--cp-admin-type-label);
   text-align: right;
 }
 .overview-unused-row {
@@ -189,8 +235,8 @@ button.overview-metric:hover {
 .overview-loading {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: var(--cp-admin-layout-gap);
+  margin-bottom: var(--cp-admin-space-6);
 }
 .overview-loading > span {
   height: 205px;
@@ -206,10 +252,10 @@ button.overview-metric:hover {
     grid-template-columns: 1fr;
   }
   .overview-metric {
-    padding: 20px;
+    padding: var(--cp-admin-space-5);
   }
   .overview-metric > strong {
-    font-size: 2.25rem;
+    font-size: var(--cp-admin-type-detail);
   }
 }
 @media (max-width: 740px) {
@@ -219,6 +265,6 @@ button.overview-metric:hover {
   }
   .overview-traffic,
   .overview-most-denied {
-    padding: 18px;
+    padding: var(--cp-admin-space-4);
   }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { SelectMenu } from '../../components/ui/dropdown/SelectMenu';
 import type { useInvestigation } from './useInvestigation';
 type State = ReturnType<typeof useInvestigation>;
 export function InvestigationToolbar({ state }: { state: State }) {
@@ -59,53 +60,46 @@ export function InvestigationToolbar({ state }: { state: State }) {
           Search
         </button>
       </form>
-      <label>
-        <span className="attention-sr-only">Agent</span>
-        <select
-          className="cp-admin-input"
-          value={state.filters.agent || ''}
-          onChange={(e) => state.update({ agent: e.target.value || undefined })}
-        >
-          <option value="">All agents</option>
-          {state.filters.agent && !state.agentItems.some((a) => a.agent === state.filters.agent) ? (
-            <option value={state.filters.agent}>{state.filters.agent}</option>
-          ) : null}
-          {state.agentItems.map((a) => (
-            <option key={a.agent} value={a.agent}>
-              {a.agent_name || a.agent}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        <span className="attention-sr-only">Period</span>
-        <select
-          className="cp-admin-input"
-          value={state.params.get('period') || (state.filters.from ? 'custom' : 'all')}
-          onChange={(e) => period(e.target.value)}
-        >
-          <option value="all">All retained history</option>
-          <option value="1">Last 24 hours</option>
-          <option value="7">Last 7 days</option>
-          <option value="30">Last 30 days</option>
-          {state.filters.from && !state.params.has('period') ? (
-            <option value="custom">Selected UTC period</option>
-          ) : null}
-        </select>
-      </label>
+      <SelectMenu
+        group="investigate-filters"
+        label="Agent"
+        value={state.filters.agent || ''}
+        onChange={(value) => state.update({ agent: value || undefined })}
+        options={[
+          { value: '', label: 'All agents' },
+          ...(state.filters.agent && !state.agentItems.some((a) => a.agent === state.filters.agent)
+            ? [{ value: state.filters.agent, label: state.filters.agent }]
+            : []),
+          ...state.agentItems.map((a) => ({ value: a.agent, label: a.agent_name || a.agent })),
+        ]}
+      />
+      <SelectMenu
+        group="investigate-filters"
+        label="Period"
+        value={state.params.get('period') || (state.filters.from ? 'custom' : 'all')}
+        onChange={period}
+        options={[
+          { value: 'all', label: 'All retained history' },
+          { value: '1', label: 'Last 24 hours' },
+          { value: '7', label: 'Last 7 days' },
+          { value: '30', label: 'Last 30 days' },
+          ...(state.filters.from && !state.params.has('period')
+            ? [{ value: 'custom', label: 'Selected UTC period' }]
+            : []),
+        ]}
+      />
       {state.view === 'decisions' ? (
-        <label>
-          <span className="attention-sr-only">Result</span>
-          <select
-            className="cp-admin-input"
-            value={state.filters.result || 'all'}
-            onChange={(e) => state.update({ result: e.target.value })}
-          >
-            <option value="all">All results</option>
-            <option value="deny">Deny</option>
-            <option value="allow">Allow</option>
-          </select>
-        </label>
+        <SelectMenu
+          group="investigate-filters"
+          label="Result"
+          value={state.filters.result || 'all'}
+          onChange={(value) => state.update({ result: value })}
+          options={[
+            { value: 'all', label: 'All results' },
+            { value: 'deny', label: 'Deny' },
+            { value: 'allow', label: 'Allow' },
+          ]}
+        />
       ) : null}
       {state.agents.hasNextPage ? (
         <button

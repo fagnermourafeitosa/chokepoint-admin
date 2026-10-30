@@ -53,18 +53,24 @@
   gap: var(--cp-admin-space-4);
   padding: var(--cp-admin-space-5) var(--cp-admin-space-6) var(--cp-admin-space-3);
 }
+/* Section title of the design system. */
 .attention-inbox-header h2 {
   margin: 0;
-  font: 700 1.25rem var(--cp-admin-font-heading);
+  font-family: var(--cp-admin-font-heading);
+  font-size: var(--cp-admin-type-section);
+  font-weight: var(--cp-admin-weight-heavy);
+  line-height: 1.3;
+  letter-spacing: var(--cp-admin-tracking-heading);
 }
+/* Same treatment as cp-admin-label. */
 .attention-kicker {
   display: block;
   margin-block-end: var(--cp-admin-space-1);
-  font-size: 0.6875rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--cp-admin-color-text-muted);
+  font-size: var(--cp-admin-type-label);
+  font-weight: var(--cp-admin-weight-bold);
+  letter-spacing: var(--cp-admin-tracking-label);
+  text-transform: uppercase;
 }
 .attention-status {
   padding: var(--cp-admin-space-4) var(--cp-admin-space-6);
@@ -104,25 +110,25 @@
   display: flex;
   justify-content: flex-end;
 }
+/* Type tags: brand palette in an ink outline; the label names the type. */
 .attention-tag {
   display: inline-block;
   padding: var(--cp-admin-space-1) var(--cp-admin-space-2);
-  border-radius: var(--cp-admin-radius-sm);
-  font:
-    700 0.6875rem ui-monospace,
-    monospace;
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-text);
+  border-radius: var(--cp-admin-radius-button);
+  color: var(--cp-admin-color-text);
+  font-family: var(--cp-admin-font-mono);
+  font-size: var(--cp-admin-type-label);
+  font-weight: var(--cp-admin-weight-bold);
 }
 .attention-tag--tool-discovery {
-  background: var(--cp-admin-color-warning-bg);
-  color: var(--cp-admin-color-warning);
+  background: var(--cp-admin-color-brand);
 }
 .attention-tag--requests-denied {
-  background: var(--cp-admin-color-danger-bg);
-  color: var(--cp-admin-color-danger);
+  background: var(--cp-admin-color-action);
 }
 .attention-tag--idp-user-disable {
-  background: var(--cp-admin-color-surface-muted);
-  color: var(--cp-admin-color-text);
+  background: var(--cp-admin-color-accent-soft);
 }
 .attention-pager {
   display: flex;
@@ -155,7 +161,7 @@
 
 .attention-filters {
   display: flex;
-  gap: 10px;
+  gap: var(--cp-admin-space-2);
   flex-wrap: wrap;
 }
 .attention-row--reviewed {
@@ -166,16 +172,20 @@
 }
 .attention-main > small {
   color: var(--cp-admin-color-text-muted);
-  font-size: 0.75rem;
+  font-size: var(--cp-admin-type-label);
 }
+/* Status chip: ink outline on the surface; the text carries the meaning. */
 .attention-status-chip {
   display: block;
-  margin-top: 7px;
-  font-size: 0.6875rem;
   width: max-content;
-  border: 1px solid var(--cp-admin-color-border);
-  padding: 3px 6px;
-  border-radius: 5px;
+  margin-top: var(--cp-admin-space-2);
+  padding: var(--cp-admin-space-1) var(--cp-admin-space-2);
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-text);
+  border-radius: var(--cp-admin-radius-button);
+  background: var(--cp-admin-color-surface);
+  color: var(--cp-admin-color-text);
+  font-size: var(--cp-admin-type-label);
+  font-weight: var(--cp-admin-weight-semibold);
 }
 .attention-when time {
   line-height: 1.5;
@@ -187,10 +197,10 @@
   .attention-filters {
     width: 100%;
   }
-  .attention-filters label {
+  .attention-filters .admin-dropdown {
     flex: 1;
   }
-  .attention-filters select {
+  .attention-filters .admin-select {
     width: 100%;
   }
 }

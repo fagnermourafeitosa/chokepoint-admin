@@ -16,7 +16,8 @@ The static specimens include [scripts/preview.js](scripts/preview.js) for local 
 | Radio group | `cp-admin-choice-group` | Native exclusive selection with fieldset/legend |
 | Switch | `cp-admin-switch` | Native checkbox with switch role and visible label |
 | Segmented selection | `cp-admin-segmented`, `cp-admin-segment` | Native radio choices; selected segment and visible keyboard focus |
-| Input/select/textarea | `cp-admin-input`, `cp-admin-field` | Existing default, readonly, disabled, invalid, and focus styling |
+| Input/select/textarea | `cp-admin-input`, `cp-admin-field` | Existing default, readonly, disabled, invalid, and focus styling. A `select` drops the platform chrome: semibold label-size value, design-system chevron and the neutral hover surface |
+| Filter menu | `admin-select` (`SelectMenu`) | List filters use the header environment selector's outlined trigger and option panel instead of a native select; the current option shows a check |
 | Range | `cp-admin-range` | Native keyboard/pointer input; specimen output updates locally |
 | Progress | `cp-admin-progress` | Native progress element with an accessible label |
 | Notice | `cp-admin-notice` | Neutral, success, and danger appearances; message remains explicit |
