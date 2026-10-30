@@ -1,7 +1,7 @@
 /* Page geometry follows the workbench source; thresholds are literal CSS media conditions. */
 .cp-admin-title { font-size: var(--cp-admin-type-page); line-height: var(--cp-admin-leading-heading); }
 .cp-admin-title--detail { font-size: var(--cp-admin-type-detail); }
-.cp-admin-topbar { position: sticky; top: 0; z-index: var(--cp-admin-z-header); min-height: var(--cp-admin-layout-header-height); background: var(--cp-admin-color-surface); border-bottom: var(--cp-admin-border-width) solid var(--cp-admin-color-border); }
+.cp-admin-topbar { position: sticky; top: 0; z-index: var(--cp-admin-z-header); min-height: var(--cp-admin-layout-header-height); background: var(--cp-admin-color-canvas); border-bottom: 2px solid var(--cp-admin-color-text); }
 .cp-admin-topbar-inner { display: flex; align-items: center; flex-wrap: wrap; min-height: calc(var(--cp-admin-layout-header-height) - var(--cp-admin-border-width)); gap: var(--cp-admin-space-4); max-width: var(--cp-admin-layout-nav-max); margin-inline: auto; padding-inline: var(--cp-admin-layout-nav-gutter); }
 .cp-admin-topbar-nav { flex: 1; min-width: 0; flex-wrap: nowrap; overflow-x: auto; }
 .cp-admin-topbar-nav > * { flex: 0 0 auto; }

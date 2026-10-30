@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { useLoginAction } from "./useLoginAction";
 import { useWorkspaceOnboarding } from "./useWorkspaceOnboarding";
 import { Link, Navigate } from "react-router";
-import logo from "../../assets/logo.png";
 import { useAuth } from "./AuthContext";
 
 import "./auth.css";
@@ -11,7 +10,7 @@ export function AuthFrame({ children, publicEntry = false }: { children: ReactNo
   return (
     <main className={publicEntry ? "auth-page auth-page--public" : "auth-page"}>
       <div className="auth-region">
-        {publicEntry ? <span className="auth-public-logo">CHOKEPOINT</span> : <img className="auth-logo" src={logo} alt="Chokepoint" />}
+        <span className="auth-public-logo">CHOKEPOINT</span>
         {children}
       </div>
     </main>

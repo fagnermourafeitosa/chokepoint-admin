@@ -6,7 +6,7 @@ type PrimaryNavigationProps = {
 
 export function PrimaryNavigation({ items }: PrimaryNavigationProps) {
   return (
-    <nav className="cp-admin-topbar-nav admin-primary-nav" aria-label="Primary">
+    <nav className="cp-admin-topbar-nav cp-admin-primary-nav admin-primary-nav" aria-label="Primary">
       {items.map(({ path, label }) => (
         <NavLink key={path} to={path} end={path === '/'}>{label}</NavLink>
       ))}

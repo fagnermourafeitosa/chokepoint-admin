@@ -3,7 +3,7 @@
 .enterprise-catalog h2 { font-size: var(--cp-admin-type-section); font-family: var(--cp-admin-font-heading); }
 .enterprise-provider { display: flex; align-items: center; gap: var(--cp-admin-space-5); padding: var(--cp-admin-space-6); background: var(--cp-admin-color-surface); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-panel); }
 .enterprise-provider-copy { flex: 1; min-width: 0; }
-.enterprise-provider-copy h3 { font-size: 1.125rem; margin-bottom: var(--cp-admin-space-1); }
+.enterprise-provider-copy h3 { font: var(--cp-admin-weight-bold) 1.375rem/var(--cp-admin-leading-heading) var(--cp-admin-font-heading); margin-bottom: var(--cp-admin-space-1); }
 .enterprise-provider-copy p { color: var(--cp-admin-color-text-muted); }
 .enterprise-provider-copy small { display: flex; align-items: center; gap: var(--cp-admin-space-2); margin-top: var(--cp-admin-space-3); color: var(--cp-admin-color-text-muted); }
 .enterprise-provider-action { display: grid; gap: var(--cp-admin-space-2); justify-items: start; max-width: 20rem; }
@@ -14,11 +14,12 @@
 .enterprise-review > p { max-width: 70ch; }
 @media(max-width:740px) { .enterprise-provider { flex-wrap: wrap; padding: var(--cp-admin-space-4); gap: var(--cp-admin-space-3); } .enterprise-provider-action { flex-basis: 100%; max-width: none; } .enterprise-selection { align-items: start; flex-direction: column; } }
 .github-setup-guide { padding: var(--cp-admin-space-5) var(--cp-admin-space-6); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); }
-.github-setup-guide > summary { cursor: pointer; font-weight: var(--cp-admin-weight-semibold); color: var(--cp-admin-color-accent-text); padding-block: var(--cp-admin-space-1); }
+.github-setup-guide > summary { cursor: pointer; font-weight: var(--cp-admin-weight-bold); color: var(--cp-admin-color-text); padding-block: var(--cp-admin-space-1); }
+.github-setup-guide > summary:hover { text-decoration: underline; text-underline-offset: 3px; }
 .github-setup-guide > p { margin-top: var(--cp-admin-space-4); max-width: 72ch; color: var(--cp-admin-color-text-muted); }
 .github-setup-steps { list-style: none; padding: 0; margin: var(--cp-admin-space-5) 0 0; counter-reset: setup-step; display: grid; gap: var(--cp-admin-space-5); }
 .github-setup-steps > li { display: flex; gap: var(--cp-admin-space-4); counter-increment: setup-step; }
-.github-setup-steps > li::before { content: counter(setup-step); flex: 0 0 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: var(--cp-admin-color-accent-soft); color: var(--cp-admin-color-accent-text); font-weight: var(--cp-admin-weight-bold); }
+.github-setup-steps > li::before { content: counter(setup-step); flex: 0 0 28px; height: 28px; display: grid; place-items: center; border: 2px solid var(--cp-admin-color-text); background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); font-weight: var(--cp-admin-weight-bold); }
 .github-setup-steps > li > div { min-width: 0; }
 .github-setup-steps h4 { font-weight: var(--cp-admin-weight-bold); margin-block: 2px var(--cp-admin-space-2); }
 .github-setup-steps p { max-width: 72ch; color: var(--cp-admin-color-text-muted); margin-bottom: var(--cp-admin-space-2); }
@@ -28,9 +29,10 @@
 @media(max-width:740px) { .github-setup-guide { padding: var(--cp-admin-space-4); } .github-setup-steps > li { gap: var(--cp-admin-space-3); } }
 .github-application { display: grid; gap: var(--cp-admin-space-5); }
 .github-application-form { padding: var(--cp-admin-space-6); display: grid; gap: var(--cp-admin-space-4); }
+.github-application-form h3 { font: var(--cp-admin-weight-bold) 1.375rem/var(--cp-admin-leading-heading) var(--cp-admin-font-heading); }
 .github-application-form fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: var(--cp-admin-space-4); max-width: 42rem; }
 .github-callback { display: grid; gap: var(--cp-admin-space-2); max-width: 42rem; }
-.github-callback-label { font-weight: var(--cp-admin-weight-semibold); }
+.github-callback-label { font-size: var(--cp-admin-type-small); }
 .github-callback-row { display: flex; align-items: center; gap: var(--cp-admin-space-3); }
 .github-callback-row .github-setup-value { flex: 1; margin: 0; }
 .github-secret-row { display: flex; gap: var(--cp-admin-space-2); align-items: flex-start; }

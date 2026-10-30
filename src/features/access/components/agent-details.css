@@ -52,40 +52,7 @@
   gap: 0.375rem;
 }
 
-.access-detail-tabs {
-  display: inline-flex;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  margin-inline: var(--cp-admin-space-6);
-  border: 1px solid var(--cp-admin-color-border);
-  border-radius: var(--cp-admin-radius-control);
-  background: var(--cp-admin-color-surface-muted);
-}
-
-.access-detail-tabs button {
-  display: flex;
-  align-items: center;
-  gap: var(--cp-admin-space-4);
-  min-height: var(--cp-admin-control-height);
-  padding-inline: var(--cp-admin-space-4);
-  border: 0;
-  border-bottom: 2px solid transparent;
-  border-radius: var(--cp-admin-radius-control);
-  background: transparent;
-  color: var(--cp-admin-color-text-muted);
-  font-size: var(--cp-admin-type-small);
-  font-weight: var(--cp-admin-weight-bold);
-}
-
-.access-detail-tabs button[aria-pressed='true'] {
-  background: var(--cp-admin-color-surface);
-  border-bottom-color: var(--cp-admin-color-brand);
-  color: var(--cp-admin-color-text);
-}
-
-.access-detail-tabs button:hover {
-  background: var(--cp-admin-color-row-hover);
-}
+.access-detail-tabs { margin-inline: var(--cp-admin-space-6); }
 
 .access-detail-tabs span {
   font-size: var(--cp-admin-type-label);
