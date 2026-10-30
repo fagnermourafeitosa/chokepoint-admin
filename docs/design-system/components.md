@@ -17,7 +17,7 @@ The static specimens include [scripts/preview.js](scripts/preview.js) for local 
 | Switch | `cp-admin-switch` | Native checkbox with switch role and visible label |
 | Segmented selection | `cp-admin-segmented`, `cp-admin-segment` | Native radio choices; selected segment and visible keyboard focus |
 | Input/textarea | `cp-admin-input`, `cp-admin-field` | Existing default, readonly, disabled, invalid, and focus styling |
-| Select | `admin-select` (`SelectMenu`) | Every choice from a list, in filters and forms. Never a native `select`: its platform chrome ignores the system. Same outlined trigger and option panel as the header environment selector; the current option shows a check. `block` fills a form field, `required` keeps native form validation, and disabled options stay visible |
+| Select | `admin-select` (`SelectMenu`) | Every choice from a list, in filters and forms. Never a native `select`: its platform chrome ignores the system. Same outlined trigger and option panel as the header environment selector, defined in `styles/controls.css` and shown in the specimen; the current option shows a check. `block` fills a form field, `required` keeps native form validation, and disabled options stay visible |
 | Range | `cp-admin-range` | Native keyboard/pointer input; specimen output updates locally |
 | Progress | `cp-admin-progress` | Native progress element with an accessible label |
 | Notice | `cp-admin-notice` | Neutral, success, and danger appearances; message remains explicit |

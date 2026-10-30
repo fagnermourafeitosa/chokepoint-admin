@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { useDropdown } from './useDropdown';
-import './dropdown.css';
 
 type DropdownProps = {
   label: string;

@@ -44,3 +44,11 @@ document.addEventListener('reset', event => {
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') document.querySelectorAll('details[data-demo-disclosure][open]').forEach(el => { el.open = false; });
 });
+document.addEventListener('click', event => {
+  const option = event.target instanceof Element && event.target.closest('details[data-demo-select] .admin-dropdown-option');
+  if (!option) return;
+  const menu = option.closest('details');
+  menu.querySelectorAll('.admin-dropdown-option').forEach(el => el.setAttribute('aria-pressed', String(el === option)));
+  menu.querySelector('summary > span').textContent = option.textContent;
+  menu.open = false;
+});
