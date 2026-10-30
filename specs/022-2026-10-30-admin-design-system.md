@@ -3,7 +3,7 @@
 - **Specification ID**: 022
 - **Date**: 2026-10-30
 - **Slug**: admin-design-system
-- **Status**: Implemented but not merged, requires review
+- **Status**: Implemented
 - **Owner**: Admin
 - **Related Specification**: [001 — Admin Shell](001-2026-10-24-admin-shell.md)
 
@@ -49,29 +49,35 @@ Define or update shared tokens and CSS for the app shell and wordmark; primary a
 
 Specify and implement default, hover, focus-visible, active and disabled treatments where applicable. Loading, empty, error, selected and success states must remain understandable without color alone. Maintain visible keyboard focus, native semantics, readable contrast, zoom and reduced-motion behavior. Preserve horizontal overflow handling for dense content on narrow screens.
 
+Hover follows the visual language rather than a generic tint. Yellow is reserved for current and selected items, so hover uses a neutral surface or movement. Elements with an offset shadow (primary, ghost and soft destructive buttons, inactive primary navigation items and graph nodes) lift on hover into a deeper shadow and press into it when active; inactive primary navigation items also gain the dark outline. Items joined in one outlined group (section navigation, inner tabs, graph zoom controls) do not lift: they use the neutral hover surface, with a dark underline for navigation and tabs. List and table rows use the neutral row hover. Destructive actions that open a confirmation use a soft red treatment, as in the reference.
+
 ## Implementation decisions
 
 1. Apply the visual system to all existing admin screens, including authentication and feature-specific styles. Preserve existing content, actions, navigation, permissions and API behavior.
 2. Use the screenshot for visual decisions, adapting its styling to existing layouts and content. Do not introduce new backend data, UI features or a dark theme.
 3. Reuse the existing semantic token and component stylesheet entrypoint. Update the design-system documentation, token reference and specimen to reflect the implemented system.
 4. Use local font assets and licenses; make no runtime remote font requests. Use the frontend home wordmark implementation as the source for its brand treatment.
-5. Prefer CSS changes. React changes are allowed only when needed to render the home wordmark or preserve accessibility and the existing interaction contract.
+5. Prefer CSS changes. React changes are allowed only when needed to render the home wordmark, to apply a shared component class or decorative icon shown in the reference, or to preserve accessibility and the existing interaction contract.
 
 ## User stories
 
-- [ ] An administrator sees a coherent visual language across the admin and recognizes Chokepoint's home identity.
-- [ ] An administrator can identify the active navigation, primary actions and status without relying on color alone.
-- [ ] A keyboard or small-screen user can continue to use the existing workflows.
-- [ ] A developer can reuse documented tokens and components without duplicating styles for each screen.
+- [x] An administrator sees a coherent visual language across the admin and recognizes Chokepoint's home identity.
+- [x] An administrator can identify the active navigation, primary actions and status without relying on color alone.
+- [x] A keyboard or small-screen user can continue to use the existing workflows.
+- [x] A developer can reuse documented tokens and components without duplicating styles for each screen.
 
 ## Verification and acceptance criteria
 
-- [ ] The specified fonts, logo and visual roles are applied across the admin, including feature-specific screens and authentication.
-- [ ] Shared component states, semantic colors, focus, responsive layouts and reduced motion are documented and verified.
-- [ ] Existing behavior, navigation and API contracts remain unchanged.
-- [ ] The design-system documentation and visual specimen match the implementation.
-- [ ] `npm run check` and `npm run build` pass.
-- [ ] Functional browser review covers the shell and representative screens, controls and narrow viewport. Record any unavailable checks and their limits.
+- [x] The specified fonts, logo and visual roles are applied across the admin, including feature-specific screens and authentication.
+- [x] Shared component states, semantic colors, focus, responsive layouts and reduced motion are documented and verified.
+- [x] Existing behavior, navigation and API contracts remain unchanged.
+- [x] The design-system documentation and visual specimen match the implementation.
+- [x] `npm run check` and `npm run build` pass.
+- [x] Functional browser review covers the shell and representative screens, controls and narrow viewport. Record any unavailable checks and their limits.
+
+## Verification notes
+
+Reviewed in the built-in browser as `admin-a` against the local backend: shell, Overview, Access (Permissions, Context sources, Integrations with Enterprise, Custom and Identity providers), the GitHub App form, dialogs, menus and authentication screens, at desktop width and 375px. Hover, active and focus states were confirmed from computed styles. Limits: Investigate is an empty placeholder on this branch, so its screens are reviewed with specifications 019–021; the Keycloak login theme lives in `dev-infra` and still uses a yellow primary button; under reduced motion, transitions stop but the 1px hover lift remains.
 
 ## Out of scope
 

@@ -1,4 +1,4 @@
-import { Bot } from 'lucide-react';
+import { Bot, Plus } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
 import { EmptyState } from '../../../components/ui/empty-state/EmptyState';
 import { Dialog } from '../../../components/ui/dialog/Dialog';
@@ -19,7 +19,7 @@ function AgentWorkbench({ scope }: { scope: AgentScope }) {
   return <section aria-label="Permissions">
     <div className="access-page-heading">
       <div><span className="cp-admin-label">ACCESS WORKBENCH</span><h1 className="cp-admin-title">Configure user permissions</h1><p className="cp-admin-muted">Associate users with permission groups, grant server/tool access and apply fine-grained policies.</p></div>
-      <button className="cp-admin-button" onClick={() => workbench.setDialog('new-agent')}>New agent</button>
+      <button className="cp-admin-button access-primary-action" onClick={() => workbench.setDialog('new-agent')}><Plus size={18} aria-hidden="true" />New agent</button>
     </div>
     {workbench.isPending ? <p role="status" className="agent-inline-status">Loading agents…</p> : workbench.isError ? <div className="agent-inline-status" role="alert">Could not load agents in this environment. <button className="cp-admin-button cp-admin-button--ghost" onClick={() => void workbench.refetch()}>Retry</button></div> : <div className="access-workbench">
       <div>

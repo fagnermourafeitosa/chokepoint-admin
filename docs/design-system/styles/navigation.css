@@ -44,10 +44,6 @@
   white-space: nowrap;
 }
 
-:is(.access-navigation-links, .cp-admin-section-nav) a:hover:not([aria-current="page"]) {
-  background: var(--cp-admin-color-row-hover);
-  color: var(--cp-admin-color-text);
-}
 
 :is(.access-navigation-links, .cp-admin-section-nav) a[aria-current='page'] {
   background: var(--cp-admin-color-surface);
@@ -58,6 +54,7 @@
 :is(.access-navigation-links, .cp-admin-section-nav) { gap: 0; padding: 0; border: 2px solid var(--cp-admin-color-text); border-radius: 0; background: var(--cp-admin-color-surface); }
 :is(.access-navigation-links, .cp-admin-section-nav) a { border-radius: 0; color: var(--cp-admin-color-text); }
 :is(.access-navigation-links, .cp-admin-section-nav) a + a { border-left: 1px solid var(--cp-admin-color-text); }
+:is(.access-navigation-links, .cp-admin-section-nav) a:hover:not([aria-current='page']) { background: var(--cp-admin-color-hover); box-shadow: inset 0 -3px 0 var(--cp-admin-color-text); }
 :is(.access-navigation-links, .cp-admin-section-nav) a[aria-current='page'] { background: var(--cp-admin-color-brand); box-shadow: inset 0 -2px 0 var(--cp-admin-color-text); }
 @media (max-width: 740px) { :is(.access-navigation-links, .cp-admin-section-nav) { display: flex; overflow-x: auto; } }
 
@@ -66,6 +63,9 @@
 
 /* Primary navigation, shared by the shell and specimen. */
 .cp-admin-primary-nav { display: flex; align-items: center; gap: .3125rem; min-width: 0; overflow-x: auto; }
-.cp-admin-primary-nav a { display: inline-flex; align-items: center; flex: 0 0 auto; min-height: 2.5rem; padding: .5rem 1rem; border: 2px solid transparent; color: var(--cp-admin-color-text); font-size: var(--cp-admin-type-label); font-weight: 700; text-decoration: none; text-transform: uppercase; white-space: nowrap; }
-.cp-admin-primary-nav a:hover:not([aria-current="page"]) { background: var(--cp-admin-color-row-hover); }
-.cp-admin-primary-nav a[aria-current="page"] { border-color: var(--cp-admin-color-text); background: var(--cp-admin-color-brand); box-shadow: 3px 3px 0 var(--cp-admin-color-text); }
+/* Room for the lift and offset shadow inside the scroll container. */
+.cp-admin-primary-nav { padding: 4px; }
+.cp-admin-primary-nav a { display: inline-flex; align-items: center; flex: 0 0 auto; min-height: 2.5rem; padding: .5rem 1rem; border: 2px solid transparent; color: var(--cp-admin-color-text); font-size: var(--cp-admin-type-label); font-weight: 700; text-decoration: none; text-transform: uppercase; white-space: nowrap; transition: box-shadow var(--cp-admin-duration-fast) var(--cp-admin-ease-out), transform var(--cp-admin-duration-fast) var(--cp-admin-ease-out); }
+.cp-admin-primary-nav a:hover:not([aria-current="page"]) { border-color: var(--cp-admin-color-text); background: var(--cp-admin-color-surface); box-shadow: var(--cp-admin-shadow-offset); transform: var(--cp-admin-lift); }
+.cp-admin-primary-nav a:active:not([aria-current="page"]) { box-shadow: var(--cp-admin-shadow-press); transform: var(--cp-admin-press); }
+.cp-admin-primary-nav a[aria-current="page"] { border-color: var(--cp-admin-color-text); background: var(--cp-admin-color-brand); box-shadow: var(--cp-admin-shadow-offset); }

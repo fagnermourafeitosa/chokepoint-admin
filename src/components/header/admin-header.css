@@ -4,11 +4,8 @@
 .admin-workspace > svg { color: var(--cp-admin-color-text-muted); }
 .admin-workspace-avatar { display: grid; place-items: center; width: 1.6875rem; height: 1.6875rem; border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-strong); color: var(--cp-admin-color-text-inverse); }
 .admin-environment { display: inline-flex; align-items: center; gap: .375rem; padding: .3125rem .5625rem; border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-success-bg); color: var(--cp-admin-color-success); font-size: var(--cp-admin-type-label); font-weight: 700; }
-.admin-primary-nav { display: flex; align-self: stretch; align-items: stretch; gap: .3125rem; margin-inline-start: 1.75rem; }
-.admin-primary-nav a { display: flex; align-items: center; min-height: var(--cp-admin-layout-header-height); padding-inline: 1.0625rem; border-bottom: 2px solid transparent; color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-small); font-weight: 700; text-decoration: none; white-space: nowrap; }
-.admin-primary-nav a:hover:not([aria-current="page"]) { background: var(--cp-admin-color-row-hover); color: var(--cp-admin-color-text); }
-.admin-primary-nav a[aria-current="page"] { color: var(--cp-admin-color-text); }
-.admin-primary-nav a[aria-current="page"] { border-bottom-color: var(--cp-admin-color-accent-text); }
+/* Header placement only; .cp-admin-primary-nav in the design system owns the item treatment. */
+.admin-primary-nav { margin-inline-start: 1.75rem; }
 .admin-nav-actions { display: flex; align-items: center; gap: .8125rem; margin-inline-start: auto; }
 .admin-account { display: grid; place-items: center; width: 2.125rem; height: 2.125rem; border-radius: 50%; background: var(--cp-admin-color-surface-muted); font-size: var(--cp-admin-type-label); font-weight: 800; }
 @media (max-width: 1290px) { .admin-primary-nav { margin-inline-start: .25rem; } }
@@ -29,17 +26,3 @@
 .admin-workspace { border-radius: var(--cp-admin-radius-control); }
 .admin-profile { display: grid; gap: var(--cp-admin-space-2); padding: var(--cp-admin-space-3); font-size: var(--cp-admin-type-small); white-space: nowrap; }
 .admin-profile span { color: var(--cp-admin-color-text-muted); }
-
-.admin-primary-nav { align-items: center; }
-.admin-primary-nav a {
-  min-height: 2.5rem;
-  border: 2px solid transparent;
-  color: var(--cp-admin-color-text);
-  font-size: var(--cp-admin-type-label);
-  text-transform: uppercase;
-}
-.admin-primary-nav a[aria-current="page"] {
-  border-color: var(--cp-admin-color-text);
-  background: var(--cp-admin-color-brand);
-  box-shadow: 3px 3px 0 var(--cp-admin-color-text);
-}

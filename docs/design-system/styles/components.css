@@ -5,29 +5,32 @@
   gap: var(--cp-admin-space-2); border: 2px solid var(--cp-admin-color-text);
   border-radius: var(--cp-admin-radius-button); background: var(--cp-admin-color-action); color: var(--cp-admin-color-on-action);
   font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-bold); line-height: var(--cp-admin-leading-ui);
-  text-align: center; text-decoration: none; box-shadow: 3px 3px 0 var(--cp-admin-color-text);
-  transition: background-color var(--cp-admin-duration-fast) var(--cp-admin-ease-out), transform var(--cp-admin-duration-fast) var(--cp-admin-ease-out);
+  text-align: center; text-decoration: none; box-shadow: var(--cp-admin-shadow-offset);
+  transition: background-color var(--cp-admin-duration-fast) var(--cp-admin-ease-out), box-shadow var(--cp-admin-duration-fast) var(--cp-admin-ease-out), transform var(--cp-admin-duration-fast) var(--cp-admin-ease-out);
 }
-.cp-admin-button:hover:not(:disabled) { background: var(--cp-admin-color-action-hover); }
-.cp-admin-button:active:not(:disabled) { transform: translateY(1px); }
+/* Buttons with an offset shadow lift on hover and press into it when active. */
+.cp-admin-button:hover:not(:disabled) { background: var(--cp-admin-color-action-hover); box-shadow: var(--cp-admin-shadow-lift); transform: var(--cp-admin-lift); }
+.cp-admin-button:active:not(:disabled) { box-shadow: var(--cp-admin-shadow-press); transform: var(--cp-admin-press); }
 .cp-admin-button--dark { box-shadow: none; background: var(--cp-admin-color-strong); color: var(--cp-admin-color-text-inverse); }
-.cp-admin-button--dark:hover:not(:disabled) { background: var(--cp-admin-color-text); }
+.cp-admin-button--dark:hover:not(:disabled) { background: var(--cp-admin-color-text); box-shadow: none; transform: none; }
 .cp-admin-button--secondary { box-shadow: none; background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); border-color: var(--cp-admin-color-control-border); }
-.cp-admin-button--secondary:hover:not(:disabled) { background: var(--cp-admin-color-surface-muted); }
+.cp-admin-button--secondary:hover:not(:disabled) { background: var(--cp-admin-color-hover); border-color: var(--cp-admin-color-text); box-shadow: none; transform: none; }
 .cp-admin-button:disabled { box-shadow: none; color: var(--cp-admin-color-text-muted); background: var(--cp-admin-color-surface-muted); border-color: var(--cp-admin-color-border); cursor: not-allowed; }
 .cp-admin-button[aria-busy="true"] { cursor: progress; }
 .cp-admin-icon-button { min-width: var(--cp-admin-control-height); padding: var(--cp-admin-space-2); }
 .cp-admin-icon { width: var(--cp-admin-icon-size); height: var(--cp-admin-icon-size); flex: none; }
-.cp-admin-field { display: grid; gap: var(--cp-admin-space-2); min-width: 0; font-size: var(--cp-admin-type-small); }
+.cp-admin-field { display: grid; gap: var(--cp-admin-space-2); min-width: 0; font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); }
 .cp-admin-field > label, .cp-admin-field > span { font-weight: var(--cp-admin-weight-semibold); }
 .cp-admin-input {
   width: 100%; min-width: 0; min-height: var(--cp-admin-control-height);
   border: var(--cp-admin-border-width) solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-control);
   padding: var(--cp-admin-space-2) var(--cp-admin-space-3); background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text);
+  font-weight: var(--cp-admin-weight-regular);
 }
 .cp-admin-input::placeholder { color: var(--cp-admin-color-text-muted); opacity: 1; }
 .cp-admin-input[aria-invalid="true"] { border-color: var(--cp-admin-color-danger); }
 .cp-admin-input:disabled { background: var(--cp-admin-color-surface-muted); color: var(--cp-admin-color-text-muted); cursor: not-allowed; }
+.cp-admin-field small { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-regular); }
 .cp-admin-field-error { color: var(--cp-admin-color-danger); font-size: var(--cp-admin-type-small); }
 .cp-admin-panel { min-width: 0; border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-panel); background: var(--cp-admin-color-surface); box-shadow: var(--cp-admin-shadow-panel); }
 .cp-admin-panel-body { padding: var(--cp-admin-space-6); }

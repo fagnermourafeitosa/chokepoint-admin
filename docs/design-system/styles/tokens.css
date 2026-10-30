@@ -58,7 +58,8 @@
   --cp-admin-color-on-action: #15161b;
   --cp-admin-color-accent-text: #292a29;
   --cp-admin-color-accent-soft: #fff3c7;
-  --cp-admin-color-row-hover: var(--cp-admin-color-accent-soft);
+  --cp-admin-color-hover: #e6e5dc;
+  --cp-admin-color-row-hover: var(--cp-admin-color-hover);
   --cp-admin-color-row-selected: #ffedb9;
   --cp-admin-color-strong: #15161b;
   --cp-admin-color-focus: #784160;
@@ -66,6 +67,7 @@
   --cp-admin-color-success-bg: #ddf2e3;
   --cp-admin-color-danger: #ad2525;
   --cp-admin-color-danger-bg: #fbe4e2;
+  --cp-admin-color-danger-bg-hover: #f6cfcb;
   --cp-admin-color-warning: #80510c;
   --cp-admin-color-warning-bg: #fff1cc;
   --cp-admin-color-code-bg: #202122;
@@ -77,6 +79,11 @@
   --cp-admin-type-detail: 2rem;
   --cp-admin-type-page-mobile: 1.75rem;
   --cp-admin-shadow-panel: none;
+  --cp-admin-shadow-offset: 3px 3px 0 var(--cp-admin-color-text);
+  --cp-admin-shadow-lift: 4px 4px 0 var(--cp-admin-color-text);
+  --cp-admin-shadow-press: 1px 1px 0 var(--cp-admin-color-text);
+  --cp-admin-lift: translate(-1px, -1px);
+  --cp-admin-press: translate(2px, 2px);
   --cp-admin-shadow-dialog: 0 35px 85px rgba(23, 32, 25, .25);
   --cp-admin-color-overlay: rgba(19, 24, 21, .42);
   --cp-admin-layout-max: 92.5rem;

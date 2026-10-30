@@ -1,10 +1,6 @@
 .mcp-registry { display: grid; gap: var(--cp-admin-space-6); }
 .mcp-registry .access-page-heading { margin-bottom: 0; }
 .mcp-registry h1 { letter-spacing: -.03em; }
-.mcp-types { display: flex; flex-wrap: wrap; gap: var(--cp-admin-space-2); border-bottom: 1px solid var(--cp-admin-color-border); padding-bottom: var(--cp-admin-space-4); }
-.mcp-types > button { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); min-height: var(--cp-admin-control-height); border: 0; border-radius: var(--cp-admin-radius-control); padding: var(--cp-admin-space-2) var(--cp-admin-space-4); background: transparent; color: var(--cp-admin-color-text-muted); }
-.mcp-types > button[aria-pressed="true"] { background: var(--cp-admin-color-accent-soft); color: var(--cp-admin-color-accent-text); font-weight: var(--cp-admin-weight-bold); }
-.mcp-types > button:hover { background: var(--cp-admin-color-row-hover); }
 .mcp-toolbar { display: grid; gap: var(--cp-admin-space-2); max-width: 25rem; }
 .mcp-toolbar label { font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); }
 .mcp-servers th { text-align: left; }

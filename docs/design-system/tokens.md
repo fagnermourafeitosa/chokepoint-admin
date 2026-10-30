@@ -22,14 +22,16 @@
 | `--cp-admin-color-on-action` | `#15161b` | Text on primary action |
 | `--cp-admin-color-accent-text` | `#292a29` | Normalized link and small accent text |
 | `--cp-admin-color-accent-soft` | `#fff3c7` | Soft yellow highlight |
-| `--cp-admin-color-row-hover` | `var(--cp-admin-color-accent-soft)` | Same soft background as hovered More options links |
+| `--cp-admin-color-hover` | `#e6e5dc` | Neutral hover surface; yellow stays reserved for current and selected items |
+| `--cp-admin-color-row-hover` | `var(--cp-admin-color-hover)` | Hovered list rows, table rows and menu links |
 | `--cp-admin-color-row-selected` | `#ffedb9` | Selected table rows; takes precedence over hover |
 | `--cp-admin-color-strong` | `#15161b` | Mock dark action |
 | `--cp-admin-color-focus` | `#784160` | Keyboard focus on light surfaces |
 | `--cp-admin-color-success` | `#08744d` | Mock ALLOW text |
 | `--cp-admin-color-success-bg` | `#ddf2e3` | Mock ALLOW surface |
 | `--cp-admin-color-danger` | `#ad2525` | Normalized DENY text |
-| `--cp-admin-color-danger-bg` | `#fbe4e2` | Mock DENY surface |
+| `--cp-admin-color-danger-bg` | `#fbe4e2` | Mock DENY surface; soft destructive button fill |
+| `--cp-admin-color-danger-bg-hover` | `#f6cfcb` | Hovered soft destructive button |
 | `--cp-admin-color-warning` | `#80510c` | Normalized review/pending text |
 | `--cp-admin-color-warning-bg` | `#fff1cc` | Warm pending surface |
 | `--cp-admin-color-code-bg` | `#202122` | Dark CEL/JSON editor |
@@ -107,6 +109,11 @@
 | `--cp-admin-z-floating` | `110` | Toast or floating controls |
 | `--cp-admin-shadow-panel` | `none` | Mock quiet panel elevation |
 | `--cp-admin-shadow-dialog` | `0 35px 85px rgba(23, 32, 25, .25)` | Mock dialog elevation |
+| `--cp-admin-shadow-offset` | `3px 3px 0 var(--cp-admin-color-text)` | Resting offset shadow of prominent actions and current primary navigation |
+| `--cp-admin-shadow-lift` | `4px 4px 0 var(--cp-admin-color-text)` | Hovered offset shadow |
+| `--cp-admin-shadow-press` | `1px 1px 0 var(--cp-admin-color-text)` | Pressed offset shadow |
+| `--cp-admin-lift` | `translate(-1px, -1px)` | Hover movement paired with `shadow-lift` |
+| `--cp-admin-press` | `translate(2px, 2px)` | Active movement paired with `shadow-press` |
 
 ## Layout dimensions
 

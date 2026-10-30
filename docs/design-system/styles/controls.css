@@ -30,8 +30,8 @@
 .cp-admin-input-group .cp-admin-button { flex: none; border-radius: 0; }
 .cp-admin-notice { display: flex; align-items: flex-start; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-4); border: 1px solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); font-size: var(--cp-admin-type-small); }
 .cp-admin-notice strong { display: block; margin-bottom: var(--cp-admin-space-1); }
-.cp-admin-notice--success { background: var(--cp-admin-color-success-bg); border-color: var(--cp-admin-color-success); color: var(--cp-admin-color-success); }
-.cp-admin-notice--danger { background: var(--cp-admin-color-danger-bg); border-color: var(--cp-admin-color-danger); color: var(--cp-admin-color-danger); }
+.cp-admin-notice:is(.cp-admin-notice--success, [data-tone="success"]) { background: var(--cp-admin-color-success-bg); border-color: var(--cp-admin-color-success); color: var(--cp-admin-color-success); }
+.cp-admin-notice:is(.cp-admin-notice--danger, [data-tone="danger"]) { background: var(--cp-admin-color-danger-bg); border-color: var(--cp-admin-color-danger); color: var(--cp-admin-color-danger); }
 .cp-admin-accordion { border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); }
 .cp-admin-accordion summary { min-height: var(--cp-admin-control-height); padding: var(--cp-admin-space-4); font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); cursor: pointer; }
 .cp-admin-accordion > div { padding: 0 var(--cp-admin-space-4) var(--cp-admin-space-4); font-size: var(--cp-admin-type-small); }
@@ -40,13 +40,15 @@
 .cp-admin-disclosure > summary::-webkit-details-marker { display: none; }
 .cp-admin-disclosure-panel { position: absolute; inset-inline-end: 0; top: calc(100% + var(--cp-admin-space-2)); z-index: var(--cp-admin-z-drawer); min-width: var(--cp-admin-menu-min-width); max-width: calc(100vw - 2rem); padding: var(--cp-admin-space-2); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); box-shadow: var(--cp-admin-shadow-panel); }
 .cp-admin-disclosure-panel a { display: flex; min-height: var(--cp-admin-control-height); align-items: center; padding: var(--cp-admin-space-2); border-radius: var(--cp-admin-radius-sm); color: var(--cp-admin-color-text); text-decoration: none; font-size: var(--cp-admin-type-small); }
-.cp-admin-disclosure-panel a:hover { background: var(--cp-admin-color-accent-soft); }
+.cp-admin-disclosure-panel a:hover { background: var(--cp-admin-color-row-hover); }
 .cp-admin-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--cp-admin-space-3); }
 .cp-admin-pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--cp-admin-space-3); font-size: var(--cp-admin-type-small); }
 .cp-admin-button--danger { background: var(--cp-admin-color-danger); color: var(--cp-admin-color-text-inverse); }
 .cp-admin-button--danger:hover:not(:disabled) { background: var(--cp-admin-color-danger); filter: brightness(.95); }
 .cp-admin-button--ghost { background: transparent; color: var(--cp-admin-color-accent-text); }
-.cp-admin-button--ghost:hover:not(:disabled) { background: var(--cp-admin-color-accent-soft); }
+.cp-admin-button--ghost:hover:not(:disabled) { background: var(--cp-admin-color-surface); }
+.cp-admin-button--danger-soft { background: var(--cp-admin-color-danger-bg); color: var(--cp-admin-color-danger); }
+.cp-admin-button--danger-soft:hover:not(:disabled) { background: var(--cp-admin-color-danger-bg-hover); }
 .cp-admin-button--small { min-height: var(--cp-admin-control-compact-height); padding: var(--cp-admin-space-1) var(--cp-admin-space-3); font-size: var(--cp-admin-type-label); }
 .cp-admin-toast { position: fixed; inset-inline-end: var(--cp-admin-space-4); bottom: var(--cp-admin-space-4); z-index: var(--cp-admin-z-floating); width: min(var(--cp-admin-toast-max-width), calc(100vw - 2rem)); padding: var(--cp-admin-space-4); border: 1px solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); box-shadow: var(--cp-admin-shadow-dialog); font-size: var(--cp-admin-type-small); }
 .cp-admin-toast[hidden] { display: none; }

@@ -36,7 +36,7 @@ The admin gallery adds an input with a trailing selection action, JSON file pick
 
 Use `cp-admin-input-group` for grouped input/actions, `cp-admin-toolbar` for related action groups, and `cp-admin-pagination` for the table footer. Keep table overflow inside `cp-admin-table-scroll`; essential row actions remain reachable on small screens.
 
-Table body rows use the same hover background as More options links (`color-row-hover`, an alias of `color-accent-soft`). A checked `input[data-row-select]` gives its row the subtly darker `color-row-selected` background. Selection remains visible while hovering and clears when unchecked, without a separate JavaScript styling state. React table components can also expose selection with `aria-selected="true"` on the row.
+Table body rows use the same hover background as More options links (`color-row-hover`, an alias of the neutral `color-hover`). A checked `input[data-row-select]` gives its row the subtly darker `color-row-selected` background. Selection remains visible while hovering and clears when unchecked, without a separate JavaScript styling state. React table components can also expose selection with `aria-selected="true"` on the row.
 
 ## Topbars and footers
 
@@ -49,3 +49,13 @@ The footer uses `cp-admin-shell-footer` and `cp-admin-footer-nav`: product/works
 ## Interactive demonstration coverage
 
 The specimens demonstrate checking/unchecking, exclusive choices, switches, segmented selection, range output, details expansion, native form validation/reset, modal open/close, and a local notification. Button samples without an attached demonstration are appearance-only. No control changes platform permissions, connects a server, or publishes policy.
+
+## Hover and press
+
+Hover never uses yellow; yellow marks the current or selected item. Elements that rest on an offset shadow lift on hover (`lift` with `shadow-lift`) and press into the shadow when active (`press` with `shadow-press`): primary, ghost and soft destructive buttons, inactive primary navigation items (which gain a dark outline and surface) and graph nodes. Secondary and dark buttons have no shadow; secondary darkens its border and uses `color-hover`. Items inside one outlined group do not lift: section navigation uses `color-hover` with a dark inset underline, inner tabs use `color-hover` with a dark underline, and graph zoom controls use `color-hover` inside their shared border and shadow. Rows use `color-row-hover`. Reduced motion removes the transitions; the shadow change still shows the state.
+
+Destructive actions that open a confirmation use `cp-admin-button--danger-soft` (red text on `color-danger-bg`); the final confirmation keeps `cp-admin-button--danger`.
+
+## Notices, fields and menu triggers
+
+`cp-admin-notice` without a tone is the neutral information notice; do not add one-off info colors. Success and danger tones use the `--success`/`--danger` modifiers or `data-tone="success|danger"`. Field labels are semibold; the value typed in `cp-admin-input` is always regular, even inside a label. A `small` inside `cp-admin-field` is helper text: label size, muted, regular weight. Menu triggers such as the identity row's More button use the ghost button treatment: dark border, offset shadow and lift.
