@@ -3,7 +3,7 @@
 - **Specification ID**: 022
 - **Date**: 2026-10-30
 - **Slug**: admin-design-system
-- **Status**: In Progress
+- **Status**: Implemented but not merged, requires review
 - **Owner**: Admin
 - **Related Specification**: [001 — Admin Shell](001-2026-10-24-admin-shell.md)
 
