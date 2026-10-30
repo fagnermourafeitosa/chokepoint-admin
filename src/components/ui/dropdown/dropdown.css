@@ -54,3 +54,51 @@
 .admin-dropdown-option[aria-pressed='true'] {
   background: var(--cp-admin-color-row-selected);
 }
+.admin-select-field {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+}
+.admin-select-field--block,
+.admin-select-field--block .admin-dropdown,
+.admin-select-field--block .admin-select {
+  display: flex;
+  width: 100%;
+}
+.admin-select-field--block .admin-select {
+  min-height: var(--cp-admin-control-height);
+}
+.admin-select-field--block .admin-dropdown-panel {
+  inset-inline: 0 auto;
+  min-width: 100%;
+}
+.admin-select > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-select[aria-disabled='true'] {
+  border-color: var(--cp-admin-color-border);
+  background: var(--cp-admin-color-surface-muted);
+  color: var(--cp-admin-color-text-muted);
+  cursor: not-allowed;
+}
+.admin-dropdown-option:disabled {
+  color: var(--cp-admin-color-text-muted);
+  cursor: not-allowed;
+}
+.admin-dropdown-option:disabled:hover {
+  background: transparent;
+}
+/* Carries native required validation for the menu; the browser anchors its message here. */
+.admin-select-constraint {
+  position: absolute;
+  inset-inline-start: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}

@@ -1,4 +1,5 @@
 import { usePendingChanges } from "../auth/pending/PendingChanges";
+import { SelectMenu } from '../../components/ui/dropdown/SelectMenu';
 import { useState } from 'react';
 import { sourceApi, type Source, type SourceConfig } from './api';
 import type { EnvironmentScope } from '../access/environment-scope';
@@ -15,7 +16,7 @@ export function SourceConnection({scope,source,actions,onSaved}:Props){
  return <div className="source-columns"><form className="cp-admin-panel source-form" onSubmit={e=>{e.preventDefault();setReview(true)}}><h2>Connection details</h2><fieldset disabled={actions.busy}>
  <label>Source name<input className="cp-admin-input" required maxLength={80} value={config.name} onChange={e=>field('name',e.target.value)}/></label>
  <label>Base URL<input className="cp-admin-input" required type="url" value={config.base_url} onChange={e=>field('base_url',e.target.value)}/></label><small>Approved API destination. Bindings supply identifiers, not arbitrary URLs.</small>
- <label>Authentication<select className="cp-admin-input" value={config.auth_type} onChange={e=>setConfig({...config,auth_type:e.target.value as SourceConfig['auth_type'],api_key_header:undefined})}><option value="bearer">Bearer token</option><option value="api_key">API key</option><option value="none">No authentication</option></select></label>
+ <label>Authentication<SelectMenu block label="Authentication" value={config.auth_type} onChange={v=>setConfig({...config,auth_type:v as SourceConfig['auth_type'],api_key_header:undefined})} options={[{value:'bearer',label:'Bearer token'},{value:'api_key',label:'API key'},{value:'none',label:'No authentication'}]}/></label>
  {config.auth_type==='api_key'?<label>API key header<input className="cp-admin-input" required value={config.api_key_header??''} onChange={e=>field('api_key_header',e.target.value)} placeholder="X-API-Key"/></label>:null}
  {config.auth_type!=='none'?<label>API credential<input className="cp-admin-input" type="password" autoComplete="new-password" value={credential} onChange={e=>setCredential(e.target.value)} placeholder={source?.credential_configured?'Saved credential. Leave blank to retain.':'Enter API credential'} required={!source?.credential_configured}/></label>:null}
  <div className="source-field-pair"><label>Timeout (ms)<input className="cp-admin-input" type="number" min={100} max={3000} required value={config.timeout_millis} onChange={e=>field('timeout_millis',Number(e.target.value))}/></label><label>Cache TTL (seconds)<input className="cp-admin-input" type="number" min={0} max={300} required value={config.cache_ttl_seconds} onChange={e=>field('cache_ttl_seconds',Number(e.target.value))}/></label></div>

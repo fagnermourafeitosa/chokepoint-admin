@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { SelectMenu } from '../../components/ui/dropdown/SelectMenu';
 import { TriangleAlert } from 'lucide-react';
 import { Dialog } from '../../components/ui/dialog/Dialog';
 import type { AgentScope } from '../access/agent-api';
@@ -57,7 +58,7 @@ export function PeopleEditor({ scope, members, identities, disabled, focusPrinci
  return <section aria-label="User associations" className="people-editor">
   <header className="permission-section-header"><div><h3>Users in this permission group</h3><p className="cp-admin-muted">Select people from an identity provider. Changes take effect after publication.</p></div></header>
   <div className="cp-admin-notice people-lifecycle-warning"><TriangleAlert size={18} aria-hidden="true" /><div><strong>Access follows lifecycle events</strong><span>When Auto sync users is enabled for the identity provider, Chokepoint blocks users that it reports as disabled or deleted, and allows them again after reactivation. The association stays. A change that Chokepoint did not receive is not applied, and providers without Auto sync users keep access until you remove the association and publish.</span></div></div>
-  <div className="people-directory-toolbar"><label>Identity provider<select className="cp-admin-input" value={connectionId} onChange={e => switchConnection(e.target.value)} disabled={disabled}><option value="">Select an identity provider</option>{identities.filter(i => i.enabled).map(i => <option key={i.id} value={i.id}>{i.name}</option>)}</select></label>
+  <div className="people-directory-toolbar"><label>Identity provider<SelectMenu block label="Identity provider" value={connectionId} onChange={switchConnection} disabled={disabled} options={[{ value: '', label: 'Select an identity provider' }, ...identities.filter(i => i.enabled).map(i => ({ value: i.id, label: i.name }))]} /></label>
    <label>Search users<input type="search" className="cp-admin-input" value={search} maxLength={128} onChange={e => updateSearch(e.target.value)} placeholder="Search by name or email" disabled={!connectionId || !connection?.directory || disabled} /></label>
   </div>
   {connection && !connection.directory ? <p className="cp-admin-notice">Configure this provider's user directory in Integrations before selecting users.</p> : null}

@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { SelectMenu } from '../../components/ui/dropdown/SelectMenu';
 import { ArrowLeft, Check, Plus, X } from 'lucide-react';
 import { usePendingChanges } from '../auth/pending/PendingChanges';
 import { useAuth } from '../auth/AuthContext';
@@ -99,10 +100,7 @@ export function IdentityConnectionForm({ scope, connection, providers, providerE
        : <input className="cp-admin-input" type="password" autoComplete="new-password" required={!directory.has_secret} maxLength={4096} value={directory.client_secret ?? ''} onChange={e => updateDirectory({ client_secret: e.target.value })} />}<small>{provider === 'keycloak' ? 'In Keycloak: Clients, select this client, then Credentials. Stored encrypted. Existing secrets cannot be displayed.' : 'Stored encrypted. Existing secrets cannot be displayed.'}</small></label></div>
      {error || localError ? <p className="cp-admin-notice cp-admin-notice--danger" role="alert">{error || localError}</p> : null}
      <div className="identity-inline-check"><button type="button" className="cp-admin-button cp-admin-button--secondary" disabled={checking} onClick={() => void checkConnection()}>{checking ? 'Checking…' : 'Check connection'}</button><Help label="What the check verifies" text={checkHelp} /><small role="status">{checked ? 'Connection verified.' : 'Not checked'}</small></div>
-     {provider === 'keycloak' ? <label className="cp-admin-field">Token issuing client<select className="cp-admin-input identity-mono" required disabled={!clients} value={directory.issuing_client_id ?? ''} onChange={e => setDirectory(value => ({ ...value, issuing_client_id: e.target.value }))}>
-      <option value="">{clients ? 'Choose a client' : 'Check the connection to load clients'}</option>
-      {clientOptions.map(item => <option key={item.client_id} value={item.client_id}>{item.name ? `${item.client_id} — ${item.name}` : item.client_id}</option>)}
-     </select><small>{clients?.truncated ? 'Only the first 500 realm clients are listed.' : 'The Keycloak client that issues user access tokens for this integration.'}</small></label> : null}
+     {provider === 'keycloak' ? <label className="cp-admin-field">Token issuing client<SelectMenu block required triggerClassName="identity-mono" label="Token issuing client" disabled={!clients} value={directory.issuing_client_id ?? ''} onChange={v => setDirectory(value => ({ ...value, issuing_client_id: v }))} options={[{ value: '', label: clients ? 'Choose a client' : 'Check the connection to load clients' }, ...clientOptions.map(item => ({ value: item.client_id, label: item.name ? `${item.client_id} — ${item.name}` : item.client_id }))]} /><small>{clients?.truncated ? 'Only the first 500 realm clients are listed.' : 'The Keycloak client that issues user access tokens for this integration.'}</small></label> : null}
     </div></div>
     <LifecycleSyncSection scope={scope} connection={connection} onSecretVisibleChange={onSecretVisibleChange} />
    </fieldset>

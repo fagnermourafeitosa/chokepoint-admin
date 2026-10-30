@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { SelectMenu } from '../../components/ui/dropdown/SelectMenu';
 import { X } from 'lucide-react';
 import { useDialog } from '../../components/ui/dialog/useDialog';
 import type { EnvironmentScope } from '../access/environment-scope';
@@ -22,9 +23,9 @@ export function MCPDialog({ scope, server, onClose, onRefresh, onSaved }: { scop
    {!form.preview ? <>
     <label>Server name<input className="cp-admin-input" name="name" required maxLength={80} value={form.fields.name} disabled={form.busy} onChange={e => form.update('name', e.target.value)} placeholder="e.g. Inventory MCP" /></label>
     <label>MCP endpoint<input className="cp-admin-input" name="endpoint" type="url" required maxLength={2048} value={form.fields.endpoint} disabled={form.busy} onChange={e => form.update('endpoint', e.target.value)} placeholder="https://mcp.example.com/mcp" /></label>
-    <label>Transport<select className="cp-admin-input" value={form.fields.transport} disabled={form.busy} onChange={e => form.update('transport', e.target.value)}><option value="streamable-http">Streamable HTTP</option><option value="stdio" disabled>stdio — unsupported</option></select></label>
+    <label>Transport<SelectMenu block label="Transport" value={form.fields.transport} disabled={form.busy} onChange={v => form.update('transport', v)} options={[{ value: 'streamable-http', label: 'Streamable HTTP' }, { value: 'stdio', label: 'stdio — unsupported', disabled: true }]} /></label>
     <p className="cp-admin-muted">stdio is not supported. Chokepoint connects to an HTTP endpoint.</p>
-    <label>Authentication<select className="cp-admin-input" value={form.fields.auth_type} disabled={form.busy} onChange={e => form.update('auth_type', e.target.value as 'none' | 'bearer')}><option value="none">None</option><option value="bearer">Bearer token</option></select></label>
+    <label>Authentication<SelectMenu block label="Authentication" value={form.fields.auth_type} disabled={form.busy} onChange={v => form.update('auth_type', v as 'none' | 'bearer')} options={[{ value: 'none', label: 'None' }, { value: 'bearer', label: 'Bearer token' }]} /></label>
     {form.fields.auth_type === 'bearer' ? <label>{server?.token_configured ? 'Replacement Bearer token' : 'Bearer token'}<input className="cp-admin-input" name="token" type="password" autoComplete="off" required={requiresToken} maxLength={4096} value={form.token} disabled={form.busy} onChange={e => form.setToken(e.target.value)} /><small className="cp-admin-muted">{server?.token_configured && !requiresToken ? 'Leave blank to retain the saved token.' : 'Required for this connection. Tokens are never returned in server details.'}</small></label> : null}
    </> : <>
     <div className="mcp-preview-summary"><strong>{available.length} available tools</strong><span>{form.selected.length} selected</span></div>
