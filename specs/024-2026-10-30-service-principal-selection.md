@@ -1,0 +1,57 @@
+# Specification: Service Principal Selection
+
+- **Specification ID**: 024
+- **Date**: 2026-10-30
+- **Slug**: service-principal-selection
+- **Status**: In Progress
+- **Owner**: Admin — Access and Permissions
+- **Related Specification**: [Backend 027 — Service Principals](../../backend/specs/027-2026-10-30-service-principals.md)
+- **Related Specification**: [012 — SCIM People Selection](012-2026-10-28-scim-people-selection.md)
+- **Related Specification**: [023 — Google Workspace Connection Form](023-2026-10-30-google-workspace-connection-form.md)
+
+> Approved for implementation by the user on 2026-10-30. The API field names come from the Backend 027 implementation.
+
+## Context & Background
+
+A permission group ("agent") holds people selected from the provider directory. The main customer use case is a microservice that runs agents and calls MCP tools by itself. Backend 027 makes that microservice a member (a service principal), identified by issuer and subject, like a person. The Admin must let an administrator select it.
+
+## Problem Statement
+
+The People selection lists only directory users. A Keycloak client or a Google service account cannot be selected, so a microservice cannot receive a grant.
+
+## Solution
+
+1. **One selection, two kinds.** The member picker shows people and services. Each row shows its kind with a text label, not only an icon or a color. The kinds are named "People" and "Services" (Backend 027 Resolved Decision B).
+2. **Keycloak.** Services come from the backend list (clients with service accounts on). The row shows the client ID.
+3. **Google.** Manual entry (Backend 027 Resolved Decision A). A small form takes the service account e-mail and unique ID, with help text that says where to copy them in the Google Cloud console and that Chokepoint cannot check the account before its first call.
+4. **Group detail.** Members list people and services together, each with its kind label.
+5. **Help text.** A service acts by itself with its own token (client credentials in Keycloak, a service account ID token in Google). An application ID in the decision trace is not a member and grants nothing.
+
+## User Stories
+
+- [ ] 1. As an administrator, I can find a customer microservice and add it to a permission group.
+- [ ] 2. As an administrator, I can tell people and services apart in the picker and in the group.
+
+## Architecture Gate
+
+- Admin owns the picker, local state and labels. Backend 027 owns listing, registration and verification.
+- Keep the code in the existing People and identity feature folders. Split a file that nears 300 lines.
+- Reuse the design system classes. No new tokens.
+- Do not invent API fields before Backend 027 defines them.
+
+## Verification
+
+No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build` when the user says the screen is ready. The user runs the interface test.
+
+## Acceptance Criteria
+
+- [ ] 1. Services appear in the picker with a text kind label.
+- [ ] 2. A selected service is saved as a member and appears in the group with its label.
+- [ ] 3. A Google service account is registered by e-mail and unique ID; the e-mail is shown, the unique ID is the member subject.
+- [ ] 4. People selection behaves as before.
+- [ ] 5. `npm run check` and `npm run build` pass.
+- [ ] 6. The user confirms the interface test.
+
+## Out of Scope
+
+Token exchange, roles and scopes, agentic coding clients.
