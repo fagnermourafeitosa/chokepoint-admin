@@ -9,7 +9,7 @@ Reusable visual tokens, CSS primitives, and page composition rules for the React
 - [Page layouts](layouts.md): overview, workbench, sources, investigation, catalog, and audit.
 - [Static visual specimen](preview.html): typography, palette, controls, and a responsive workbench.
 - [Reusable CSS entrypoint](styles/index.css): import once at the application root.
-- [Font assets and licenses](fonts/README.md): self-hosted DM Sans, Manrope, and JetBrains Mono.
+- [Font assets and licenses](fonts/README.md): self-hosted Barlow Condensed, IBM Plex Sans, and IBM Plex Mono.
 
 - [Verification record](verification.md): checked assets, contrast pairs, and browser sizes.
 
@@ -21,7 +21,7 @@ Reusable visual tokens, CSS primitives, and page composition rules for the React
 
 Derived from [workbench CSS](../chokepoint-workbench/styles.css) and [React screen structure](../chokepoint-workbench/src/app.tsx). The runnable source mock is [dist/index.html](../chokepoint-workbench/dist/index.html); its parent index references an absent `app.js`.
 
-This is an extraction, not a redesign or a migration of the original mock. The source remains intact. New semantic names consolidate repeated styles; contrast and tiny type changes are explicitly recorded in [tokens](tokens.md). The frontend owns an independent system, including its own fonts, naming, and page geometry. Similar values do not imply a shared package or cross-repository import.
+Specification 022 refreshes the admin visual system using its attached reference. The source remains intact. New semantic names consolidate repeated styles; contrast and tiny type changes are explicitly recorded in [tokens](tokens.md). The frontend owns an independent system, including its own fonts, naming, and page geometry. Similar values do not imply a shared package or cross-repository import.
 
 ## CSS integration
 
@@ -50,4 +50,4 @@ Serve this module with a local static server and open `docs/design-system/previe
 
 ## Maintenance
 
-Change canonical values in `styles/tokens.css`, update the token table, and review the specimen at desktop, tablet, and mobile sizes. Keep user-facing statuses readable without color alone. No dark mode is specified. Do not edit the original mock to disguise a difference introduced by this system.
+Change canonical values in `styles/tokens.css`, update the token table, and review the specimen at desktop, tablet, and mobile sizes. Keep user-facing statuses readable without color alone. No dark mode is specified.

@@ -49,4 +49,4 @@ Topbar/footer specimens exist in both systems; frontend includes separate public
 
 ## Table hover and selection
 
-Browser checks confirmed the More options hover color (`#fff3e9`) on table body rows. Checking a row checkbox applies `#fbe7d8`, including while hovered; unchecking clears the selected background. These states reuse semantic tokens and need no JavaScript styling state.
+Table body rows and More options links hover with `color-row-hover` (`#e6e5dc`). Checking a row checkbox applies `color-row-selected`, including while hovered; unchecking clears the selected background. These states reuse semantic tokens and need no JavaScript styling state.

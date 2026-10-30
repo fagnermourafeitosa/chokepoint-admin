@@ -1,5 +1,4 @@
 import { NavLink } from 'react-router';
-import logo from '../../assets/logo.png';
 import { EnvironmentSelector } from './EnvironmentSelector';
 import type { Environment } from '../../app/context/AdminEnvironmentContext';
 import { PrimaryNavigation } from './PrimaryNavigation';
@@ -19,7 +18,7 @@ export function AdminHeader({ environment, onEnvironmentChange, navigation, acco
     <header className="cp-admin-topbar">
       <div className="cp-admin-topbar-inner admin-topbar-inner">
         <NavLink className="cp-admin-brand" to="/" aria-label="Chokepoint home">
-          <img src={logo} alt="Chokepoint" />
+          CHOKEPOINT
         </NavLink>
         <span className="admin-nav-divider" aria-hidden="true" />
         <WorkspaceSelector />

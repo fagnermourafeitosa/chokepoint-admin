@@ -1,0 +1,29 @@
+/* Shared inner section tabs. Existing controls keep their original semantics. */
+:is(.cp-admin-inner-tabs, .access-detail-tabs, .source-tabs, .mapping-tabs, .mcp-types) {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--cp-admin-color-border);
+}
+:is(.cp-admin-inner-tabs, .access-detail-tabs, .source-tabs, .mapping-tabs, .mcp-types) > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cp-admin-space-2);
+  flex: 0 0 auto;
+  min-height: var(--cp-admin-control-height);
+  padding: var(--cp-admin-space-2) var(--cp-admin-space-4);
+  border: 1px solid var(--cp-admin-color-border);
+  border-bottom: 3px solid transparent;
+  border-radius: .25rem .25rem 0 0;
+  background: var(--cp-admin-color-surface-muted);
+  color: var(--cp-admin-color-text);
+  font: 700 var(--cp-admin-type-small)/var(--cp-admin-leading-ui) var(--cp-admin-font-body);
+  cursor: pointer;
+}
+:is(.cp-admin-inner-tabs, .access-detail-tabs, .source-tabs, .mapping-tabs, .mcp-types) > button + button { border-left: 0; }
+:is(.cp-admin-inner-tabs, .access-detail-tabs, .source-tabs, .mapping-tabs, .mcp-types) > button:hover:not(:disabled):not([aria-pressed="true"]):not([aria-current]) { background: var(--cp-admin-color-hover); border-bottom-color: var(--cp-admin-color-text); }
+:is(.cp-admin-inner-tabs, .access-detail-tabs, .source-tabs, .mapping-tabs, .mcp-types) > button:is([aria-pressed="true"], [aria-current="page"]) { background: var(--cp-admin-color-surface); border-bottom-color: var(--cp-admin-color-brand); }
+:is(.cp-admin-inner-tabs, .access-detail-tabs, .source-tabs, .mapping-tabs, .mcp-types) > button:disabled { color: var(--cp-admin-color-text-muted); opacity: .65; cursor: not-allowed; }
+:is(.cp-admin-inner-tabs, .access-detail-tabs, .source-tabs, .mapping-tabs, .mcp-types) > button:focus-visible { position: relative; z-index: 1; outline: 2px solid var(--cp-admin-color-focus); outline-offset: -3px; }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Plus } from 'lucide-react';
 import { sourceApi, type Source } from './api';
 import { useSources } from './useSources';
 import { SourceConnection } from './SourceConnection';
@@ -11,7 +12,7 @@ export function SourcesPage({scope}:{scope:EnvironmentScope}){
  const source=actions.sources.find(s=>s.id===selected);
  function choose(item?:Source){setSelected(item?.id??'new');setTab(item?'bindings':'connection');setRemove(false)}
  async function deleteSource(){if(!source)return;const result=await actions.run(async signal=>{await sourceApi.remove(scope,source,signal);return true});if(result){actions.removed(source.id);setSelected(undefined)}}
- return <section className="source-manager" aria-label="Context sources"><header className="access-page-heading"><div><h1 className="cp-admin-title">{selected?(tab==='connection'?'Connect an authoritative API':'Attribute bindings'):'Trusted data for your policies'}</h1><p className="cp-admin-muted">Resolve user and resource attributes from your APIs before policy evaluation.</p></div>{selected?<button className="cp-admin-button cp-admin-button--secondary" disabled={actions.busy} onClick={()=>setSelected(undefined)}>Back to sources</button>:<button className="cp-admin-button" onClick={()=>choose()}>Connect API source</button>}</header>
+ return <section className="source-manager" aria-label="Context sources"><header className="access-page-heading"><div><h1 className="cp-admin-title">{selected?(tab==='connection'?'Connect an authoritative API':'Attribute bindings'):'Trusted data for your policies'}</h1><p className="cp-admin-muted">Resolve user and resource attributes from your APIs before policy evaluation.</p></div>{selected?<button className="cp-admin-button cp-admin-button--secondary" disabled={actions.busy} onClick={()=>setSelected(undefined)}>Back to sources</button>:<button className="cp-admin-button" onClick={()=>choose()}><Plus size={16} aria-hidden="true" />Connect API source</button>}</header>
  {actions.error?<div className="cp-admin-notice" role="alert">{actions.error} <button className="cp-admin-button cp-admin-button--secondary" disabled={actions.busy} onClick={()=>void actions.refetch()}>Reload</button></div>:null}
  {actions.isPending?<p role="status">Loading sources…</p>:actions.isError?<p role="alert">Could not load sources. <button className="cp-admin-button" onClick={()=>void actions.refetch()}>Retry</button></p>:selected?<>
  <nav className="source-tabs" aria-label="Source settings"><button aria-current={tab==='connection'?'page':undefined} onClick={()=>setTab('connection')}>Connection</button><button disabled={!source} aria-current={tab==='bindings'?'page':undefined} onClick={()=>setTab('bindings')}>Attribute bindings</button></nav>

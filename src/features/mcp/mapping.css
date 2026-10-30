@@ -25,10 +25,7 @@
 .mapping-context-row { display:grid; grid-template-columns:minmax(90px,.6fr) minmax(0,1fr) 40px; gap:8px; }
 .mapping-inline { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
 .mapping-inline label { margin:0; }
-.mapping-tabs { display:flex; border:1px solid var(--cp-admin-color-border); border-radius:8px; overflow:clip; }
-.mapping-tabs button { padding:7px 10px; border:0; background:transparent; font:inherit; font-size:12px; cursor:pointer; color:var(--cp-admin-color-text); }
-.mapping-tabs button[aria-pressed=true] { background:var(--cp-admin-color-accent-soft); color:var(--cp-admin-color-accent-text); }
-.mapping-tabs button:disabled { opacity:.5; cursor:default; }
+
 .mapping-manager button:focus-visible { outline:2px solid var(--cp-admin-color-focus); outline-offset:3px; }
 .mapping-output { margin:0; border-top:1px solid var(--cp-admin-color-border); padding:24px; background:var(--cp-admin-color-canvas); white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.8; }
 .mapping-caption { padding:0 24px 20px; color:var(--cp-admin-color-text-muted); font-size:12px; }

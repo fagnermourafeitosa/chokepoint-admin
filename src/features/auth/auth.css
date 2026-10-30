@@ -10,12 +10,6 @@
   max-width: 26rem;
   padding-block: var(--cp-admin-space-12);
 }
-.auth-logo {
-  display: block;
-  width: 10.5rem;
-  height: auto;
-  margin-bottom: var(--cp-admin-space-12);
-}
 .auth-region h1 {
   font: var(--cp-admin-weight-heavy) var(--cp-admin-type-detail) /
     var(--cp-admin-leading-heading) var(--cp-admin-font-heading);
@@ -63,11 +57,10 @@
   font-display: swap;
   unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF;
 }
-.auth-page--public { background: #fffdf2; color: #131313; }
-.auth-page--public .auth-public-logo { display: inline-block; margin-bottom: 42px; padding: 5px 13px 8px; background: #ffe64b; border: 4px solid #131313; box-shadow: 3px 3px 0 #131313; color: #131313; font: 400 30px/1 "Chokepoint Anton", Impact, sans-serif; letter-spacing: normal; }
-.auth-page--public .auth-region h1 { color: #131313; font: 400 clamp(38px, 5vw, 54px)/1.05 "Chokepoint Anton", Impact, sans-serif; letter-spacing: normal; text-transform: uppercase; margin-bottom: 28px; }
+.auth-page--public { background: var(--cp-admin-color-canvas); color: var(--cp-admin-color-text); }
+.auth-public-logo { display: inline-block; margin-bottom: 42px; padding: 5px 13px 8px; background: #ffe64b; border: 4px solid #131313; box-shadow: 3px 3px 0 #131313; color: #131313; font: 400 30px/1 "Chokepoint Anton", Impact, sans-serif; letter-spacing: normal; }
+.auth-page--public .auth-region h1 { color: #131313; font: 700 clamp(38px, 5vw, 54px)/1.05 var(--cp-admin-font-heading); letter-spacing: normal; text-transform: uppercase; margin-bottom: 28px; }
 .auth-page--public .auth-region p { color: #30302c; }
 .auth-page--public .auth-region a { color: #131313; text-decoration: underline; text-underline-offset: 3px; }
-.auth-page--public .auth-primary { min-height: 48px; border: 2px solid #131313; border-radius: 0; background: #ffe64b; color: #131313; box-shadow: 4px 4px 0 #131313; font-weight: 700; }
-.auth-page--public .auth-primary:hover:not(:disabled) { background: #f9d735; }
+.auth-page--public .auth-primary { min-height: 48px; border-radius: 0; font-weight: 700; }
 .auth-page--public :is(button, a):focus-visible { outline: 3px solid #a43a5c; outline-offset: 3px; }
