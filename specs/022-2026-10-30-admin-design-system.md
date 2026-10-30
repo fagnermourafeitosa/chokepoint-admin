@@ -21,6 +21,20 @@ Update the admin design system, reusable CSS primitives and screen-specific styl
 
 The screenshot above is the visual reference for the system described below.
 
+### Navigation and tab details
+
+![Inner tabs](assets/022-admin-design-system/inner-tabs.png)
+
+Inner tabs sit on a shared horizontal divider. The active tab has a light surface and a yellow underline; inactive tabs have a muted surface. Preserve this pattern across inner sections.
+
+![Top navigation](assets/022-admin-design-system/top-navigation.png)
+
+The top navigation uses compact uppercase labels. The active item has a yellow fill, dark outline and short dark offset shadow.
+
+![Section navigation](assets/022-admin-design-system/section-navigation.png)
+
+Section navigation joins icon-and-label items in one outlined group. The active item is yellow, while inactive items use a light surface and dark dividers. Use consistent icon size and alignment. Hover should give clear feedback while keeping the active state distinct. Keyboard focus remains visible.
+
 ## Visual language
 
 - **Typography:** Barlow Condensed Bold for page and section titles; IBM Plex Sans for interface text, navigation, buttons, forms and descriptions; IBM Plex Mono for code, identifiers, technical values and logs. Host fonts locally and include licenses. Keep regular interface text legible, and do not use the condensed display face for dense data or form labels.
