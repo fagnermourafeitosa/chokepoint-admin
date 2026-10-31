@@ -84,7 +84,7 @@ export function RelationPanel({ selected, onClose, agentName, disabled, doc, onC
   return <aside className="relation-panel" aria-label="Selected relation">
     <button type="button" className="relation-icon-button relation-close" aria-label="Close panel" onClick={onClose}><X size={16} /></button>
     {back?.type === 'group' ? <button type="button" className="rule-switch" onClick={onBack}>← Back to {back.label}</button> : null}
-    {head}{selected.type !== 'add' && selected.type !== 'group' && selected.type !== 'idp' ? <WaitingBackend spec="033" /> : null}
+    {head}{selected.type !== 'add' && selected.type !== 'group' && selected.type !== 'idp' ? <WaitingBackend spec="033" tip="Edits this relation of the agent: its expiration and, on a tool, its rules." /> : null}
     {body}
   </aside>;
 }

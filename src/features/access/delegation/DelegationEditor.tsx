@@ -43,7 +43,7 @@ export function DelegationEditor({ agentName, disabled }: { agentName: string; d
   }, [maximized]);
   return <section className="delegation-editor" data-maximized={maximized} aria-label="Agent delegation editor">
     <header className="delegation-toolbar">
-      <div className="agent-graph-title"><h3>Delegation and access</h3><button type="button" className="delegation-help" onClick={() => setHelp(true)}><CircleHelp size={16} aria-hidden="true" />How this works</button><WaitingBackend spec="029–033" /></div>
+      <div className="agent-graph-title"><h3>Delegation and access</h3><button type="button" className="delegation-help" onClick={() => setHelp(true)}><CircleHelp size={16} aria-hidden="true" />How this works</button><WaitingBackend spec="029–033" tip="Shows and edits who can delegate to this agent, what it can call, where it can act, and the rules of each tool." /></div>
       <div className="delegation-toolbar-actions">
         <Toggle label="View" value={mode} onChange={setMode} options={[['graph', 'Graph'], ['list', 'List']]} />
         <Toggle label="Version" value={version} onChange={v => { setVersion(v); setSelected(undefined); }} options={[['draft', 'Draft'], ['published', 'Published']]} />

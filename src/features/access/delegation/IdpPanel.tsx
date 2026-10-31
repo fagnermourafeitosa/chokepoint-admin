@@ -33,7 +33,7 @@ export function IdpPanel({ doc, issuer, agentName, onChange, onClose }: { doc: D
     : doc.delegations.filter(d => !(d.issuer === issuer && d.subject === subject)) });
   return <>
     <header><div><small>Identity provider</small><h4>{issuer}</h4><p className="cp-admin-muted">{issuer} → {agentName}</p></div></header>
-    <div className="relation-chips"><WaitingBackend spec="033" /></div>
+    <div className="relation-chips"><WaitingBackend spec="033" tip="Sets who in this identity provider can delegate to the agent, and records the consent." /></div>
     <div className="relation-field"><span>Who can delegate</span>
       <div className="relation-choice" role="radiogroup" aria-label="Who can delegate">
         <label><input type="radio" name="idp-mode" checked={scope.mode === 'everyone'} onChange={() => set({ mode: 'everyone' })} /><span><strong>Everyone in {issuer}</strong><small>Publishing saves one delegation for each subject listed now, except the excluded ones. A subject added to {issuer} later needs a new publication.</small></span></label>

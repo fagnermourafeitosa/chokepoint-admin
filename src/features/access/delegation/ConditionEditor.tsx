@@ -15,7 +15,7 @@ export function ConditionEditor({ tool, onSave, onCancel }: { tool: string; onSa
   const ready = raw !== undefined ? raw.trim() !== '' : ruleComplete(rule, fields);
   if (!fields.length) return <div className="condition-editor"><p className="cp-admin-muted">This tool has no arguments and no approved bindings, so there is nothing a rule can check. Add a binding under Context sources.</p><button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={onCancel}>Close</button></div>;
   return <div className="condition-editor">
-    <div className="relation-field-head"><strong>Rule on call data</strong><WaitingBackend spec="033" /></div>
+    <div className="relation-field-head"><strong>Rule on call data</strong><WaitingBackend spec="033" tip="Adds a rule that each call of this agent · server · tool must pass." /></div>
     {raw === undefined ? <>
       <RuleBuilder fields={fields} rule={rule} onChange={setRule} />
       {sentence ? <p className="rule-sentence"><CircleCheck size={14} aria-hidden="true" />Reads as: <strong>{sentence}</strong></p> : null}

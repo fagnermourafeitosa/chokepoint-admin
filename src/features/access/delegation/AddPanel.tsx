@@ -58,6 +58,6 @@ function AddResource({ doc, onChange, onDone }: Omit<Props, 'what' | 'agentName'
 const titles: Record<Adding, string> = { delegator: 'Add an identity provider', tool: 'Add tools', resource: 'Add a resource' };
 
 export function AddPanel(props: Props) {
-  return <><header><div><small>Add</small><h4>{titles[props.what]}</h4></div></header><WaitingBackend spec="033" />
+  return <><header><div><small>Add</small><h4>{titles[props.what]}</h4></div></header><WaitingBackend spec="033" tip="Adds an identity provider, tools or resources to the agent draft." />
     {props.what === 'delegator' ? <AddIdentityProvider {...props} /> : props.what === 'tool' ? <AddTool {...props} /> : <AddResource {...props} />}</>;
 }

@@ -12,7 +12,7 @@ export function PublishBar({ state, onState, changes, onDiscard }: { state: Publ
       {state === 'effective'
         ? <span className="mcp-badge" data-tone="success"><CircleCheck size={13} aria-hidden="true" /> Revision 3 effective</span>
         : <span className="mcp-badge" data-tone="warning"><RefreshCw size={13} aria-hidden="true" /> Revision 4 pending · revision 3 still applies</span>}
-      <WaitingBackend spec="033" />
+      <WaitingBackend spec="033" tip="Shows whether the last publication applies now or still waits for the relations to update." />
     </div>
     <div className="delegation-publish-actions">
       <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => onState(state === 'effective' ? 'pending' : 'effective')} title="Prototype only: switch the runtime state">Preview state</button>

@@ -38,7 +38,7 @@ export function ResourceMapping({ tool, state, kinds, agents, onChange }: { tool
     <div className="resource-mapping-line">
       <Database size={15} aria-hidden="true" /><span>Resource</span><code>{show(state.active)}</code>
       {label ? <span className="mcp-badge" data-tone={pending ? 'warning' : 'success'}>{label}{pending && !removing ? ` · ${show(state.draft ?? undefined)}` : ''}</span> : null}
-      <WaitingBackend spec="029" />
+      <WaitingBackend spec="029" tip="Declares which argument of this tool identifies the resource that a call acts on." />
       <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => setOpen(v => !v)}>{open ? 'Close' : 'Configure resource'}</button>
     </div>
     {open ? <div className="resource-mapping-editor">
