@@ -3,7 +3,7 @@
 - **Specification ID**: 024
 - **Date**: 2026-10-30
 - **Slug**: service-principal-selection
-- **Status**: Waiting Approve
+- **Status**: Implemented
 - **Owner**: Admin — Access and Permissions
 - **Related Specification**: [Backend 027 — Service Principals](../../backend/specs/027-2026-10-30-service-principals.md)
 - **Related Specification**: [012 — SCIM People Selection](012-2026-10-28-scim-people-selection.md)
