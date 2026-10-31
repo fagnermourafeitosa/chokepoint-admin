@@ -89,7 +89,7 @@ flowchart LR
 ## User Stories
 
 - [ ] 1. As an administrator, I see who can delegate, what the agent can call, where it can act and the rules, in one graph.
-- [ ] 2. As an administrator, I let everyone in an identity provider delegate, with exclusions, and I record the consent once.
+- [ ] 2. As an administrator, I select who in an identity provider can delegate, with Select all for everyone, and I record the consent once.
 - [ ] 3. As an administrator, I add a rule to agent · server · tool without writing CEL.
 - [ ] 4. As an administrator, I allow concrete resources by server and resource type.
 - [ ] 5. As an administrator, I understand the model from the help dialog.
@@ -149,7 +149,7 @@ The agent list rail collapses to a narrow column of agent icons. A chevron butto
 ### 4. Graph
 
 1. Four columns: who can delegate → agent → servers and tools → resources.
-2. **Who can delegate:** one node for each identity provider, never one node for each person. The subtitle says "Everyone · people and services · N excluded" or "N selected".
+2. **Who can delegate:** one node for each identity provider, never one node for each person. The subtitle says "All N people and services" when every subject is selected, or "N of M people and services".
 3. **Servers and tools:** a dashed box for each server, labeled with the server name and type (Custom or Enterprise MCP). A tool node shows "Resource: <resource type>" or "No resource mapping".
 4. **Resources:** a box for each **server › resource type**. The heading shows the resource type, for example `merge_pull_request_repository`, and "GitHub · used by" with the tools that use it. The allowed values are inside the box. Long labels wrap to the next line.
 5. **Edges:**
@@ -173,15 +173,17 @@ The panel opens on the right of the graph or the list. It has a close button and
 
 | Selection | Content |
 | :--- | :--- |
-| Identity provider | **Everyone in {IdP}** with exclusions, or **Only selected subjects**; kinds (People, Services); a searchable subject list (30 per page); expiration; consent; remove. |
+| Identity provider | **Includes** People and/or Services, each with a short description and a help icon on the difference; **Who can delegate · N of M**: one searchable list of the directory subjects with a **People** section and a **Services** section, each with "N of M", **Select all N** (or **Clear** when all are selected) and 10 rows, then Show more; checked subjects can delegate; **Expires**: **Never** or **On a date**; the consent record; remove. |
 | Agent · server · tool | Server; resource mapping (read only); expiration; the rules for this triad; **Add condition**; remove tool. |
 | Resource | Resource type, value and server; the tools that use it; remove. A resource is an allow list: it has no rules and no expiration. |
 | Group | Summary (total, expire, with rules), search, 50 per page, add action. |
 | Add | Add identity provider; add tools (reviewed tools of each server, with mapping); add resource (choose server › resource type, enter the value). |
 
-**Everyone in {IdP}.** Publication saves one delegation for each subject listed now in the identity provider directory, without the excluded subjects (Backend 033 stores one delegation for each subject). A subject added to the identity provider later needs a new publication. The screen says this in the option text.
+**Select all.** There is no "Everyone" mode and no exclusion list. Select all checks every subject listed now in the directory of that identity provider, and publication saves one delegation for each checked subject (Backend 033 stores one delegation for each subject). A subject added to the identity provider later is not checked; the administrator checks it and publishes again. The add flow uses the same list.
 
 **Consent.** In v1 no identity provider supports delegation, so the administrator records the consent once for the identity provider scope. Each delegation that the scope creates has `source` = `administrator`, `recorded_by` = the administrator and `recorded_at` = the time (Backend 033 Resolved Decision 1). The add flow requires a consent checkbox.
+
+The consent is shown as a read-only record, not as a form field: **Last consent recorded**, "by {administrator} · {time}", and a help icon. The administrator is the signed-in platform user, taken from the session; nobody types it. The add flow requires the checkbox "I confirm that these subjects agreed to let {agent} act for them". The record shows the last confirmation; a history of confirmations needs a read that Backend 033 does not define.
 
 ### 6. Conditions
 
@@ -223,9 +225,9 @@ Three tables: Who can delegate (identity provider, who, kinds, consent), Servers
 
 **How this works** opens a dialog with:
 
-1. a diagram of a real example: Keycloak customer (everyone, except diego) → Deploy bot → GitHub · `merge_pull_request` (rule: 2 approvals) and `list_issues` → `merge_pull_request_repository` › `acme/payments-api` and `list_issues_repository` › `acme/payments-api`, `acme/web`, with the dashed "reads /repository" lines;
+1. a diagram of a real example: Keycloak customer (80 of 81 selected) → Deploy bot → GitHub · `merge_pull_request` (rule: 2 approvals) and `list_issues` → `merge_pull_request_repository` › `acme/payments-api` and `list_issues_repository` › `acme/payments-api`, `acme/web`, with the dashed "reads /repository" lines;
 2. the four checks in order, with the deny reason of each: `no_delegation`, `no_grant`, `no_resource`, `condition`;
-3. example calls and their results, for example "diego (excluded in Keycloak): list_issues → Denied · no_delegation";
+3. example calls and their results, for example "diego (not selected in Keycloak): list_issues → Denied · no_delegation";
 4. what to remember: a resource belongs to the agent inside server and resource type; the resource type is proposed as `<tool>_<argument>`; a rule belongs to agent · server · tool; expiration ends a delegation or a tool relation; OpenFGA checks relations, the PDP checks rules; who can delegate is set for each identity provider, and tools, resources and rules are the same for everyone who delegates.
 
 The diagram is static SVG. The Admin has no Mermaid dependency.
@@ -243,14 +245,14 @@ The screen needs these items. Backend 029–033 do not define them yet. Each one
 1. **Document shape** ([Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md)). Field names and JSON of `delegations`, `capabilities`, `resources` and `conditions`; how a condition names its edge; the expiration format.
 2. **Publication state in the read API** ([Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md)). Pending or effective revision, the effective revision number and the reconciliation state.
 3. **Agent status API** ([Backend 032](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md), Resolved Decision 2). The field or command for Active / Disabled.
-4. **Identity provider scope** ([Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md)). The Admin expands "Everyone" into one delegation for each subject. The backend does not store the mode or the exclusions, so a reopened agent shows "N selected". To keep the intent, the backend must store the scope.
+4. **Identity provider scope** ([Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md)). Resolved on 2026-10-31: the screen has no "Everyone" mode, only checked subjects, so the backend stores one delegation for each subject as 033 already defines. The backend still needs the expiration and the consent for each identity provider, or the Admin copies them to each delegation.
 5. **Rules on resource relations** ([Backend 031](../../backend/specs/031-2026-10-31-pdp-relation-checks-and-call-conditions.md), [Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md)). Resolved on 2026-10-31: Backend 031 Resolved Decision 3 removes call conditions from agent → resource.
-6. **Directory listing for "Everyone"** ([Backend 015](../../backend/specs/015-2026-10-28-scim-user-directory.md), [Backend 027](../../backend/specs/027-2026-10-30-service-principals.md)). Publication needs the full subject list of the identity provider (people and services), with paging (Admin 024 cursor contract).
+6. **Directory listing for Select all** ([Backend 036](../../backend/specs/036-2026-10-31-remove-identity-lifecycle-sync-and-scim-read.md), [Backend 017](../../backend/specs/017-2026-10-28-okta-auth0-directory-integration.md), [Backend 027](../../backend/specs/027-2026-10-30-service-principals.md)). Publication needs the full subject list of the identity provider (people and services), with paging (Admin 024 cursor contract). Each provider is read through its native API (Keycloak Admin REST API, Okta Users API), not SCIM. The directory contract of Backend 015 stays.
 7. **Tool arguments and bindings for the rule builder** ([Backend 006](../../backend/specs/006-2026-10-25-mcp-server-registry-and-tool-discovery.md), [Backend 009](../../backend/specs/009-2026-10-26-trusted-api-attribute-sources.md)). The current catalog and binding APIs supply them. Confirm at implementation that they are available for each server tool.
 
 **Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item:
 
-1. remove the chip of each element that the item unblocks, in the prototype and in the workbench mock, in the same change;
+1. remove the chip of each element that the item unblocks, in the prototype, in the same change;
 2. mark the item here as resolved, with the backend specification that implements it.
 
 The real Admin never shows this chip. A limitation that remains after implementation uses the temporary warning of `AGENTS.md`.
@@ -303,4 +305,4 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ### Prototype
 
-The prototype marks backend data with a "Waiting backend · spec" chip. Its hover text says what the element is for and names the backend specification, as `docs/design-system/visual-specification.md` requires for the Planned tag. The chip is for the prototype only. The real Admin uses the temporary warning of `AGENTS.md` where a limitation stays. The workbench mock (`docs/chokepoint-workbench`) does not have this screen yet; a mock change needs a request from the user.
+The prototype marks backend data with a "Waiting backend · spec" chip. Its hover text says what the element is for and names the backend specification, as `docs/design-system/visual-specification.md` requires. The chip is for the prototype only. The real Admin uses the temporary warning of `AGENTS.md` where a limitation stays. The prototype is the only visual reference; the workbench mock was removed on 2026-10-31.

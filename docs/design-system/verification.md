@@ -34,7 +34,7 @@ The font loader intentionally leaves unused unicode subsets unloaded. This is no
 
 ## Source fingerprints
 
-The following original files were used as references and were not migrated by this work.
+The following original files were used as references and were not migrated by this work. The workbench mock was removed on 2026-10-31; the hashes stay as a record.
 
 | Source | SHA-256 |
 | :--- | :--- |

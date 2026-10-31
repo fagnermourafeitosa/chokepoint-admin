@@ -1,49 +1,31 @@
-# Visual Specification in the Mock
+# Visual Specification in the Prototype
 
-The [workbench mock](../chokepoint-workbench/dist/index.html) is the visual specification of the target interface. It shows the ideal screen, not the screen that the backend supports today. This page tells how to change it and how to mark what is not implemented.
+The visual specification of a new screen is a **layout prototype**: the real Admin code with fixed data, on a design branch. It shows the target screen, not the screen that the backend supports today. This page tells how to build it and how to mark what the backend does not serve yet.
 
 ## Process
 
-1. **Draw the ideal.** Change the mock until the user accepts the format. The user asks for each mock change. A mock change needs no formal specification.
-2. **Start from stored data.** Before you propose or draw an element, check that the backend stores its data. Read the backend specification and the code. Do not propose an element from data that is not stored.
-3. **Warn before an increment.** An element that needs data or behavior beyond what the backend stores today is an increment. Tell the user before you suggest it, and say what the backend must add.
-4. **Mark what is not implemented.** Add the [Planned tag](#planned-tag) to each element that the backend or the Admin does not implement yet. The date is the day you add the tag.
-5. **Say what was intended, not what is missing.** The mock shows no text such as "data not available" or "needs the signal". A Planned tag has a hover (and keyboard focus) tooltip of one or two sentences that say what the element is for. Put the reason that it is missing in the specification.
-6. **Remove the tag at implementation.** When the element is implemented, remove its tag from the mock in the same change.
+1. **Branch and worktree.** Create a `git worktree` on a branch `design/<slug>` from `main`. The prototype is never merged into `main`. The specification links the branch and the folder as its visual reference.
+2. **Real screens, fixed data.** Change the real Admin screens and reuse the design system. Keep fixed data in one file next to the prototype. Use realistic data from the central use case, for example an agent that merges a pull request in a GitHub repository. No API call writes data.
+3. **Layout first.** Define the layout with the user on the running prototype. Do not block on backend endpoints or field names. Collect them in the "Backend dependencies" section of the specification, each with a link to the backend specification.
+4. **Mark what the backend does not serve.** Each element whose data the backend does not serve yet has the [Waiting backend chip](#waiting-backend-chip).
+5. **Warn before an increment.** An element that no backend specification defines needs a backend change. Tell the user before you draw it, and record it in the specification.
+6. **Say what was intended, not what is missing.** The prototype shows no text such as "data not available". The chip tooltip says what the element is for.
+7. **Remove the chip at implementation.** When the backend implements an item, remove the chip of each element that the item unblocks, and mark the item as resolved in the specification.
 
-The Planned tag is for the mock only. The real Admin does not use it. A limitation of the real Admin uses the temporary warning that [AGENTS.md](../../AGENTS.md) describes.
+The chip is for the prototype only. The real Admin never shows it. A limitation of the real Admin uses the temporary warning that [AGENTS.md](../../AGENTS.md) describes.
 
-## Planned tag
+## Waiting backend chip
 
-Text: `Planned · YYYY-MM-DD`. The date is the day of marking.
+Text: `Waiting backend · <backend specification>`, for example `Waiting backend · 033`.
 
-| Element | Marking |
-| :--- | :--- |
-| Field, card title or label | `planned-tag` badge next to the label. |
-| Path dot (authorization path) | Dashed ring (`auth-planned`) and the badge inside the tooltip. |
+The tooltip (hover and keyboard focus) has one or two sentences that say what the element is for, then the backend specification: "Shows whether the last publication applies now or still waits for the relations to update. Backend 033."
 
-### Differs tag
-
-Use `Differs · YYYY-MM-DD` when the real Admin already has the element but behaves in another way, for example a counter that opens another screen. Use Planned only for an element that does not exist yet. Use the modifier `planned-tag--differs` (blue) on the same badge.
-
-A Differs tag has a hover (and keyboard focus) tooltip that says what differs: what the real Admin does and what the mock shows. Put the text in `data-tip` and add `tabindex="0"`.
-
-```html
-<span class="planned-tag" tabindex="0"
-  data-tip="Ranks each problem so the most urgent are read first.">Planned · 2026-10-29</span>
-<span class="planned-tag planned-tag--differs" tabindex="0"
-  data-tip="In the Admin, a reviewed signal leaves the Inbox. The mock keeps it, dimmed.">Differs · 2026-10-29</span>
+```tsx
+<WaitingBackend spec="033" tip="Shows whether the last publication applies now or still waits for the relations to update." />
 ```
 
-```css
-.planned-tag{display:inline-block;margin-left:8px;font-size:9px;font-weight:800;letter-spacing:.02em;color:#8a6a2f;background:#fdf3de;border:1px dashed #e3c98e;border-radius:5px;padding:2px 6px;vertical-align:middle;white-space:nowrap}
-.auth-tip .planned-tag{margin:6px 0 0;color:#f1d9a3;background:transparent;border-color:#8a7440;width:max-content}
-.auth-planned{background:transparent!important;border:2px dashed currentColor}
-.planned-tag--differs{color:#2f5f8a;background:#e8f1fa;border-color:#a9c8e3}
-```
-
-The source is in [styles.css](../chokepoint-workbench/styles.css) and `dist/styles.css`. Compile the mock with the options in its `tsconfig.json`; the Admin `tsc` does not accept `module: none`, so pass the same options on the command line with `--ignoreConfig --strict false`.
+The component and its style are part of the prototype (`WaitingBackend.tsx`, class `waiting-backend`). They use the dashed amber style of the earlier Planned tag.
 
 ## Example
 
-The Investigate decision inspector marks the Identity, Relation and Tool review dots, the Context field, the repeat window and the "Rule that allowed" card. The backend decision trace stores only the final deny reason, so the other path steps are not recorded.
+Admin 026 (Agent Delegation Editor) and Admin 027 (Tool Resource Mapping Review) use the prototype on the branch `design/agent-delegation-screens`.

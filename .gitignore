@@ -10,6 +10,3 @@ out/
 npm-debug.log*
 .DS_Store
 
-# Keep runnable documentation mocks with their source references.
-!docs/chokepoint-workbench/dist/
-!docs/chokepoint-workbench/dist/**

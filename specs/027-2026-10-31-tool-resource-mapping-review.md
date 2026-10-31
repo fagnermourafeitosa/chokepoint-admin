@@ -148,7 +148,7 @@ Backend 029 decides the mapping but does not define these items. Each one is a b
 
 **Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item:
 
-1. remove the chip of each element that the item unblocks, in the prototype and in the workbench mock, in the same change;
+1. remove the chip of each element that the item unblocks, in the prototype, in the same change;
 2. mark the item here as resolved, with the backend specification that implements it.
 
 The real Admin never shows this chip. A limitation that remains after implementation uses the temporary warning of `AGENTS.md`.
