@@ -1,5 +1,5 @@
 import './agent-list.css';
-import { Bot, Search } from 'lucide-react';
+import { Bot, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { EmptyState } from '../../../components/ui/empty-state/EmptyState';
 import { AgentRow } from './AgentRow';
 import type { AgentRecord, AgentScope } from '../agent-api';
@@ -12,6 +12,8 @@ type AgentListProps = {
   onSearch: (value: string) => void;
   selectedId?: string;
   onSelect: (id: string) => void;
+  collapsed: boolean;
+  onToggle: () => void;
 };
 
 export function AgentList({
@@ -22,16 +24,21 @@ export function AgentList({
   onSearch,
   selectedId,
   onSelect,
+  collapsed,
+  onToggle,
 }: AgentListProps) {
   return (
-    <aside className="cp-admin-panel access-agent-rail" aria-label="Agents">
+    <aside className="cp-admin-panel access-agent-rail" aria-label="Agents" data-collapsed={collapsed}>
       <div className="access-agent-rail-heading">
-        <span>Agents</span>
+        <span className="access-agent-rail-label">Agents</span>
         <span className="access-agent-count" aria-label={`${total} agents`}>
           {total}
         </span>
+        <button type="button" className="access-rail-toggle" aria-expanded={!collapsed} aria-label={collapsed ? 'Expand agent list' : 'Collapse agent list'} title={collapsed ? 'Expand' : 'Collapse'} onClick={onToggle}>
+          {collapsed ? <ChevronRight size={16} aria-hidden="true" /> : <ChevronLeft size={16} aria-hidden="true" />}
+        </button>
       </div>
-      <div className="access-agent-search">
+      <div className="access-agent-search" hidden={collapsed}>
         <Search size={16} aria-hidden="true" />
         <input
           className="cp-admin-input"

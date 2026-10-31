@@ -91,3 +91,12 @@
   color: var(--cp-admin-color-text-muted);
   font-size: var(--cp-admin-type-label);
 }
+
+.access-agent-rail-heading { gap: var(--cp-admin-space-2); }
+.access-agent-rail-label { margin-inline-end: auto; }
+.access-rail-toggle { display: inline-grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 1px solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-button); background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); cursor: pointer; }
+.access-rail-toggle:hover { background: var(--cp-admin-color-hover); }
+.access-agent-rail[data-collapsed="true"] .access-agent-rail-heading { flex-direction: column; padding-inline: var(--cp-admin-space-2); }
+.access-agent-rail[data-collapsed="true"] .access-agent-rail-label { display: none; }
+.access-agent-rail[data-collapsed="true"] .access-agent-row { justify-content: center; padding-inline: var(--cp-admin-space-2); }
+.access-agent-rail[data-collapsed="true"] .access-agent-row-copy, .access-agent-rail[data-collapsed="true"] .access-agent-row > svg { display: none; }
