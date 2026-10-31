@@ -31,10 +31,10 @@ function AddTool({ doc, onChange, onDone }: Omit<Props, 'what' | 'agentName'>) {
   const [picked, setPicked] = useState<string[]>([]);
   const [expires, setExpires] = useState('');
   function add() {
-    const added = toolCatalog.filter(t => picked.includes(t.tool)).map(t => ({ id: `c-${t.tool}`, serverId: t.serverId, tool: t.tool, expiresAt: expires || undefined, mapping: 'mapping' in t ? { ...t.mapping } : undefined, conditions: [] }));
+    const added = toolCatalog.filter(t => picked.includes(t.tool)).map(t => ({ id: `c-${t.tool}`, serverId: t.serverId, tool: t.tool, expiresAt: expires || undefined, mapping: t.mapping ? { ...t.mapping } : undefined, conditions: [] }));
     onChange({ ...doc, capabilities: [...doc.capabilities, ...added] }); onDone();
   }
-  return <>{servers.map(s => <div key={s.id} className="relation-field"><span>{s.name} · reviewed tools</span><ul className="relation-pick">{toolCatalog.filter(t => t.serverId === s.id).map(t => <li key={t.tool}><label><input type="checkbox" disabled={granted.has(t.tool)} checked={granted.has(t.tool) || picked.includes(t.tool)} onChange={e => setPicked(p => e.target.checked ? [...p, t.tool] : p.filter(x => x !== t.tool))} /><span>{t.tool}<small>{granted.has(t.tool) ? 'Already granted' : 'mapping' in t ? `Resource: ${t.mapping.kind}` : 'No resource mapping'}</small></span></label></li>)}</ul></div>)}
+  return <>{servers.map(s => <div key={s.id} className="relation-field"><span>{s.name} · reviewed tools</span><ul className="relation-pick">{toolCatalog.filter(t => t.serverId === s.id).map(t => <li key={t.tool}><label><input type="checkbox" disabled={granted.has(t.tool)} checked={granted.has(t.tool) || picked.includes(t.tool)} onChange={e => setPicked(p => e.target.checked ? [...p, t.tool] : p.filter(x => x !== t.tool))} /><span>{t.tool}<small>{granted.has(t.tool) ? 'Already granted' : t.mapping ? `Resource: ${t.mapping.kind}` : 'No resource mapping'}</small></span></label></li>)}</ul></div>)}
     <label className="relation-field"><span>Expires (optional)</span><input className="cp-admin-input" type="date" value={expires} onChange={e => setExpires(e.target.value)} /></label>
     <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!picked.length} onClick={add}>Add {picked.length || ''} to draft</button></>;
 }
@@ -49,7 +49,7 @@ function AddResource({ doc, onChange, onDone }: Omit<Props, 'what' | 'agentName'
   const exists = doc.resources.some(r => r.serverId === serverId && r.kind === kind && r.value === value.trim());
   if (!kinds.length) return <p className="cp-admin-muted">No granted tool has a resource mapping. Add the mapping in the tool review first.</p>;
   return <>
-    <label className="relation-field"><span>Kind</span><select className="cp-admin-input" value={key} onChange={e => setKey(e.target.value)}>{kinds.map(c => <option key={`${c.serverId}|${c.mapping!.kind}`} value={`${c.serverId}|${c.mapping!.kind}`}>{c.mapping!.kind} · {servers.find(s => s.id === c.serverId)?.name}</option>)}</select><small className="cp-admin-muted">Used by {tools.map(t => t.tool).join(', ')}.</small></label>
+    <label className="relation-field"><span>Resource type</span><select className="cp-admin-input" value={key} onChange={e => setKey(e.target.value)}>{kinds.map(c => <option key={`${c.serverId}|${c.mapping!.kind}`} value={`${c.serverId}|${c.mapping!.kind}`}>{c.mapping!.kind} · {servers.find(s => s.id === c.serverId)?.name}</option>)}</select><small className="cp-admin-muted">Used by {tools.map(t => t.tool).join(', ')}.</small></label>
     <label className="relation-field"><span>{kind} value</span><input className="cp-admin-input" value={value} onChange={e => setValue(e.target.value)} placeholder={kind === 'github_repository' ? 'acme/payments-api' : 'e.g. 3'} /><small className="cp-admin-muted">Must match the mapped argument ({tools[0]?.mapping?.pointer}) in each call.</small></label>
     <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!value.trim() || exists} onClick={() => { onChange({ ...doc, resources: [...doc.resources, { id: `r-${key}-${value.trim()}`, serverId, kind, value: value.trim() }] }); onDone(); }}>{exists ? 'Already allowed' : 'Add to draft'}</button>
   </>;

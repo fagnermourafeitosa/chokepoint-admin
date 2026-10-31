@@ -1,10 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { ResourceMapping, type ResourceState } from './ResourceMapping';
 import { ToolAnnotations } from '../access/components/ToolAnnotations';
 import { sourceLabel } from "./mapping-fields";
 import type { ManagedTool } from './api';
 const labels = { new: 'New', changed: 'Changed', removed: 'Removed', unchanged: '' };
+// Prototype seed: one approved mapping that follows the <tool>_<argument> proposal. Fixed data, not read from the API.
+const seedResources: Record<string, ResourceState> = { get_test_item: { active: { pointer: 'id', kind: 'get_test_item_id' } } };
+const seedAgents: Record<string, string[]> = { get_test_item_id: ['teste'] };
 export function ToolRows({ tools, selected, onToggle, disabled, serverEnabled = true, onMapping, focusTool }: { tools: ManagedTool[]; focusTool?: string; selected?: string[]; onToggle?: (name: string) => void; disabled?: boolean; serverEnabled?: boolean; onMapping?: (tool: ManagedTool) => void }) {
  const ref = useRef<HTMLDivElement>(null);
+ const [resources, setResources] = useState<Record<string, ResourceState>>(seedResources);
+ const kinds = [...new Set(Object.values(resources).flatMap(r => [r.active?.kind, r.draft?.kind]).filter((k): k is string => !!k))];
  useEffect(() => { const el = ref.current?.querySelector<HTMLElement>('[data-context-target=true]'); if (el) { el.scrollIntoView({ block: 'center' }); el.focus({ preventScroll: true }); } }, [focusTool, tools]);
  return <div ref={ref} className="mcp-tool-list">{tools.map(tool => <article key={tool.name} className="mcp-tool-row" tabIndex={focusTool === tool.name ? -1 : undefined} data-context-target={focusTool === tool.name} data-change={tool.change}>
   <div className="mcp-tool-heading">
@@ -15,6 +21,7 @@ export function ToolRows({ tools, selected, onToggle, disabled, serverEnabled = 
    {!onToggle && onMapping && tool.change !== 'removed' ? <div className="mapping-tool-action"><span className="mcp-badge">{sourceLabel(tool.local_mapping ? 'local' : typeof tool.contract.inputSchema === 'object' && tool.contract.inputSchema !== null && 'x-authzen-mapping' in tool.contract.inputSchema ? 'server' : 'default')}{tool.mapping_draft ? ' · Draft' : ''}</span><button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => onMapping(tool)}>Configure mapping</button></div> : null}
   </div>
   {tool.contract.description ? <p>{tool.contract.description}</p> : null}
+  {!onToggle && onMapping && tool.change !== 'removed' ? <ResourceMapping tool={tool} state={resources[tool.name] ?? {}} kinds={kinds} agents={k => seedAgents[k] ?? []} onChange={s => setResources(r => ({ ...r, [tool.name]: s }))} /> : null}
   <ToolAnnotations annotations={tool.contract.annotations} />
   {tool.change === 'changed' || tool.change === 'removed' ? <p className="cp-admin-muted">Disabled{!tool.reviewed ? ' · review required' : ''}{tool.change === 'removed' ? ' · not returned by the server' : ''}.</p> : null}
   <details className="mcp-contract"><summary>{tool.previous ? 'Compare contract and metadata' : 'Contract and metadata'}</summary>

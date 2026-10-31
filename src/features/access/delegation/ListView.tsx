@@ -39,7 +39,7 @@ export function ListView({ doc, selected, onSelect, onChange, readOnly }: { doc:
       rows={doc.scopes.map(sc => ({ select: { type: 'idp', issuer: sc.issuer }, label: sc.issuer, cells: [sc.issuer, sc.mode === 'everyone' ? `Everyone${sc.except.length ? `, ${sc.except.length} excluded` : ''}` : `${doc.delegations.filter(d => d.issuer === sc.issuer).length} selected`, sc.kinds.map(k => (k === 'person' ? 'People' : 'Services')).join(', '), `${sc.consent.recordedBy} · ${sc.consent.recordedAt}`], expires: sc.expiresAt, conditions: 0 }))} />
     <Section title="Servers and tools" columns={['Tool', 'Server', 'Resource mapping']} {...common}
       rows={doc.capabilities.map(c => ({ select: { type: 'capability', id: c.id }, label: c.tool, cells: [c.tool, servers.find(s => s.id === c.serverId)?.name ?? '', c.mapping ? `${c.mapping.pointer} → ${c.mapping.kind}` : '—'], expires: c.expiresAt, conditions: c.conditions.length }))} />
-    <Section title="Resources" columns={['Resource', 'Kind', 'Server', 'Used by']} {...common}
+    <Section title="Resources" columns={['Resource', 'Type', 'Server', 'Used by']} {...common}
       rows={doc.resources.map(r => ({ select: { type: 'resource', id: r.id }, label: `${r.kind} ${r.value}`, cells: [r.value, r.kind, servers.find(s => s.id === r.serverId)?.name ?? '', doc.capabilities.filter(c => c.serverId === r.serverId && c.mapping?.kind === r.kind).map(c => c.tool).join(', ') || '—'], conditions: 0 }))} />
   </div>;
 }

@@ -170,3 +170,9 @@
 #help-arrow path { fill: var(--cp-admin-color-control-border); }
 .delegation-edge--mapping path { stroke-dasharray: 5 4; stroke: var(--cp-admin-color-text-muted); stroke-width: 1; }
 .delegation-edge--mapping text { fill: var(--cp-admin-color-text-muted); font: 10px var(--cp-admin-font-mono); paint-order: stroke; stroke: var(--cp-admin-color-canvas); stroke-width: 3px; }
+.delegation-box-head { display: grid; gap: 2px; overflow: hidden; color: var(--cp-admin-color-text-muted); font: var(--cp-admin-weight-semibold) 11px/1.3 var(--cp-admin-font-body); }
+.delegation-box-head, .delegation-box-head > * { white-space: normal; overflow-wrap: anywhere; }
+.delegation-box-head strong { color: var(--cp-admin-color-text); font: var(--cp-admin-weight-bold) 11px/1.3 var(--cp-admin-font-mono); }
+.delegation-box-head small { font-weight: var(--cp-admin-weight-regular); font-size: 10px; }
+.delegation-node .agent-graph-node-copy strong, .delegation-node .agent-graph-node-copy small { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.delegation-node .agent-graph-node-copy { gap: 4px; }

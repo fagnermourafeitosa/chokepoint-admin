@@ -9,10 +9,10 @@ export type LayoutNode = { key: string; select: Selection; column: Column; x: nu
 export type LayoutEdge = { key: string; select: Selection; from: LayoutNode; to: LayoutNode; expires?: string; conditions: number; count?: number; below?: number; mapping?: string };
 export type Positions = Record<string, { x: number; y: number }>;
 
-export const nodeW = 196, nodeH = 60;
+export const nodeW = 196, nodeH = 72;
 // A column with more items than this shows groups. The group panel lists and searches the items.
 export const groupAt = 8;
-const rowGap = 82, top = 40;
+const rowGap = 94, top = 40;
 const colX: Record<Column, number> = { delegators: 24, agent: 296, tools: 568, resources: 864 };
 
 const groupNode = (group: GroupKind, column: Column, key: string, title: string, subtitle: string, count: number, y: number): LayoutNode =>
@@ -46,14 +46,14 @@ export function delegationLayout(agentName: string, doc: Doc, positions: Positio
   const resourceEdges: LayoutEdge[] = [];
   const kindSets: { key: string; serverId: string; kind: string; nodes: LayoutNode[]; anchor: LayoutNode }[] = [];
   const anchors = new Map(servers.map(sv => [sv.id, { key: `anchor-${sv.id}`, select: { type: 'agent' }, column: 'tools', x: 0, y: 0, title: sv.name, subtitle: '' } as LayoutNode]));
-  let ry = top + 22;
+  let ry = top + 56;
   [...new Set(doc.resources.map(r => `${r.serverId}|${r.kind}`))].forEach(k => {
     const [serverId, kind] = k.split('|'), items = doc.resources.filter(r => `${r.serverId}|${r.kind}` === k);
     const grouped = items.length > groupAt;
     const nodes: LayoutNode[] = grouped
       ? [groupNode('resources', 'resources', k, `${items.length} values`, 'Open to list and search', items.length, ry)]
       : items.map((r, i) => ({ key: r.id, select: { type: 'resource', id: r.id }, column: 'resources', x: colX.resources, y: ry + i * rowGap, title: r.value, subtitle: kind }));
-    ry += nodes.length * rowGap + 30;
+    ry += nodes.length * rowGap + 72;
     const anchor: LayoutNode = { key: `kind-${k}`, select: { type: 'group', group: 'resources', key: k, label: `${kind} · ${items.length}` }, column: 'resources', x: 0, y: 0, title: kind, subtitle: '' };
     kindSets.push({ key: k, serverId, kind, nodes, anchor });
     resourceNodes.push(...nodes);
@@ -91,7 +91,7 @@ export function delegationLayout(agentName: string, doc: Doc, positions: Positio
   edges.forEach(e => { if (e.below !== undefined) e.below = under; });
   const kinds = kindSets.map(ks => {
     const x0 = Math.min(...ks.nodes.map(n => n.x)), y0 = Math.min(...ks.nodes.map(n => n.y)), x1 = Math.max(...ks.nodes.map(n => n.x)) + nodeW, y1 = Math.max(...ks.nodes.map(n => n.y)) + nodeH;
-    const box = { key: ks.key, kind: ks.kind, server: servers.find(sv => sv.id === ks.serverId)?.name ?? ks.serverId, usedBy: doc.capabilities.filter(c => c.serverId === ks.serverId && c.mapping?.kind === ks.kind).map(c => c.tool), x: x0 - 10, y: y0 - 30, width: x1 - x0 + 20, height: y1 - y0 + 40 };
+    const box = { key: ks.key, kind: ks.kind, server: servers.find(sv => sv.id === ks.serverId)?.name ?? ks.serverId, usedBy: doc.capabilities.filter(c => c.serverId === ks.serverId && c.mapping?.kind === ks.kind).map(c => c.tool), x: x0 - 10, y: y0 - 62, width: x1 - x0 + 20, height: y1 - y0 + 72 };
     // The edge ends at the left side of the kind box, so it is drawn as box → box.
     ks.anchor.x = box.x; ks.anchor.y = box.y + box.height / 2 - nodeH / 2;
     return box;

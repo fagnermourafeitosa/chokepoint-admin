@@ -78,7 +78,7 @@ export function RelationPanel({ selected, onClose, agentName, disabled, doc, onC
     const users = doc.capabilities.filter(c => c.serverId === r.serverId && c.mapping?.kind === r.kind);
     head = header('Resource access', r.value, `${agentName} → ${r.kind} ${r.value}`);
     body = <><Field label="Resource">{r.kind} · <code>{r.value}</code><small className="cp-admin-muted">On {server}</small></Field>
-      <Field label="Allows these tools to act on it">{users.length ? users.map(c => <span key={c.id}>{c.tool}</span>) : 'No granted tool maps this kind.'}<small className="cp-admin-muted">A resource is an allow list. Rules go on the agent · server · tool relation.</small></Field>
+      <Field label="Allows these tools to act on it">{users.length ? users.map(c => <span key={c.id}>{c.tool}</span>) : 'No granted tool uses this resource type.'}<small className="cp-admin-muted">A resource is an allow list. Rules go on the agent · server · tool relation.</small></Field>
       <footer><button type="button" className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" onClick={() => { onChange({ ...doc, resources: doc.resources.filter(x => x.id !== r.id) }); onClose(); }}><Trash2 size={14} aria-hidden="true" />Remove resource</button></footer></>;
   }
   return <aside className="relation-panel" aria-label="Selected relation">
