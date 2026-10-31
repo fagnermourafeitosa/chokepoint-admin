@@ -23,17 +23,18 @@ For React work, read and apply the [Vercel React Best Practices skill](.agents/s
 
 ## Design System
 
-Before you implement or review an interface, read [the module design system](docs/design-system/README.md), including its token and layout rules. Reuse `docs/design-system/styles/index.css` and the documented semantic tokens. Keep this module's own visual system and the reference mocks.
+Before you implement or review an interface, read [the module design system](docs/design-system/README.md), including its token and layout rules. Reuse `docs/design-system/styles/index.css` and the documented semantic tokens. Keep this module's own visual system.
 
-## Visual Specification (Mock)
+## Visual Specification (Prototype)
 
-The workbench mock in `docs/chokepoint-workbench` is the visual specification of the ideal interface. Follow [the visual specification rules](docs/design-system/visual-specification.md).
+The visual specification of a new screen is a **layout prototype** in the real Admin code, with fixed data, on a design branch. Follow [the visual specification rules](docs/design-system/visual-specification.md).
 
-* A mock change needs no formal specification, but only the user asks for it.
-* Propose and draw only from data that the backend stores today. Tell the user before you suggest an element that needs more.
-* Mark each element that is not implemented with the Planned tag and its date. Give the tag a hover text (`data-tip`) that says what the element is for. Do not write "data not available" or similar text in the mock.
-* Mark each element that the real Admin already has, but with a different behavior or content, with the Differs tag and its date. Do not use Planned for it.
-* Remove the tag when the element is implemented or when the real Admin matches the mock.
+* Build the prototype in a `git worktree` on a branch `design/<slug>`. It is never merged into `main`; the specification links it as the visual reference.
+* Use the real screens, the design system and realistic data from the central use case. Sign in to the local Admin yourself to run it.
+* Define the layout with the user first. Do not block on backend endpoints or field names: collect them in the "Backend dependencies" section of the specification.
+* Mark each element whose data the backend does not serve yet with the "Waiting backend · <spec>" chip. Its hover text says what the element is for and names the backend specification. Do not write "data not available" or similar text.
+* Tell the user before you draw an element that no backend specification defines. It needs a backend change.
+* Remove the chip when the backend implements the item. The real Admin never shows the chip.
 
 ## Temporary Implementation Warnings
 

@@ -252,7 +252,7 @@ The screen needs these items. Backend 029–033 do not define them yet. Each one
 
 **Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item:
 
-1. remove the chip of each element that the item unblocks, in the prototype and in the workbench mock, in the same change;
+1. remove the chip of each element that the item unblocks, in the prototype, in the same change;
 2. mark the item here as resolved, with the backend specification that implements it.
 
 The real Admin never shows this chip. A limitation that remains after implementation uses the temporary warning of `AGENTS.md`.
@@ -305,4 +305,4 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ### Prototype
 
-The prototype marks backend data with a "Waiting backend · spec" chip. Its hover text says what the element is for and names the backend specification, as `docs/design-system/visual-specification.md` requires for the Planned tag. The chip is for the prototype only. The real Admin uses the temporary warning of `AGENTS.md` where a limitation stays. The workbench mock (`docs/chokepoint-workbench`) does not have this screen yet; a mock change needs a request from the user.
+The prototype marks backend data with a "Waiting backend · spec" chip. Its hover text says what the element is for and names the backend specification, as `docs/design-system/visual-specification.md` requires. The chip is for the prototype only. The real Admin uses the temporary warning of `AGENTS.md` where a limitation stays. The prototype is the only visual reference; the workbench mock was removed on 2026-10-31.

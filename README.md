@@ -45,7 +45,7 @@ The development server binds to `127.0.0.1:5173`. Production hosting must serve 
 
 ## Design System
 
-The application imports [the admin design system](docs/design-system/README.md), including its local fonts and semantic tokens. The [workbench mock](docs/chokepoint-workbench/README.md) remains a reference and is not modified.
+The application imports [the admin design system](docs/design-system/README.md), including its local fonts and semantic tokens. New screens use a layout prototype on a design branch as their visual reference ([visual specification](docs/design-system/visual-specification.md)).
 
 ## Source Organization
 
