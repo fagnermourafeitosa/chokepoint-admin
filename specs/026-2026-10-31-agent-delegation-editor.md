@@ -173,7 +173,7 @@ The panel opens on the right of the graph or the list. It has a close button and
 
 | Selection | Content |
 | :--- | :--- |
-| Identity provider | **Everyone in {IdP}** with exclusions, or **Only selected subjects**; kinds (People, Services); a searchable subject list (30 per page); expiration; consent; remove. |
+| Identity provider | **Everyone in {IdP}** with exclusions, or **Only selected subjects**; **Includes** People and/or Services, each with a short description and a help icon on the difference; one searchable subject list with a **People** section and a **Services** section (10 per section, then Show more); **Expires**: **Never** or **On a date**; the consent record; remove. |
 | Agent · server · tool | Server; resource mapping (read only); expiration; the rules for this triad; **Add condition**; remove tool. |
 | Resource | Resource type, value and server; the tools that use it; remove. A resource is an allow list: it has no rules and no expiration. |
 | Group | Summary (total, expire, with rules), search, 50 per page, add action. |
@@ -182,6 +182,8 @@ The panel opens on the right of the graph or the list. It has a close button and
 **Everyone in {IdP}.** Publication saves one delegation for each subject listed now in the identity provider directory, without the excluded subjects (Backend 033 stores one delegation for each subject). A subject added to the identity provider later needs a new publication. The screen says this in the option text.
 
 **Consent.** In v1 no identity provider supports delegation, so the administrator records the consent once for the identity provider scope. Each delegation that the scope creates has `source` = `administrator`, `recorded_by` = the administrator and `recorded_at` = the time (Backend 033 Resolved Decision 1). The add flow requires a consent checkbox.
+
+The consent is shown as a read-only record, not as a form field: **Last consent recorded**, "by {administrator} · {time}", and a help icon. The administrator is the signed-in platform user, taken from the session; nobody types it. The add flow requires the checkbox "I confirm that these subjects agreed to let {agent} act for them". The record shows the last confirmation; a history of confirmations needs a read that Backend 033 does not define.
 
 ### 6. Conditions
 
