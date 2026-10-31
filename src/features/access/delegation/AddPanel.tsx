@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { SelectMenu } from '../../../components/ui/dropdown/SelectMenu';
-import { currentAdmin, directory, servers, toolCatalog, type Doc } from './fixtures';
+import { currentAdmin, delegationOf, directory, idpSubjects, servers, toolCatalog, type Doc, type SubjectKind } from './fixtures';
+import { SubjectList } from './IdpPanel';
+import { ExpiresField, IncludesField } from './Fields';
 import type { Adding } from './layout';
 import { WaitingBackend } from './WaitingBackend';
 
@@ -10,20 +12,23 @@ const now = () => new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UT
 function AddIdentityProvider({ agentName, doc, onChange, onDone }: Omit<Props, 'what'>) {
   const free = directory.filter(d => !doc.scopes.some(s => s.issuer === d.issuer));
   const [issuer, setIssuer] = useState(free[0]?.issuer ?? '');
-  const [mode, setMode] = useState<'everyone' | 'selected'>('everyone');
+  const [kinds, setKinds] = useState<SubjectKind[]>(['person', 'service']);
+  const [chosen, setChosen] = useState<Set<string>>(new Set());
+  const [expires, setExpires] = useState<string>();
   const [consent, setConsent] = useState(false);
   if (!free.length) return <p className="cp-admin-muted">Every connected identity provider is already in this list. Open one to change who can delegate.</p>;
+  const picked = idpSubjects(issuer, kinds).filter(x => chosen.has(x.subject));
   function add() {
-    onChange({ ...doc, scopes: [...doc.scopes, { issuer, mode, kinds: ['person', 'service'], except: [], consent: { source: 'administrator', recordedBy: currentAdmin, recordedAt: now() } }] }); onDone();
+    const at = { source: 'administrator' as const, recordedBy: currentAdmin, recordedAt: now() };
+    onChange({ ...doc, scopes: [...doc.scopes, { issuer, kinds, expiresAt: expires, consent: at }], delegations: [...doc.delegations, ...picked.map(x => delegationOf(issuer, x, at))] }); onDone();
   }
   return <>
-    <div className="relation-field"><span>Identity provider</span><SelectMenu block label="Identity provider" value={issuer} onChange={setIssuer} options={free.map(d => ({ value: d.issuer, label: d.issuer }))} /></div>
-    <div className="relation-choice" role="radiogroup" aria-label="Who can delegate">
-      <label><input type="radio" name="add-mode" checked={mode === 'everyone'} onChange={() => setMode('everyone')} /><span><strong>Everyone in {issuer}</strong><small>One delegation for each subject listed now. Exclude some later.</small></span></label>
-      <label><input type="radio" name="add-mode" checked={mode === 'selected'} onChange={() => setMode('selected')} /><span><strong>Only selected subjects</strong><small>Pick them after you add the provider.</small></span></label>
-    </div>
+    <div className="relation-field"><span>Identity provider</span><SelectMenu block label="Identity provider" value={issuer} onChange={v => { setIssuer(v); setChosen(new Set()); }} options={free.map(d => ({ value: d.issuer, label: d.issuer }))} /></div>
+    <IncludesField value={kinds} onChange={setKinds} />
+    <SubjectList key={issuer} issuer={issuer} kinds={kinds} chosen={chosen} onSet={(subjects, on) => setChosen(c => { const n = new Set(c); subjects.forEach(x => (on ? n.add(x.subject) : n.delete(x.subject))); return n; })} />
+    <ExpiresField name="add-idp-expires" value={expires} onChange={setExpires} dateText="Delegation from this identity provider ends on this date." />
     <label className="relation-consent"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /><span>I confirm that these subjects agreed to let <strong>{agentName}</strong> act for them.<small>{issuer} can not record this consent itself, so it is recorded here with your name ({currentAdmin}) and the time.</small></span></label>
-    <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!consent} onClick={add}>Add to draft</button>
+    <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!consent || !picked.length} onClick={add}>Add {picked.length || ''} to draft</button>
   </>;
 }
 
@@ -36,7 +41,7 @@ function AddTool({ doc, onChange, onDone }: Omit<Props, 'what' | 'agentName'>) {
     onChange({ ...doc, capabilities: [...doc.capabilities, ...added] }); onDone();
   }
   return <>{servers.map(s => <div key={s.id} className="relation-field"><span>{s.name} · reviewed tools</span><ul className="relation-pick">{toolCatalog.filter(t => t.serverId === s.id).map(t => <li key={t.tool}><label><input type="checkbox" disabled={granted.has(t.tool)} checked={granted.has(t.tool) || picked.includes(t.tool)} onChange={e => setPicked(p => e.target.checked ? [...p, t.tool] : p.filter(x => x !== t.tool))} /><span>{t.tool}<small>{granted.has(t.tool) ? 'Already granted' : t.mapping ? `Resource: ${t.mapping.kind}` : 'No resource mapping'}</small></span></label></li>)}</ul></div>)}
-    <label className="relation-field"><span>Expires (optional)</span><input className="cp-admin-input" type="date" value={expires} onChange={e => setExpires(e.target.value)} /></label>
+    <ExpiresField name="add-tools-expires" value={expires || undefined} onChange={v => setExpires(v ?? '')} dateText="Access to these tools ends on this date." />
     <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!picked.length} onClick={add}>Add {picked.length || ''} to draft</button></>;
 }
 

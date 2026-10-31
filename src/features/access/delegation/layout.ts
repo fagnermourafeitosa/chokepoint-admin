@@ -1,4 +1,4 @@
-import { servers, type Doc } from './fixtures';
+import { idpSubjects, servers, type Doc } from './fixtures';
 
 export type Adding = 'delegator' | 'tool' | 'resource';
 export type GroupKind = 'delegators' | 'tools' | 'resources';
@@ -23,9 +23,9 @@ const groupNode = (group: GroupKind, column: Column, key: string, title: string,
 export function delegationLayout(agentName: string, doc: Doc, positions: Positions = {}) {
   // Who can delegate: one node for each identity provider, never one node for each person.
   const subjectNodes: LayoutNode[] = doc.scopes.map((sc, i) => {
-    const count = sc.mode === 'selected' ? doc.delegations.filter(d => d.issuer === sc.issuer).length : 0;
+    const count = doc.delegations.filter(d => d.issuer === sc.issuer && sc.kinds.includes(d.kind)).length, total = idpSubjects(sc.issuer, sc.kinds).length;
     const kinds = sc.kinds.length === 2 ? 'people and services' : sc.kinds[0] === 'person' ? 'people' : 'services';
-    return { key: `idp-${sc.issuer}`, select: { type: 'idp', issuer: sc.issuer }, column: 'delegators', x: colX.delegators, y: top + i * rowGap, title: sc.issuer, subtitle: sc.mode === 'everyone' ? `Everyone · ${kinds}${sc.except.length ? ` · ${sc.except.length} excluded` : ''}` : `${count} selected ${kinds}` };
+    return { key: `idp-${sc.issuer}`, select: { type: 'idp', issuer: sc.issuer }, column: 'delegators', x: colX.delegators, y: top + i * rowGap, title: sc.issuer, subtitle: count === total && total > 0 ? `All ${total} ${kinds}` : `${count} of ${total} ${kinds}` };
   });
   // Servers and tools: a server with many tools becomes one group node.
   let y = top + 22;

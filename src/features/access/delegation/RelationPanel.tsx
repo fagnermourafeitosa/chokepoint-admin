@@ -7,13 +7,14 @@ import { GroupPanel } from './GroupPanel';
 import { IdpPanel } from './IdpPanel';
 import { ConditionEditor } from './ConditionEditor';
 import { WaitingBackend } from './WaitingBackend';
+import { ExpiresField } from './Fields';
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return <div className="relation-field"><span>{label}</span><div>{children}</div></div>;
 }
 
-function Expiration({ value, onChange }: { value?: string; onChange: (v?: string) => void }) {
-  return <Field label="Expires"><input className="cp-admin-input" type="date" value={value ?? ''} onChange={e => onChange(e.target.value || undefined)} aria-label="Expiration date" /><small className="cp-admin-muted">{value ? 'The relation ends on this date. Stored with the relation.' : 'No expiration.'}</small></Field>;
+function Expiration({ id, value, onChange }: { id: string; value?: string; onChange: (v?: string) => void }) {
+  return <ExpiresField name={`expires-${id}`} value={value} onChange={onChange} dateText="The relation ends on this date. Stored with the relation." />;
 }
 
 function Conditions({ items, onRemove }: { items: Condition[]; onRemove: (id: string) => void }) {
@@ -56,7 +57,7 @@ export function RelationPanel({ selected, onClose, agentName, disabled, doc, onC
     head = header('Delegation', d.name, `${d.name} → ${agentName}`);
     body = <><Field label="Subject"><span className="people-kind-chip" data-kind={d.kind}>{d.kind === 'person' ? 'Person' : 'Service'}</span>{d.subject}<small className="cp-admin-muted">{d.issuer}</small></Field>
       <Field label="Consent">{d.consent.source === 'administrator' ? 'Recorded by an administrator' : 'From the identity provider'}<small className="cp-admin-muted">{d.consent.recordedBy} · {d.consent.recordedAt}</small></Field>
-      <Expiration value={d.expiresAt} onChange={v => set({ expiresAt: v })} />
+      <Expiration id={d.id} value={d.expiresAt} onChange={v => set({ expiresAt: v })} />
       <AddCondition key={d.id + start} tool="" start={start} expiration={!d.expiresAt} cel={false} onExpiration={() => set({ expiresAt: inAMonth() })} onRule={() => undefined} />
       <footer><button type="button" className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" onClick={() => { onChange({ ...doc, delegations: doc.delegations.filter(x => x.id !== d.id) }); onClose(); }}><Trash2 size={14} aria-hidden="true" />Remove delegation</button></footer></>;
   } else if (selected.type === 'capability') {
@@ -67,7 +68,7 @@ export function RelationPanel({ selected, onClose, agentName, disabled, doc, onC
     head = header('Agent · server · tool', c.tool, `${agentName} · ${server} · ${c.tool}`);
     body = <><Field label="Server">{server}</Field>
       <Field label="Resource mapping">{c.mapping ? <span><code>{c.mapping.pointer}</code> → {c.mapping.kind}</span> : 'None. This tool has no resource check.'}</Field>
-      <Expiration value={c.expiresAt} onChange={v => set({ expiresAt: v })} />
+      <Expiration id={c.id} value={c.expiresAt} onChange={v => set({ expiresAt: v })} />
       <Field label="Rules for this agent on this server tool"><Conditions items={c.conditions} onRemove={id => set({ conditions: c.conditions.filter(k => k.id !== id) })} /><small className="cp-admin-muted">Every rule must pass. They apply only when {agentName} calls {server} · {c.tool}.</small></Field>
       <AddCondition key={c.id + start} tool={c.tool} start={start} expiration={!c.expiresAt} cel onExpiration={() => set({ expiresAt: inAMonth() })} onRule={k => set({ conditions: [...c.conditions, k] })} />
       <footer><button type="button" className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" onClick={() => { onChange({ ...doc, capabilities: doc.capabilities.filter(x => x.id !== c.id), }); onClose(); }}><Trash2 size={14} aria-hidden="true" />Remove tool</button></footer></>;

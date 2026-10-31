@@ -4,10 +4,10 @@ import { Dialog } from '../../../components/ui/dialog/Dialog';
 function HierarchyDiagram() {
   const box = (x: number, y: number, w: number, h: number, title: string, sub?: string, tone?: string) => <g className={`help-box${tone ? ` help-box--${tone}` : ''}`}><rect x={x} y={y} width={w} height={h} rx={4} /><text x={x + 10} y={y + 20} className="help-title">{title}</text>{sub ? <text x={x + 10} y={y + 36} className="help-sub">{sub}</text> : null}</g>;
   const edge = (d: string, label: string, lx: number, ly: number, dashed = false) => <g className={`help-edge${dashed ? ' help-edge--dashed' : ''}`}><path d={d} /><text x={lx} y={ly}>{label}</text></g>;
-  return <svg className="help-diagram" viewBox="0 0 840 340" role="img" aria-label="Example: everyone in Keycloak except Diego delegates to Deploy bot. Deploy bot can call merge_pull_request on acme/payments-api, and list_issues on acme/payments-api and acme/web.">
+  return <svg className="help-diagram" viewBox="0 0 840 340" role="img" aria-label="Example: everyone in Keycloak but Diego is selected to delegate to Deploy bot. Deploy bot can call merge_pull_request on acme/payments-api, and list_issues on acme/payments-api and acme/web.">
     <defs><marker id="help-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" /></marker></defs>
     <text x={10} y={18} className="help-col">WHO CAN DELEGATE</text><text x={196} y={18} className="help-col">AGENT</text><text x={372} y={18} className="help-col">SERVER · TOOLS</text><text x={610} y={18} className="help-col">RESOURCES</text>
-    {box(10, 120, 150, 50, 'Keycloak customer', 'everyone, except diego')}
+    {box(10, 120, 150, 50, 'Keycloak customer', '80 of 81 selected')}
     {box(196, 120, 140, 50, 'Deploy bot', 'acts, is verified', 'agent')}
     <g className="help-group"><rect x={372} y={40} width={196} height={190} rx={6} /><text x={382} y={58}>GitHub · Enterprise MCP</text></g>
     {box(382, 70, 176, 64, 'merge_pull_request', 'rule: 2 approvals')}
@@ -38,7 +38,7 @@ const examples = [
   ['alice: merge a PR in acme/payments-api with 1 approval', 'Denied · condition'],
   ['alice: merge a PR in acme/infra', 'Denied · no_resource'],
   ['alice: create_issue in acme/web', 'Denied · no_grant'],
-  ['diego (excluded in Keycloak): list_issues', 'Denied · no_delegation'],
+  ['diego (not selected in Keycloak): list_issues', 'Denied · no_delegation'],
 ];
 
 export function GraphHelp({ onClose }: { onClose: () => void }) {
@@ -55,7 +55,7 @@ export function GraphHelp({ onClose }: { onClose: () => void }) {
       <ul>
         <li><strong>A resource belongs to the agent</strong>, inside a server and a resource type. The resource type is proposed as <code>&lt;tool&gt;_&lt;argument&gt;</code>, so each tool has its own list of allowed values.</li>
         <li><strong>A rule belongs to agent · server · tool.</strong> It reads call arguments and trusted attributes. A rule never targets a person.</li>
-        <li><strong>Who can delegate</strong> is set for each identity provider: everyone with exclusions, or only selected subjects. Tools, resources and rules are the same for everyone who delegates to the agent.</li>
+        <li><strong>Who can delegate</strong> is set for each identity provider: the selected people and services, with Select all for everyone. Tools, resources and rules are the same for everyone who delegates to the agent.</li>
         <li><strong>Expiration</strong> can end a delegation or a tool relation.</li>
         <li>Relations and expirations are checked by OpenFGA. Rules are checked by the PDP with facts from the attribute sources.</li>
       </ul>

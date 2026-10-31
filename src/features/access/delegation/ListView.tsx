@@ -1,5 +1,5 @@
 import { Braces, Clock, Pencil, Plus, Trash2 } from 'lucide-react';
-import { servers, type Doc } from './fixtures';
+import { idpSubjects, servers, type Doc } from './fixtures';
 import { sameSelection, type Selection } from './layout';
 
 type Edge = Extract<Selection, { type: 'idp' | 'delegation' | 'capability' | 'resource' }>;
@@ -38,7 +38,7 @@ export function ListView({ doc, source, selected, onSelect, onChange, readOnly }
   const common = { selected, onSelect, onRemove: remove, readOnly };
   return <div className="delegation-list">
     <Section title="Who can delegate" columns={['Identity provider', 'Who', 'Kinds', 'Consent']} {...common}
-      rows={doc.scopes.map(sc => ({ select: { type: 'idp', issuer: sc.issuer }, label: sc.issuer, cells: [sc.issuer, sc.mode === 'everyone' ? `Everyone${sc.except.length ? `, ${sc.except.length} excluded` : ''}` : `${doc.delegations.filter(d => d.issuer === sc.issuer).length} selected`, sc.kinds.map(k => (k === 'person' ? 'People' : 'Services')).join(', '), `${sc.consent.recordedBy} · ${sc.consent.recordedAt}`], expires: sc.expiresAt, conditions: 0 }))} />
+      rows={doc.scopes.map(sc => ({ select: { type: 'idp', issuer: sc.issuer }, label: sc.issuer, cells: [sc.issuer, (() => { const total = idpSubjects(sc.issuer, sc.kinds).length, n = source.delegations.filter(d => d.issuer === sc.issuer && sc.kinds.includes(d.kind)).length; return n === total && total ? `All ${total}` : `${n} of ${total}`; })(), sc.kinds.map(k => (k === 'person' ? 'People' : 'Services')).join(', '), `${sc.consent.recordedBy} · ${sc.consent.recordedAt}`], expires: sc.expiresAt, conditions: 0 }))} />
     <Section title="Servers and tools" columns={['Tool', 'Server', 'Resource mapping']} {...common}
       rows={doc.capabilities.map(c => ({ select: { type: 'capability', id: c.id }, label: c.tool, cells: [c.tool, servers.find(s => s.id === c.serverId)?.name ?? '', c.mapping ? `${c.mapping.pointer} → ${c.mapping.kind}` : '—'], expires: c.expiresAt, conditions: c.conditions.length }))} />
     <Section title="Resources" columns={['Resource', 'Type', 'Server', 'Used by']} {...common}

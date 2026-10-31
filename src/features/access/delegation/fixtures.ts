@@ -7,8 +7,8 @@ export type Capability = { id: string; serverId: string; tool: string; expiresAt
 // A resource belongs to a server and a resource type (Backend 029). It is an allow list: no rules.
 export type Resource = { id: string; serverId: string; kind: string; value: string };
 export type Server = { id: string; name: string; type: 'custom' | 'enterprise' };
-// Who can delegate is set for each identity provider: everyone (with exceptions) or only selected subjects.
-export type IdpScope = { issuer: string; mode: 'everyone' | 'selected'; kinds: SubjectKind[]; except: string[]; expiresAt?: string; consent: Consent };
+// Who can delegate is set for each identity provider: the subjects that are selected, with Select all for everyone.
+export type IdpScope = { issuer: string; kinds: SubjectKind[]; expiresAt?: string; consent: Consent };
 export type Doc = { scopes: IdpScope[]; delegations: Delegation[]; capabilities: Capability[]; resources: Resource[] };
 
 export const servers: Server[] = [{ id: 'github', name: 'GitHub', type: 'enterprise' }, { id: 'payments', name: 'Payments API', type: 'custom' }];
@@ -62,13 +62,10 @@ const res = (tool: string, value: string, serverId = 'github'): Resource => ({ i
 
 export const initialDoc: Doc = {
   scopes: [
-    { issuer: 'Keycloak customer', mode: 'everyone', kinds: ['person', 'service'], except: ['diego'], expiresAt: '2027-03-31', consent: consent('09:10') },
-    { issuer: 'Google Workspace', mode: 'selected', kinds: ['person'], except: [], consent: consent('09:30') },
+    { issuer: 'Keycloak customer', kinds: ['person', 'service'], expiresAt: '2027-03-31', consent: consent('09:10') },
+    { issuer: 'Google Workspace', kinds: ['person'], consent: consent('09:30') },
   ],
   delegations: [
-    { id: 'd-alice', issuer: 'Keycloak customer', subject: 'alice', name: 'Alice Martins', kind: 'person', expiresAt: '2026-11-30', consent: consent('09:12') },
-    { id: 'd-bruno', issuer: 'Keycloak customer', subject: 'bruno', name: 'Bruno Costa', kind: 'person', consent: consent('09:14') },
-    { id: 'd-pipeline', issuer: 'Keycloak customer', subject: 'release-pipeline', name: 'release-pipeline', kind: 'service', consent: consent('09:20') },
     { id: 'd-erica', issuer: 'Google Workspace', subject: '1029384756', name: 'Erica Lima', kind: 'person', consent: consent('09:31') },
   ],
   capabilities: [
@@ -99,3 +96,13 @@ export const directory = baseDirectory.map(d => ({
   people: [...d.people, ...largeSubjects.filter(x => x.issuer === d.issuer && x.kind === 'person').map(x => ({ subject: x.subject, name: x.name }))],
   services: [...d.services, ...largeSubjects.filter(x => x.issuer === d.issuer && x.kind === 'service').map(x => ({ subject: x.subject, name: x.name }))],
 }));
+
+// Directory subjects of one identity provider and kinds.
+export const idpSubjects = (issuer: string, kinds: SubjectKind[]) => {
+  const d = directory.find(x => x.issuer === issuer);
+  return [...(kinds.includes('person') ? (d?.people ?? []).map(p => ({ ...p, kind: 'person' as const })) : []), ...(kinds.includes('service') ? (d?.services ?? []).map(p => ({ ...p, kind: 'service' as const })) : [])];
+};
+export const delegationOf = (issuer: string, s: { subject: string; name: string; kind: SubjectKind }, at: Consent): Delegation => ({ id: `d-${issuer}-${s.subject}`, issuer, subject: s.subject, name: s.name, kind: s.kind, consent: at });
+
+// The sample: everyone in Keycloak is selected except Diego.
+initialDoc.delegations.unshift(...idpSubjects('Keycloak customer', ['person', 'service']).filter(x => x.subject !== 'diego').map(x => delegationOf('Keycloak customer', x, consent('09:10'))));
