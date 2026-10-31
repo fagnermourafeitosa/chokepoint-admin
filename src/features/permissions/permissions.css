@@ -15,3 +15,5 @@
 
 [data-context-target=true] { background:var(--cp-admin-color-warning-bg); outline:1px solid var(--cp-admin-color-warning); outline-offset:4px; border-radius:6px; scroll-margin-top:100px; }
 .access-target-context { display:flex; gap:12px; flex-wrap:wrap; padding:14px 18px; border:1px solid var(--cp-admin-color-border); border-radius:8px; margin:0 0 20px; font-size:.8125rem; }.access-target-context span { color:var(--cp-admin-color-text-muted); }
+.people-kind-chip{display:inline-flex;align-items:center;margin-inline-start:var(--cp-admin-space-2);padding:var(--cp-admin-space-1) var(--cp-admin-space-2);border-radius:var(--cp-admin-radius-sm);font-size:var(--cp-admin-type-label);font-weight:var(--cp-admin-weight-semibold);background:var(--cp-admin-color-surface-muted);color:var(--cp-admin-color-text-muted);vertical-align:middle}.people-kind-chip[data-kind="service"]{background:var(--cp-admin-color-accent-soft);color:var(--cp-admin-color-accent-text)}
+.people-view-switch{max-width:20rem}
