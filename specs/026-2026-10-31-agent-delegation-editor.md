@@ -96,6 +96,7 @@ flowchart LR
 - [ ] 6. As an administrator, the graph stays usable with 100 subjects and hundreds of resources.
 - [ ] 7. As an administrator, I see the published revision and whether my last publication is effective.
 - [ ] 8. As an administrator, I disable an agent at once.
+- [ ] 9. As an administrator, I narrow the graph to one server or one tool to work on it.
 
 ---
 
@@ -133,9 +134,17 @@ The agent list rail collapses to a narrow column of agent icons. A chevron butto
 
 ### 3. Toolbar and section bar
 
-1. The toolbar has the title, a **How this works** help button, a **Graph / List** toggle, a **Draft / Published** toggle and **Reset layout** after a box was moved.
+1. The toolbar has the title with the **How this works** help button next to it, a **Graph / List** toggle, a **Draft / Published** toggle and **Reset layout** after a box was moved.
 2. **Published** shows the published revision, read only. Add actions are hidden and the side panel controls are disabled.
-3. Below the title, a section bar shows **Who can delegate**, **Servers and tools** and **Resources**, each with its count and an add action. The bar is the same in Graph and List.
+3. Below the title, a **filter bar**:
+   - a text search on identity provider, subject, tool, server, resource type, rule name and resource value. Each column is filtered only when the text matches something in it, so a search for a tool still shows who can delegate;
+   - **Server** (All servers, or one server) and **Tool**. The tool list follows the server: one server lists its tools; all servers list "server · tool". A new server clears the tool;
+   - **With rules** and **Expiring**;
+   - when a filter is active: "N of M relations" and **Clear filters**.
+
+   Filters change only what Graph and List show. Every edit applies to the whole draft. There is no filter by identity provider: tools, resources and rules are the same for every subject that delegates to the agent.
+4. Below the filters, a section bar shows **Who can delegate**, **Servers and tools** and **Resources**, each with its count and an add action. The bar is the same in Graph and List.
+5. Every choice from a list uses the design system `SelectMenu` (`admin-select`), never a native `select` (`docs/design-system/components.md`).
 
 ### 4. Graph
 
@@ -214,16 +223,16 @@ Three tables: Who can delegate (identity provider, who, kinds, consent), Servers
 
 **How this works** opens a dialog with:
 
-1. a diagram of a real example: Keycloak customer (alice, bruno) → Deploy bot → GitHub · `merge_pull_request` (rule: 2 approvals) and `list_issues` → `merge_pull_request_repository` › `acme/payments-api` and `list_issues_repository` › `acme/payments-api`, `acme/web`, with the dashed "reads /repository" lines;
+1. a diagram of a real example: Keycloak customer (everyone, except diego) → Deploy bot → GitHub · `merge_pull_request` (rule: 2 approvals) and `list_issues` → `merge_pull_request_repository` › `acme/payments-api` and `list_issues_repository` › `acme/payments-api`, `acme/web`, with the dashed "reads /repository" lines;
 2. the four checks in order, with the deny reason of each: `no_delegation`, `no_grant`, `no_resource`, `condition`;
-3. example calls and their results;
-4. what to remember: a resource belongs to the agent inside server and resource type; the resource type is proposed as `<tool>_<argument>`; a rule belongs to agent · server · tool; expiration ends a delegation or a tool relation; OpenFGA checks relations, the PDP checks rules.
+3. example calls and their results, for example "diego (excluded in Keycloak): list_issues → Denied · no_delegation";
+4. what to remember: a resource belongs to the agent inside server and resource type; the resource type is proposed as `<tool>_<argument>`; a rule belongs to agent · server · tool; expiration ends a delegation or a tool relation; OpenFGA checks relations, the PDP checks rules; who can delegate is set for each identity provider, and tools, resources and rules are the same for everyone who delegates.
 
 The diagram is static SVG. The Admin has no Mermaid dependency.
 
 ### 11. Files
 
-The editor stays in `src/features/access`. Data hooks, layout, graph, panels, rule builder, list and help are separate files. Each file stays under about 300 lines.
+The editor stays in `src/features/access`. Data hooks, layout, filters, graph, panels, rule builder, list and help are separate files. Each file stays under about 300 lines.
 
 ---
 
@@ -263,12 +272,14 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [ ] 5. Expiration is offered on delegation and agent · server · tool; rules only on agent · server · tool; resources have neither.
 - [ ] 6. The rule builder produces the CEL of section 7, and the advanced CEL edit is one-way.
 - [ ] 7. The list view has the three tables with Open, Add condition and Remove.
-- [ ] 8. The publication bar shows the draft changes and the effective or pending revision.
-- [ ] 9. The help dialog has the diagram, the four checks and the examples.
-- [ ] 10. Every item of Backend dependencies is resolved in a backend specification before implementation.
-- [ ] 11. No "Waiting backend" chip remains for an implemented item.
-- [ ] 12. `npm run check` and `npm run build` pass.
-- [ ] 13. The user confirms the interface test.
+- [ ] 8. The filter bar filters Graph and List by text, server → tool, rules and expiration, and edits still apply to the whole draft.
+- [ ] 9. No native `select`: every list choice uses `SelectMenu`.
+- [ ] 10. The publication bar shows the draft changes and the effective or pending revision.
+- [ ] 11. The help dialog has the diagram, the four checks and the examples.
+- [ ] 12. Every item of Backend dependencies is resolved in a backend specification before implementation.
+- [ ] 13. No "Waiting backend" chip remains for an implemented item.
+- [ ] 14. `npm run check` and `npm run build` pass.
+- [ ] 15. The user confirms the interface test.
 
 ---
 
