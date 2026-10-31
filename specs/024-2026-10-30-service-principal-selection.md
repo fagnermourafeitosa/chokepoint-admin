@@ -3,7 +3,7 @@
 - **Specification ID**: 024
 - **Date**: 2026-10-30
 - **Slug**: service-principal-selection
-- **Status**: In Progress
+- **Status**: Waiting Approve
 - **Owner**: Admin — Access and Permissions
 - **Related Specification**: [Backend 027 — Service Principals](../../backend/specs/027-2026-10-30-service-principals.md)
 - **Related Specification**: [012 — SCIM People Selection](012-2026-10-28-scim-people-selection.md)
@@ -34,8 +34,8 @@ The People selection lists only directory users. A Keycloak client or a Google s
 
 ## User Stories
 
-- [ ] 1. As an administrator, I can find a customer microservice and add it to a permission group.
-- [ ] 2. As an administrator, I can tell people and services apart, by a chip, in the picker and in the group.
+- [x] 1. As an administrator, I can find a customer microservice and add it to a permission group. — evidence: live
+- [x] 2. As an administrator, I can tell people and services apart, by a chip, in the picker and in the group. — evidence: live, after reload
 
 ## Architecture Gate
 
@@ -52,11 +52,11 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build` wh
 
 - [ ] 1. Services appear in the picker with a kind chip.
 - [ ] 2. A selected service is saved as a member with kind `service` and appears in the group with its chip. A selected person is saved with kind `person`.
-- [ ] 4. People selection behaves as before.
-- [ ] 4b. People pagination works with the cursor, for a provider with a total and for one without.
-- [ ] 4a. Switching views clears the selection; a member without a kind shows the warning; a service member shows its name when the list can be read.
-- [ ] 5. `npm run check` and `npm run build` pass.
-- [ ] 6. The user confirms the interface test.
+- [x] 4. People selection behaves as before. — evidence: live
+- [ ] 4b. People pagination works with the cursor, for a provider with a total and for one without. — partly met: one page with a total (Keycloak) seen live; several pages and a null total not exercised
+- [x] 4a. Switching views clears the selection; a member without a kind shows the warning; a service member shows its name when the list can be read. — evidence: service names live; view switch and the untyped warning by code inspection
+- [x] 5. `npm run check` and `npm run build` pass.
+- [ ] 6. The user confirms the interface test. — waiting for the user
 
 ## Out of Scope
 
