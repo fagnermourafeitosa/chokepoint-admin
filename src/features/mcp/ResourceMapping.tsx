@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { SelectMenu } from '../../components/ui/dropdown/SelectMenu';
 import { Database, TriangleAlert } from 'lucide-react';
 import type { ManagedTool } from './api';
 import { WaitingBackend } from '../access/delegation/WaitingBackend';
@@ -43,13 +44,11 @@ export function ResourceMapping({ tool, state, kinds, agents, onChange }: { tool
     </div>
     {open ? <div className="resource-mapping-editor">
       <p className="cp-admin-muted">The resource is the object a call acts on. An agent can call this tool only on resources it has.</p>
-      <label className="resource-field"><span>Argument</span>
-        <select className="cp-admin-input" value={pointer} onChange={e => { setPointer(e.target.value); if (!edited) setKind(e.target.value ? propose(tool.name, e.target.value) : ''); }}>
-          <option value="">No resource. Calls have no resource check.</option>
-          {args.map(a => <option key={a.name} value={a.name} disabled={a.type !== 'string'}>{a.name} · {a.type}{a.required ? ' · required' : ''}{a.type !== 'string' ? ' · must be a string' : ''}</option>)}
-        </select>
+      <div className="resource-field"><span>Argument</span>
+        <SelectMenu block label="Argument" value={pointer} onChange={v => { setPointer(v); if (!edited) setKind(v ? propose(tool.name, v) : ''); }}
+          options={[{ value: '', label: 'No resource. Calls have no resource check.' }, ...args.map(a => ({ value: a.name, disabled: a.type !== 'string', label: `${a.name} · ${a.type}${a.required ? ' · required' : ''}${a.type !== 'string' ? ' · must be a string' : ''}` }))]} />
         {!args.length ? <small>This tool has no arguments, so it can not have a resource.</small> : null}
-      </label>
+      </div>
       {pointer ? <>
         <div className="resource-field">
           <span className="resource-label">Resource type{!edited ? <em> · proposed</em> : null}<Tooltip content="A label that identifies one type of resource on this server. It must be unique on the server. It has no other effect."><CircleHelp size={14} aria-label="About resource type" /></Tooltip></span>

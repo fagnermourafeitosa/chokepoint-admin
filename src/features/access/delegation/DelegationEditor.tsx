@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CircleHelp } from 'lucide-react';
 import { DelegationGraph } from './DelegationGraph';
+import { FilterBar, filterDoc, isFiltered, noFilters, type Filters } from './FilterBar';
 import { GraphHelp } from './GraphHelp';
-import { initialDoc, largeDoc, type Doc } from './fixtures';
+import { initialDoc, type Doc } from './fixtures';
 import { delegationLayout, type Positions, type Selection } from './layout';
 import { ListView } from './ListView';
 import { PublishBar, type PublishState } from './PublishBar';
@@ -19,8 +20,6 @@ function Toggle<T extends string>({ label, value, options, onChange }: { label: 
 
 // Layout prototype of Admin A1: the agent graph as the editor. Fixed data, kept in memory only.
 export function DelegationEditor({ agentName, disabled }: { agentName: string; disabled: boolean }) {
-  const [sample, setSample] = useState<'small' | 'large'>('small');
-  const base = sample === 'small' ? initialDoc : largeDoc;
   const [draft, setDraft] = useState<Doc>(initialDoc);
   const [back, setBack] = useState<Selection>();
   const [changes, setChanges] = useState(0);
@@ -32,8 +31,11 @@ export function DelegationEditor({ agentName, disabled }: { agentName: string; d
   const [selected, setSelected] = useState<Selection>();
   const [state, setState] = useState<PublishState>('effective');
   const readOnly = version === 'published';
-  const doc = readOnly ? base : draft;
-  const layout = useMemo(() => delegationLayout(agentName, doc, positions), [agentName, doc, positions]);
+  const doc = readOnly ? initialDoc : draft;
+  const [filters, setFilters] = useState<Filters>(noFilters);
+  const view = useMemo(() => (isFiltered(filters) ? filterDoc(doc, filters) : doc), [doc, filters]);
+  const count = (d: Doc) => d.scopes.length + d.capabilities.length + d.resources.length;
+  const layout = useMemo(() => delegationLayout(agentName, view, positions), [agentName, view, positions]);
   const change = (next: Doc) => { setDraft(next); setChanges(n => n + 1); };
   useEffect(() => {
     if (!maximized) return;
@@ -47,19 +49,19 @@ export function DelegationEditor({ agentName, disabled }: { agentName: string; d
       <div className="delegation-toolbar-actions">
         <Toggle label="View" value={mode} onChange={setMode} options={[['graph', 'Graph'], ['list', 'List']]} />
         <Toggle label="Version" value={version} onChange={v => { setVersion(v); setSelected(undefined); }} options={[['draft', 'Draft'], ['published', 'Published']]} />
-        <Toggle label="Prototype sample" value={sample} onChange={v => { setSample(v); setDraft(v === 'small' ? initialDoc : largeDoc); setChanges(0); setPositions({}); setSelected(undefined); }} options={[['small', 'Small sample'], ['large', '100 subjects']]} />
         {mode === 'graph' && Object.keys(positions).length ? <button type="button" className="rule-switch" onClick={() => setPositions({})}>Reset layout</button> : null}
       </div>
     </header>
+    <FilterBar filters={filters} onChange={setFilters} shown={count(view)} total={count(doc)} doc={doc} />
     <SectionBar doc={doc} selected={selected} onSelect={setSelected} readOnly={readOnly} />
     {readOnly ? <p className="delegation-readonly">You see published revision 3, the configuration that applies now. Switch to Draft to edit.</p> : null}
     <div className="delegation-body" data-panel={!!selected}>
       {mode === 'graph'
-        ? <DelegationGraph key={sample} layout={layout} selected={selected} onSelect={setSelected} onMove={(key, x, y) => setPositions(p => ({ ...p, [key]: { x, y } }))} disabled={disabled} readOnly={readOnly} maximized={maximized} onMaximize={() => setMaximized(v => !v)} />
-        : <ListView doc={doc} selected={selected} onSelect={setSelected} onChange={change} readOnly={readOnly} />}
+        ? <DelegationGraph layout={layout} selected={selected} onSelect={setSelected} onMove={(key, x, y) => setPositions(p => ({ ...p, [key]: { x, y } }))} disabled={disabled} readOnly={readOnly} maximized={maximized} onMaximize={() => setMaximized(v => !v)} />
+        : <ListView doc={view} source={doc} selected={selected} onSelect={setSelected} onChange={change} readOnly={readOnly} />}
       {selected ? <fieldset className="delegation-panel-frame" disabled={readOnly}><RelationPanel key={JSON.stringify(selected) + version} selected={selected} agentName={agentName} disabled={disabled} doc={doc} onChange={change} onClose={() => { setSelected(undefined); setBack(undefined); }} onSelect={s => { setBack(selected?.type === 'group' ? selected : undefined); setSelected(s); }} back={back} onBack={() => { setSelected(back); setBack(undefined); }} /></fieldset> : null}
     </div>
     {help ? <GraphHelp onClose={() => setHelp(false)} /> : null}
-    <PublishBar state={state} onState={setState} changes={changes} onDiscard={() => { setDraft(base); setChanges(0); setSelected(undefined); }} />
+    <PublishBar state={state} onState={setState} changes={changes} onDiscard={() => { setDraft(initialDoc); setChanges(0); setSelected(undefined); }} />
   </section>;
 }

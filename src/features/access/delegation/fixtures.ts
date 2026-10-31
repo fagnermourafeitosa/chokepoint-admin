@@ -61,11 +61,15 @@ const cap = (serverId: string, tool: string, conditions: Condition[] = [], expir
 const res = (tool: string, value: string, serverId = 'github'): Resource => ({ id: `r-${tool}-${value}`, serverId, kind: resourceType(tool, 'repository'), value });
 
 export const initialDoc: Doc = {
-  scopes: [{ issuer: 'Keycloak customer', mode: 'selected', kinds: ['person', 'service'], except: [], consent: consent('09:10') }],
+  scopes: [
+    { issuer: 'Keycloak customer', mode: 'everyone', kinds: ['person', 'service'], except: ['diego'], expiresAt: '2027-03-31', consent: consent('09:10') },
+    { issuer: 'Google Workspace', mode: 'selected', kinds: ['person'], except: [], consent: consent('09:30') },
+  ],
   delegations: [
     { id: 'd-alice', issuer: 'Keycloak customer', subject: 'alice', name: 'Alice Martins', kind: 'person', expiresAt: '2026-11-30', consent: consent('09:12') },
     { id: 'd-bruno', issuer: 'Keycloak customer', subject: 'bruno', name: 'Bruno Costa', kind: 'person', consent: consent('09:14') },
     { id: 'd-pipeline', issuer: 'Keycloak customer', subject: 'release-pipeline', name: 'release-pipeline', kind: 'service', consent: consent('09:20') },
+    { id: 'd-erica', issuer: 'Google Workspace', subject: '1029384756', name: 'Erica Lima', kind: 'person', consent: consent('09:31') },
   ],
   capabilities: [
     cap('github', 'merge_pull_request', [{ id: 'k-approvals', name: 'At least 2 approvals, no changes requested', expression: `${reviewsValue('approvals')} >= 2 && !${reviewsValue('changes_requested')}`, bindings: ['pr-reviews'] }]),
@@ -82,32 +86,13 @@ export const initialDoc: Doc = {
   ],
 };
 
-// Large sample to check how the screen scales: 100 subjects, 12 tools, 160 resources.
+// Extra directory subjects, so the identity provider lists look like a real company.
 const first = ['Ana', 'Bruno', 'Carla', 'Davi', 'Elisa', 'Felipe', 'Gabi', 'Hugo', 'Iara', 'João'], last = ['Silva', 'Souza', 'Lima', 'Costa', 'Rocha', 'Alves', 'Melo', 'Dias', 'Nunes'];
 const largeSubjects: Delegation[] = Array.from({ length: 100 }, (_, i) => {
   const service = i % 10 === 9, issuer = i % 4 === 3 ? 'Google Workspace' : 'Keycloak customer';
   const name = service ? `worker-${i}` : `${first[i % first.length]} ${last[i % last.length]} ${i}`;
   return { id: `d-l${i}`, issuer, subject: service ? `svc-${i}` : `user-${i}`, name, kind: service ? 'service' : 'person', expiresAt: i % 3 === 0 ? '2026-12-31' : undefined, consent: consent(`10:${String(i % 60).padStart(2, '0')}`) };
 });
-const repos = ['payments-api', 'web', 'checkout', 'billing', 'auth', 'search', 'ledger', 'mobile', 'infra', 'notifications'];
-const repoName = (i: number) => `acme/${repos[i % 10]}${i >= 10 ? `-${Math.floor(i / 10)}` : ''}`;
-export const largeDoc: Doc = {
-  scopes: [
-    { issuer: 'Keycloak customer', mode: 'everyone', kinds: ['person', 'service'], except: ['user-5', 'user-12'], expiresAt: '2027-03-31', consent: consent('10:00') },
-    { issuer: 'Google Workspace', mode: 'selected', kinds: ['person'], except: [], consent: consent('10:05') },
-  ],
-  delegations: largeSubjects.filter(d => d.issuer === 'Google Workspace'),
-  capabilities: [
-    ...initialDoc.capabilities,
-    ...githubTools.map(([tool]) => tool).filter(tool => !initialDoc.capabilities.some(c => c.tool === tool)).map(tool => cap('github', tool)),
-  ],
-  resources: [
-    ...Array.from({ length: 80 }, (_, i) => res('list_issues', repoName(i))),
-    ...Array.from({ length: 60 }, (_, i) => res('get_file_contents', repoName(i))),
-    ...Array.from({ length: 20 }, (_, i) => res('merge_pull_request', repoName(i))),
-  ],
-};
-
 // Directory of each identity provider, as the backend lists it (people and services).
 export const directory = baseDirectory.map(d => ({
   ...d,

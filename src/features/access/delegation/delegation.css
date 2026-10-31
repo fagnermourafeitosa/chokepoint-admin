@@ -176,3 +176,10 @@
 .delegation-box-head small { font-weight: var(--cp-admin-weight-regular); font-size: 10px; }
 .delegation-node .agent-graph-node-copy strong, .delegation-node .agent-graph-node-copy small { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 .delegation-node .agent-graph-node-copy { gap: 4px; }
+.delegation-filters { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-3); margin-bottom: var(--cp-admin-space-3); }
+.delegation-filter-text { flex: 1 1 18rem; max-width: 28rem; }
+.delegation-filter-server { width: auto; min-height: 34px; padding-block: 4px; font-size: var(--cp-admin-type-small); }
+.delegation-filter-check { display: inline-flex; align-items: center; gap: 6px; font-size: var(--cp-admin-type-small); cursor: pointer; }
+.delegation-filter-count { font-size: var(--cp-admin-type-label); color: var(--cp-admin-color-text-muted); }
+/* The help button stays next to the title; the toolbar actions wrap below when space is short. */
+.delegation-toolbar .agent-graph-title { display: flex; align-items: center; gap: var(--cp-admin-space-2); flex: 0 0 auto; flex-wrap: nowrap; white-space: nowrap; }

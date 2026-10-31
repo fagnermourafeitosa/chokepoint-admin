@@ -1,5 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { toolBindings, toolCatalog } from './fixtures';
+import { SelectMenu } from '../../../components/ui/dropdown/SelectMenu';
 
 // A field the rule can read: a call argument or a trusted attribute. Only the CEL leaves the Admin.
 export type RuleField = { key: string; label: string; group: string; type: string; cel: string; binding?: string };
@@ -49,19 +50,19 @@ export const ruleComplete = (rule: Rule, fields: RuleField[]) => rule.clauses.le
 function FieldSelect({ fields, value, onChange, label, only }: { fields: RuleField[]; value: string; onChange: (v: string) => void; label: string; only?: string }) {
   const list = only ? fields.filter(f => f.type === only) : fields;
   const groups = [...new Set(list.map(f => f.group))];
-  return <select className="cp-admin-input" aria-label={label} value={value} onChange={e => onChange(e.target.value)}>{groups.map(g => <optgroup key={g} label={g}>{list.filter(f => f.group === g).map(f => <option key={f.key} value={f.key}>{f.label} · {f.type}</option>)}</optgroup>)}</select>;
+  return <SelectMenu block label={label} value={value} onChange={onChange} options={groups.flatMap(g => list.filter(f => f.group === g).map(f => ({ value: f.key, label: `${f.label} · ${f.type} — ${g}` })))} />;
 }
 
 export function RuleBuilder({ fields, rule, onChange }: { fields: RuleField[]; rule: Rule; onChange: (r: Rule) => void }) {
   const set = (id: string, patch: Partial<Clause>) => onChange({ ...rule, clauses: rule.clauses.map(c => (c.id === id ? { ...c, ...patch } : c)) });
   const add = () => { const f = fields[0]; onChange({ ...rule, clauses: [...rule.clauses, { id: `q-${Date.now()}`, field: f.key, op: (ops[f.type] ?? ops.string)[0].id, value: '' }] }); };
   return <div className="rule-builder">
-    <div className="rule-join">Allow the call when <select className="cp-admin-input" aria-label="Match" value={rule.join} onChange={e => onChange({ ...rule, join: e.target.value as Rule['join'] })}><option value="all">all</option><option value="any">any</option></select> of these are true:</div>
+    <div className="rule-join">Allow the call when <SelectMenu label="Match" value={rule.join} onChange={v => onChange({ ...rule, join: v as Rule['join'] })} options={[{ value: 'all', label: 'all' }, { value: 'any', label: 'any' }]} /> of these are true:</div>
     {rule.clauses.map(c => {
       const f = fields.find(x => x.key === c.field)!; const list = ops[f.type] ?? ops.string; const op = list.find(o => o.id === c.op) ?? list[0];
       return <div key={c.id} className="rule-clause">
         <FieldSelect fields={fields} label="Field" value={c.field} onChange={v => { const nf = fields.find(x => x.key === v)!; set(c.id, { field: v, op: (ops[nf.type] ?? ops.string)[0].id, value: '', valueField: undefined }); }} />
-        <select className="cp-admin-input" aria-label="Operator" value={op.id} onChange={e => set(c.id, { op: e.target.value })}>{list.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}</select>
+        <SelectMenu block label="Operator" value={op.id} onChange={v => set(c.id, { op: v })} options={list.map(o => ({ value: o.id, label: o.label }))} />
         {op.noValue ? <span /> : <div className="rule-value">
           {c.valueField !== undefined ? <FieldSelect fields={fields.filter(x => x.key !== c.field)} only={f.type} label="Compare with field" value={c.valueField} onChange={v => set(c.id, { valueField: v })} />
             : <input className="cp-admin-input" aria-label="Value" type={f.type === 'number' ? 'number' : 'text'} value={c.value} placeholder={op.id === 'in' ? 'RJ, SP' : 'value'} onChange={e => set(c.id, { value: e.target.value })} />}

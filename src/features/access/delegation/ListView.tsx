@@ -25,8 +25,10 @@ function Section({ title, columns, rows, selected, onSelect, onRemove, readOnly 
 }
 
 // The same relations as the graph, as tables. Better for keyboards and for long lists.
-export function ListView({ doc, selected, onSelect, onChange, readOnly }: { doc: Doc; selected?: Selection; onSelect: (s: Selection) => void; onChange: (d: Doc) => void; readOnly: boolean }) {
+// doc is what the view shows (filtered); source is the whole draft that edits change.
+export function ListView({ doc, source, selected, onSelect, onChange, readOnly }: { doc: Doc; source: Doc; selected?: Selection; onSelect: (s: Selection) => void; onChange: (d: Doc) => void; readOnly: boolean }) {
   const remove = (r: Row) => {
+    const doc = source;
     if (r.select.type === 'idp') { const issuer = r.select.issuer; onChange({ ...doc, scopes: doc.scopes.filter(s => s.issuer !== issuer), delegations: doc.delegations.filter(d => d.issuer !== issuer) }); return; }
     const id = r.select.id;
     if (r.select.type === 'delegation') onChange({ ...doc, delegations: doc.delegations.filter(d => d.id !== id) });

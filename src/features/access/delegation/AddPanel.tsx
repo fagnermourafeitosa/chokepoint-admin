@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { SelectMenu } from '../../../components/ui/dropdown/SelectMenu';
 import { currentAdmin, directory, servers, toolCatalog, type Doc } from './fixtures';
 import type { Adding } from './layout';
 import { WaitingBackend } from './WaitingBackend';
@@ -16,7 +17,7 @@ function AddIdentityProvider({ agentName, doc, onChange, onDone }: Omit<Props, '
     onChange({ ...doc, scopes: [...doc.scopes, { issuer, mode, kinds: ['person', 'service'], except: [], consent: { source: 'administrator', recordedBy: currentAdmin, recordedAt: now() } }] }); onDone();
   }
   return <>
-    <label className="relation-field"><span>Identity provider</span><select className="cp-admin-input" value={issuer} onChange={e => setIssuer(e.target.value)}>{free.map(d => <option key={d.issuer}>{d.issuer}</option>)}</select></label>
+    <div className="relation-field"><span>Identity provider</span><SelectMenu block label="Identity provider" value={issuer} onChange={setIssuer} options={free.map(d => ({ value: d.issuer, label: d.issuer }))} /></div>
     <div className="relation-choice" role="radiogroup" aria-label="Who can delegate">
       <label><input type="radio" name="add-mode" checked={mode === 'everyone'} onChange={() => setMode('everyone')} /><span><strong>Everyone in {issuer}</strong><small>One delegation for each subject listed now. Exclude some later.</small></span></label>
       <label><input type="radio" name="add-mode" checked={mode === 'selected'} onChange={() => setMode('selected')} /><span><strong>Only selected subjects</strong><small>Pick them after you add the provider.</small></span></label>
@@ -49,7 +50,7 @@ function AddResource({ doc, onChange, onDone }: Omit<Props, 'what' | 'agentName'
   const exists = doc.resources.some(r => r.serverId === serverId && r.kind === kind && r.value === value.trim());
   if (!kinds.length) return <p className="cp-admin-muted">No granted tool has a resource mapping. Add the mapping in the tool review first.</p>;
   return <>
-    <label className="relation-field"><span>Resource type</span><select className="cp-admin-input" value={key} onChange={e => setKey(e.target.value)}>{kinds.map(c => <option key={`${c.serverId}|${c.mapping!.kind}`} value={`${c.serverId}|${c.mapping!.kind}`}>{c.mapping!.kind} · {servers.find(s => s.id === c.serverId)?.name}</option>)}</select><small className="cp-admin-muted">Used by {tools.map(t => t.tool).join(', ')}.</small></label>
+    <div className="relation-field"><span>Resource type</span><SelectMenu block label="Resource type" value={key} onChange={setKey} options={kinds.map(c => ({ value: `${c.serverId}|${c.mapping!.kind}`, label: `${c.mapping!.kind} · ${servers.find(s => s.id === c.serverId)?.name}` }))} /><small className="cp-admin-muted">Used by {tools.map(t => t.tool).join(', ')}.</small></div>
     <label className="relation-field"><span>{kind} value</span><input className="cp-admin-input" value={value} onChange={e => setValue(e.target.value)} placeholder={kind === 'github_repository' ? 'acme/payments-api' : 'e.g. 3'} /><small className="cp-admin-muted">Must match the mapped argument ({tools[0]?.mapping?.pointer}) in each call.</small></label>
     <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!value.trim() || exists} onClick={() => { onChange({ ...doc, resources: [...doc.resources, { id: `r-${key}-${value.trim()}`, serverId, kind, value: value.trim() }] }); onDone(); }}>{exists ? 'Already allowed' : 'Add to draft'}</button>
   </>;
