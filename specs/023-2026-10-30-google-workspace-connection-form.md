@@ -3,7 +3,7 @@
 - **Specification ID**: 023
 - **Date**: 2026-10-30
 - **Slug**: google-workspace-connection-form
-- **Status**: Waiting Approve
+- **Status**: Implemented
 - **Owner**: Admin — Access and Integrations
 - **Related Specification**: [Backend 026 — Google Workspace OIDC Integration](../../backend/specs/026-2026-10-30-google-workspace-oidc-integration.md)
 - **Related Specification**: [017 — Simplified Keycloak Connection Form](017-2026-10-29-simplified-keycloak-connection-form.md)
