@@ -22,7 +22,7 @@ function AddIdentityProvider({ agentName, doc, onChange, onDone }: Omit<Props, '
       <label><input type="radio" name="add-mode" checked={mode === 'everyone'} onChange={() => setMode('everyone')} /><span><strong>Everyone in {issuer}</strong><small>One delegation for each subject listed now. Exclude some later.</small></span></label>
       <label><input type="radio" name="add-mode" checked={mode === 'selected'} onChange={() => setMode('selected')} /><span><strong>Only selected subjects</strong><small>Pick them after you add the provider.</small></span></label>
     </div>
-    <label className="relation-consent"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /><span>The organization agreed that these subjects delegate to <strong>{agentName}</strong>. {issuer} has no delegation of its own, so I record this consent.<small>Recorded by {currentAdmin}, with the date and time.</small></span></label>
+    <label className="relation-consent"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /><span>I confirm that these subjects agreed to let <strong>{agentName}</strong> act for them.<small>{issuer} can not record this consent itself, so it is recorded here with your name ({currentAdmin}) and the time.</small></span></label>
     <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!consent} onClick={add}>Add to draft</button>
   </>;
 }

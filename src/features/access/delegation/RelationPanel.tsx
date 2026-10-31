@@ -27,7 +27,7 @@ function AddCondition({ tool, expiration, cel, start, onExpiration, onRule }: { 
   if (step === 'closed') return <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small relation-add-button" onClick={() => setStep('choose')}><Plus size={14} aria-hidden="true" />Add condition</button>;
   return <div className="relation-add" role="group" aria-label="Condition kind">
     <button type="button" disabled={!expiration} onClick={() => { onExpiration(); setStep('closed'); }}><Clock size={16} aria-hidden="true" /><span><strong>Expiration</strong><small>{expiration ? 'The relation ends on a date. Stored with the relation.' : 'Already set, or not available on this relation.'}</small></span></button>
-    <button type="button" disabled={!cel} onClick={() => setStep('rule')}><Braces size={16} aria-hidden="true" /><span><strong>Rule on call data</strong><small>{cel ? 'CEL on call arguments and trusted attributes. Checked on each call.' : 'A rule can not target one person. Add it to a tool or a resource.'}</small></span></button>
+    <button type="button" disabled={!cel} onClick={() => setStep('rule')}><Braces size={16} aria-hidden="true" /><span><strong>Rule on call data</strong><small>{cel ? 'CEL on call arguments and trusted attributes. Checked on each call.' : 'Who can delegate has no rules. Add the rule to a tool of the agent.'}</small></span></button>
     <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => setStep('closed')}>Cancel</button>
   </div>;
 }

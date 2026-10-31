@@ -183,3 +183,17 @@
 .delegation-filter-count { font-size: var(--cp-admin-type-label); color: var(--cp-admin-color-text-muted); }
 /* The help button stays next to the title; the toolbar actions wrap below when space is short. */
 .delegation-toolbar .agent-graph-title { display: flex; align-items: center; gap: var(--cp-admin-space-2); flex: 0 0 auto; flex-wrap: nowrap; white-space: nowrap; }
+.relation-label { display: inline-flex; align-items: center; gap: 4px; }
+.relation-label .admin-tooltip-trigger { display: inline-flex; padding: 0; color: var(--cp-admin-color-text-muted); }
+.relation-pick { display: block; max-height: 320px; }
+.relation-pick ul { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.relation-pick-section + .relation-pick-section { border-top: 1px solid var(--cp-admin-color-border); }
+.relation-pick-section h5 { position: sticky; top: 0; margin: 0; padding: 6px var(--cp-admin-space-3); background: var(--cp-admin-color-surface-muted); font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-heavy); letter-spacing: var(--cp-admin-tracking-label); text-transform: uppercase; color: var(--cp-admin-color-text-muted); }
+.relation-pick-section h5 span { font-weight: var(--cp-admin-weight-regular); }
+.relation-pick-section > p, .relation-pick-section > .rule-switch { margin: 4px var(--cp-admin-space-3) 8px; }
+/* Consent is a read-only record, not a form field. */
+.consent-record { display: flex; align-items: center; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-2) var(--cp-admin-space-3); border: 1px solid var(--cp-admin-color-success); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-success-bg); color: var(--cp-admin-color-success); }
+.consent-record > div { display: grid; flex: 1; min-width: 0; }
+.consent-record strong { font-size: var(--cp-admin-type-small); }
+.consent-record small { color: var(--cp-admin-color-text); font-size: var(--cp-admin-type-label); overflow-wrap: anywhere; }
+.consent-record .admin-tooltip-trigger { display: inline-flex; padding: 0; color: var(--cp-admin-color-success); }
