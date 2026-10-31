@@ -1,1 +1,1 @@
-Provider marks are the Keycloak, Auth0, Okta and Google icons from [Simple Icons](https://github.com/simple-icons/simple-icons/tree/develop/icons), distributed under the project's CC0 1.0 license. The marks themselves are trademarks of their respective owners. These files are unmodified.
+Provider marks are the Keycloak, Okta and Google icons from [Simple Icons](https://github.com/simple-icons/simple-icons/tree/develop/icons), distributed under the project's CC0 1.0 license. The marks themselves are trademarks of their respective owners. These files are unmodified.
