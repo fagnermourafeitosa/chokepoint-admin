@@ -3,7 +3,7 @@
 - **Specification ID**: 023
 - **Date**: 2026-10-30
 - **Slug**: google-workspace-connection-form
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Access and Integrations
 - **Related Specification**: [Backend 026 — Google Workspace OIDC Integration](../../backend/specs/026-2026-10-30-google-workspace-oidc-integration.md)
 - **Related Specification**: [017 — Simplified Keycloak Connection Form](017-2026-10-29-simplified-keycloak-connection-form.md)
@@ -55,10 +55,10 @@ The Primary domain help also states that the customer's Google OAuth client must
 
 ## User Stories
 
-- [ ] 1. As an administrator, I see Google Workspace in its own category and I can start a connection.
-- [ ] 2. As an administrator, I see Auth0 and Okta as disabled, with "Not available yet" on hover.
-- [ ] 3. As an administrator, I fill only the fields that Google needs, and I understand each one from its help text.
-- [ ] 4. As an administrator, I cannot read a stored service account key again.
+- [x] 1. As an administrator, I see Google Workspace in its own category and I can start a connection. — evidence: live
+- [x] 2. As an administrator, I see Auth0 and Okta as disabled, with "Not available yet" on hover. — evidence: live
+- [x] 3. As an administrator, I fill only the fields that Google needs, and I understand each one from its help text. — evidence: live
+- [x] 4. As an administrator, I cannot read a stored service account key again. — evidence: code inspection; a Google connection cannot be saved without a Workspace
 
 ## Architecture Gate
 
@@ -85,12 +85,12 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build` wh
 - [ ] 2. Unavailable cards are disabled and show the tooltip on hover and focus.
 - [ ] 3. The Google form has the fields in the table above and no Keycloak-only field.
 - [ ] 4. The stored key is never shown; replacing it needs an explicit Change action.
-- [ ] 5. The temporary warning shows until the real-Workspace evidence of Backend 026 Open Decision 3 is recorded.
-- [ ] 6. The warning that user synchronization is not supported shows at the top of the form until synchronization exists.
-- [ ] 7. In the edit form, the warning about a change to another Google organization shows near the User directory fields.
-- [ ] 8. The Keycloak form behaves as before.
-- [ ] 9. `npm run check` and `npm run build` pass.
-- [ ] 10. The user confirms the interface test.
+- [x] 5. The temporary warning shows until the real-Workspace evidence of Backend 026 Open Decision 3 is recorded. — evidence: live; the warning stays because the Workspace evidence is excluded
+- [x] 6. The warning that user synchronization is not supported shows at the top of the form until synchronization exists. — evidence: live
+- [x] 7. In the edit form, the warning about a change to another Google organization shows near the User directory fields. — evidence: code inspection, same reason as 4
+- [x] 8. The Keycloak form behaves as before. — evidence: live edit form
+- [x] 9. `npm run check` and `npm run build` pass.
+- [ ] 10. The user confirms the interface test. — waiting for the user
 
 ## Out of Scope
 

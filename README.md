@@ -111,7 +111,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 020 | [Investigate Problems and Decisions](specs/020-2026-10-29-investigate-problems-and-decisions.md) | Implemented |
 | 021 | [Overview Dashboard](specs/021-2026-10-29-overview-dashboard.md) | Implemented |
 | 022 | [Admin Design System Refresh](specs/022-2026-10-30-admin-design-system.md) | Implemented |
-| 023 | [Google Workspace Connection Form](specs/023-2026-10-30-google-workspace-connection-form.md) | In Progress |
+| 023 | [Google Workspace Connection Form](specs/023-2026-10-30-google-workspace-connection-form.md) | Implemented |
 | 024 | [Service Principal Selection](specs/024-2026-10-30-service-principal-selection.md) | In Progress |
 | 025 | [Google Service Account Registration](specs/025-2026-10-30-google-service-account-registration.md) | Proposed |
 

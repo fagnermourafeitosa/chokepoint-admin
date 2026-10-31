@@ -1,7 +1,8 @@
 import { httpClient, HttpError } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 
-export type DirectorySettings = { client_id: string; issuing_client_id: string; client_secret?: string; has_secret: boolean; check_status: 'not_checked' | 'verified' | 'failed'; checked_at: string | null };
+// delegated_admin, domain and customer_id are the Google Workspace settings (Backend 026). customer_id is read by the check, not typed.
+export type DirectorySettings = { client_id: string; issuing_client_id: string; client_secret?: string; has_secret: boolean; delegated_admin?: string; domain?: string; customer_id?: string; check_status: 'not_checked' | 'verified' | 'failed'; checked_at: string | null };
 export type IssuingClient = { client_id: string; name?: string };
 // The directory check result lists the Keycloak clients that can issue user tokens (Backend 019).
 export type DirectoryCheck = DirectorySettings & { issuing_clients?: IssuingClient[]; truncated?: boolean };
@@ -29,6 +30,8 @@ export const identityApi = {
 };
 export function identityError(error: unknown): string {
  if (error instanceof HttpError) {
+  if (error.status === 422 && error.code === 'directory_api_disabled') return 'The Admin SDK API is not enabled in the Google Cloud project of the service account. Enable it, then check the connection again.';
+  if (error.status === 422 && error.code === 'directory_not_authorized') return 'The service account may not read the directory as this administrator. In the Google Admin console, authorize domain-wide delegation with the read-only user scope and check the administrator e-mail. A change can take up to 24 hours.';
   if (error.status === 422 && error.code === 'clients_unavailable') return 'Cannot read the Keycloak clients. Grant the service account the realm-management role view-clients, then check the connection again.';
   if (error.status === 422) return 'Cannot verify Keycloak directory and administrative access. Check the connection and network, grant the service account the realm-management roles view-users and view-clients (or equivalent), and ensure the directory contains a user.';
   if (error.status === 400) return 'Check the connection and directory fields.';
