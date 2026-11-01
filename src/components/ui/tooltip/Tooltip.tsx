@@ -35,7 +35,8 @@ export function Tooltip({ children, content }: TooltipProps) {
             >
               {content}
             </span>,
-            document.body,
+            // A modal dialog is in the top layer; a tooltip in body would stay behind it.
+            tip.trigger.current?.closest('dialog') ?? document.body,
           )
         : null}
     </>

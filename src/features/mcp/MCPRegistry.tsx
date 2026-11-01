@@ -1,4 +1,6 @@
 import { ToolReviewCatalog } from './ToolReviewCatalog';
+import { ChokepointTokenSetup } from './ChokepointTokenSetup';
+import { usesChokepointToken } from './chokepoint-servers';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router';
@@ -35,6 +37,9 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
   useEffect(() => { registry.setSelectedId(selectedId); }, [selectedId, registry.setSelectedId]);
   const details = useQuery({ queryKey: ['mcp-detail', scope.userId, scope.tenantId, scope.environmentId, selectedId], queryFn: ({ signal }) => mcpApi.get(scope, selectedId!, signal), enabled: !!selectedId });
   const server = details.data ?? registry.selected;
+  // The details render below the table; bring them into view when a server is chosen.
+  const shownId = server?.id;
+  useEffect(() => { if (selectedId && shownId === selectedId) document.getElementById('mcp-server-details')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); }, [selectedId, shownId]);
   const choose = (id?: string) => setParams({ type: kind, ...(id ? { server: id } : {}) });
   const saved = (s: MCPServer) => { registry.setDialog(null); setParams({ type: s.connection_type === 'enterprise' ? 'enterprise' : 'custom', server: s.id }); void registry.refresh(); };
   const connect = (s: MCPServer) => s.connection_type === 'enterprise' ? void enterprise.connect(s.provider_id!, s) : registry.setDialog(s);
@@ -58,7 +63,7 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
       </> : null}
       {registry.error ? <p role="alert" className="cp-admin-notice" data-tone="danger">{registry.error}</p> : null}
       {selectedId && details.isError ? <p role="alert">Connection details are unavailable. <button className="cp-admin-button cp-admin-button--ghost" onClick={() => void details.refetch()}>Retry</button></p> : null}
-      {server ? <section id="mcp-server-details" className="mcp-details" aria-label={`${server.name} details`}><header className="mcp-details-heading"><div><h2>{server.name}</h2><p className="cp-admin-muted">{server.connection_type === 'enterprise' ? `Enterprise MCP · ${server.account || 'Account unavailable'}` : 'Custom MCP'} · {server.transport} · {server.enabled ? 'Enabled' : 'Disabled'}</p></div><button className="cp-admin-button cp-admin-button--secondary" disabled={enterprise.busy} onClick={() => connect(server)}>{server.connection_type === 'enterprise' ? 'Reconnect & review tools' : 'Discover tools'}</button></header><ToolRows tools={server.tools} focusTool={params.get('tool') || undefined} serverEnabled={server.enabled} onMapping={tool => setMapping({ serverId: server.id, serverName: server.name, toolName: tool.name })} /></section> : null}
+      {server ? <section id="mcp-server-details" className="mcp-details" aria-label={`${server.name} details`}><header className="mcp-details-heading"><div><h2>{server.name}</h2><p className="cp-admin-muted">{server.connection_type === 'enterprise' ? `Enterprise MCP · ${server.account || 'Account unavailable'}` : 'Custom MCP'} · {server.transport} · {server.enabled ? 'Enabled' : 'Disabled'}</p></div><button className="cp-admin-button cp-admin-button--secondary" disabled={enterprise.busy} onClick={() => connect(server)}>{server.connection_type === 'enterprise' ? 'Reconnect & review tools' : 'Discover tools'}</button></header>{server.connection_type !== 'enterprise' && usesChokepointToken(server.id, server.name) ? <ChokepointTokenSetup endpoint={server.endpoint} /> : null}<ToolRows tools={server.tools} focusTool={params.get('tool') || undefined} serverEnabled={server.enabled} onMapping={tool => setMapping({ serverId: server.id, serverName: server.name, toolName: tool.name })} /></section> : null}
     </>}
     <p className="mcp-footnote cp-admin-muted">Connections belong to this workspace and environment. Agent permissions determine who can use their tools.</p>
     {registry.dialog ? <MCPDialog key={registry.dialog === 'new' ? 'new' : registry.dialog.id} scope={scope} server={registry.dialog === 'new' ? undefined : registry.dialog} onClose={() => registry.setDialog(null)} onRefresh={() => void registry.refresh()} onSaved={saved} /> : null}
