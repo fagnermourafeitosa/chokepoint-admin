@@ -15,7 +15,7 @@ export function ProtoExchangeSignals() {
       <span role="cell" className="attention-main"><strong>{x.count} refused exchanges</strong><small>{exchangeText[x.reason!]}</small></span>
       <span role="cell" className="attention-main attention-context"><code>{x.agent}</code><small>{x.subject ? `for ${x.subject.name} · ${x.subject.issuer}` : x.reason}</small></span>
       <span role="cell" className="attention-when"><time>{x.at} UTC</time><WaitingBackend spec="034" tip="Raises one item when an agent keeps failing to get a token, so a leaked key or a disabled user shows up." /></span>
-      <span role="cell" className="attention-action"><button className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => navigate('/investigate?view=exchanges')}>Investigate<ArrowRight size={14} /></button></span>
+      <span role="cell" className="attention-action"><button className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => navigate('/prototype/investigate')}>Investigate<ArrowRight size={14} /></button></span>
     </div>)}
   </div>;
 }

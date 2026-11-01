@@ -1,23 +1,25 @@
 import type { AccessTarget } from '../target-context';
 import './agent-details.css';
-import { useState } from 'react';
-import { Pencil, Power, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AgentGraph } from '../graph/AgentGraph';
+import { Pencil, Trash2 } from 'lucide-react';
 import type { AgentRecord, AgentScope } from '../agent-api';
 import { AgentVisual } from './AgentVisual';
-import { DelegationEditor } from '../delegation/DelegationEditor';
-import { WaitingBackend } from '../delegation/WaitingBackend';
-import { AgentIdentity } from '../delegation/AgentIdentity';
+import { PermissionManager } from '../../permissions/PermissionManager';
 
 type AgentDetailsProps = { agent: AgentRecord; scope: AgentScope; target?: AccessTarget; onEdit: () => void; onDelete: () => void };
 
-// Layout prototype: one view replaces the connection graph and the permission editors.
-export function AgentDetails({ agent, scope, onEdit, onDelete }: AgentDetailsProps) {
-  const [disabled, setDisabled] = useState(false);
-  const [tab, setTab] = useState<'access' | 'identity'>('access');
+// Agent metadata remains separate from the revisioned permission definition.
+// The keyed editor drops scoped drafts and aborts requests when selection changes.
+export function AgentDetails({ agent, scope, target, onEdit, onDelete }: AgentDetailsProps) {
+  const [tab, setTab] = useState<'graph' | 'permissions'>(target ? 'permissions' : 'graph');
+  const [permissionsOpened, setPermissionsOpened] = useState(!!target);
+  useEffect(() => { if (target) { setTab('permissions'); setPermissionsOpened(true); } }, [target?.section, target?.policyId, target?.tool]);
+  function openPermissions() { setPermissionsOpened(true); setTab('permissions'); }
   return <section className="cp-admin-panel access-agent-details" aria-label="Selected agent">
-    <div className="access-agent-heading"><AgentVisual agent={agent} scope={scope} /><div className="agent-detail-copy"><div className="access-agent-title"><h2>{agent.name}</h2><span className="mcp-badge agent-status" data-tone={disabled ? undefined : 'success'}>{disabled ? 'Disabled' : 'Active'}</span><WaitingBackend spec="032" tip="Turns the agent on or off at once. A disabled agent gets no new token and its next call is rejected." /></div><p>{agent.description}</p><p className="cp-admin-muted">Acts for the subjects that delegate to it</p></div><div className="agent-detail-actions"><button className={`cp-admin-button cp-admin-button--small ${disabled ? 'cp-admin-button--secondary' : 'cp-admin-button--danger-soft'}`} type="button" onClick={() => setDisabled(v => !v)}><Power size={15} aria-hidden="true" />{disabled ? 'Enable agent' : 'Disable agent'}</button><button className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" type="button" onClick={onEdit}><Pencil size={15} aria-hidden="true" />Edit</button><button className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" type="button" onClick={onDelete}><Trash2 size={15} aria-hidden="true" />Delete</button></div></div>
-    <div className="access-detail-tabs agent-view-tabs" role="group" aria-label="Agent views"><button type="button" aria-pressed={tab === 'access'} onClick={() => setTab('access')}>Delegation and access</button><button type="button" aria-pressed={tab === 'identity'} onClick={() => setTab('identity')}>Identity</button></div>
-    <div hidden={tab !== 'access'}><DelegationEditor key={agent.id} agentName={agent.name} disabled={disabled} /></div>
-    {tab === 'identity' ? <AgentIdentity agentId={agent.id} agentName={agent.name} disabled={disabled} /> : null}
+    <div className="access-agent-heading"><AgentVisual agent={agent} scope={scope} /><div className="agent-detail-copy"><div className="access-agent-title"><h2>{agent.name}</h2></div><p>{agent.description}</p><p className="cp-admin-muted">Permission grouping for associated users</p></div><div className="agent-detail-actions"><button className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" type="button" onClick={onEdit}><Pencil size={15} aria-hidden="true" />Edit</button><button className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" type="button" onClick={onDelete}><Trash2 size={15} aria-hidden="true" />Delete</button></div></div>
+    <div className="access-detail-tabs" role="group" aria-label="Agent views"><button type="button" aria-pressed={tab === 'graph'} onClick={() => setTab('graph')}>Connection graph</button><button type="button" aria-pressed={tab === 'permissions'} onClick={openPermissions}>Permissions</button></div>
+    <div hidden={tab !== 'graph'}><AgentGraph key={agent.id} agent={agent} scope={scope} onPermissions={openPermissions} /></div>
+    {permissionsOpened ? <div hidden={tab !== 'permissions'}><PermissionManager key={`${scope.userId}:${scope.tenantId}:${scope.environmentId}:${agent.id}`} scope={scope} agentId={agent.id} target={target} /></div> : null}
   </section>;
 }

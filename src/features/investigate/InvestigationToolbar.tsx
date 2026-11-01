@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router';
 import { useEffect, useState } from 'react';
 import { SelectMenu } from '../../components/ui/dropdown/SelectMenu';
 import type { useInvestigation } from './useInvestigation';
@@ -18,7 +17,6 @@ export function InvestigationToolbar({ state }: { state: State }) {
       });
     }
   }
-  const navigate = useNavigate();
   return (
     <div className="trace-toolbar">
       <div className="trace-segments" role="group" aria-label="Investigation view">
@@ -33,9 +31,6 @@ export function InvestigationToolbar({ state }: { state: State }) {
           onClick={() => state.update({ view: 'decisions' })}
         >
           All decisions
-        </button>
-        <button aria-pressed={false} onClick={() => navigate('/investigate?view=exchanges')}>
-          Token exchanges
         </button>
       </div>
       <form
