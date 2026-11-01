@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { useState } from 'react';
 import { useAccessTarget } from '../hooks/useAccessTarget';
 import { Bot, Plus } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
@@ -19,6 +20,7 @@ export function PermissionsPage() {
 function AgentWorkbench({ scope }: { scope: AgentScope }) {
   const context = useAccessTarget(scope);
   const workbench = useAgentWorkbench(scope, context.requestedId, context.contextual, context.candidateIds);
+  const [railCollapsed, setRailCollapsed] = useState(false);
   return <section aria-label="Permissions">
     <div className="access-page-heading">
       <div><span className="cp-admin-label">ACCESS WORKBENCH</span><h1 className="cp-admin-title">Configure user permissions</h1><p className="cp-admin-muted">Associate users with permission groups, grant server/tool access and apply fine-grained policies.</p></div>
@@ -27,9 +29,9 @@ function AgentWorkbench({ scope }: { scope: AgentScope }) {
     {context.returnTo ? <Link className="cp-admin-button cp-admin-button--secondary trace-back" to={context.returnTo}>Back to {context.returnTo === '/' ? 'Overview' : 'Investigate'}</Link> : null}
     {context.invalidSection ? <p role="alert" className="cp-admin-notice">This link requests an unavailable permission section.</p> : null}
     {context.target ? <div className="access-target-context"><strong>{context.target.tool ? `Tool: ${context.target.tool}` : 'Contextual access review'}</strong>{context.detail.isPending && context.detail.fetchStatus === 'fetching' ? <span role="status">Loading recorded context…</span> : context.detail.isError ? <span role="alert">The recorded context is unavailable.</span> : !context.requestedId ? <span>Choose an existing permission group below. No unique permission group was identified for this item.</span> : null}</div> : null}
-    {workbench.isPending ? <p role="status" className="agent-inline-status">Loading agents…</p> : workbench.isError ? <div className="agent-inline-status" role="alert">Could not load agents in this environment. <button className="cp-admin-button cp-admin-button--ghost" onClick={() => void workbench.refetch()}>Retry</button></div> : <div className="access-workbench">
+    {workbench.isPending ? <p role="status" className="agent-inline-status">Loading agents…</p> : workbench.isError ? <div className="agent-inline-status" role="alert">Could not load agents in this environment. <button className="cp-admin-button cp-admin-button--ghost" onClick={() => void workbench.refetch()}>Retry</button></div> : <div className="access-workbench" data-rail={railCollapsed ? 'collapsed' : undefined}>
       <div>
-        <AgentList agents={workbench.visibleAgents} scope={scope} total={workbench.agents.length} search={workbench.search} onSearch={workbench.setSearch} selectedId={workbench.selectedAgent?.id} onSelect={id => { workbench.selectAgent(id); context.select(id); }} />
+        <AgentList agents={workbench.visibleAgents} scope={scope} total={workbench.agents.length} search={workbench.search} onSearch={workbench.setSearch} selectedId={workbench.selectedAgent?.id} onSelect={id => { workbench.selectAgent(id); context.select(id); }} collapsed={railCollapsed} onToggle={() => setRailCollapsed(v => !v)} />
         {workbench.hasNextPage ? <div className="agent-pagination"><button className="cp-admin-button cp-admin-button--secondary" disabled={workbench.isFetchingNextPage} onClick={() => void workbench.fetchNextPage()}>{workbench.isFetchingNextPage ? 'Loading…' : 'Load more agents'}</button></div> : null}
       </div>
       {workbench.selectedAgent ? <AgentDetails agent={workbench.selectedAgent} scope={scope} target={context.target} onEdit={() => workbench.setDialog('edit-agent')} onDelete={() => workbench.setDialog('delete-agent')} /> : <section className="cp-admin-panel access-agent-details access-agent-details--empty" aria-label="Selected agent">

@@ -26,3 +26,4 @@
   .access-agent-heading .agent-detail-copy { flex-basis: calc(100% - 5rem); }
   .agent-detail-actions { margin-inline-start: auto; }
 }
+.access-workbench[data-rail="collapsed"] { grid-template-columns: 4rem minmax(0, 1fr); }

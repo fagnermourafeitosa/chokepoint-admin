@@ -3,6 +3,7 @@ import { AdminLayout } from '../layouts/AdminLayout';
 import { AuthProvider, RequireSession } from '../features/auth/AuthRoutes';
 import { LoginPage, WorkspacePage, WorkspaceOnboarding } from '../features/auth/AuthPages';
 import { navigation } from './navigation';
+import { PrototypePage } from '../features/prototype/PrototypePage';
 
 // A data router provides one navigation blocker for the shared Inbox detail flow.
 const router = createBrowserRouter(createRoutesFromElements(
@@ -15,6 +16,8 @@ const router = createBrowserRouter(createRoutesFromElements(
       {navigation.map(({ path, Page, children }) => <Route key={path} path={path} element={<Page />}>
         {children?.map(({ path: childPath, Page: ChildPage }) => childPath ? <Route key={childPath} path={childPath} element={<ChildPage />} /> : <Route key="index" index element={<ChildPage />} />)}
       </Route>)}
+      {/* Layout prototypes: not in the navigation; the specifications link them. */}
+      <Route path="/prototype/*" element={<PrototypePage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Route></Route>
   </Route>,
