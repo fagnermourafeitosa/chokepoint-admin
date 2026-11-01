@@ -62,7 +62,7 @@ flowchart LR
 
 ### Platform user flow
 
-The agent editor is stage 2 of the end-to-end flow. Stages 1 and 3 are other specifications (Admin 027 for the tool review; Admin 029 for agent identity and the Chokepoint token auth type). Stage 5 is Admin A3.
+The agent editor is stage 2 of the end-to-end flow. Stages 1 and 3 are other specifications (Admin 027 for the tool review; Admin 029 for agent identity and the Chokepoint token auth type). Stage 5 is [Admin 030](030-2026-10-31-investigate-agent-subject-and-token-exchanges.md).
 
 ```mermaid
 flowchart TD
@@ -185,7 +185,7 @@ Read and change the agent permission aggregate (Backend 033), read the identity 
 
 1. The header shows the agent status, **Active** or **Disabled**, as a text chip.
 2. A **Disable agent** / **Enable agent** action changes the status (kill switch, Backend 032 Resolved Decision 2). Disabled: the AS issues no new token and the PEP rejects the next call. The configuration and the client key stay.
-3. The agent client and key registration are not in this specification (Admin A2).
+3. The agent client and key registration are in [Admin 029](029-2026-10-31-agent-identity-and-chokepoint-token-setup.md).
 
 ### 2. Agent rail
 
@@ -299,22 +299,18 @@ The editor stays in `src/features/access`. Data hooks, layout, filters, graph, p
 
 ## Backend dependencies
 
-The screen needs these items. Backend 029–033 do not define them yet. Each one is a backend specification change, decided with the user before implementation.
+The contracts and decisions are written in the backend specifications (2026-11-01).
 
-1. **Document shape** ([Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md)). Field names and JSON of `delegations`, `capabilities`, `resources` and `conditions`; how a condition names its edge; the expiration format.
-2. **Publication state in the read API** ([Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md)). Pending or effective revision, the effective revision number and the reconciliation state.
-3. **Agent status API** ([Backend 032](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md), Resolved Decision 2). The field or command for Active / Disabled.
-4. **Identity provider scope** ([Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md)). Resolved on 2026-10-31: the screen has no "Everyone" mode, only checked subjects, so the backend stores one delegation for each subject as 033 already defines. The backend still needs the expiration and the consent for each identity provider, or the Admin copies them to each delegation.
-5. **Rules on resource relations** ([Backend 031](../../backend/specs/031-2026-10-31-pdp-relation-checks-and-call-conditions.md), [Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md)). Resolved on 2026-10-31: Backend 031 Resolved Decision 3 removes call conditions from agent → resource.
-6. **Directory listing for Select all** ([Backend 036](../../backend/specs/036-2026-10-31-remove-identity-lifecycle-sync-and-scim-read.md), [Backend 017](../../backend/specs/017-2026-10-28-okta-auth0-directory-integration.md), [Backend 027](../../backend/specs/027-2026-10-30-service-principals.md)). Publication needs the full subject list of the identity provider (people and services), with paging (Admin 024 cursor contract). Each provider is read through its native API (Keycloak Admin REST API, Okta Users API), not SCIM. The directory contract of Backend 015 stays.
-7. **Tool arguments and bindings for the rule builder** ([Backend 006](../../backend/specs/006-2026-10-25-mcp-server-registry-and-tool-discovery.md), [Backend 009](../../backend/specs/009-2026-10-26-trusted-api-attribute-sources.md)). The current catalog and binding APIs supply them. Confirm at implementation that they are available for each server tool.
+1. **Document shape:** [Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md), Admin contract 1.
+2. **Publication state in the read API:** [Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md), Admin contract 2.
+3. **Agent status API:** [Backend 032](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md), Admin contract.
+4. **Expiration and consent for each identity provider:** [Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md), Admin contract 1 (`scopes`). resolved in Backend 033 (Admin contract, Resolved decision).
+5. **Rules on resource relations:** resolved, [Backend 031](../../backend/specs/031-2026-10-31-pdp-relation-checks-and-call-conditions.md) Resolved Decision 3.
+6. **Directory listing for Select all:** [Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md), Admin contract 4 (existing directory reads, [Backend 036](../../backend/specs/036-2026-10-31-remove-identity-lifecycle-sync-and-scim-read.md)).
+7. **Tool arguments and bindings for the rule builder:** the existing catalog and binding reads ([Backend 006](../../backend/specs/006-2026-10-25-mcp-server-registry-and-tool-discovery.md), [Backend 009](../../backend/specs/009-2026-10-26-trusted-api-attribute-sources.md)).
+8. **Resource types:** the resource of a call is `resource.type` and `resource.id` of the COAZ projection ([Backend 029](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md) Resolved Decision 4).
 
-**Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item:
-
-1. remove the chip of each element that the item unblocks, in the prototype, in the same change;
-2. mark the item here as resolved, with the backend specification that implements it.
-
-The real Admin never shows this chip. A limitation that remains after implementation uses the temporary warning of `AGENTS.md`.
+**Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item, remove the chip of each element that it unblocks, in the same change. The real Admin never shows the chip.
 
 ---
 
@@ -348,7 +344,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 - The resource mapping in the tool review ([027](027-2026-10-31-tool-resource-mapping-review.md)).
 - Agent client and key registration, and the Chokepoint token auth type for custom MCP ([029](029-2026-10-31-agent-identity-and-chokepoint-token-setup.md)).
-- Investigate, Inbox and Overview with actor and relations (Admin A3).
+- Investigate, Inbox and Overview with actor and relations ([Admin 030](030-2026-10-31-investigate-agent-subject-and-token-exchanges.md)).
 - "Who can do X" queries (ListUsers; Backend 034 Out of Scope).
 - Call limits (`max_call_count`; pending in Backend 031).
 - Native IdP delegation (Backend 030 follow-ups).

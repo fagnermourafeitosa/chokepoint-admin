@@ -6,13 +6,13 @@
 - **Status**: Proposed
 - **Owner**: Admin — Integrations
 - **Design**: [Agent delegation authorization](../../backend/docs/agent-delegation-authorization.md)
-- **Related Specification**: [Backend 029 — ReBAC Model and OpenFGA Integration](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md) (resource mapping for each tool)
+- **Related Specification**: [Backend 029 — ReBAC Model and OpenFGA Integration](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md) (the resource comes from the COAZ projection, Resolved Decision 4), [Backend 008 — COAZ-MCP, CEL and AuthZEN Integration](../../backend/specs/008-2026-10-26-coaz-mcp-cel-and-authzen-integration.md) (mapping API and lifecycle)
 - **Related Specification**: [Backend 032 — PEP Chokepoint Token and Actor Projection](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md) (resource projection)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md) (consumes the resource types)
 - **Related Specification**: [007 — MCP Server Management and Discovery Preview](007-2026-10-25-mcp-server-management-and-discovery-preview.md), [009 — Authorization Management Workbench](009-2026-10-26-authorization-management-workbench.md) (COAZ mapping review)
 - **Visual reference**: layout prototype on the task branch `design/agent-delegation-screens` (`src/features/mcp/ResourceMapping.tsx`). Fixed data only. It is not merged.
 
-> **On hold for Backend 029.** Backend 029 is approved and not implemented. It decides the mapping but does not define its API. See [Backend dependencies](#backend-dependencies). This is the first part of Admin A2; agent identity and the Chokepoint token auth type for custom MCP servers are separate specifications.
+> **On hold for Backend 029.** Backend 029 is approved and not implemented. The contracts are written (see [Backend dependencies](#backend-dependencies)). Agent identity and the Chokepoint token auth type for custom MCP servers are in [Admin 029](029-2026-10-31-agent-identity-and-chokepoint-token-setup.md).
 
 ---
 
@@ -20,7 +20,7 @@
 
 Integrations shows the tools of each MCP server. Each managed tool has its status, the origin of its COAZ mapping with **Configure mapping**, its description, annotations and contract.
 
-Backend 029 adds a **resource mapping** for each tool: an RFC 6901 pointer into the tool arguments and a resource type (backend field `kind`). It is reviewed with the tool, like source bindings. A tool without a mapping has no resource check. A call with a missing, empty or non-string mapped argument fails closed.
+Backend 029 (Resolved Decision 4, 2026-11-01) takes the **resource** of a call from the COAZ projection of the tool: `resource.type` and `resource.id` of the effective mapping, as in the COAZ-MCP example `{ "type": "account", "id": "$params.arguments.account_id" }`. The COAZ-MCP default (`resource.type = "tool"`) means no resource check. A call with a missing, empty or non-string `resource.id` fails closed. The tool identity never comes from the mapping.
 
 Admin 026 shows the resources of each agent as **server › resource type › values**. Those resource types come from this review.
 
@@ -84,10 +84,10 @@ flowchart LR
 
 ### 1. Bounded Context & Ubiquitous Language
 
-- **Context**: Admin — Integrations. The Admin owns the form, the proposal and the view state. `mcpregistry` owns the mapping, its review and its validation (Backend 029).
+- **Context**: Admin — Integrations. The Admin owns the form, the proposal and the view state. `mcpregistry` owns the COAZ mapping, its review and its validation (Backend 008, 029).
 - **Package Ownership**: `src/features/mcp`, next to the COAZ mapping review. A separate component for the Resource block; the API client and the data hook in the same feature.
 - **Terms**:
-  - *Resource mapping*: the argument pointer and the resource type of one tool.
+  - *Resource mapping*: the `resource` fields (`type`, `id`) of the COAZ mapping of one tool.
   - *Resource type*: a label that identifies one type of resource on a server. Backend field `kind`. The screen never shows the word "kind".
 
 ### 2. Aggregate Root & State Transitions
@@ -128,7 +128,11 @@ Read the tool schema (current catalog API). Read, save, approve and discard the 
 
 ### 3. Lifecycle
 
-The block follows the COAZ mapping lifecycle of Admin 009: save creates an inactive draft, review approves it, discard keeps the active mapping, and a revision conflict requires a reload. The backend validates and owns the result. The Admin does not evaluate a mapping.
+The Resource block is a shortcut inside the COAZ mapping of the tool. It writes `resource.type` and `resource.id = $params.arguments.<argument>` into the local mapping draft, and it uses the COAZ mapping actions of Admin 009 and Backend 008: save draft, approve, discard draft, remove. A revision conflict requires a reload. **Configure mapping** shows the same draft with every field.
+
+- When the effective mapping is a reviewed server declaration (`x-authzen-mapping`) with a resource, the block shows that resource as "Declared by the server"; **Configure resource** creates a local draft that replaces it.
+- "No resource" sets `resource` back to the COAZ-MCP default (`type = "tool"`).
+- The backend validates and owns the result. The Admin does not evaluate a mapping.
 
 ### 4. Files
 
@@ -138,20 +142,14 @@ Keep the API client, the data hook and the component separate. Each file stays u
 
 ## Backend dependencies
 
-Backend 029 decides the mapping but does not define these items. Each one is a backend specification change, decided with the user before implementation.
+The contracts are written in the backend specifications (2026-11-01).
 
-1. **API of the resource mapping** ([Backend 029](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md)): read, save draft, approve, discard and remove for one tool, with a revision for conflicts.
-2. **Lifecycle states** ([Backend 029](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md)): whether the mapping has draft, active and removal states like the COAZ mapping, and what happens to an active mapping when the tool contract changes.
-3. **Resource type rules** ([Backend 029](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md)): allowed characters and length. Backend 029 says "a short identifier" and rejects separators inside identifier values. The prototype uses lowercase letters, digits and `_`.
-4. **Affected agents** ([Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md)): a read of the agents that have published values of a resource type on a server.
-5. **Pointer form** ([Backend 029](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md), [Backend 032](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md)): Backend 029 uses an RFC 6901 pointer. Confirm that v1 allows only top-level arguments (`/repository`), as the select offers.
+1. **API and lifecycle:** the existing COAZ mapping API and lifecycle ([Backend 008](../../backend/specs/008-2026-10-26-coaz-mcp-cel-and-authzen-integration.md)): `GET /tool-mapping`, `PUT /tool-mapping/draft`, `POST /tool-mapping/approve`, `DELETE /tool-mapping/draft`, `POST /tool-mapping/remove`, with `tool_name` and `revision`. The Resource block edits the `resource` of the local mapping draft.
+2. **Resource type rules:** [Backend 029](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md), "Resource from the COAZ projection" (`^[a-z][a-z0-9_]{1,79}$`; `tool` means no resource check).
+3. **Affected agents:** [Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md), Admin contract 3.
+4. **Argument form:** the COAZ expression `$params.arguments.<name>` of a top-level string argument.
 
-**Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item:
-
-1. remove the chip of each element that the item unblocks, in the prototype, in the same change;
-2. mark the item here as resolved, with the backend specification that implements it.
-
-The real Admin never shows this chip. A limitation that remains after implementation uses the temporary warning of `AGENTS.md`.
+**Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item, remove the chip of each element that it unblocks, in the same change. The real Admin never shows the chip.
 
 ---
 
@@ -178,8 +176,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ## Out of Scope
 
-- Agent identity: client, public key and status (Admin A2, separate specification).
-- The Chokepoint token auth type for custom MCP servers (Admin A2, separate specification).
+- Agent identity (client, public key) and the Chokepoint token auth type for custom MCP servers ([Admin 029](029-2026-10-31-agent-identity-and-chokepoint-token-setup.md)). The agent status is in [Admin 026](026-2026-10-31-agent-delegation-editor.md).
 - The allowed values of each agent (Admin 026).
 - A readable label next to the resource type, and resource types provided by enterprise providers (follow-up).
 - Nested pointers and more than one mapping for each tool.

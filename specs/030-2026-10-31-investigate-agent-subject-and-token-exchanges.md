@@ -176,14 +176,16 @@ A **Token exchange denied** item for each signal: the count, the detail text of 
 
 ## Backend dependencies
 
-1. **Decision read fields** ([Backend 034](../../backend/specs/034-2026-10-31-decision-trace-actor-and-relations.md), [Backend 023](../../backend/specs/023-2026-10-29-decision-trace-read-api.md)): agent (ID and name), subject with kind and identity connection, resource type and value, each relation checked with its state, and the agent · server · tool of each rule, in the problem, decision and detail responses.
-2. **Token exchange read API** ([Backend 034](../../backend/specs/034-2026-10-31-decision-trace-actor-and-relations.md)): 034 creates the table, but no endpoint reads it. The view needs a paged list with filters (agent, reason, period, text), the grouping into problems and a detail with its occurrences.
-3. **Exchange signal** ([Backend 034](../../backend/specs/034-2026-10-31-decision-trace-actor-and-relations.md) Resolved Decision 2, [Backend 024](../../backend/specs/024-2026-10-29-attention-signal-review-and-resolution.md)): the signal type name and its target (view, filters).
-4. **Overview grouping** ([Backend 025](../../backend/specs/025-2026-10-29-overview-aggregation-api.md), Backend 034 Solution 7): `most_denied` by the verified agent, with its name.
-5. **Problem key** ([Backend 023](../../backend/specs/023-2026-10-29-decision-trace-read-api.md)): whether the subject is part of the problem key of a decision, as it is for expired and invalid subject tokens in exchanges.
-6. **Records from before 034** (Backend 034 Implementation Decision 1): the read API returns old records with the old steps. The inspector shows them with the old path.
+The contracts and decisions are written in the backend specifications (2026-11-01).
 
-**Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item, remove the chip of each element that it unblocks, in the same change, and mark the item here as resolved. The real Admin never shows the chip.
+1. **Decision read fields:** [Backend 034](../../backend/specs/034-2026-10-31-decision-trace-actor-and-relations.md), Admin contract 1.
+2. **Token exchange read API:** [Backend 034](../../backend/specs/034-2026-10-31-decision-trace-actor-and-relations.md), Admin contract 2.
+3. **Exchange signal:** [Backend 034](../../backend/specs/034-2026-10-31-decision-trace-actor-and-relations.md), Admin contract 3 (`token_exchange_denied`).
+4. **Overview grouping:** [Backend 034](../../backend/specs/034-2026-10-31-decision-trace-actor-and-relations.md), Admin contract 4.
+5. **Problem key:** resolved in Backend 034 (Admin contract, Resolved decision).
+6. **Records from before 034:** resolved, [Backend 034](../../backend/specs/034-2026-10-31-decision-trace-actor-and-relations.md) Implementation Decision 1.
+
+**Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item, remove the chip of each element that it unblocks, in the same change. The real Admin never shows the chip.
 
 ---
 

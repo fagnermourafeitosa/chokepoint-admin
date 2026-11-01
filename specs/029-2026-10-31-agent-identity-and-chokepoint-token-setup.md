@@ -117,7 +117,7 @@ Read the agent client; register, rotate and remove its public key; read the issu
 1. **No key:** "No key yet. The agent can not get a token." and **Generate key and download**, with a help.
 2. **Generate:**
    - the browser creates an ECDSA P-256 key pair with WebCrypto;
-   - the key ID is generated: `<agent>-<date>-<random>`; nobody types it;
+   - the key ID is the RFC 7638 thumbprint of the public key, computed in the browser; nobody types it (Backend 030 Resolved decision);
    - the Admin sends only the public key;
    - the browser downloads `<agent>.chokepoint.json` with `client_id`, `issuer`, `token_endpoint`, `kid`, `alg` and `private_key` (JWK);
    - a green record says: "File downloaded … This is the only copy of the private key. Store it like a password. Chokepoint can not show it again."
@@ -128,7 +128,7 @@ Read the agent client; register, rotate and remove its public key; read the issu
 
 1. **Connection details** (help: the file already has these values): Client ID, Issuer and Token endpoint, each with a help and a copy button.
 2. **How the agent connects** (help: an SDK does these steps): the person signs in; the agent exchanges the token, signed with the private key; the agent calls the tools with the Chokepoint token (5 minutes). A refused exchange returns `invalid_client` or `invalid_grant`; Investigate shows the reason.
-3. **Use my own public key** (advanced; for a key kept in a vault): a JWK or PEM field and a key ID field. The field rejects a private key ("Paste only the public key") and an unknown format. **Use this key** registers it; no file is downloaded.
+3. **Use my own public key** (advanced; for a key kept in a vault): a JWK or PEM field and an optional key ID field (the `kid` of the JWK; without it, the backend uses the RFC 7638 thumbprint). The field rejects a private key ("Paste only the public key") and an unknown format. **Use this key** registers it; no file is downloaded.
 
 ### 4. Custom MCP server: authentication
 
@@ -163,16 +163,18 @@ Read the agent client; register, rotate and remove its public key; read the issu
 
 ## Backend dependencies
 
-1. **Issuer and JWKS URLs** ([Backend 030](../../backend/specs/030-2026-10-31-agent-authorization-server.md)): the URL format of the issuer of each workspace and environment, the token endpoint and the JWKS.
-2. **Agent key API** ([Backend 030](../../backend/specs/030-2026-10-31-agent-authorization-server.md)): register, rotate and remove the public key of the agent client, with who and when.
-3. **Key ID** ([Backend 030](../../backend/specs/030-2026-10-31-agent-authorization-server.md)): whether the backend accepts the key ID that the Admin generates, or computes it (for example an RFC 7638 thumbprint).
-4. **Rotation overlap** ([Backend 030](../../backend/specs/030-2026-10-31-agent-authorization-server.md)): 030 allows one key for each client, so a rotation stops the old key at once. A short overlap needs two keys.
-5. **Signing algorithm** ([Backend 030](../../backend/specs/030-2026-10-31-agent-authorization-server.md)): ES256 or RS256. The FastMCP example must use the same value; the FastMCP default is RS256.
-6. **Chokepoint token auth type** ([Backend 035](../../backend/specs/035-2026-10-31-upstream-token-for-custom-mcp-servers.md)): its name and its field in the server API (035 decides the name at implementation).
-7. **Discovery** ([Backend 035](../../backend/specs/035-2026-10-31-upstream-token-for-custom-mcp-servers.md), Pending 1): which token the registry sends to discover the tools of a server that requires the Chokepoint token.
-8. **Existing custom servers** ([Backend 035](../../backend/specs/035-2026-10-31-upstream-token-for-custom-mcp-servers.md), Resolved Decision 3): the migration removes the custom servers with None or Bearer, and the development seed recreates them with the Chokepoint token.
+The contracts and decisions are written in the backend specifications (2026-11-01).
 
-**Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item, remove the chip of each element that it unblocks, in the same change, and mark the item here as resolved. The real Admin never shows the chip.
+1. **Issuer, token endpoint, JWKS and metadata URLs:** [Backend 030](../../backend/specs/030-2026-10-31-agent-authorization-server.md), Admin contract 1.
+2. **Agent key API:** [Backend 030](../../backend/specs/030-2026-10-31-agent-authorization-server.md), Admin contract 2–5 (JWK only; the Admin converts a PEM in the browser).
+3. **Key ID:** resolved in Backend 030 (Admin contract, Resolved decision).
+4. **Rotation overlap:** resolved in Backend 030 (Admin contract, Resolved decision).
+5. **Signing algorithm:** resolved in Backend 030 (Admin contract, Resolved decision).
+6. **Chokepoint token auth type:** [Backend 035](../../backend/specs/035-2026-10-31-upstream-token-for-custom-mcp-servers.md), Admin contract (`chokepoint_token`, `audience`, `issuer`, `jwks_uri`).
+7. **Discovery:** resolved in Backend 035 (Admin contract, Resolved decision).
+8. **Existing custom servers:** resolved, [Backend 035](../../backend/specs/035-2026-10-31-upstream-token-for-custom-mcp-servers.md) Resolved Decision 3.
+
+**Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item, remove the chip of each element that it unblocks, in the same change. The real Admin never shows the chip.
 
 ---
 
