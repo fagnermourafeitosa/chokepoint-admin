@@ -60,6 +60,65 @@ flowchart LR
     Tool -. "reads /repository" .-> Res
 ```
 
+### Platform user flow
+
+The agent editor is stage 2 of the end-to-end flow. Stages 1 and 3 are other specifications (Admin 027 for the tool review; Admin A2 for agent identity and the Chokepoint token auth type). Stage 5 is Admin A3.
+
+```mermaid
+flowchart TD
+    subgraph S1["1. Environment base (once, administrator)"]
+        W["Workspace and environment<br/>(Sandbox / Production)"] --> IDP["Connect the identity provider<br/>Keycloak, Google, Okta<br/>issuer and accepted audiences"]
+        IDP --> MCP["Connect the MCP server<br/>Enterprise (GitHub) or Custom<br/>Custom: Chokepoint token auth type"]
+        MCP --> REV["Review the discovered tools<br/>and the resource mapping<br/>(argument → &lt;tool&gt;_&lt;argument&gt;, proposed)"]
+        REV --> CTX{"Does a rule need<br/>external data?"}
+        CTX -- "yes" --> SRC["Context source and binding<br/>(for example the issue status) → approve"]
+        CTX -- "no" --> AG
+        SRC --> AG
+    end
+
+    subgraph S2["2. Agent (administrator) — this specification"]
+        AG["Create the agent<br/>issues-manager"] --> KEY["Identity: generate a key pair<br/>give the private key and the config to the developer"]
+        KEY --> DEL["Who can delegate<br/>identity provider → check people and services or Select all<br/>confirm the consent, expiration"]
+        DEL --> TOOLS["Tools of the agent<br/>move_issue (expiration)"]
+        TOOLS --> RES["Allowed resources<br/>(only tools with a mapping)"]
+        RES --> RULE["Rules on agent · server · tool<br/>rule builder → CEL"]
+        RULE --> PUB["Review and publish<br/>→ OpenFGA, automatic reconciliation"]
+    end
+
+    subgraph S3["3. Integration (developer)"]
+        DEV["The agent uses the key and the config<br/>(an SDK does the token exchange)"]
+        SRV["A custom MCP server trusts the Chokepoint JWKS<br/>and checks aud"]
+    end
+
+    subgraph S4["4. Use (person or service, on each call)"]
+        U["The person signs in to the identity provider<br/>→ subject token"] --> X["The agent exchanges it at the Chokepoint AS<br/>→ 5-minute token (sub = person, act = agent)"]
+        X --> CALL["The agent calls the tool through Chokepoint"]
+        CALL --> PDP{"delegation → tool → resource → rules<br/>(PIP reads the facts)"}
+        PDP -- "permit" --> UP["Chokepoint calls the MCP server<br/>with its own token (aud = server)"]
+        PDP -- "deny" --> DENY["Denied with the reason"]
+    end
+
+    subgraph S5["5. Operation (administrator)"]
+        INB["Inbox: repeated denies,<br/>denied token exchanges"] --> INV["Investigate: who, through which agent,<br/>which relation or rule failed"]
+        INV --> FIX["Adjust the agent and publish"]
+        KILL["Kill switch: Disable agent<br/>→ stops at the next call"]
+    end
+
+    PUB --> DEV
+    PUB --> SRV
+    DEV --> U
+    UP --> INB
+    DENY --> INB
+```
+
+| Role | Does |
+| :--- | :--- |
+| Administrator, once for each environment | Identity provider, MCP server, tool review, context sources (only when a rule needs external data). |
+| Administrator, for each agent | Create, generate the key, who can delegate, tools, resources, rules, publish. |
+| Developer | Puts the key and the config in the agent; a custom MCP server checks the Chokepoint token. |
+| Person or service | Signs in to its identity provider as today; the agent does the rest. |
+| Administrator, daily | Inbox, Investigate, adjustments, kill switch. |
+
 ### Vocabulary on the screen
 
 | Term | Meaning |
