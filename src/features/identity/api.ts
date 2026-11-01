@@ -9,15 +9,15 @@ export type DirectoryCheck = DirectorySettings & { issuing_clients?: IssuingClie
 export type IdentityFields = { provider: string; name: string; issuer: string; audiences: string[]; groups_claim: string; enabled: boolean; revision: number; directory: DirectorySettings | null };
 export type IdentityConnection = IdentityFields & { id: string; created_at: string; updated_at: string; checked_at: string | null; check_status: 'not_checked' | 'verified' | 'failed' };
 export type IdentityPage = { items: IdentityConnection[]; next_offset: number | null };
-export type ProviderCapability = { provider: string; name: string; available: boolean; directory: boolean; runtime_identity: boolean; lifecycle: boolean };
+export type ProviderCapability = { provider: string; name: string; available: boolean; directory: boolean; runtime_identity: boolean };
 export type DirectoryIdentity = { issuer: string; subject: string };
 export type DirectoryUser = { kind: 'person' | 'service'; identity: DirectoryIdentity; id: string; user_name: string; display_name: string; email?: string; given_name?: string; family_name?: string; active: boolean | null };
 // Service principals of one connection (Backend 027), for example Keycloak clients with service accounts. truncated means the provider has more.
 export type ServicePage = { items: DirectoryUser[]; truncated: boolean };
 // total is null when the provider reports none (Google). next_cursor is opaque and null on the last page (Backend 026).
 export type DirectoryPage = { items: DirectoryUser[]; total: number | null; next_cursor: string | null };
-// Retained lifecycle state from Backend 016. Identities without events are absent.
-export type LifecycleUserState = DirectoryIdentity & { display_name?: string; user_name?: string; email?: string; disabled: boolean; disabled_at: string | null; source_deleted: boolean; updated_at: string };
+export type PrincipalName = DirectoryIdentity & { name: string };
+export const nameLookupLimit = 200;
 export const identityKey = (s: EnvironmentScope) => ['identity-connections', s.userId, s.tenantId, s.environmentId] as const;
 const path = (s: EnvironmentScope): `/v1/${string}` => `/v1/workspaces/${encodeURIComponent(s.tenantId)}/environments/${encodeURIComponent(s.environmentId)}/identity-connections`;
 export const identityApi = {
@@ -29,7 +29,8 @@ export const identityApi = {
  users: (s: EnvironmentScope, id: string, search: string, cursor: string, signal: AbortSignal) => httpClient<DirectoryPage>(`${path(s)}/${encodeURIComponent(id)}/users?${new URLSearchParams(cursor ? { q: search, cursor } : { q: search })}`, { signal }),
  services: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<ServicePage>(`${path(s)}/${encodeURIComponent(id)}/services`, { signal }),
  user: (s: EnvironmentScope, id: string, user: string, signal: AbortSignal) => httpClient<DirectoryUser>(`${path(s)}/${encodeURIComponent(id)}/users/${encodeURIComponent(user)}`, { signal }),
- lifecycleUsers: (s: EnvironmentScope, identities: DirectoryIdentity[], signal: AbortSignal) => httpClient<{ items: LifecycleUserState[] }>(`/v1/workspaces/${encodeURIComponent(s.tenantId)}/environments/${encodeURIComponent(s.environmentId)}/identity-lifecycle-users/lookup`, { method: 'POST', json: { identities }, signal }),
+ // Current directory names of exact identities, at most nameLookupLimit per request; an unreadable name is absent.
+ names: (s: EnvironmentScope, identities: DirectoryIdentity[], signal: AbortSignal) => httpClient<{ items: PrincipalName[] }>(`${path(s)}/names`, { method: 'POST', json: { identities }, signal }),
  remove: (s: EnvironmentScope, c: IdentityConnection, signal: AbortSignal) => httpClient<void>(`${path(s)}/${encodeURIComponent(c.id)}`, { method: 'DELETE', json: { revision: c.revision }, signal }),
 };
 export function identityError(error: unknown): string {
@@ -47,19 +48,3 @@ export function identityError(error: unknown): string {
  }
  return 'The request could not be completed. Retry when the service is available.';
 }
-// Lifecycle receiver state from Backend 016. The secret is present only in the
-// create and rotate responses; rotation evidence only while a rotation runs.
-export type LifecycleConfiguration = {
- configured: boolean; enabled: boolean; receiver_url?: string; rotation_in_progress: boolean; secret?: string;
- last_committed_at: string | null; last_failure_at: string | null; last_failure_code?: string;
- previous_secret_last_accepted_at?: string; current_secret_first_accepted_at?: string;
-};
-const lifecyclePath = (s: EnvironmentScope, id: string): `/v1/${string}` => `${path(s)}/${encodeURIComponent(id)}/lifecycle`;
-export const lifecycleKey = (s: EnvironmentScope, id: string) => [...identityKey(s), id, 'lifecycle'] as const;
-export const lifecycleApi = {
- get: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<LifecycleConfiguration>(lifecyclePath(s, id), { signal }),
- create: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<LifecycleConfiguration>(lifecyclePath(s, id), { method: 'POST', signal }),
- rotate: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<LifecycleConfiguration>(`${lifecyclePath(s, id)}/rotate-secret`, { method: 'POST', signal }),
- complete: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<LifecycleConfiguration>(`${lifecyclePath(s, id)}/complete-rotation`, { method: 'POST', signal }),
- remove: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<LifecycleConfiguration>(lifecyclePath(s, id), { method: 'DELETE', signal }),
-};

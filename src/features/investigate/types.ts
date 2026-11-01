@@ -7,7 +7,7 @@ export type Page<T> = {
   search_truncated?: boolean;
 };
 export type Reason = {
-  label: 'no_grant' | 'condition' | 'tool_not_reviewed' | 'user_disabled';
+  label: 'no_grant' | 'condition' | 'tool_not_reviewed';
   description: string;
 };
 export type SignalRef = { id: string; status: 'open' | 'reviewed' | 'resolved' };
@@ -74,7 +74,7 @@ export type Problem = Omit<ProblemKey, 'reason'> & {
 };
 export type Action = {
   label: string;
-  route: 'permissions' | 'tool-catalog' | 'person-detail';
+  route: 'permissions' | 'tool-catalog';
   params: Record<string, string>;
   available: boolean;
   unavailable_reason?: string;

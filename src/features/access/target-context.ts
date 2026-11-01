@@ -39,9 +39,8 @@ export function actionPath(
   if (signalId) params.set('signal_id', signalId);
   if (returnTo && (returnTo === '/' || returnTo.startsWith('/investigate?')))
     params.set('return_to', returnTo);
-  if (action.route === 'permissions' || action.route === 'person-detail') {
-    if (action.route === 'person-detail') params.set('section', 'people');
-    else if (!params.has('section'))
+  if (action.route === 'permissions') {
+    if (!params.has('section'))
       params.set('section', params.has('policy_id') ? 'policies' : 'grants');
     return `/access?${params}`;
   }

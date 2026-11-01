@@ -35,7 +35,6 @@ export function useAccessTarget(scope: AgentScope) {
       issuer: detail.data.decision.issuer,
       subject: detail.data.decision.subject,
     };
-  else if (target && item.data?.principal) target.principal = item.data.principal;
   const back = params.get('return_to');
   const returnTo = back && (back === '/' || back.startsWith('/investigate?')) ? back : undefined;
   return {

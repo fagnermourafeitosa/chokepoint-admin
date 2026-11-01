@@ -3,7 +3,7 @@
 - **Specification ID**: 028
 - **Date**: 2026-10-31
 - **Slug**: remove-lifecycle-sync-screen-and-google-warnings
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Integrations and Permissions
 - **Supersedes**: [015 — Identity Lifecycle Sync Management](015-2026-10-28-identity-lifecycle-sync-management.md) (all), [023 — Google Workspace Connection Form](023-2026-10-30-google-workspace-connection-form.md) (acceptance item 6 and the "Not verified with a real Google Workspace" warning), [012 — SCIM People Selection](012-2026-10-28-scim-people-selection.md) (the lifecycle state of associated users), [020 — Investigate Problems and Decisions](020-2026-10-29-investigate-problems-and-decisions.md) (the `user_disabled` reason only)
 - **Related Specification**: [Backend 036 — Remove Identity Lifecycle Synchronization and SCIM Directory Reads](../../backend/specs/036-2026-10-31-remove-identity-lifecycle-sync-and-scim-read.md), [Backend 034 — Decision Trace with Actor and Relations](../../backend/specs/034-2026-10-31-decision-trace-actor-and-relations.md)
@@ -43,6 +43,8 @@ The Google warning says that synchronization is not supported, as if it were mis
 4. **People editor.** Remove the warning "Access follows lifecycle events", the lifecycle lookup and the lifecycle status of associated users. The warning "Some members have no type" stays.
 5. **Investigate.** Remove `user_disabled` from the reason labels.
 6. Remove the CSS that only these elements use.
+7. **Names of associated people** (decided by the user on 2026-11-01). The lifecycle lookup gave the name of each associated person. The people editor now reads the current directory name with `POST .../identity-connections/names` (Backend, branch `feat/admin-028-directory-names`): at most 200 identities per request, a live read in batch per issuer. A name that cannot be read is absent, and the row shows the subject. Services keep their names from the services list.
+8. **Dead contract fields** (decided by the user on 2026-11-01). The `idp-user-disable` signal type, the `person-detail` route and the signal `principal` field go away in the Admin and in the backend. Backend 036 removed their only producer. The dead `.identity-lifecycle` CSS goes away too.
 
 ---
 
@@ -59,9 +61,9 @@ The Google warning says that synchronization is not supported, as if it were mis
 
 ## User Stories
 
-- [ ] 1. As an administrator, I configure a Keycloak connection without an Auto sync section.
-- [ ] 2. As an administrator, I configure a Google connection without the two removed warnings.
-- [ ] 3. As an administrator, I see associated users without a lifecycle state.
+- [x] 1. As an administrator, I configure a Keycloak connection without an Auto sync section.
+- [x] 2. As an administrator, I configure a Google connection without the two removed warnings.
+- [x] 3. As an administrator, I see associated users without a lifecycle state.
 
 ---
 
@@ -94,11 +96,13 @@ The Google warning says that synchronization is not supported, as if it were mis
 
 ## Acceptance Criteria
 
-- [ ] 1. No Auto sync section, lifecycle API call or lifecycle type remains.
-- [ ] 2. The Google form shows neither removed warning; "Changing the Google organization" still shows when editing.
-- [ ] 3. The people editor shows no lifecycle warning or state.
-- [ ] 4. Investigate has no `user_disabled` label.
-- [ ] 5. `npm run check` and `npm run build` pass.
+- [x] 1. No Auto sync section, lifecycle API call or lifecycle type remains.
+- [x] 2. The Google form shows neither removed warning; "Changing the Google organization" still shows when editing.
+- [x] 3. The people editor shows no lifecycle warning or state.
+- [x] 4. Investigate has no `user_disabled` label.
+- [x] 5. `npm run check` and `npm run build` pass.
+- [x] 6. Associated people show their current directory name, or the subject when the name cannot be read.
+- [x] 7. No `idp-user-disable` type, `person-detail` route or signal `principal` field remains.
 
 ---
 

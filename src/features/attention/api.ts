@@ -1,14 +1,13 @@
-import type { Action, Principal } from '../investigate/types';
+import type { Action } from '../investigate/types';
 import { httpClient } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 
 // SignalType mirrors the backend attention_signal_type enum.
-export type SignalType = 'tool-discovery' | 'requests-denied' | 'idp-user-disable';
+export type SignalType = 'tool-discovery' | 'requests-denied';
 
 export const signalTypeLabels: Record<SignalType, string> = {
   'tool-discovery': 'Tool discovery',
   'requests-denied': 'Requests denied',
-  'idp-user-disable': 'IdP user disabled',
 };
 
 // typeLabel shows the raw value for a type this Admin version does not know yet.
@@ -32,7 +31,6 @@ export type Signal = {
   resolved_at?: string | null;
   resolved_by?: string | null;
   note: string;
-  principal?: Principal | null;
   actions: Action[];
 };
 export type SignalPage = { items: Signal[]; total: number; page: number; page_size: number };

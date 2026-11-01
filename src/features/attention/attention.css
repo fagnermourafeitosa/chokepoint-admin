@@ -127,9 +127,6 @@
 .attention-tag--requests-denied {
   background: var(--cp-admin-color-action);
 }
-.attention-tag--idp-user-disable {
-  background: var(--cp-admin-color-accent-soft);
-}
 .attention-pager {
   display: flex;
   justify-content: space-between;
