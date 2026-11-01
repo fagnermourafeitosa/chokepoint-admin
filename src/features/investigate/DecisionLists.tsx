@@ -21,7 +21,7 @@ function Row({
   };
   const id = problem?.latest_decision_id || decision!.id;
   return (
-    <div className="trace-list-row" role="row">
+    <div className="trace-list-row trace-list-row--open" role="row" title="Open the decision details" onClick={event => { if ((event.target as Element).closest('button, a')) return; state.open(id, problem?.signal?.id); }}>
       <div role="cell">
         <span className={`trace-outcome ${permit ? 'trace-allow' : 'trace-deny'}`}>
           {permit ? 'ALLOW' : 'DENY'}
@@ -78,6 +78,7 @@ function Row({
         <button
           className="trace-row-open"
           aria-label={`Inspect ${item.tool} at ${utcTime(problem?.last_at || decision!.decided_at)}`}
+          title="Open the decision details"
           onClick={() => state.open(id, problem?.signal?.id)}
         >
           <ArrowRight size={17} aria-hidden="true" />
