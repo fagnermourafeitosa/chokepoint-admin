@@ -27,14 +27,14 @@ Before you implement or review an interface, read [the module design system](doc
 
 ## Visual Specification (Prototype)
 
-The visual specification of a new screen is a **layout prototype** in the real Admin code, with fixed data, on a design branch. Follow [the visual specification rules](docs/design-system/visual-specification.md).
+The visual specification of a new screen is a **layout prototype** in the Admin, under the `/prototype` route, with fixed data. Follow [the visual specification rules](docs/design-system/visual-specification.md).
 
-* Build the prototype in a `git worktree` on a branch `design/<slug>`. It is never merged into `main`; the specification links it as the visual reference.
-* Use the real screens, the design system and realistic data from the central use case. Sign in to the local Admin yourself to run it.
-* Define the layout with the user first. Do not block on backend endpoints or field names: collect them in the "Backend dependencies" section of the specification.
-* Mark each element whose data the backend does not serve yet with the "Waiting backend · <spec>" chip. Its hover text says what the element is for and names the backend specification. Do not write "data not available" or similar text.
-* Tell the user before you draw an element that no backend specification defines. It needs a backend change.
-* Remove the chip when the backend implements the item. The real Admin never shows the chip.
+* The prototype lives in `src/features/prototype` and its own feature folders, and renders only under `/prototype/<page>`. It is not in the navigation and never replaces a real screen.
+* The specification links its page (`/prototype/<page>`) as its visual reference.
+* Use the design system and realistic data from the central use case. Sign in to the local Admin yourself to run it.
+* Define the layout with the user first. Do not block on backend endpoints or field names: write them into the backend specification in the same pass.
+* Mark each element whose data the backend does not serve yet with the "Waiting backend · <spec>" chip. Its hover text says what the element is for and names the backend specification.
+* When a screen is implemented, the real screen replaces its prototype page: remove the page and its fixed data in the same change.
 
 ## Temporary Implementation Warnings
 

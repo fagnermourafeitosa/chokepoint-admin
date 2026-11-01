@@ -11,7 +11,7 @@
 - **Related Specification**: [Backend 023 — Decision Trace Read API](../../backend/specs/023-2026-10-29-decision-trace-read-api.md), [Backend 025 — Overview Aggregation API](../../backend/specs/025-2026-10-29-overview-aggregation-api.md)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md), [028 — Remove Lifecycle Sync Screen and Google Warnings](028-2026-10-31-remove-lifecycle-sync-screen-and-google-warnings.md), [029 — Agent Identity and Chokepoint Token Setup](029-2026-10-31-agent-identity-and-chokepoint-token-setup.md)
 - **Superseded in part**: [018 — Attention Signals Inbox](018-2026-10-29-attention-signals-inbox.md), [020 — Investigate Problems and Decisions](020-2026-10-29-investigate-problems-and-decisions.md), [021 — Overview Dashboard](021-2026-10-29-overview-dashboard.md)
-- **Visual reference**: layout prototype on the branch `design/agent-delegation-screens` (`src/features/investigate/prototype`). Only the Token exchanges view and the exchange signals use fixed data; By problem, All decisions and the Overview read the live APIs. It is not merged.
+- **Visual reference**: layout prototype at `/prototype/investigate` in the Admin (`src/features/investigate/prototype`), with the Inbox signals and the three views. Fixed data. It is the visual specification of this screen; where it differs from this text, this text wins.
 
 > **On hold for Backend 031 and 034.** Both are decided and not implemented. See [Backend dependencies](#backend-dependencies). This is Admin A3.
 

@@ -11,7 +11,7 @@
 - **Related Specification**: [Backend 032 — PEP Chokepoint Token and Actor Projection](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md)
 - **Related Specification**: [Backend 033 — Agent Permission Administration and Tuple Publication](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md)
 - **Superseded in part**: [009](009-2026-10-26-authorization-management-workbench.md) (people, grants and policy editors), [010](010-2026-10-27-enterprise-and-custom-mcp-connections.md) (agent connection graph), [012](012-2026-10-28-scim-people-selection.md) and [024](024-2026-10-30-service-principal-selection.md) (member selection inside the group)
-- **Visual reference**: layout prototype on the task branch `design/agent-delegation-screens` (folder `src/features/access/delegation`). Fixed data only. It is not merged.
+- **Visual reference**: layout prototype at `/prototype/agent` in the Admin, tab Delegation and access (`src/features/access/delegation`). Fixed data. It is the visual specification of this screen; where it differs from this text, this text wins.
 
 > **On hold for Backend 029–033.** The backend contracts are approved (029) or decided (030–035) but not implemented. The layout below was agreed with the user on 2026-10-31 in the prototype. The [Backend dependencies](#backend-dependencies) section lists what the backend must define before implementation.
 

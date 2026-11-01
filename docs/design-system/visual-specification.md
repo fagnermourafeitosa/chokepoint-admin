@@ -1,16 +1,16 @@
 # Visual Specification in the Prototype
 
-The visual specification of a new screen is a **layout prototype**: the real Admin code with fixed data, on a design branch. It shows the target screen, not the screen that the backend supports today. This page tells how to build it and how to mark what the backend does not serve yet.
+The visual specification of a new screen is a **layout prototype**: Admin code with fixed data, under the `/prototype` route. It shows the target screen, not the screen that the backend supports today. This page tells how to build it and how to mark what the backend does not serve yet.
 
 ## Process
 
-1. **Branch and worktree.** Create a `git worktree` on a branch `design/<slug>` from `main`. The prototype is never merged into `main`. The specification links the branch and the folder as its visual reference.
-2. **Real screens, fixed data.** Change the real Admin screens and reuse the design system. Keep fixed data in one file next to the prototype. Use realistic data from the central use case, for example an agent that merges a pull request in a GitHub repository. No API call writes data.
+1. **A prototype page.** Add a page under `/prototype/<page>` (`src/features/prototype/PrototypePage.tsx`). It is not in the navigation and never replaces a real screen. The specification links the page as its visual reference. Open it at `http://127.0.0.1:5173/prototype/<page>` after you sign in.
+2. **Fixed data, real components.** Reuse the design system and the real components where they fit. Keep fixed data in one file next to the prototype. Use realistic data from the central use case, for example an agent that merges a pull request in a GitHub repository. No API call writes data.
 3. **Layout first.** Define the layout with the user on the running prototype. Do not block on backend endpoints or field names. Collect them in the "Backend dependencies" section of the specification, each with a link to the backend specification.
 4. **Mark what the backend does not serve.** Each element whose data the backend does not serve yet has the [Waiting backend chip](#waiting-backend-chip).
 5. **Warn before an increment.** An element that no backend specification defines needs a backend change. Tell the user before you draw it, and record it in the specification.
 6. **Say what was intended, not what is missing.** The prototype shows no text such as "data not available". The chip tooltip says what the element is for.
-7. **Remove the chip at implementation.** When the backend implements an item, remove the chip of each element that the item unblocks, and mark the item as resolved in the specification.
+7. **Remove the chip at implementation.** When the backend implements an item, remove the chip of each element that the item unblocks, and mark the item as resolved in the specification. When the real screen is implemented, remove its prototype page and fixed data.
 
 The chip is for the prototype only. The real Admin never shows it. A limitation of the real Admin uses the temporary warning that [AGENTS.md](../../AGENTS.md) describes.
 
@@ -28,4 +28,4 @@ The component and its style are part of the prototype (`WaitingBackend.tsx`, cla
 
 ## Example
 
-Admin 026 (Agent Delegation Editor) and Admin 027 (Tool Resource Mapping Review) use the prototype on the branch `design/agent-delegation-screens`.
+Admin 026, 027, 029 and 030 use the pages `/prototype/agent`, `/prototype/tools`, `/prototype/mcp-server` and `/prototype/investigate`.

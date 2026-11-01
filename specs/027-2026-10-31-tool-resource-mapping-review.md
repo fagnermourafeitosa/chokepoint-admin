@@ -10,7 +10,7 @@
 - **Related Specification**: [Backend 032 — PEP Chokepoint Token and Actor Projection](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md) (resource projection)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md) (consumes the resource types)
 - **Related Specification**: [007 — MCP Server Management and Discovery Preview](007-2026-10-25-mcp-server-management-and-discovery-preview.md), [009 — Authorization Management Workbench](009-2026-10-26-authorization-management-workbench.md) (COAZ mapping review)
-- **Visual reference**: layout prototype on the task branch `design/agent-delegation-screens` (`src/features/mcp/ResourceMapping.tsx`). Fixed data only. It is not merged.
+- **Visual reference**: layout prototype at `/prototype/tools` in the Admin (`src/features/mcp/ResourceMapping.tsx`). Known difference: the prototype keeps its own draft state; this text uses the COAZ mapping lifecycle. Fixed data. It is the visual specification of this screen; where it differs from this text, this text wins.
 
 > **On hold for Backend 029.** Backend 029 is approved and not implemented. The contracts are written (see [Backend dependencies](#backend-dependencies)). Agent identity and the Chokepoint token auth type for custom MCP servers are in [Admin 029](029-2026-10-31-agent-identity-and-chokepoint-token-setup.md).
 

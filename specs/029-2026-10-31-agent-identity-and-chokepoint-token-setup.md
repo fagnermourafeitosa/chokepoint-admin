@@ -11,7 +11,7 @@
 - **Related Specification**: [Backend 035 — Upstream Token for Custom MCP Servers](../../backend/specs/035-2026-10-31-upstream-token-for-custom-mcp-servers.md) (Chokepoint token auth type)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md), [027 — Tool Resource Mapping Review](027-2026-10-31-tool-resource-mapping-review.md)
 - **Superseded in part**: [007 — MCP Server Management and Discovery Preview](007-2026-10-25-mcp-server-management-and-discovery-preview.md) (None and Bearer authentication of custom servers)
-- **Visual reference**: layout prototype on the branch `design/agent-delegation-screens` (`src/features/access/delegation/AgentIdentity.tsx`, `src/features/mcp/ChokepointTokenSetup.tsx`). Fixed data only. It is not merged.
+- **Visual reference**: layout prototypes at `/prototype/agent` (tab Identity) and `/prototype/mcp-server` in the Admin (`src/features/access/delegation/AgentIdentity.tsx`, `src/features/mcp/ChokepointTokenSetup.tsx`). Known difference: the prototype generates a readable key ID; this text uses the RFC 7638 thumbprint. Fixed data. It is the visual specification of this screen; where it differs from this text, this text wins.
 
 > **On hold for Backend 030 and 035.** Both are decided and not implemented. See [Backend dependencies](#backend-dependencies). This is the second part of Admin A2; Admin 027 is the first.
 
