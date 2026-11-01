@@ -130,7 +130,7 @@ The layout of Admin 020 stays: Back to the list outside the panel; header with t
 
 1. Below the title: "**{agent}** acted for **{subject}** ({Person or Service} · {identity provider})".
 2. Path: **Delegation**, **Tool**, **Resource**, **Rules**, each with its state (Passed, Failed, Not applicable, Not evaluated) and the relation checked, visible without hover. For example "issues-manager → merge_pull_request_repository › acme/infra · Failed".
-3. Left box: "Rules of {agent} · {server} · {tool}", each rule with its name, its result, the bindings it reads and the CEL collapsed. "Values of the call and of the attribute sources are never recorded." Then one action for the reason:
+3. Left box: "Rules of {agent} · {server} · {tool}", each rule with its name, its result, the bindings it reads, the instance limits it reads and the CEL collapsed. "Values of the call and of the attribute sources are never recorded." Then one action for the reason:
 
    | Reason | Action |
    | :--- | :--- |
@@ -156,9 +156,10 @@ The layout of Admin 020 stays: Back to the list outside the panel; header with t
    | `subject_token_invalid` | Subject token not valid | Signature, issuer or audience. |
    | `subject_connection_disabled` | Identity provider disabled | The connection of this identity provider is disabled. |
    | `no_delegation` | Subject did not delegate | The subject did not delegate to this agent. |
+   | `invalid_authorization_details` | Instance limits not valid | The instance asked for limits that are not valid, or for a tool that the agent can not call (RFC 9396). |
 
 2. Detail, with the decision layout:
-   - left box "What to check": a hint and one action — `invalid_client` opens the agent identity (Admin 029); `subject_token_expired`, `subject_token_invalid` and `subject_connection_disabled` open the identity provider; `no_delegation` opens who can delegate;
+   - left box "What to check": a hint and one action — `invalid_client` opens the agent identity (Admin 029); `subject_token_expired`, `subject_token_invalid` and `subject_connection_disabled` open the identity provider; `no_delegation` opens who can delegate; `invalid_authorization_details` opens the servers and tools of the agent;
    - right box "Repeated in this window";
    - "Exchanges in this problem · N", paged by 6;
    - facts: agent, subject, identity provider, reason, what the agent received (`invalid_client` or `invalid_grant`, Backend 034 Resolved Decision 4), time.

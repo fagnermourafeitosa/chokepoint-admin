@@ -257,18 +257,18 @@ The consent is shown as a read-only record, not as a form field: **Last consent 
 Administrators do not write CEL by hand by default.
 
 1. "Allow the call when **all / any** of these are true", then one row for each check: **field**, **operator**, **value**.
-2. Fields, grouped by origin: the call arguments of the tool (from its schema) and the trusted attributes of the approved bindings of the tool. Each field shows its type.
+2. Fields, grouped by origin: the call arguments of the tool (from its schema), the trusted attributes of the approved bindings of the tool, and the **instance limits** (Backend 030 Resolved Decision 6). An instance limit is not known when the rule is written: the administrator types its name (for example `max_amount`) and chooses number or string. The **Instance limits** group has a help icon: "Each instance of the agent can carry its own limits in its signed token. Type the name that the instance sends. If the token has no limit with this name, the call is denied." Each field shows its type.
 3. Operators by type:
    - string: is, is not, is one of, starts with;
    - number: is at most, is less than, is at least, is more than, is;
    - bool: is true, is false (no value).
 4. A value can be a literal or another field of the same type ("Compare with a field").
 5. The builder shows "Reads as: …", a sentence of the rule. An empty name uses this sentence.
-6. **Generated CEL** is collapsed. It uses the current expression paths: `context.chokepoint.arguments["name"]` and `subject|resource.properties.chokepoint["binding"].values["attribute"]`.
-7. Required bindings come from the fields used. The administrator does not select them.
+6. **Generated CEL** is collapsed. It uses the current expression paths: `context.chokepoint.arguments["name"]` and `subject|resource.properties.chokepoint["binding"].values["attribute"]` and `context.chokepoint.limits["name"]`.
+7. Required bindings and required instance limits come from the fields used. The administrator does not select them.
 8. **Edit as CEL (advanced)** opens the expression as text. After a CEL edit, the rule cannot go back to the builder. The backend validates the expression (boolean result, known bindings). The Admin does not compile CEL.
 
-Example rules: `close_pull_request` "At least 2 approvals" (`resource … approvals >= 2`); `move_issue` "Only closed issues" (`resource … status == "closed"`).
+Example rules: `close_pull_request` "At least 2 approvals" (`resource … approvals >= 2`); `move_issue` "Only closed issues" (`resource … status == "closed"`). With an instance limit: `refund_payment` "Amount at most the instance limit" (`arguments amount <= limits max_amount`), together with "Amount at most 1000". A token without `max_amount` denies (Backend 031 Resolved Decisions 4–5).
 
 ### 8. List view
 
@@ -309,6 +309,7 @@ The contracts and decisions are written in the backend specifications (2026-11-0
 6. **Directory listing for Select all:** [Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md), Admin contract 4 (existing directory reads, [Backend 036](../../backend/specs/036-2026-10-31-remove-identity-lifecycle-sync-and-scim-read.md)).
 7. **Tool arguments and bindings for the rule builder:** the existing catalog and binding reads ([Backend 006](../../backend/specs/006-2026-10-25-mcp-server-registry-and-tool-discovery.md), [Backend 009](../../backend/specs/009-2026-10-26-trusted-api-attribute-sources.md)).
 8. **Resource types:** the resource of a call is `resource.type` and `resource.id` of the COAZ projection ([Backend 029](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md) Resolved Decision 4).
+9. **Instance limits:** `required_limits` in the condition shape ([Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md), Admin contract 1) and the CEL path `context.chokepoint.limits` ([Backend 031](../../backend/specs/031-2026-10-31-pdp-relation-checks-and-call-conditions.md) Resolved Decisions 4–5).
 
 **Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item, remove the chip of each element that it unblocks, in the same change. The real Admin never shows the chip.
 
