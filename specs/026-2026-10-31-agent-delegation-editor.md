@@ -62,7 +62,7 @@ flowchart LR
 
 ### Platform user flow
 
-The agent editor is stage 2 of the end-to-end flow. Stages 1 and 3 are other specifications (Admin 027 for the tool review; Admin A2 for agent identity and the Chokepoint token auth type). Stage 5 is Admin A3.
+The agent editor is stage 2 of the end-to-end flow. Stages 1 and 3 are other specifications (Admin 027 for the tool review; Admin 029 for agent identity and the Chokepoint token auth type). Stage 5 is Admin A3.
 
 ```mermaid
 flowchart TD
@@ -347,7 +347,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 ## Out of Scope
 
 - The resource mapping in the tool review ([027](027-2026-10-31-tool-resource-mapping-review.md)).
-- Agent client and key registration, and the new auth type for custom MCP (Admin A2, separate specifications).
+- Agent client and key registration, and the Chokepoint token auth type for custom MCP ([029](029-2026-10-31-agent-identity-and-chokepoint-token-setup.md)).
 - Investigate, Inbox and Overview with actor and relations (Admin A3).
 - "Who can do X" queries (ListUsers; Backend 034 Out of Scope).
 - Call limits (`max_call_count`; pending in Backend 031).

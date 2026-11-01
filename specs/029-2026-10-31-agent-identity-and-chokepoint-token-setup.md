@@ -1,0 +1,214 @@
+# Specification: Agent Identity and Chokepoint Token Setup
+
+- **Specification ID**: 029
+- **Date**: 2026-10-31
+- **Slug**: agent-identity-and-chokepoint-token-setup
+- **Status**: Proposed
+- **Owner**: Admin — Access and Integrations
+- **Design**: [Agent delegation authorization](../../backend/docs/agent-delegation-authorization.md)
+- **Related Specification**: [Backend 030 — Agent Authorization Server](../../backend/specs/030-2026-10-31-agent-authorization-server.md) (agent client, public key, token exchange)
+- **Related Specification**: [Backend 032 — PEP Chokepoint Token and Actor Projection](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md) (agent status)
+- **Related Specification**: [Backend 035 — Upstream Token for Custom MCP Servers](../../backend/specs/035-2026-10-31-upstream-token-for-custom-mcp-servers.md) (Chokepoint token auth type)
+- **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md), [027 — Tool Resource Mapping Review](027-2026-10-31-tool-resource-mapping-review.md)
+- **Superseded in part**: [007 — MCP Server Management and Discovery Preview](007-2026-10-25-mcp-server-management-and-discovery-preview.md) (None and Bearer authentication of custom servers)
+- **Visual reference**: layout prototype on the branch `design/agent-delegation-screens` (`src/features/access/delegation/AgentIdentity.tsx`, `src/features/mcp/ChokepointTokenSetup.tsx`). Fixed data only. It is not merged.
+
+> **On hold for Backend 030 and 035.** Both are decided and not implemented. See [Backend dependencies](#backend-dependencies). This is the second part of Admin A2; Admin 027 is the first.
+
+---
+
+## Context & Background
+
+After Backend 030, an agent is a client of the Chokepoint authorization server of its environment. It signs in with its own key (`private_key_jwt`) and exchanges the token of a person or a service for a Chokepoint token of 5 minutes. After Backend 035, a custom MCP server receives a token for its own audience with the subject (`sub`) and the agent (`act`), and checks it with the Chokepoint keys. Backend 035 Resolved Decision 3 makes this the only auth type of a custom server.
+
+The Admin has no place to give an agent its key, and the custom MCP form offers None and Bearer token.
+
+---
+
+## Problem Statement
+
+### 1. An agent cannot get a token
+
+Without a registered public key, the authorization server rejects every exchange of the agent.
+
+### 2. Keys are hard to handle
+
+Pasting a JWK or a PEM, choosing a key ID and copying several values by hand is error-prone. The private key must never reach Chokepoint.
+
+### 3. The custom server does not know what to trust
+
+The developer of a custom server needs the issuer, the JWKS and the audience, and an example for the framework. None and Bearer give calls without identity.
+
+---
+
+## Solution
+
+Two places:
+
+1. **Agent → Identity tab:** one action, **Generate key and download**. The key pair is created in the browser; Chokepoint registers the public key; the administrator downloads one file for the agent.
+2. **Custom MCP server:** the only authentication is the **Chokepoint token**. The connection dialog and the server details show what the server must trust.
+
+```mermaid
+flowchart LR
+    Admin["Administrator"] -->|"Generate key and download"| File["agent.chokepoint.json<br/>private key + connection values"]
+    File --> Agent["Agent code"]
+    Agent -->|"token exchange, private_key_jwt"| AS["Chokepoint AS"]
+    Agent -->|"tools/call + Chokepoint token"| CP["Chokepoint"]
+    CP -->|"token aud = server, sub, act"| Server["Custom MCP server<br/>checks issuer, JWKS, audience"]
+```
+
+---
+
+## Practical Gains & Operational Outcomes
+
+1. **One click to an agent key**:
+   - *Before*: no key, so no token.
+   - *Now*: one button creates the key and downloads the file; the private key stays out of Chokepoint.
+2. **A server that knows who calls**:
+   - *Before*: None or a shared Bearer token, without identity.
+   - *Now*: each call brings the person and the agent, checked with the Chokepoint keys.
+
+---
+
+## User Stories
+
+- [ ] 1. As an administrator, I generate the key of an agent and download one file for it.
+- [ ] 2. As an administrator, I rotate the key of an agent when the file is lost or exposed.
+- [ ] 3. As an administrator with a key in a vault, I register my own public key.
+- [ ] 4. As an administrator, I copy the client ID, the issuer and the token endpoint when I configure an agent by hand.
+- [ ] 5. As an administrator, I connect a custom MCP server and see the three values that my server must trust.
+- [ ] 6. As a developer, I copy a FastMCP example that checks the Chokepoint token and reads the person and the agent.
+- [ ] 7. As an administrator, I understand each item from its help.
+
+---
+
+## Architecture Gate
+
+### 1. Bounded Context & Ubiquitous Language
+
+- **Context**: Admin — Access (agent identity) and Integrations (custom MCP servers). The backend owns the client registration, the key validation, the issuer, the JWKS and the tokens.
+- **Package Ownership**: `src/features/access` (Identity tab), `src/features/mcp` (connection dialog, server details).
+- **Terms**:
+  - *Agent client*: the registration of the agent at the Chokepoint authorization server.
+  - *Agent key*: the public key of the agent client. The private key exists only in the downloaded file or in the vault of the customer.
+  - *Chokepoint token*: the token that Chokepoint issues; for a custom server, with `aud` = the server.
+
+### 2. Aggregate Root & State Transitions
+
+- Key states: **none** → **active** (generate, or own key) → **active** with a new key (rotate) → **none** (remove). One active key for each agent (Backend 030).
+- Invariants: the browser never sends the private key; the Admin never shows a private key again after the download; a custom server has no other auth type than the Chokepoint token.
+
+### 3. Commands, Queries & Domain Ports
+
+Read the agent client; register, rotate and remove its public key; read the issuer, the token endpoint and the JWKS of the environment; save a custom server with the Chokepoint token auth type. Exact contracts: see [Backend dependencies](#backend-dependencies).
+
+---
+
+## Implementation Decisions
+
+### 1. Identity tab
+
+1. The agent has two views, **Delegation and access** (Admin 026) and **Identity**. The agent header (status, kill switch) is shared.
+2. Heading "Identity" with a help: the agent proves who it is with its own key; without a key it can not get a token.
+3. A disabled agent shows: "This agent is disabled. It gets no token, and its next call is rejected."
+
+### 2. Key
+
+1. **No key:** "No key yet. The agent can not get a token." and **Generate key and download**, with a help.
+2. **Generate:**
+   - the browser creates an ECDSA P-256 key pair with WebCrypto;
+   - the key ID is generated: `<agent>-<date>-<random>`; nobody types it;
+   - the Admin sends only the public key;
+   - the browser downloads `<agent>.chokepoint.json` with `client_id`, `issuer`, `token_endpoint`, `kid`, `alg` and `private_key` (JWK);
+   - a green record says: "File downloaded … This is the only copy of the private key. Store it like a password. Chokepoint can not show it again."
+3. **Active key:** "Active key", the key ID and the algorithm, "Created by {administrator} · {time}" (the signed-in administrator).
+4. **Rotate key**, with a help, asks for confirmation ("The current key stops working now. Give the new file to the agent at once.") and then **Rotate and download**. Tokens already issued stay valid until they expire (5 minutes).
+
+### 3. Collapsed sections
+
+1. **Connection details** (help: the file already has these values): Client ID, Issuer and Token endpoint, each with a help and a copy button.
+2. **How the agent connects** (help: an SDK does these steps): the person signs in; the agent exchanges the token, signed with the private key; the agent calls the tools with the Chokepoint token (5 minutes). A refused exchange returns `invalid_client` or `invalid_grant`; Investigate shows the reason.
+3. **Use my own public key** (advanced; for a key kept in a vault): a JWK or PEM field and a key ID field. The field rejects a private key ("Paste only the public key") and an unknown format. **Use this key** registers it; no file is downloaded.
+
+### 4. Custom MCP server: authentication
+
+1. The connection dialog (Connect and Edit) has no authentication choice and no Bearer token field. It shows **Authentication: Chokepoint token**, with a help: the server accepts only calls that passed through Chokepoint; each call brings who the person is (`sub`) and which agent acts (`act`); it is the only option, because a shared token or no authentication would hide who calls.
+2. Below it, three copyable values with a help each: **Issuer**, **JWKS** (read the URL, do not copy the keys; keys rotate) and **Audience** (the endpoint of the server; a token for another server is rejected). The text says that the server details show an example. The dialog stays short enough to need no scroll.
+3. **Server details** show the same block and a collapsed **Example: FastMCP** with **Copy example**:
+
+   ```python
+   from fastmcp import FastMCP
+   from fastmcp.server.auth.providers.jwt import JWTVerifier
+   from fastmcp.server.dependencies import get_access_token
+
+   auth = JWTVerifier(jwks_uri="<JWKS>", issuer="<Issuer>", audience="<Audience>", algorithm="ES256")
+   mcp = FastMCP("issues", auth=auth)
+
+   @mcp.tool
+   def move_issue(repository: str, issue_number: int, column: str) -> str:
+       claims = get_access_token().claims
+       person, agent = claims["sub"], claims["act"]["sub"]
+       ...
+   ```
+
+   The note says: in each tool, the token gives `sub` (the person or service) and `act.sub` (the agent).
+4. A click anywhere on a server row opens its details. The row actions keep their own click. A second click on the same row closes the details.
+
+### 5. Shared fixes
+
+1. A tooltip inside a modal dialog renders inside the dialog, so that it is not behind the top layer.
+2. Every help is a `Tooltip` on a help icon, with hover and keyboard focus.
+
+---
+
+## Backend dependencies
+
+1. **Issuer and JWKS URLs** ([Backend 030](../../backend/specs/030-2026-10-31-agent-authorization-server.md)): the URL format of the issuer of each workspace and environment, the token endpoint and the JWKS.
+2. **Agent key API** ([Backend 030](../../backend/specs/030-2026-10-31-agent-authorization-server.md)): register, rotate and remove the public key of the agent client, with who and when.
+3. **Key ID** ([Backend 030](../../backend/specs/030-2026-10-31-agent-authorization-server.md)): whether the backend accepts the key ID that the Admin generates, or computes it (for example an RFC 7638 thumbprint).
+4. **Rotation overlap** ([Backend 030](../../backend/specs/030-2026-10-31-agent-authorization-server.md)): 030 allows one key for each client, so a rotation stops the old key at once. A short overlap needs two keys.
+5. **Signing algorithm** ([Backend 030](../../backend/specs/030-2026-10-31-agent-authorization-server.md)): ES256 or RS256. The FastMCP example must use the same value; the FastMCP default is RS256.
+6. **Chokepoint token auth type** ([Backend 035](../../backend/specs/035-2026-10-31-upstream-token-for-custom-mcp-servers.md)): its name and its field in the server API (035 decides the name at implementation).
+7. **Discovery** ([Backend 035](../../backend/specs/035-2026-10-31-upstream-token-for-custom-mcp-servers.md), Pending 1): which token the registry sends to discover the tools of a server that requires the Chokepoint token.
+8. **Existing custom servers** ([Backend 035](../../backend/specs/035-2026-10-31-upstream-token-for-custom-mcp-servers.md), Resolved Decision 3): the migration removes the custom servers with None or Bearer, and the development seed recreates them with the Chokepoint token.
+
+**Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item, remove the chip of each element that it unblocks, in the same change, and mark the item here as resolved. The real Admin never shows the chip.
+
+---
+
+## Testing Decisions
+
+No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. The user runs the interface test in the built-in browser.
+
+---
+
+## Acceptance Criteria
+
+- [ ] 1. The agent has an Identity view next to Delegation and access.
+- [ ] 2. Generate key and download creates the key pair in the browser, sends only the public key and downloads one file with the values of section 2.
+- [ ] 3. The Admin never shows the private key after the download.
+- [ ] 4. Rotate key asks for confirmation and downloads a new file.
+- [ ] 5. Use my own public key rejects a private key.
+- [ ] 6. The custom server dialog has no None or Bearer option and shows Issuer, JWKS and Audience without scroll.
+- [ ] 7. The server details show the FastMCP example with Copy example.
+- [ ] 8. A click anywhere on a server row opens its details.
+- [ ] 9. Every help opens on hover and focus, also inside a modal dialog.
+- [ ] 10. Every item of Backend dependencies is resolved in a backend specification before implementation.
+- [ ] 11. No "Waiting backend" chip remains for an implemented item.
+- [ ] 12. `npm run check` and `npm run build` pass.
+- [ ] 13. The user confirms the interface test.
+
+---
+
+## Out of Scope
+
+- Sign-in in the browser for MCP clients such as Cursor or Claude Code (OAuth authorization code for the Chokepoint authorization server). Later.
+- An SDK that does the token exchange.
+- Native identity provider delegation (Backend 030 follow-ups).
+- Third-party servers that accept only a static API key (Backend 035 Resolved Decision 3).
+
+---
+
+## Further Notes
+
+References: [FastMCP — Token Verification](https://gofastmcp.com/servers/auth/token-verification), [FastMCP — Authorization](https://gofastmcp.com/servers/authorization). `get_access_token()` exists since FastMCP 2.11.
