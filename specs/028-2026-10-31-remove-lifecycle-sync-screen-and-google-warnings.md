@@ -3,7 +3,7 @@
 - **Specification ID**: 028
 - **Date**: 2026-10-31
 - **Slug**: remove-lifecycle-sync-screen-and-google-warnings
-- **Status**: Not Implemented
+- **Status**: In Progress
 - **Owner**: Admin — Integrations and Permissions
 - **Supersedes**: [015 — Identity Lifecycle Sync Management](015-2026-10-28-identity-lifecycle-sync-management.md) (all), [023 — Google Workspace Connection Form](023-2026-10-30-google-workspace-connection-form.md) (acceptance item 6 and the "Not verified with a real Google Workspace" warning), [012 — SCIM People Selection](012-2026-10-28-scim-people-selection.md) (the lifecycle state of associated users), [020 — Investigate Problems and Decisions](020-2026-10-29-investigate-problems-and-decisions.md) (the `user_disabled` reason only)
 - **Related Specification**: [Backend 036 — Remove Identity Lifecycle Synchronization and SCIM Directory Reads](../../backend/specs/036-2026-10-31-remove-identity-lifecycle-sync-and-scim-read.md), [Backend 034 — Decision Trace with Actor and Relations](../../backend/specs/034-2026-10-31-decision-trace-actor-and-relations.md)
