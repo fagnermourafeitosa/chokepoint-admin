@@ -133,11 +133,13 @@ The Resource block is a shortcut inside the COAZ mapping of the tool. It writes 
 - When the effective mapping is a reviewed server declaration (`x-authzen-mapping`) with a resource, the block shows that resource as "Declared by the server"; **Configure resource** creates a local draft that replaces it.
 - "No resource" sets `resource` back to the COAZ-MCP default (`type = "tool"`).
 - The backend validates and owns the result. The Admin does not evaluate a mapping.
+- The block edits only a mapping with one `evaluation` whose resource is `tool` or `$params.arguments.<argument>`. Another form (`evaluations`, or a literal or CEL `resource.id`) is read-only in the block, which says to edit it in **Configure mapping** (Admin 027 review, 2026-11-02).
 
 ### 4. Resolved decisions (2026-11-02)
 
 1. **Tools can share a resource type** (decided by the user). Two tools of a server with the same resource type share the allowed values of each agent (Further Notes). The backend does not require a unique type. Not chosen: a unique resource type for each tool, enforced by the backend.
 2. **The resource is validated by the Admin form and by the backend** (decided by the user). The form accepts only a type that matches `^[a-z][a-z0-9_]{1,79}$` and only a top-level string argument. The backend rejects an invalid resource at save draft and approve ([Backend 032](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md) Resolved Decision 3). Until Backend 032, only the form checks it. Not chosen: only the form, with the runtime fail-closed.
+3. **A nullable argument is not a string argument** (Admin 027 review, decided by the user). An argument whose schema is a union with `null` (`anyOf`, `oneOf` or a type array) is shown with its types, for example `string | null`, and is disabled. Backend 032 Resolved Decision 3 rejects it too.
 
 ### 5. Files
 
