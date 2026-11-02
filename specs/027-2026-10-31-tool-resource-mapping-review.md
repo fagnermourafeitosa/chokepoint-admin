@@ -170,7 +170,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [ ] 1. Each managed tool shows the Resource block with its state.
 - [ ] 2. The argument select lists the schema arguments; non-string arguments are disabled.
 - [ ] 3. Selecting an argument proposes `<tool>_<argument>`, marked as proposed and editable; the field has no dropdown.
-- [ ] 4. The help explains that the resource type is only a unique label on the server.
+- [ ] 4. The help explains that the resource type is only a label on the server, shared by the tools that use it (Resolved Decision 1).
 - [ ] 5. The example, the optional-argument warning and the impact warning appear as in section 2.
 - [ ] 6. Save draft, Review & approve and Discard draft follow section 3; a draft has no runtime effect.
 - [ ] 7. Every item of Backend dependencies is resolved in a backend specification before implementation.
