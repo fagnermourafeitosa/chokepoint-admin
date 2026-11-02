@@ -1,9 +1,13 @@
 import { Plus, Trash2 } from 'lucide-react';
-import { toolBindings, toolCatalog } from './fixtures';
+import { findTool, type Catalog } from './model';
 import { SelectMenu } from '../../../components/ui/dropdown/SelectMenu';
 
 // A field the rule can read: a call argument or a trusted attribute. Only the CEL leaves the Admin.
-export type RuleField = { key: string; label: string; group: string; type: string; cel: string; binding?: string };
+export type RuleField = { key: string; label: string; group: string; type: string; cel: string; binding?: string; limit?: string };
+export const limitsGroup = 'Instance limits';
+// An instance limit is not known when the rule is written: the administrator types its name (Backend 030 Resolved Decision 6).
+export const limitName = /^[a-z][a-z0-9_]{0,63}$/;
+export const limitField = (name: string, type: string): RuleField => ({ key: `limit:${name}`, label: `limits.${name}`, group: limitsGroup, type, cel: `context.chokepoint.limits["${name}"]`, limit: name });
 export type Clause = { id: string; field: string; op: string; value: string; valueField?: string };
 export type Rule = { join: 'all' | 'any'; clauses: Clause[] };
 
@@ -13,9 +17,9 @@ const ops: Record<string, { id: string; label: string; cel: string; noValue?: bo
   bool: [{ id: 'true', label: 'is true', cel: '', noValue: true }, { id: 'false', label: 'is false', cel: '!', noValue: true }],
 };
 
-export function ruleFields(tool: string): RuleField[] {
-  const args = Object.entries(toolCatalog.find(t => t.tool === tool)?.args ?? {}).map(([name, type]): RuleField => ({ key: `arg:${name}`, label: name, group: 'Call arguments', type, cel: `context.chokepoint.arguments["${name}"]` }));
-  const attrs = (toolBindings[tool] ?? []).flatMap(s => s.attributes.map((a): RuleField => ({ key: `${s.id}:${a.name}`, label: `${s.entity}.${a.name}`, group: s.source, type: a.type, cel: `${s.entity}.properties.chokepoint["${s.id}"].values["${a.name}"]`, binding: s.id })));
+export function ruleFields(catalog: Catalog, serverId: string, tool: string): RuleField[] {
+  const args = Object.entries(findTool(catalog, serverId, tool)?.args ?? {}).map(([name, type]): RuleField => ({ key: `arg:${name}`, label: name, group: 'Call arguments', type, cel: `context.chokepoint.arguments["${name}"]` }));
+  const attrs = catalog.bindings(serverId, tool).flatMap(s => s.attributes.map((a): RuleField => ({ key: `${s.id}:${a.name}`, label: `${s.entity}.${a.name}`, group: s.source, type: a.type, cel: `${s.entity}.properties.chokepoint["${s.id}"].values["${a.name}"]`, binding: s.id })));
   return [...args, ...attrs];
 }
 
@@ -45,6 +49,7 @@ export function ruleSentence(rule: Rule, fields: RuleField[]) {
 }
 
 export const ruleBindings = (rule: Rule, fields: RuleField[]) => [...new Set(rule.clauses.flatMap(c => [c.field, c.valueField]).map(k => fields.find(f => f.key === k)?.binding).filter((b): b is string => !!b))];
+export const ruleLimits = (rule: Rule, fields: RuleField[]) => [...new Set(rule.clauses.flatMap(c => [c.field, c.valueField]).map(k => fields.find(f => f.key === k)?.limit).filter((l): l is string => !!l))];
 export const ruleComplete = (rule: Rule, fields: RuleField[]) => rule.clauses.length > 0 && rule.clauses.every(c => { const f = fields.find(x => x.key === c.field); const op = f && (ops[f.type] ?? ops.string).find(o => o.id === c.op); return !!op && (op.noValue || !!c.valueField || c.value.trim() !== ''); });
 
 function FieldSelect({ fields, value, onChange, label, only }: { fields: RuleField[]; value: string; onChange: (v: string) => void; label: string; only?: string }) {

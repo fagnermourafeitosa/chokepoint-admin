@@ -1,51 +1,68 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { CircleHelp } from 'lucide-react';
+import type { AgentScope } from '../agent-api';
+import type { AccessTarget } from '../target-context';
+import { delegationKey, permissionApi } from './api';
+import { CatalogProvider, useCatalog } from './catalog';
 import { DelegationGraph } from './DelegationGraph';
 import { FilterBar, filterDoc, isFiltered, noFilters, type Filters } from './FilterBar';
 import { GraphHelp } from './GraphHelp';
-import { initialDoc, type Doc } from './fixtures';
+import { capabilityId, type Doc } from './model';
 import { delegationLayout, type Positions, type Selection } from './layout';
 import { ListView } from './ListView';
-import { PublishBar, type PublishState } from './PublishBar';
+import { PublishBar } from './PublishBar';
 import { RelationPanel } from './RelationPanel';
 import { SectionBar } from './SectionBar';
-import { WaitingBackend } from './WaitingBackend';
+import { useDelegation } from './useDelegation';
 import '../../mcp/mcp.css';
-import '../../permissions/permissions.css';
 import './delegation.css';
 
 function Toggle<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: [T, string][]; onChange: (v: T) => void }) {
   return <div className="delegation-toggle" role="group" aria-label={label}>{options.map(([v, text]) => <button key={v} type="button" aria-pressed={value === v} onClick={() => onChange(v)}>{text}</button>)}</div>;
 }
 
-// Layout prototype of Admin A1: the agent graph as the editor. Fixed data, kept in memory only.
-export function DelegationEditor({ agentName, disabled }: { agentName: string; disabled: boolean }) {
-  const [draft, setDraft] = useState<Doc>(initialDoc);
+type Props = { scope: AgentScope; agentId: string; agentName: string; target?: AccessTarget };
+
+// Delegation and access (Admin 026): the agent graph as the editor. The catalog loads the
+// directories of the identity providers in the saved document.
+export function DelegationEditor(props: Props) {
+  const query = useQuery({ queryKey: delegationKey(props.scope, props.agentId), queryFn: ({ signal }) => permissionApi.get(props.scope, props.agentId, signal), retry: false, refetchInterval: q => (q.state.data?.reconciliation.state === 'pending' ? 5000 : false) });
+  const saved = query.data?.draft ?? query.data?.published;
+  const issuers = useMemo(() => [...new Set([...(saved?.scopes ?? []), ...(query.data?.published?.scopes ?? [])].map(s => s.identity_connection_id))], [saved, query.data?.published]);
+  return <CatalogProvider scope={props.scope} issuers={issuers}><Editor {...props} /></CatalogProvider>;
+}
+
+const targetSelection = (target?: AccessTarget): Selection | undefined => (target?.serverId && target.tool ? { type: 'capability', id: capabilityId(target.serverId, target.tool) } : undefined);
+
+function Editor({ scope, agentId, agentName, target }: Props) {
+  const { catalog, loading, error, retry } = useCatalog();
+  const state = useDelegation(scope, agentId, catalog);
   const [back, setBack] = useState<Selection>();
-  const [changes, setChanges] = useState(0);
   const [mode, setMode] = useState<'graph' | 'list'>('graph');
   const [version, setVersion] = useState<'draft' | 'published'>('draft');
   const [positions, setPositions] = useState<Positions>({});
   const [maximized, setMaximized] = useState(false);
   const [help, setHelp] = useState(false);
-  const [selected, setSelected] = useState<Selection>();
-  const [state, setState] = useState<PublishState>('effective');
-  const readOnly = version === 'published';
-  const doc = readOnly ? initialDoc : draft;
+  const [selected, setSelected] = useState<Selection | undefined>(() => targetSelection(target));
   const [filters, setFilters] = useState<Filters>(noFilters);
-  const view = useMemo(() => (isFiltered(filters) ? filterDoc(doc, filters) : doc), [doc, filters]);
+  const readOnly = version === 'published';
+  const doc: Doc = readOnly ? state.published : state.draft;
+  const view = useMemo(() => (isFiltered(filters) ? filterDoc(doc, filters, catalog) : doc), [doc, filters, catalog]);
   const count = (d: Doc) => d.scopes.length + d.capabilities.length + d.resources.length;
-  const layout = useMemo(() => delegationLayout(agentName, view, positions), [agentName, view, positions]);
-  const change = (next: Doc) => { setDraft(next); setChanges(n => n + 1); };
+  const layout = useMemo(() => delegationLayout(agentName, view, catalog, positions), [agentName, view, catalog, positions]);
+  useEffect(() => { const next = targetSelection(target); if (next) setSelected(next); }, [target?.serverId, target?.tool]);
   useEffect(() => {
     if (!maximized) return;
     const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setMaximized(false); };
     window.addEventListener('keydown', esc);
     return () => window.removeEventListener('keydown', esc);
   }, [maximized]);
+  if (state.query.isError || error) return <div role="alert" className="cp-admin-notice" data-tone="danger">Could not load the delegation and access of this agent. <button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => { void state.reload(); retry(); }}>Retry</button></div>;
+  if (!state.config || loading) return <p role="status" className="cp-admin-muted">Loading delegation and access…</p>;
   return <section className="delegation-editor" data-maximized={maximized} aria-label="Agent delegation editor">
     <header className="delegation-toolbar">
-      <div className="agent-graph-title"><h3>Delegation and access</h3><button type="button" className="delegation-help" onClick={() => setHelp(true)}><CircleHelp size={16} aria-hidden="true" />How this works</button><WaitingBackend spec="029–033" tip="Shows and edits who can delegate to this agent, what it can call, where it can act, and the rules of each tool." /></div>
+      <div className="agent-graph-title"><h3>Delegation and access</h3><button type="button" className="delegation-help" onClick={() => setHelp(true)}><CircleHelp size={16} aria-hidden="true" />How this works</button></div>
       <div className="delegation-toolbar-actions">
         <Toggle label="View" value={mode} onChange={setMode} options={[['graph', 'Graph'], ['list', 'List']]} />
         <Toggle label="Version" value={version} onChange={v => { setVersion(v); setSelected(undefined); }} options={[['draft', 'Draft'], ['published', 'Published']]} />
@@ -54,14 +71,15 @@ export function DelegationEditor({ agentName, disabled }: { agentName: string; d
     </header>
     <FilterBar filters={filters} onChange={setFilters} shown={count(view)} total={count(doc)} doc={doc} />
     <SectionBar doc={doc} selected={selected} onSelect={setSelected} readOnly={readOnly} />
-    {readOnly ? <p className="delegation-readonly">You see published revision 3, the configuration that applies now. Switch to Draft to edit.</p> : null}
+    {readOnly ? <p className="delegation-readonly">{state.config.published_revision ? `You see published revision ${state.config.published_revision}. Switch to Draft to edit.` : 'Nothing is published yet. Switch to Draft to edit.'}</p> : null}
+    {state.error ? <div role="alert" className="cp-admin-notice" data-tone="danger">{state.error}{state.conflict ? <button type="button" className="cp-admin-button cp-admin-button--ghost" disabled={state.busy} onClick={() => void state.reload()}>Reload</button> : null}</div> : null}
     <div className="delegation-body" data-panel={!!selected}>
       {mode === 'graph'
-        ? <DelegationGraph layout={layout} selected={selected} onSelect={setSelected} onMove={(key, x, y) => setPositions(p => ({ ...p, [key]: { x, y } }))} disabled={disabled} readOnly={readOnly} maximized={maximized} onMaximize={() => setMaximized(v => !v)} />
-        : <ListView doc={view} source={doc} selected={selected} onSelect={setSelected} onChange={change} readOnly={readOnly} />}
-      {selected ? <fieldset className="delegation-panel-frame" disabled={readOnly}><RelationPanel key={JSON.stringify(selected) + version} selected={selected} agentName={agentName} disabled={disabled} doc={doc} onChange={change} onClose={() => { setSelected(undefined); setBack(undefined); }} onSelect={s => { setBack(selected?.type === 'group' ? selected : undefined); setSelected(s); }} back={back} onBack={() => { setSelected(back); setBack(undefined); }} /></fieldset> : null}
+        ? <DelegationGraph layout={layout} selected={selected} onSelect={setSelected} onMove={(key, x, y) => setPositions(p => ({ ...p, [key]: { x, y } }))} readOnly={readOnly} maximized={maximized} onMaximize={() => setMaximized(v => !v)} />
+        : <ListView doc={view} source={doc} selected={selected} onSelect={setSelected} onChange={state.edit} readOnly={readOnly} />}
+      {selected ? <fieldset className="delegation-panel-frame" disabled={readOnly || state.busy}><RelationPanel key={JSON.stringify(selected) + version} selected={selected} agentName={agentName} doc={doc} onChange={state.edit} onClose={() => { setSelected(undefined); setBack(undefined); }} onSelect={s => { setBack(selected?.type === 'group' ? selected : undefined); setSelected(s); }} back={back} onBack={() => { setSelected(back); setBack(undefined); }} /></fieldset> : null}
     </div>
     {help ? <GraphHelp onClose={() => setHelp(false)} /> : null}
-    <PublishBar state={state} onState={setState} changes={changes} onDiscard={() => { setDraft(initialDoc); setChanges(0); setSelected(undefined); }} />
+    <PublishBar config={state.config} changes={state.changes} busy={state.busy} onPublish={state.publish} onDiscard={() => { void state.discard(); setSelected(undefined); }} />
   </section>;
 }

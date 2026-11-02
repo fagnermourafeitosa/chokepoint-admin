@@ -28,4 +28,4 @@ The component and its style are part of the prototype (`WaitingBackend.tsx`, cla
 
 ## Example
 
-Admin 026, 029 and 030 use the pages `/prototype/agent`, `/prototype/mcp-server` and `/prototype/investigate`. Admin 027 is implemented in the server detail of Integrations; its prototype page was removed.
+Admin 029, 030 and 031 use the pages `/prototype/agent`, `/prototype/mcp-server` and `/prototype/investigate`. Admin 026 and 027 are implemented (Access and Integrations); their prototype pages were removed.

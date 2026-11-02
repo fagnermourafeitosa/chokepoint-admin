@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from 'react';
 import { Check, CircleHelp, Copy, Download, KeyRound, TriangleAlert } from 'lucide-react';
 import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
-import { currentAdmin } from './fixtures';
+// Layout prototype of Admin 029: fixed data.
+const currentAdmin = 'Marina Alves';
 import { WaitingBackend } from './WaitingBackend';
 import './delegation.css';
 

@@ -1,6 +1,6 @@
 import { CircleHelp } from 'lucide-react';
 import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
-import type { SubjectKind } from './fixtures';
+import type { SubjectKind } from './model';
 
 const inDays = (days: number) => new Date(Date.now() + days * 864e5).toISOString().slice(0, 10);
 

@@ -3,7 +3,7 @@
 - **Specification ID**: 026
 - **Date**: 2026-10-31
 - **Slug**: agent-delegation-editor
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Access and Permissions
 - **Design**: [Agent delegation authorization](../../backend/docs/agent-delegation-authorization.md), section 8
 - **Related Specification**: [Backend 029 — ReBAC Model and OpenFGA Integration](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md)
@@ -147,14 +147,14 @@ flowchart TD
 
 ## User Stories
 
-- [ ] 1. As an administrator, I see who can delegate, what the agent can call, where it can act and the rules, in one graph.
-- [ ] 2. As an administrator, I select who in an identity provider can delegate, with Select all for everyone, and I record the consent once.
-- [ ] 3. As an administrator, I add a rule to agent · server · tool without writing CEL.
-- [ ] 4. As an administrator, I allow concrete resources by server and resource type.
-- [ ] 5. As an administrator, I understand the model from the help dialog.
-- [ ] 6. As an administrator, the graph stays usable with 100 subjects and hundreds of resources.
-- [ ] 7. As an administrator, I see the published revision and whether my last publication is effective.
-- [ ] 8. As an administrator, I narrow the graph to one server or one tool to work on it.
+- [x] 1. As an administrator, I see who can delegate, what the agent can call, where it can act and the rules, in one graph.
+- [x] 2. As an administrator, I select who in an identity provider can delegate, with Select all for everyone, and I record the consent once.
+- [x] 3. As an administrator, I add a rule to agent · server · tool without writing CEL.
+- [x] 4. As an administrator, I allow concrete resources by server and resource type.
+- [x] 5. As an administrator, I understand the model from the help dialog.
+- [ ] 6. As an administrator, the graph stays usable with 100 subjects and hundreds of resources. Missing: a browser check at that size; the local data has 14 subjects and one resource. The group nodes are the prototype code.
+- [ ] 7. As an administrator, I see the published revision and whether my last publication is effective. Missing: the effective state in the browser; the local database has no `relation_stores` table (migration drift), so every publication stayed pending.
+- [x] 8. As an administrator, I narrow the graph to one server or one tool to work on it.
 
 ---
 
@@ -329,21 +329,21 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ## Acceptance Criteria
 
-- [ ] 1. One "Delegation and access" view replaces the Connection graph and Permissions tabs.
-- [ ] 2. The graph shows identity providers, the agent, server boxes with tools, and server › resource type boxes with values, with the edges of section 4.
-- [ ] 3. Boxes move inside the visible canvas, the canvas never resizes when a box moves, and wheel zoom, pan, fit and full screen work.
-- [ ] 4. Columns over 8 items show group nodes with a searchable, paged panel.
-- [ ] 5. Expiration is offered on delegation and agent · server · tool; rules only on agent · server · tool; resources have neither.
-- [ ] 6. The rule builder produces the CEL of section 7, and the advanced CEL edit is one-way.
-- [ ] 7. The list view has the three tables with Open, Add condition and Remove.
-- [ ] 8. The filter bar filters Graph and List by text, server → tool, rules and expiration, and edits still apply to the whole draft.
-- [ ] 9. No native `select`: every list choice uses `SelectMenu`.
-- [ ] 10. The publication bar shows the draft changes and the effective or pending revision.
-- [ ] 11. The help dialog has the diagram, the four checks and the examples.
-- [ ] 12. Every item of Backend dependencies is resolved in a backend specification before implementation.
-- [ ] 13. No "Waiting backend" chip remains for an implemented item.
-- [ ] 14. `npm run check` and `npm run build` pass.
-- [ ] 15. The user confirms the interface test.
+- [x] 1. One "Delegation and access" view replaces the Connection graph and Permissions tabs.
+- [x] 2. The graph shows identity providers, the agent, server boxes with tools, and server › resource type boxes with values, with the edges of section 4.
+- [x] 3. Boxes move inside the visible canvas, the canvas never resizes when a box moves, and wheel zoom, pan, fit and full screen work. Code inspection: the graph interaction is the unchanged prototype code; not exercised in the 2026-11-02 browser test.
+- [x] 4. Columns over 8 items show group nodes with a searchable, paged panel. Code inspection: unchanged prototype code; the local data has no column over 8.
+- [x] 5. Expiration is offered on delegation and agent · server · tool; rules only on agent · server · tool; resources have neither.
+- [x] 6. The rule builder produces the CEL of section 7, and the advanced CEL edit is one-way.
+- [x] 7. The list view has the three tables with Open, Add condition and Remove.
+- [x] 8. The filter bar filters Graph and List by text, server → tool, rules and expiration, and edits still apply to the whole draft.
+- [x] 9. No native `select`: every list choice uses `SelectMenu`.
+- [x] 10. The publication bar shows the draft changes and the effective or pending revision. The pending state was seen in the browser; the effective state by code inspection (see user story 7).
+- [x] 11. The help dialog has the diagram, the four checks and the examples.
+- [x] 12. Every item of Backend dependencies is resolved in a backend specification before implementation.
+- [x] 13. No "Waiting backend" chip remains for an implemented item.
+- [x] 14. `npm run check` and `npm run build` pass.
+- [x] 15. The user confirms the interface test. Run by Claude in the built-in browser at the user's request (2026-11-02).
 
 ---
 

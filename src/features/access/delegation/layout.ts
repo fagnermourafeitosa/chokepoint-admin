@@ -1,8 +1,8 @@
-import { idpSubjects, servers, type Doc } from './fixtures';
+import { idpName, idpSubjects, type Catalog, type Doc } from './model';
 
 export type Adding = 'delegator' | 'tool' | 'resource';
-export type GroupKind = 'delegators' | 'tools' | 'resources';
-export type Selection = { type: 'agent' } | { type: 'idp'; issuer: string } | { type: 'add'; what: Adding } | { type: 'group'; group: GroupKind; key: string; label: string } | { type: 'delegation' | 'capability' | 'resource'; id: string; addCondition?: boolean };
+export type GroupKind = 'tools' | 'resources';
+export type Selection = { type: 'agent' } | { type: 'idp'; issuer: string } | { type: 'add'; what: Adding } | { type: 'group'; group: GroupKind; key: string; label: string } | { type: 'capability' | 'resource'; id: string; addCondition?: boolean };
 export type Column = 'delegators' | 'agent' | 'tools' | 'resources';
 export type LayoutNode = { key: string; select: Selection; column: Column; x: number; y: number; title: string; subtitle: string; kind?: 'person' | 'service'; count?: number };
 // below: route under the server boxes (agent → resource). mapping: dashed tool → kind line, not a relation.
@@ -20,12 +20,13 @@ const groupNode = (group: GroupKind, column: Column, key: string, title: string,
 
 // Four columns: who delegates → agent → server/tools → resources. Moved boxes override the column place.
 // The world size comes from the column layout only, so moving a box never resizes the canvas.
-export function delegationLayout(agentName: string, doc: Doc, positions: Positions = {}) {
+export function delegationLayout(agentName: string, doc: Doc, catalog: Catalog, positions: Positions = {}) {
+  const servers = catalog.servers;
   // Who can delegate: one node for each identity provider, never one node for each person.
   const subjectNodes: LayoutNode[] = doc.scopes.map((sc, i) => {
-    const count = doc.delegations.filter(d => d.issuer === sc.issuer && sc.kinds.includes(d.kind)).length, total = idpSubjects(sc.issuer, sc.kinds).length;
+    const count = doc.delegations.filter(d => d.issuer === sc.issuer && sc.kinds.includes(d.kind)).length, total = idpSubjects(catalog, sc.issuer, sc.kinds).length, known = !!catalog.directory(sc.issuer);
     const kinds = sc.kinds.length === 2 ? 'people and services' : sc.kinds[0] === 'person' ? 'people' : 'services';
-    return { key: `idp-${sc.issuer}`, select: { type: 'idp', issuer: sc.issuer }, column: 'delegators', x: colX.delegators, y: top + i * rowGap, title: sc.issuer, subtitle: count === total && total > 0 ? `All ${total} ${kinds}` : `${count} of ${total} ${kinds}` };
+    return { key: `idp-${sc.issuer}`, select: { type: 'idp', issuer: sc.issuer }, column: 'delegators', x: colX.delegators, y: top + i * rowGap, title: idpName(catalog, sc.issuer), subtitle: !known ? `${count} ${kinds}` : count === total && total > 0 ? `All ${total} ${kinds}` : `${count} of ${total} ${kinds}` };
   });
   // Servers and tools: a server with many tools becomes one group node.
   let y = top + 22;
@@ -35,7 +36,7 @@ export function delegationLayout(agentName: string, doc: Doc, positions: Positio
     const tools: LayoutNode[] = caps.length > groupAt
       ? [groupNode('tools', 'tools', server.id, `${caps.length} tools`, `${server.name} · open to list`, caps.length, y)]
       : caps.map(c => ({ key: c.id, select: { type: 'capability', id: c.id }, column: 'tools', x: colX.tools, y: y + caps.indexOf(c) * rowGap, title: c.tool, subtitle: c.mapping ? `Resource: ${c.mapping.kind}` : 'No resource mapping' }));
-    caps.forEach((c, i) => toolOf.set(c.tool, tools.length === 1 && caps.length > groupAt ? tools[0] : tools[i]));
+    caps.forEach((c, i) => toolOf.set(c.id, tools.length === 1 && caps.length > groupAt ? tools[0] : tools[i]));
     if (tools.length) y += tools.length * rowGap + 30;
     return { server, tools, caps };
   });
@@ -63,17 +64,17 @@ export function delegationLayout(agentName: string, doc: Doc, positions: Positio
   const edges: LayoutEdge[] = [
     ...doc.scopes.map((sc, i) => ({ key: `e-idp-${sc.issuer}`, select: { type: 'idp' as const, issuer: sc.issuer }, from: subjectNodes[i], to: agent, expires: sc.expiresAt, conditions: 0 })),
     ...tools.map(t => {
-      const caps = doc.capabilities.filter(c => toolOf.get(c.tool) === t);
+      const caps = doc.capabilities.filter(c => toolOf.get(c.id) === t);
       return t.count ? { key: `e-${t.key}`, select: t.select, from: agent, to: t, conditions: caps.reduce((n, c) => n + c.conditions.length, 0), count: t.count } : { key: `e-${t.key}`, select: { type: 'capability' as const, id: caps[0].id }, from: agent, to: t, expires: caps[0].expiresAt, conditions: caps[0].conditions.length };
     }),
     ...resourceEdges,
     ...kindSets.flatMap(ks => {
       const count = doc.resources.filter(r => `${r.serverId}|${r.kind}` === ks.key).length;
       const mapped = doc.capabilities.filter(c => c.serverId === ks.serverId && c.mapping?.kind === ks.kind);
-      const toolNodes = [...new Set(mapped.map(c => toolOf.get(c.tool)).filter((n): n is LayoutNode => !!n))];
+      const toolNodes = [...new Set(mapped.map(c => toolOf.get(c.id)).filter((n): n is LayoutNode => !!n))];
       return [
         { key: `e-kind-${ks.key}`, select: ks.anchor.select, from: agent, to: ks.anchor, conditions: 0, count, below: 0 },
-        ...toolNodes.map(t => ({ key: `m-${t.key}-${ks.key}`, select: ks.anchor.select, from: t, to: ks.anchor, conditions: 0, mapping: mapped.find(c => toolOf.get(c.tool) === t)?.mapping?.pointer ?? '' })),
+        ...toolNodes.map(t => ({ key: `m-${t.key}-${ks.key}`, select: ks.anchor.select, from: t, to: ks.anchor, conditions: 0, mapping: mapped.find(c => toolOf.get(c.id) === t)?.mapping?.pointer ?? '' })),
       ];
     }),
   ];

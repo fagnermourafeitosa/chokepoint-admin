@@ -15,3 +15,4 @@
 .proto-kicker { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); }
 .proto-kicker .attention-kicker { margin: 0; }
 
+.people-kind-chip{display:inline-flex;align-items:center;margin-inline-start:var(--cp-admin-space-2);padding:var(--cp-admin-space-1) var(--cp-admin-space-2);border-radius:var(--cp-admin-radius-sm);font-size:var(--cp-admin-type-label);font-weight:var(--cp-admin-weight-semibold);background:var(--cp-admin-color-surface-muted);color:var(--cp-admin-color-text-muted);vertical-align:middle}.people-kind-chip[data-kind="service"]{background:var(--cp-admin-color-accent-soft);color:var(--cp-admin-color-accent-text)}

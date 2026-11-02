@@ -27,3 +27,4 @@
   .agent-detail-actions { margin-inline-start: auto; }
 }
 .access-workbench[data-rail="collapsed"] { grid-template-columns: 4rem minmax(0, 1fr); }
+.access-target-context { display:flex; gap:12px; flex-wrap:wrap; padding:14px 18px; border:1px solid var(--cp-admin-color-border); border-radius:8px; margin:0 0 20px; font-size:.8125rem; }.access-target-context span { color:var(--cp-admin-color-text-muted); }

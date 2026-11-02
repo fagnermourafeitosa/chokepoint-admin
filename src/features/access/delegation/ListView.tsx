@@ -1,8 +1,9 @@
 import { Braces, Clock, Pencil, Plus, Trash2 } from 'lucide-react';
-import { idpSubjects, servers, type Doc } from './fixtures';
+import { formatTime, idpName, idpSubjects, serverName, withoutCapability, type Doc } from './model';
+import { useCatalog } from './catalog';
 import { sameSelection, type Selection } from './layout';
 
-type Edge = Extract<Selection, { type: 'idp' | 'delegation' | 'capability' | 'resource' }>;
+type Edge = Extract<Selection, { type: 'idp' | 'capability' | 'resource' }>;
 type Row = { select: Edge; cells: string[]; expires?: string; conditions: number; label: string };
 type SectionProps = { title: string; columns: string[]; rows: Row[]; selected?: Selection; onSelect: (s: Selection) => void; onRemove: (r: Row) => void; readOnly: boolean };
 
@@ -27,21 +28,21 @@ function Section({ title, columns, rows, selected, onSelect, onRemove, readOnly 
 // The same relations as the graph, as tables. Better for keyboards and for long lists.
 // doc is what the view shows (filtered); source is the whole draft that edits change.
 export function ListView({ doc, source, selected, onSelect, onChange, readOnly }: { doc: Doc; source: Doc; selected?: Selection; onSelect: (s: Selection) => void; onChange: (d: Doc) => void; readOnly: boolean }) {
+  const { catalog } = useCatalog();
   const remove = (r: Row) => {
     const doc = source;
     if (r.select.type === 'idp') { const issuer = r.select.issuer; onChange({ ...doc, scopes: doc.scopes.filter(s => s.issuer !== issuer), delegations: doc.delegations.filter(d => d.issuer !== issuer) }); return; }
     const id = r.select.id;
-    if (r.select.type === 'delegation') onChange({ ...doc, delegations: doc.delegations.filter(d => d.id !== id) });
-    else if (r.select.type === 'capability') onChange({ ...doc, capabilities: doc.capabilities.filter(c => c.id !== id) });
+    if (r.select.type === 'capability') onChange(withoutCapability(doc, id).doc);
     else onChange({ ...doc, resources: doc.resources.filter(x => x.id !== id) });
   };
   const common = { selected, onSelect, onRemove: remove, readOnly };
   return <div className="delegation-list">
     <Section title="Who can delegate" columns={['Identity provider', 'Who', 'Kinds', 'Consent']} {...common}
-      rows={doc.scopes.map(sc => ({ select: { type: 'idp', issuer: sc.issuer }, label: sc.issuer, cells: [sc.issuer, (() => { const total = idpSubjects(sc.issuer, sc.kinds).length, n = source.delegations.filter(d => d.issuer === sc.issuer && sc.kinds.includes(d.kind)).length; return n === total && total ? `All ${total}` : `${n} of ${total}`; })(), sc.kinds.map(k => (k === 'person' ? 'People' : 'Services')).join(', '), `${sc.consent.recordedBy} · ${sc.consent.recordedAt}`], expires: sc.expiresAt, conditions: 0 }))} />
+      rows={doc.scopes.map(sc => ({ select: { type: 'idp', issuer: sc.issuer }, label: idpName(catalog, sc.issuer), cells: [idpName(catalog, sc.issuer), (() => { const total = idpSubjects(catalog, sc.issuer, sc.kinds).length, n = source.delegations.filter(d => d.issuer === sc.issuer && sc.kinds.includes(d.kind)).length; return !catalog.directory(sc.issuer) ? `${n}` : n === total && total ? `All ${total}` : `${n} of ${total}`; })(), sc.kinds.map(k => (k === 'person' ? 'People' : 'Services')).join(', '), sc.consent ? `${sc.consent.name ?? sc.consent.recordedBy} · ${formatTime(sc.consent.recordedAt)}` : sc.confirmed ? 'Confirmed in this draft' : 'Not recorded'], expires: sc.expiresAt, conditions: 0 }))} />
     <Section title="Servers and tools" columns={['Tool', 'Server', 'Resource mapping']} {...common}
-      rows={doc.capabilities.map(c => ({ select: { type: 'capability', id: c.id }, label: c.tool, cells: [c.tool, servers.find(s => s.id === c.serverId)?.name ?? '', c.mapping ? `${c.mapping.pointer} → ${c.mapping.kind}` : '—'], expires: c.expiresAt, conditions: c.conditions.length }))} />
+      rows={doc.capabilities.map(c => ({ select: { type: 'capability', id: c.id }, label: `${serverName(catalog, c.serverId)} · ${c.tool}`, cells: [c.tool, serverName(catalog, c.serverId), c.mapping ? `${c.mapping.pointer ? `${c.mapping.pointer} → ` : ''}${c.mapping.kind}` : '—'], expires: c.expiresAt, conditions: c.conditions.length }))} />
     <Section title="Resources" columns={['Resource', 'Type', 'Server', 'Used by']} {...common}
-      rows={doc.resources.map(r => ({ select: { type: 'resource', id: r.id }, label: `${r.kind} ${r.value}`, cells: [r.value, r.kind, servers.find(s => s.id === r.serverId)?.name ?? '', doc.capabilities.filter(c => c.serverId === r.serverId && c.mapping?.kind === r.kind).map(c => c.tool).join(', ') || '—'], conditions: 0 }))} />
+      rows={doc.resources.map(r => ({ select: { type: 'resource', id: r.id }, label: `${r.kind} ${r.value}`, cells: [r.value, r.kind, serverName(catalog, r.serverId), doc.capabilities.filter(c => c.serverId === r.serverId && c.mapping?.kind === r.kind).map(c => c.tool).join(', ') || '—'], conditions: 0 }))} />
   </div>;
 }

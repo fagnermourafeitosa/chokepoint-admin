@@ -1,5 +1,5 @@
 import { Database, Plus, User, Wrench } from 'lucide-react';
-import type { Doc } from './fixtures';
+import type { Doc } from './model';
 import { sameSelection, type Adding, type Selection } from './layout';
 
 const sections: { what: Adding; label: string; add: string; Icon: typeof User; count: (d: Doc) => number }[] = [

@@ -2,7 +2,6 @@
 .delegation-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--cp-admin-space-4); }
 .delegation-body[data-panel="true"] { grid-template-columns: minmax(0, 1fr) 340px; }
 .delegation-canvas { position: relative; border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background-color: var(--cp-admin-color-canvas); background-image: radial-gradient(var(--cp-admin-color-border) 1px, transparent 1px); background-size: 18px 18px; overflow: hidden; }
-.delegation-canvas[data-disabled="true"] { opacity: .55; }
 .delegation-canvas > svg { display: block; width: 100%; touch-action: none; cursor: grab; }
 .delegation-column-head { display: flex; align-items: center; justify-content: space-between; height: 100%; padding-inline: 2px; font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-heavy); letter-spacing: var(--cp-admin-tracking-label); text-transform: uppercase; color: var(--cp-admin-color-text-muted); }
 .delegation-add { display: inline-grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-button); background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); cursor: pointer; }
@@ -25,7 +24,6 @@
 .relation-field { display: grid; gap: var(--cp-admin-space-1); font-size: var(--cp-admin-type-small); }
 .relation-field > span { font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-bold); color: var(--cp-admin-color-text-muted); }
 .relation-field > div { display: grid; gap: var(--cp-admin-space-1); overflow-wrap: anywhere; }
-.relation-field .people-kind-chip { margin-inline-start: 0; width: max-content; }
 .relation-note { font-size: var(--cp-admin-type-small); }
 .relation-conditions { display: grid; gap: var(--cp-admin-space-2); }
 .relation-condition { display: grid; gap: var(--cp-admin-space-1); padding: var(--cp-admin-space-3); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-canvas); }
@@ -224,3 +222,5 @@
 .identity-confirm { display: grid; gap: var(--cp-admin-space-2); }
 .identity-downloaded span { display: grid; }
 .identity-own-save { justify-self: start; }
+.rule-limit { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); }
+.rule-limit .cp-admin-input { max-width: 14rem; }

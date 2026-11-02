@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { Bot, Braces, Clock, Database, Layers, Maximize2, Minimize2, Plus, ScanSearch, ServerCog, User, Users, Wrench, ZoomIn, ZoomOut } from 'lucide-react';
 import { nodeH, nodeW, sameSelection, type delegationLayout, type LayoutNode, type Selection } from './layout';
+import './graph.css';
 
 type Layout = ReturnType<typeof delegationLayout>;
 type View = { x: number; y: number; width: number; height: number };
@@ -19,10 +20,10 @@ function zoomAt(o: View, factor: number, px: number, py: number, limit: number):
   return { x: px - (px - o.x) * r, y: py - (py - o.y) * r, width, height: o.height * r };
 }
 
-type Props = { layout: Layout; selected?: Selection; onSelect: (s: Selection) => void; onMove: (key: string, x: number, y: number) => void; disabled: boolean; readOnly: boolean; maximized: boolean; onMaximize: () => void };
+type Props = { layout: Layout; selected?: Selection; onSelect: (s: Selection) => void; onMove: (key: string, x: number, y: number) => void; readOnly: boolean; maximized: boolean; onMaximize: () => void };
 
 // The graph is the map: a node or an edge opens its editor in the side panel. Boxes can be moved.
-export function DelegationGraph({ layout, selected, onSelect, onMove, disabled, readOnly, maximized, onMaximize }: Props) {
+export function DelegationGraph({ layout, selected, onSelect, onMove, readOnly, maximized, onMaximize }: Props) {
   const fit: View = { x: 0, y: 0, width: layout.width, height: layout.height };
   const [view, setView] = useState(fit);
   const svg = useRef<SVGSVGElement>(null);
@@ -66,7 +67,7 @@ export function DelegationGraph({ layout, selected, onSelect, onMove, disabled, 
     const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
     onMove(m.key, clamp(m.nx + dx / ctm.a, a.x, b.x - nodeW), clamp(m.ny + dy / ctm.d, a.y, b.y - nodeH));
   }
-  return <div className="delegation-canvas" data-disabled={disabled} data-maximized={maximized}>
+  return <div className="delegation-canvas" data-maximized={maximized}>
     <div className="agent-graph-controls" aria-label="Graph view controls">
       <button type="button" className="cp-admin-button cp-admin-button--ghost" aria-label="Zoom in" onClick={() => center(.8)}><ZoomIn size={17} /></button>
       <button type="button" className="cp-admin-button cp-admin-button--ghost" aria-label="Zoom out" onClick={() => center(1.25)}><ZoomOut size={17} /></button>
