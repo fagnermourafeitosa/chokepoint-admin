@@ -276,6 +276,7 @@ Three tables: Who can delegate (identity provider, who, kinds, consent), Servers
 1. Left: "Draft · N unpublished changes" or "No unpublished changes", and the runtime state: "Revision N effective", or "Revision N pending · revision N-1 still applies".
 2. Right: **Discard draft** and **Review & publish**.
 3. Reconciliation is automatic (Backend 033 Solution 5). The screen has no repair action and no OpenFGA detail.
+4. While the published revision is pending, the screen reads the configuration again every 5 seconds, so it shows the effective state without a reload (Admin 026 review, 2026-11-02).
 
 ### 10. Help dialog
 
@@ -298,6 +299,7 @@ The editor stays in `src/features/access`. Data hooks, layout, filters, graph, p
 2. **One resource types read for each server** (decided by the user). The graph, the tool panel and "add resource" read the resource types and their arguments from [Backend 037](../../backend/specs/037-2026-11-02-resource-types-read-and-consent-author.md). Not chosen: the tool mapping read of each tool (up to 500 requests).
 3. **The backend returns the consent author name** (decided by the user). `recorded_by_name` comes from Backend 037. Not chosen: "you" or "another administrator" from the session only.
 4. **Editing follows the permission editor of Admin 009.** Edits stay in the browser until **Review & publish**, which saves the draft (`PUT …/draft`) and then publishes. A draft saved earlier is loaded as the draft. A revision conflict asks for a reload.
+5. **Removing a tool removes its orphan resources** (Admin 026 review, 2026-11-02). Backend 033 publishes a resource only for a type that a granted tool projects. When a removed tool was the last granted tool of its server that reads a resource type, the values of that type are removed with it; the tool panel says how many before the removal.
 
 ---
 
