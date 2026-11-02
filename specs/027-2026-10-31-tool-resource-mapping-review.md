@@ -3,7 +3,7 @@
 - **Specification ID**: 027
 - **Date**: 2026-10-31
 - **Slug**: tool-resource-mapping-review
-- **Status**: Proposed
+- **Status**: In Progress
 - **Owner**: Admin — Integrations
 - **Design**: [Agent delegation authorization](../../backend/docs/agent-delegation-authorization.md)
 - **Related Specification**: [Backend 029 — ReBAC Model and OpenFGA Integration](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md) (the resource comes from the COAZ projection, Resolved Decision 4), [Backend 008 — COAZ-MCP, CEL and AuthZEN Integration](../../backend/specs/008-2026-10-26-coaz-mcp-cel-and-authzen-integration.md) (mapping API and lifecycle)
@@ -12,7 +12,7 @@
 - **Related Specification**: [007 — MCP Server Management and Discovery Preview](007-2026-10-25-mcp-server-management-and-discovery-preview.md), [009 — Authorization Management Workbench](009-2026-10-26-authorization-management-workbench.md) (COAZ mapping review)
 - **Visual reference**: layout prototype at `/prototype/tools` in the Admin (`src/features/mcp/ResourceMapping.tsx`). Known difference: the prototype keeps its own draft state; this text uses the COAZ mapping lifecycle. Fixed data. It is the visual specification of this screen; where it differs from this text, this text wins.
 
-> **On hold for Backend 029.** Backend 029 is approved and not implemented. The contracts are written (see [Backend dependencies](#backend-dependencies)). Agent identity and the Chokepoint token auth type for custom MCP servers are in [Admin 029](029-2026-10-31-agent-identity-and-chokepoint-token-setup.md).
+> Agent identity and the Chokepoint token auth type for custom MCP servers are in [Admin 029](029-2026-10-31-agent-identity-and-chokepoint-token-setup.md).
 
 ---
 
@@ -117,7 +117,7 @@ Read the tool schema (current catalog API). Read, save, approve and discard the 
    - The text below says: "Proposed from the tool and the argument. You can edit it."
    - After an edit, the field keeps the administrator's value; a new argument does not replace it.
    - A plain text field. No dropdown arrow and no suggestion list.
-   - A help icon says: "A label that identifies one type of resource on this server. It must be unique on the server. It has no other effect."
+   - A help icon says: "A label that identifies one type of resource on this server. Tools with the same resource type share the allowed values in an agent. It has no other effect." (Resolved Decision 1)
 3. **Example**: a sample call and its checked resource, for example `{ "repository": "acme/payments-api" }` → `merge_pull_request_repository › acme/payments-api`, and "Missing, empty or not a string: the call is denied."
 4. **Optional argument**: a warning says that a call without it is denied.
 5. **Impact**: when an active mapping changes or is removed and agents have values of its resource type, a warning names those agents and the effect:
@@ -134,7 +134,12 @@ The Resource block is a shortcut inside the COAZ mapping of the tool. It writes 
 - "No resource" sets `resource` back to the COAZ-MCP default (`type = "tool"`).
 - The backend validates and owns the result. The Admin does not evaluate a mapping.
 
-### 4. Files
+### 4. Resolved decisions (2026-11-02)
+
+1. **Tools can share a resource type** (decided by the user). Two tools of a server with the same resource type share the allowed values of each agent (Further Notes). The backend does not require a unique type. Not chosen: a unique resource type for each tool, enforced by the backend.
+2. **The resource is validated by the Admin form and by the backend** (decided by the user). The form accepts only a type that matches `^[a-z][a-z0-9_]{1,79}$` and only a top-level string argument. The backend rejects an invalid resource at save draft and approve ([Backend 032](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md) Resolved Decision 3). Until Backend 032, only the form checks it. Not chosen: only the form, with the runtime fail-closed.
+
+### 5. Files
 
 Keep the API client, the data hook and the component separate. Each file stays under about 300 lines.
 
@@ -148,6 +153,7 @@ The contracts are written in the backend specifications (2026-11-01).
 2. **Resource type rules:** [Backend 029](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md), "Resource from the COAZ projection" (`^[a-z][a-z0-9_]{1,79}$`; `tool` means no resource check).
 3. **Affected agents:** [Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md), Admin contract 3.
 4. **Argument form:** the COAZ expression `$params.arguments.<name>` of a top-level string argument.
+5. **Resource validation at save and approve:** [Backend 032](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md) Resolved Decision 3 (Resolved Decision 2).
 
 **Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item, remove the chip of each element that it unblocks, in the same change. The real Admin never shows the chip.
 
