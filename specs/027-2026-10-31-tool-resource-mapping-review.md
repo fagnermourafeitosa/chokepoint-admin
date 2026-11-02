@@ -3,7 +3,7 @@
 - **Specification ID**: 027
 - **Date**: 2026-10-31
 - **Slug**: tool-resource-mapping-review
-- **Status**: Waiting Approve
+- **Status**: Implemented
 - **Owner**: Admin — Integrations
 - **Design**: [Agent delegation authorization](../../backend/docs/agent-delegation-authorization.md)
 - **Related Specification**: [Backend 029 — ReBAC Model and OpenFGA Integration](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md) (the resource comes from the COAZ projection, Resolved Decision 4), [Backend 008 — COAZ-MCP, CEL and AuthZEN Integration](../../backend/specs/008-2026-10-26-coaz-mcp-cel-and-authzen-integration.md) (mapping API and lifecycle)
