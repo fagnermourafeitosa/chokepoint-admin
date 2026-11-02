@@ -13,7 +13,7 @@
 - **Superseded in part**: [009](009-2026-10-26-authorization-management-workbench.md) (people, grants and policy editors), [010](010-2026-10-27-enterprise-and-custom-mcp-connections.md) (agent connection graph), [012](012-2026-10-28-scim-people-selection.md) and [024](024-2026-10-30-service-principal-selection.md) (member selection inside the group)
 - **Visual reference**: layout prototype at `/prototype/agent` in the Admin, tab Delegation and access (`src/features/access/delegation`). Fixed data. It is the visual specification of this screen; where it differs from this text, this text wins.
 
-> **On hold for Backend 029–033.** The backend contracts are approved (029) or decided (030–035) but not implemented. The layout below was agreed with the user on 2026-10-31 in the prototype. The [Backend dependencies](#backend-dependencies) section lists what the backend must define before implementation.
+> **On hold for Backend 037.** Backend 029 and 033 are implemented. The resource types read and the consent author name are in [Backend 037](../../backend/specs/037-2026-11-02-resource-types-read-and-consent-author.md) (Resolved Decisions 2 and 3). The kill switch moved to [Admin 031](031-2026-11-02-agent-kill-switch.md) (Resolved Decision 1).
 
 ---
 
@@ -126,7 +126,7 @@ flowchart TD
 | Who can delegate | Subjects (people and services) of an identity provider that delegate to the agent. |
 | Server · tool | A tool always belongs to one MCP server. |
 | Resource | A concrete object where the agent acts. It belongs to the agent, inside a server and a resource type. By default each tool has its own resource type, so each tool has its own list of allowed values. |
-| Resource type | A label that identifies one type of resource on a server, for example `merge_pull_request_repository`. The tool mapping declares it in the tool review: the Admin proposes `<tool>_<argument>` and the administrator can edit it. It is only a label that is unique on the server. Two tools share a list of values only when they use the same label. The backend field is `kind` (Backend 029). The screen never shows the word "kind". |
+| Resource type | A label that identifies one type of resource on a server, for example `merge_pull_request_repository`. The tool mapping declares it in the tool review: the Admin proposes `<tool>_<argument>` and the administrator can edit it. It is only a label on the server. Two tools share a list of values only when they use the same label (Admin 027 Resolved Decision 1). The backend field is `kind` (Backend 029). The screen never shows the word "kind". |
 | Rule | A CEL condition on call data. It belongs to the triad agent · server · tool. |
 
 ---
@@ -154,8 +154,7 @@ flowchart TD
 - [ ] 5. As an administrator, I understand the model from the help dialog.
 - [ ] 6. As an administrator, the graph stays usable with 100 subjects and hundreds of resources.
 - [ ] 7. As an administrator, I see the published revision and whether my last publication is effective.
-- [ ] 8. As an administrator, I disable an agent at once.
-- [ ] 9. As an administrator, I narrow the graph to one server or one tool to work on it.
+- [ ] 8. As an administrator, I narrow the graph to one server or one tool to work on it.
 
 ---
 
@@ -183,9 +182,7 @@ Read and change the agent permission aggregate (Backend 033), read the identity 
 
 ### 1. Agent header
 
-1. The header shows the agent status, **Active** or **Disabled**, as a text chip.
-2. A **Disable agent** / **Enable agent** action changes the status (kill switch, Backend 032 Resolved Decision 2). Disabled: the AS issues no new token and the PEP rejects the next call. The configuration and the client key stay.
-3. The agent client and key registration are in [Admin 029](029-2026-10-31-agent-identity-and-chokepoint-token-setup.md).
+The agent status and the kill switch are in [Admin 031](031-2026-11-02-agent-kill-switch.md) (Resolved Decision 1). The agent client and key registration are in [Admin 029](029-2026-10-31-agent-identity-and-chokepoint-token-setup.md).
 
 ### 2. Agent rail
 
@@ -242,7 +239,7 @@ The panel opens on the right of the graph or the list. It has a close button and
 
 **Consent.** In v1 no identity provider supports delegation, so the administrator records the consent once for the identity provider scope. Each delegation that the scope creates has `source` = `administrator`, `recorded_by` = the administrator and `recorded_at` = the time (Backend 033 Resolved Decision 1). The add flow requires a consent checkbox.
 
-The consent is shown as a read-only record, not as a form field: **Last consent recorded**, "by {administrator} · {time}", and a help icon. The administrator is the signed-in platform user, taken from the session; nobody types it. The add flow requires the checkbox "I confirm that these subjects agreed to let {agent} act for them". The record shows the last confirmation; a history of confirmations needs a read that Backend 033 does not define.
+The consent is shown as a read-only record, not as a form field: **Last consent recorded**, "by {administrator} · {time}", and a help icon. {administrator} is `recorded_by_name` (Backend 037); without a name the record shows the user ID. The administrator is the signed-in platform user, taken from the session; nobody types it. The add flow requires the checkbox "I confirm that these subjects agreed to let {agent} act for them". The record shows the last confirmation; a history of confirmations needs a read that Backend 033 does not define.
 
 ### 6. Conditions
 
@@ -295,6 +292,13 @@ The diagram is static SVG. The Admin has no Mermaid dependency.
 
 The editor stays in `src/features/access`. Data hooks, layout, filters, graph, panels, rule builder, list and help are separate files. Each file stays under about 300 lines.
 
+### 12. Resolved decisions (2026-11-02)
+
+1. **The kill switch leaves 026** (decided by the user). The agent status API is in Backend 032, which comes later in the implementation order. The header status and Disable / Enable agent move to [Admin 031](031-2026-11-02-agent-kill-switch.md), with Backend 032. Not chosen: keeping 026 open until 032, and calling an endpoint that does not exist yet.
+2. **One resource types read for each server** (decided by the user). The graph, the tool panel and "add resource" read the resource types and their arguments from [Backend 037](../../backend/specs/037-2026-11-02-resource-types-read-and-consent-author.md). Not chosen: the tool mapping read of each tool (up to 500 requests).
+3. **The backend returns the consent author name** (decided by the user). `recorded_by_name` comes from Backend 037. Not chosen: "you" or "another administrator" from the session only.
+4. **Editing follows the permission editor of Admin 009.** Edits stay in the browser until **Review & publish**, which saves the draft (`PUT …/draft`) and then publishes. A draft saved earlier is loaded as the draft. A revision conflict asks for a reload.
+
 ---
 
 ## Backend dependencies
@@ -303,13 +307,15 @@ The contracts and decisions are written in the backend specifications (2026-11-0
 
 1. **Document shape:** [Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md), Admin contract 1.
 2. **Publication state in the read API:** [Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md), Admin contract 2.
-3. **Agent status API:** [Backend 032](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md), Admin contract.
+3. **Agent status API:** moved to [Admin 031](031-2026-11-02-agent-kill-switch.md).
 4. **Expiration and consent for each identity provider:** [Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md), Admin contract 1 (`scopes`). resolved in Backend 033 (Admin contract, Resolved decision).
 5. **Rules on resource relations:** resolved, [Backend 031](../../backend/specs/031-2026-10-31-pdp-relation-checks-and-call-conditions.md) Resolved Decision 3.
 6. **Directory listing for Select all:** [Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md), Admin contract 4 (existing directory reads, [Backend 036](../../backend/specs/036-2026-10-31-remove-identity-lifecycle-sync-and-scim-read.md)).
 7. **Tool arguments and bindings for the rule builder:** the existing catalog and binding reads ([Backend 006](../../backend/specs/006-2026-10-25-mcp-server-registry-and-tool-discovery.md), [Backend 009](../../backend/specs/009-2026-10-26-trusted-api-attribute-sources.md)).
 8. **Resource types:** the resource of a call is `resource.type` and `resource.id` of the COAZ projection ([Backend 029](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md) Resolved Decision 4).
 9. **Instance limits:** `required_limits` in the condition shape ([Backend 033](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md), Admin contract 1) and the CEL path `context.chokepoint.limits` ([Backend 031](../../backend/specs/031-2026-10-31-pdp-relation-checks-and-call-conditions.md) Resolved Decisions 4–5).
+10. **Resource types of a server:** [Backend 037](../../backend/specs/037-2026-11-02-resource-types-read-and-consent-author.md) Solution 1. One read for each server; the Admin does not read the tool mapping of each tool.
+11. **Consent author name:** [Backend 037](../../backend/specs/037-2026-11-02-resource-types-read-and-consent-author.md) Solution 2.
 
 **Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item, remove the chip of each element that it unblocks, in the same change. The real Admin never shows the chip.
 
