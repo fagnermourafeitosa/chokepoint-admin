@@ -8,6 +8,7 @@ import { IdentityRegistry } from '../identity/IdentityRegistry';
 import { EmptyState } from '../../components/ui/empty-state/EmptyState';
 import { MCPDialog } from './MCPDialog';
 import { ToolRows } from './ToolRows';
+import { ResourceMapping } from './ResourceMapping';
 import { useMCPRegistry } from './useMCPRegistry';
 import { ConnectionTable } from './ConnectionTable';
 import { EnterpriseCatalog } from './enterprise/EnterpriseCatalog';
@@ -58,7 +59,7 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
       </> : null}
       {registry.error ? <p role="alert" className="cp-admin-notice" data-tone="danger">{registry.error}</p> : null}
       {selectedId && details.isError ? <p role="alert">Connection details are unavailable. <button className="cp-admin-button cp-admin-button--ghost" onClick={() => void details.refetch()}>Retry</button></p> : null}
-      {server ? <section id="mcp-server-details" className="mcp-details" aria-label={`${server.name} details`}><header className="mcp-details-heading"><div><h2>{server.name}</h2><p className="cp-admin-muted">{server.connection_type === 'enterprise' ? `Enterprise MCP · ${server.account || 'Account unavailable'}` : 'Custom MCP'} · {server.transport} · {server.enabled ? 'Enabled' : 'Disabled'}</p></div><button className="cp-admin-button cp-admin-button--secondary" disabled={enterprise.busy} onClick={() => connect(server)}>{server.connection_type === 'enterprise' ? 'Reconnect & review tools' : 'Discover tools'}</button></header><ToolRows tools={server.tools} focusTool={params.get('tool') || undefined} serverEnabled={server.enabled} onMapping={tool => setMapping({ serverId: server.id, serverName: server.name, toolName: tool.name })} /></section> : null}
+      {server ? <section id="mcp-server-details" className="mcp-details" aria-label={`${server.name} details`}><header className="mcp-details-heading"><div><h2>{server.name}</h2><p className="cp-admin-muted">{server.connection_type === 'enterprise' ? `Enterprise MCP · ${server.account || 'Account unavailable'}` : 'Custom MCP'} · {server.transport} · {server.enabled ? 'Enabled' : 'Disabled'}</p></div><button className="cp-admin-button cp-admin-button--secondary" disabled={enterprise.busy} onClick={() => connect(server)}>{server.connection_type === 'enterprise' ? 'Reconnect & review tools' : 'Discover tools'}</button></header><ToolRows tools={server.tools} focusTool={params.get('tool') || undefined} serverEnabled={server.enabled} onMapping={tool => setMapping({ serverId: server.id, serverName: server.name, toolName: tool.name })} resource={tool => <ResourceMapping key={`${scope.userId}:${scope.tenantId}:${scope.environmentId}:${server.id}:${tool.name}`} scope={scope} serverId={server.id} tool={tool} />} /></section> : null}
     </>}
     <p className="mcp-footnote cp-admin-muted">Connections belong to this workspace and environment. Agent permissions determine who can use their tools.</p>
     {registry.dialog ? <MCPDialog key={registry.dialog === 'new' ? 'new' : registry.dialog.id} scope={scope} server={registry.dialog === 'new' ? undefined : registry.dialog} onClose={() => registry.setDialog(null)} onRefresh={() => void registry.refresh()} onSaved={saved} /> : null}

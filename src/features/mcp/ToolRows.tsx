@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { ToolAnnotations } from '../access/components/ToolAnnotations';
 import { sourceLabel } from "./mapping-fields";
 import type { ManagedTool } from './api';
 const labels = { new: 'New', changed: 'Changed', removed: 'Removed', unchanged: '' };
-export function ToolRows({ tools, selected, onToggle, disabled, serverEnabled = true, onMapping, focusTool }: { tools: ManagedTool[]; focusTool?: string; selected?: string[]; onToggle?: (name: string) => void; disabled?: boolean; serverEnabled?: boolean; onMapping?: (tool: ManagedTool) => void }) {
+export function ToolRows({ tools, selected, onToggle, disabled, serverEnabled = true, onMapping, resource, focusTool }: { tools: ManagedTool[]; resource?: (tool: ManagedTool) => ReactNode; focusTool?: string; selected?: string[]; onToggle?: (name: string) => void; disabled?: boolean; serverEnabled?: boolean; onMapping?: (tool: ManagedTool) => void }) {
  const ref = useRef<HTMLDivElement>(null);
  useEffect(() => { const el = ref.current?.querySelector<HTMLElement>('[data-context-target=true]'); if (el) { el.scrollIntoView({ block: 'center' }); el.focus({ preventScroll: true }); } }, [focusTool, tools]);
  return <div ref={ref} className="mcp-tool-list">{tools.map(tool => <article key={tool.name} className="mcp-tool-row" tabIndex={focusTool === tool.name ? -1 : undefined} data-context-target={focusTool === tool.name} data-change={tool.change}>
@@ -15,6 +15,7 @@ export function ToolRows({ tools, selected, onToggle, disabled, serverEnabled = 
    {!onToggle && onMapping && tool.change !== 'removed' ? <div className="mapping-tool-action"><span className="mcp-badge">{sourceLabel(tool.local_mapping ? 'local' : typeof tool.contract.inputSchema === 'object' && tool.contract.inputSchema !== null && 'x-authzen-mapping' in tool.contract.inputSchema ? 'server' : 'default')}{tool.mapping_draft ? ' · Draft' : ''}</span><button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => onMapping(tool)}>Configure mapping</button></div> : null}
   </div>
   {tool.contract.description ? <p>{tool.contract.description}</p> : null}
+  {resource && tool.selected && tool.change !== 'removed' ? resource(tool) : null}
   <ToolAnnotations annotations={tool.contract.annotations} />
   {tool.change === 'changed' || tool.change === 'removed' ? <p className="cp-admin-muted">Disabled{!tool.reviewed ? ' · review required' : ''}{tool.change === 'removed' ? ' · not returned by the server' : ''}.</p> : null}
   <details className="mcp-contract"><summary>{tool.previous ? 'Compare contract and metadata' : 'Contract and metadata'}</summary>

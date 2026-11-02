@@ -115,7 +115,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 024 | [Service Principal Selection](specs/024-2026-10-30-service-principal-selection.md) | Implemented |
 | 025 | [Google Service Account Registration](specs/025-2026-10-30-google-service-account-registration.md) | Proposed |
 | 026 | [Agent Delegation Editor](specs/026-2026-10-31-agent-delegation-editor.md) | Proposed |
-| 027 | [Tool Resource Mapping Review](specs/027-2026-10-31-tool-resource-mapping-review.md) | In Progress |
+| 027 | [Tool Resource Mapping Review](specs/027-2026-10-31-tool-resource-mapping-review.md) | Waiting Approve |
 | 028 | [Remove Lifecycle Sync Screen and Google Warnings](specs/028-2026-10-31-remove-lifecycle-sync-screen-and-google-warnings.md) | Implemented |
 | 029 | [Agent Identity and Chokepoint Token Setup](specs/029-2026-10-31-agent-identity-and-chokepoint-token-setup.md) | Proposed |
 | 030 | [Investigate with Agent, Subject and Token Exchanges](specs/030-2026-10-31-investigate-agent-subject-and-token-exchanges.md) | Proposed |

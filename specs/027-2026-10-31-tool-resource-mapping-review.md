@@ -3,7 +3,7 @@
 - **Specification ID**: 027
 - **Date**: 2026-10-31
 - **Slug**: tool-resource-mapping-review
-- **Status**: In Progress
+- **Status**: Waiting Approve
 - **Owner**: Admin — Integrations
 - **Design**: [Agent delegation authorization](../../backend/docs/agent-delegation-authorization.md)
 - **Related Specification**: [Backend 029 — ReBAC Model and OpenFGA Integration](../../backend/specs/029-2026-10-31-rebac-model-and-openfga-integration.md) (the resource comes from the COAZ projection, Resolved Decision 4), [Backend 008 — COAZ-MCP, CEL and AuthZEN Integration](../../backend/specs/008-2026-10-26-coaz-mcp-cel-and-authzen-integration.md) (mapping API and lifecycle)
@@ -71,12 +71,12 @@ flowchart LR
 
 ## User Stories
 
-- [ ] 1. As an administrator, I select the argument that identifies the resource of a tool.
-- [ ] 2. As an administrator, I accept or edit the proposed resource type.
-- [ ] 3. As an administrator, I see an example of how a call becomes a checked resource.
-- [ ] 4. As an administrator, I save a draft, then approve it, or discard it.
-- [ ] 5. As an administrator, I see which agents a change affects before I approve it.
-- [ ] 6. As an administrator, I remove a mapping, so the tool has no resource check.
+- [x] 1. As an administrator, I select the argument that identifies the resource of a tool.
+- [x] 2. As an administrator, I accept or edit the proposed resource type.
+- [x] 3. As an administrator, I see an example of how a call becomes a checked resource.
+- [x] 4. As an administrator, I save a draft, then approve it, or discard it.
+- [ ] 5. As an administrator, I see which agents a change affects before I approve it. Missing: a browser check with an agent that has published values; the local data has none on a cataloged server (the endpoint answered 200 with no agents).
+- [x] 6. As an administrator, I remove a mapping, so the tool has no resource check.
 
 ---
 
@@ -167,16 +167,16 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ## Acceptance Criteria
 
-- [ ] 1. Each managed tool shows the Resource block with its state.
-- [ ] 2. The argument select lists the schema arguments; non-string arguments are disabled.
-- [ ] 3. Selecting an argument proposes `<tool>_<argument>`, marked as proposed and editable; the field has no dropdown.
-- [ ] 4. The help explains that the resource type is only a unique label on the server.
-- [ ] 5. The example, the optional-argument warning and the impact warning appear as in section 2.
-- [ ] 6. Save draft, Review & approve and Discard draft follow section 3; a draft has no runtime effect.
-- [ ] 7. Every item of Backend dependencies is resolved in a backend specification before implementation.
-- [ ] 8. No "Waiting backend" chip remains for an implemented item.
-- [ ] 9. `npm run check` and `npm run build` pass.
-- [ ] 10. The user confirms the interface test.
+- [x] 1. Each managed tool shows the Resource block with its state.
+- [x] 2. The argument select lists the schema arguments; non-string arguments are disabled.
+- [x] 3. Selecting an argument proposes `<tool>_<argument>`, marked as proposed and editable; the field has no dropdown.
+- [x] 4. The help explains that the resource type is only a label on the server, shared by the tools that use it (Resolved Decision 1).
+- [x] 5. The example, the optional-argument warning and the impact warning appear as in section 2.
+- [x] 6. Save draft, Review & approve and Discard draft follow section 3; a draft has no runtime effect.
+- [x] 7. Every item of Backend dependencies is resolved in a backend specification before implementation.
+- [x] 8. No "Waiting backend" chip remains for an implemented item.
+- [x] 9. `npm run check` and `npm run build` pass.
+- [x] 10. The user confirms the interface test. Run by Claude in the built-in browser at the user's request (2026-11-02).
 
 ---
 

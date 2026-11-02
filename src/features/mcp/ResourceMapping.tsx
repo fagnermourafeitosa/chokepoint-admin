@@ -1,70 +1,49 @@
 import { useState } from 'react';
-import { SelectMenu } from '../../components/ui/dropdown/SelectMenu';
-import { Database, TriangleAlert } from 'lucide-react';
+import { Database } from 'lucide-react';
+import type { EnvironmentScope } from '../access/environment-scope';
 import type { ManagedTool } from './api';
-import { WaitingBackend } from '../access/delegation/WaitingBackend';
-import { Tooltip } from '../../components/ui/tooltip/Tooltip';
-import { CircleHelp } from 'lucide-react';
+import { showResource } from './resource-api';
+import { useResourceMapping } from './useResourceMapping';
+import { ResourceEditor } from './ResourceEditor';
+import { ResourceImpact } from './ResourceImpact';
 
-// Layout prototype (Admin A2): the resource mapping of a reviewed tool (Backend 029). Local state only.
-export type ResourceMap = { pointer: string; kind: string };
-export type ResourceState = { active?: ResourceMap; draft?: ResourceMap | null };
-
-const kindPattern = /^[a-z][a-z0-9_]{1,79}$/;
-// The proposal is <tool>_<argument>, as a valid identifier. The administrator can edit it.
-const propose = (tool: string, arg: string) => `${tool}_${arg}`.toLowerCase().replace(/[^a-z0-9_]/g, '_');
-
-function argumentsOf(tool: ManagedTool) {
-  const schema = tool.contract.inputSchema as { properties?: Record<string, { type?: string; description?: string }>; required?: string[] } | undefined;
-  return Object.entries(schema?.properties ?? {}).map(([name, p]) => ({ name, type: p.type ?? 'unknown', required: schema?.required?.includes(name) ?? false, description: p.description }));
-}
-
-const show = (m?: ResourceMap) => (m ? `/${m.pointer} → ${m.kind}` : 'None');
-
-export function ResourceMapping({ tool, state, kinds, agents, onChange }: { tool: ManagedTool; state: ResourceState; kinds: string[]; agents: (kind: string) => string[]; onChange: (s: ResourceState) => void }) {
-  const [open, setOpen] = useState(false);
-  const current = state.draft === undefined ? state.active : state.draft ?? undefined;
-  const [pointer, setPointer] = useState(current?.pointer ?? '');
-  const [kind, setKind] = useState(current?.kind ?? '');
-  const [edited, setEdited] = useState(!!current?.kind);
-  const args = argumentsOf(tool);
-  const arg = args.find(a => a.name === pointer);
-  const sample = pointer.includes('repo') ? 'acme/payments-api' : '42';
-  const validKind = kindPattern.test(kind);
-  const pending = state.draft !== undefined;
-  const removing = state.draft === null;
-  const affected = state.active ? agents(state.active.kind) : [];
-  const label = pending ? (removing ? 'Removal draft' : 'Draft') : state.active ? 'Active' : '';
+// The Resource block of a managed tool (Admin 027): a shortcut inside the COAZ
+// mapping of the tool. The backend validates and owns the mapping.
+export function ResourceMapping({ scope, serverId, tool }: { scope: EnvironmentScope; serverId: string; tool: ManagedTool }) {
+  const [stage, setStage] = useState<'closed' | 'edit' | 'approve'>('closed');
+  const m = useResourceMapping(scope, serverId, tool.name, stage !== 'closed');
+  const { view, active, draft } = m;
+  if (m.query.isError && !view) return <div className="resource-mapping"><p role="alert" className="resource-warning">Could not load the resource of this tool. <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => void m.reload()}>Retry</button></p></div>;
+  if (!view) return <div className="resource-mapping"><p role="status" className="cp-admin-muted">Loading resource…</p></div>;
+  const editable = active.editable && (!draft || draft.editable);
+  const removing = !!draft && !draft.resource && !!active.resource;
+  const label = draft ? (removing ? 'Removal draft' : `Draft · ${showResource(draft.resource)}`) : active.resource ? (view.source === 'server' ? 'Declared by the server' : 'Active') : '';
   return <div className="resource-mapping">
     <div className="resource-mapping-line">
-      <Database size={15} aria-hidden="true" /><span>Resource</span><code>{show(state.active)}</code>
-      {label ? <span className="mcp-badge" data-tone={pending ? 'warning' : 'success'}>{label}{pending && !removing ? ` · ${show(state.draft ?? undefined)}` : ''}</span> : null}
-      <WaitingBackend spec="029" tip="Declares which argument of this tool identifies the resource that a call acts on." />
-      <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => setOpen(v => !v)}>{open ? 'Close' : 'Configure resource'}</button>
+      <Database size={15} aria-hidden="true" /><span>Resource</span><code>{active.custom ?? showResource(active.resource)}</code>
+      {label ? <span className="mcp-badge" data-tone={draft ? 'warning' : 'success'}>{label}</span> : null}
+      {editable ? <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => setStage(s => (s === 'closed' ? 'edit' : 'closed'))}>{stage === 'closed' ? 'Configure resource' : 'Close'}</button> : <small className="cp-admin-muted">This mapping uses an advanced form. Edit it in Configure mapping.</small>}
     </div>
-    {open ? <div className="resource-mapping-editor">
-      <p className="cp-admin-muted">The resource is the object a call acts on. An agent can call this tool only on resources it has.</p>
-      <div className="resource-field"><span>Argument</span>
-        <SelectMenu block label="Argument" value={pointer} onChange={v => { setPointer(v); if (!edited) setKind(v ? propose(tool.name, v) : ''); }}
-          options={[{ value: '', label: 'No resource. Calls have no resource check.' }, ...args.map(a => ({ value: a.name, disabled: a.type !== 'string', label: `${a.name} · ${a.type}${a.required ? ' · required' : ''}${a.type !== 'string' ? ' · must be a string' : ''}` }))]} />
-        {!args.length ? <small>This tool has no arguments, so it can not have a resource.</small> : null}
-      </div>
-      {pointer ? <>
-        <div className="resource-field">
-          <span className="resource-label">Resource type{!edited ? <em> · proposed</em> : null}<Tooltip content="A label that identifies one type of resource on this server. It must be unique on the server. It has no other effect."><CircleHelp size={14} aria-label="About resource type" /></Tooltip></span>
-          <input className="cp-admin-input" aria-label="Resource type" value={kind} onChange={e => { setKind(e.target.value.trim()); setEdited(true); }} aria-invalid={!!kind && !validKind} />
-          <small>{kind && !validKind ? 'Use lowercase letters, digits and _.' : !edited ? `Proposed from the tool and the argument (${tool.name}_${pointer}). You can edit it.` : ''}</small>
-        </div>
-        {arg && !arg.required ? <p className="resource-warning"><TriangleAlert size={14} aria-hidden="true" />{arg.name} is optional. A call without it is denied.</p> : null}
-        <div className="resource-preview"><span>Example</span><code>{`{ "${pointer}": "${sample}" }`}</code><span>→</span><strong>{kind || 'resource_type'} › {sample}</strong><small>Missing, empty or not a string: the call is denied.</small></div>
-      </> : null}
-      {state.active && (!pointer || kind !== state.active.kind) && affected.length ? <p className="resource-warning"><TriangleAlert size={14} aria-hidden="true" />{affected.length} {affected.length === 1 ? 'agent has' : 'agents have'} resources of type {state.active.kind} ({affected.join(', ')}). {pointer ? 'They do not apply to this tool after the change.' : 'Without a resource this tool has no resource check for them.'}</p> : null}
+    {m.error ? <p role="alert" className="cp-admin-notice" data-tone="danger">{m.error}{m.conflict ? <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" disabled={m.pending} onClick={() => void m.reload()}>Reload</button> : null}</p> : null}
+    {m.notice ? <p role="status" className="cp-admin-notice">{m.notice}</p> : null}
+    {stage === 'edit' && editable ? <>
+      {view.source === 'server' && active.resource && !draft ? <p className="cp-admin-muted">Declared by the server. A saved draft creates a local mapping that replaces it after approval.</p> : null}
+      <ResourceEditor key={view.server_revision} tool={tool} initial={draft ? draft.resource : active.resource} active={active.resource} agents={m.agents} agentsError={m.agentsError} pending={m.pending} onSave={async r => { await m.save(r); }} />
+      {draft ? <div className="resource-actions">
+        <button type="button" className="cp-admin-button cp-admin-button--small" disabled={m.pending} onClick={() => setStage('approve')}>Review &amp; approve</button>
+        <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" disabled={m.pending} onClick={() => void m.discard()}>Discard draft</button>
+      </div> : null}
+    </> : null}
+    {stage === 'approve' && draft ? <div className="resource-mapping-editor">
+      <p><strong>Review the resource change</strong></p>
+      <div className="resource-preview"><span>Current</span><code>{showResource(active.resource)}</code><span>→</span><span>Proposed</span><strong>{showResource(draft.resource)}</strong></div>
+      <ResourceImpact active={active.resource} next={draft.resource} agents={m.agents} error={m.agentsError} />
+      {!view.can_approve ? <p role="alert" className="cp-admin-notice" data-tone="danger">Review and enable the current server and tool through discovery before approving this mapping.</p> : null}
+      <p className="cp-admin-muted resource-note">Approval replaces the active mapping of this tool. New calls use it.</p>
       <div className="resource-actions">
-        <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" disabled={!!pointer && !validKind} onClick={() => { onChange({ ...state, draft: pointer ? { pointer, kind } : null }); setOpen(false); }}>Save draft</button>
-        {pending ? <button type="button" className="cp-admin-button cp-admin-button--small" onClick={() => { onChange({ active: state.draft ?? undefined }); setOpen(false); }}>Review &amp; approve</button> : null}
-        {pending ? <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => { onChange({ active: state.active }); setPointer(state.active?.pointer ?? ''); setKind(state.active?.kind ?? ''); }}>Discard draft</button> : null}
+        <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" disabled={m.pending} onClick={() => setStage('edit')}>Back</button>
+        <button type="button" className="cp-admin-button cp-admin-button--small" disabled={m.pending || !view.can_approve} onClick={async () => { if (await m.approve()) setStage('closed'); }}>{m.pending ? 'Approving…' : 'Approve'}</button>
       </div>
-      <p className="cp-admin-muted resource-note">A draft has no effect. After approval, new calls use the mapping. A change needs a new review, like source bindings.</p>
     </div> : null}
   </div>;
 }

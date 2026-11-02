@@ -4,10 +4,7 @@ import { Power } from 'lucide-react';
 import { DelegationEditor } from '../access/delegation/DelegationEditor';
 import { AgentIdentity } from '../access/delegation/AgentIdentity';
 import { WaitingBackend } from '../access/delegation/WaitingBackend';
-import { toolCatalog } from '../access/delegation/fixtures';
-import { ResourceMapping, type ResourceState } from '../mcp/ResourceMapping';
 import { ChokepointTokenSetup } from '../mcp/ChokepointTokenSetup';
-import type { ManagedTool } from '../mcp/api';
 import { ProtoLists, type Filters, type View } from '../investigate/prototype/ProtoLists';
 import { ProtoInspector } from '../investigate/prototype/ProtoInspector';
 import { ProtoExchangeSignals } from '../investigate/prototype/ProtoSignals';
@@ -19,11 +16,10 @@ import '../attention/attention.css';
 import '../mcp/mcp.css';
 import './prototype.css';
 
-// Layout prototypes of Admin 026, 027, 029 and 030: fixed data, never connected to the backend.
+// Layout prototypes of Admin 026, 029 and 030: fixed data, never connected to the backend.
 // The real screens stay unchanged; these pages are the visual specification until implementation.
 const pages = [
   { path: 'agent', label: 'Agent (026, 029)' },
-  { path: 'tools', label: 'Tool review (027)' },
   { path: 'mcp-server', label: 'Custom MCP server (029)' },
   { path: 'investigate', label: 'Investigate and Inbox (030)' },
 ] as const;
@@ -38,24 +34,6 @@ function AgentPrototype() {
     <div className="access-detail-tabs agent-view-tabs" role="group" aria-label="Agent views"><button type="button" aria-pressed={tab === 'access'} onClick={() => setTab('access')}>Delegation and access</button><button type="button" aria-pressed={tab === 'identity'} onClick={() => setTab('identity')}>Identity</button></div>
     <div hidden={tab !== 'access'}><DelegationEditor agentName={name} disabled={disabled} /></div>
     {tab === 'identity' ? <AgentIdentity agentId={agentId} agentName={name} disabled={disabled} /> : null}
-  </section>;
-}
-
-function toManaged(t: (typeof toolCatalog)[number]): ManagedTool {
-  const properties = Object.fromEntries(Object.entries(t.args).map(([k, type]) => [k, { type }]));
-  return { name: t.tool, reviewed: true, change: 'unchanged', selected: true, enabled: true, contract: { name: t.tool, inputSchema: { type: 'object', properties, required: Object.keys(t.args).slice(0, 1) } } } as ManagedTool;
-}
-
-function ToolsPrototype() {
-  const tools = toolCatalog.filter(t => t.serverId === 'github').slice(0, 4).map(toManaged);
-  const [state, setState] = useState<Record<string, ResourceState>>({ merge_pull_request: { active: { pointer: 'repository', kind: 'merge_pull_request_repository' } } });
-  const kinds = [...new Set(Object.values(state).flatMap(s => [s.active?.kind, s.draft?.kind]).filter((k): k is string => !!k))];
-  return <section className="cp-admin-panel mcp-details" aria-label="Tool review prototype">
-    <header className="mcp-details-heading"><div><h2>GitHub</h2><p className="cp-admin-muted">Enterprise MCP · tool review</p></div></header>
-    <div className="mcp-tool-list">{tools.map(tool => <article key={tool.name} className="mcp-tool-row">
-      <div className="mcp-tool-heading"><div className="mcp-tool-copy"><strong>{tool.name}</strong><code>{tool.name}</code></div><span className="mcp-badge">Enabled</span></div>
-      <ResourceMapping tool={tool} state={state[tool.name] ?? {}} kinds={kinds} agents={k => (k === 'merge_pull_request_repository' ? ['issues-manager'] : [])} onChange={s => setState(v => ({ ...v, [tool.name]: s }))} />
-    </article>)}</div>
   </section>;
 }
 
@@ -82,12 +60,11 @@ function InvestigatePrototype() {
 
 export function PrototypePage() {
   return <section aria-label="Prototypes" className="prototype-page">
-    <header className="access-page-heading"><div><span className="cp-admin-label">LAYOUT PROTOTYPES</span><h1 className="cp-admin-title">Agent delegation screens</h1><p className="cp-admin-muted">Fixed data. These pages are the visual specification of Admin 026, 027, 029 and 030. They do not call the backend.</p></div></header>
+    <header className="access-page-heading"><div><span className="cp-admin-label">LAYOUT PROTOTYPES</span><h1 className="cp-admin-title">Agent delegation screens</h1><p className="cp-admin-muted">Fixed data. These pages are the visual specification of Admin 026, 029 and 030. They do not call the backend.</p></div></header>
     <nav className="prototype-nav" aria-label="Prototype pages">{pages.map(p => <NavLink key={p.path} to={`/prototype/${p.path}`}>{p.label}</NavLink>)}</nav>
     <Routes>
       <Route index element={<Navigate to="agent" replace />} />
       <Route path="agent" element={<AgentPrototype />} />
-      <Route path="tools" element={<ToolsPrototype />} />
       <Route path="mcp-server" element={<McpServerPrototype />} />
       <Route path="investigate" element={<InvestigatePrototype />} />
     </Routes>
