@@ -3,7 +3,7 @@
 - **Specification ID**: 031
 - **Date**: 2026-11-02
 - **Slug**: agent-kill-switch
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Access and Permissions
 - **Related Specification**: [Backend 032 — PEP Chokepoint Token and Actor Projection](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md) (agent status, Resolved Decision 2 and Admin contract)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md) (moved from section 1, Resolved Decision 1)
@@ -35,8 +35,8 @@ An administrator who sees an agent misbehave can only remove its permissions and
 
 ## User Stories
 
-- [ ] 1. As an administrator, I disable an agent at once, and its next call is rejected.
-- [ ] 2. As an administrator, I enable a disabled agent again with its configuration and key.
+- [x] 1. As an administrator, I disable an agent at once, and its next call is rejected.
+- [x] 2. As an administrator, I enable a disabled agent again with its configuration and key.
 
 ---
 
@@ -54,11 +54,11 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ## Acceptance Criteria
 
-- [ ] 1. The header shows Active or Disabled.
-- [ ] 2. Disable agent and Enable agent call the Backend 032 API with the revision, and a conflict asks for a reload.
-- [ ] 3. No "Waiting backend" chip remains for an implemented item.
-- [ ] 4. `npm run check` and `npm run build` pass.
-- [ ] 5. The user confirms the interface test.
+- [x] 1. The header shows Active or Disabled.
+- [x] 2. Disable agent and Enable agent call the Backend 032 API with the revision, and a conflict asks for a reload.
+- [x] 3. No "Waiting backend" chip remains for an implemented item.
+- [x] 4. `npm run check` and `npm run build` pass.
+- [x] 5. The user confirms the interface test. Run by Claude in the built-in browser at the user's request (2026-11-02): Disable agent showed Disabled, a token issued before got HTTP 401 and a new exchange got `invalid_client`; a stale revision showed the conflict with Reload, which loaded the current status; Enable agent restored the calls with the same delegations and key.
 
 ---
 

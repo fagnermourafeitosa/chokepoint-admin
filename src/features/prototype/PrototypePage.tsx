@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Navigate, Route, Routes } from 'react-router';
-import { Power } from 'lucide-react';
 import { AgentIdentity } from '../access/delegation/AgentIdentity';
-import { WaitingBackend } from '../access/delegation/WaitingBackend';
 import { ChokepointTokenSetup } from '../mcp/ChokepointTokenSetup';
 import { ProtoLists, type Filters, type View } from '../investigate/prototype/ProtoLists';
 import { ProtoInspector } from '../investigate/prototype/ProtoInspector';
@@ -15,21 +13,19 @@ import '../attention/attention.css';
 import '../mcp/mcp.css';
 import './prototype.css';
 
-// Layout prototypes of Admin 029, 030 and 031: fixed data, never connected to the backend.
+// Layout prototypes of Admin 029 and 030: fixed data, never connected to the backend.
 // The real screens stay unchanged; these pages are the visual specification until implementation.
 const pages = [
-  { path: 'agent', label: 'Agent (029, 031)' },
+  { path: 'agent', label: 'Agent (029)' },
   { path: 'mcp-server', label: 'Custom MCP server (029)' },
   { path: 'investigate', label: 'Investigate and Inbox (030)' },
 ] as const;
 
 function AgentPrototype() {
-  const [disabled, setDisabled] = useState(false);
   const agentId = 'c61e0a96-18ad-4a42-8aea-882c4a8847d7', name = 'issues-manager';
   return <section className="cp-admin-panel access-agent-details" aria-label="Agent prototype">
-    <div className="access-agent-heading"><div className="agent-detail-copy"><div className="access-agent-title"><h2>{name}</h2><span className="mcp-badge" data-tone={disabled ? undefined : 'success'}>{disabled ? 'Disabled' : 'Active'}</span><WaitingBackend spec="032" tip="Turns the agent on or off at once. A disabled agent gets no new token and its next call is rejected." /></div><p className="cp-admin-muted">Acts for the subjects that delegate to it</p></div>
-      <div className="agent-detail-actions"><button className={`cp-admin-button cp-admin-button--small ${disabled ? 'cp-admin-button--secondary' : 'cp-admin-button--danger-soft'}`} type="button" onClick={() => setDisabled(v => !v)}><Power size={15} aria-hidden="true" />{disabled ? 'Enable agent' : 'Disable agent'}</button></div></div>
-    <AgentIdentity agentId={agentId} agentName={name} disabled={disabled} />
+    <div className="access-agent-heading"><div className="agent-detail-copy"><div className="access-agent-title"><h2>{name}</h2></div><p className="cp-admin-muted">Acts for the subjects that delegate to it</p></div></div>
+    <AgentIdentity agentId={agentId} agentName={name} disabled={false} />
   </section>;
 }
 

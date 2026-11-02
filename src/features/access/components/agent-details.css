@@ -77,3 +77,10 @@
   background: var(--cp-admin-color-accent-soft);
   color: var(--cp-admin-color-accent-text);
 }
+
+.access-agent-status-error {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-admin-space-3);
+  flex-basis: 100%;
+}
