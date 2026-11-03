@@ -1,3 +1,4 @@
+import { HttpError } from '../../../api/http-client';
 import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAccessData } from './useAccessData';
@@ -35,12 +36,19 @@ export function useAgentWorkbench(scope: AgentScope, requestedId?: string, conte
     if (!selectedAgent || removing.current) return false;
     removing.current = true; setDeleting(true); setError('');
     try {
-      await agentApi.remove(scope, selectedAgent.id);
+      await agentApi.remove(scope, selectedAgent.id, selectedAgent.revision);
       if (!alive.current) return false;
       client.removeQueries({ queryKey: [...agentKey(scope), 'detail', selectedAgent.id] });
       client.removeQueries({ queryKey: [...agentKey(scope), 'image', selectedAgent.id] });
       setSelectedId(null); setDialog(null); await data.refresh(); return true;
-    } catch (reason) { if (alive.current) setError(agentError(reason)); return false; }
+    } catch (reason) {
+      if (!alive.current) return false;
+      // Backend 038: a stale revision changes nothing; a failed revocation keeps the agent (Admin 032 section 6).
+      if (reason instanceof HttpError && reason.status === 409) { setError('This agent changed in another session. It was reloaded; check it and delete again.'); await data.refresh(); }
+      else if (reason instanceof HttpError && reason.status >= 500) setError('The access of this agent could not be removed, so it was not deleted. Try again.');
+      else setError(agentError(reason));
+      return false;
+    }
     finally { removing.current = false; if (alive.current) setDeleting(false); }
   }
   return { ...data, details, visibleAgents, selectedAgent, search, setSearch, selectAgent: setSelectedId, dialog, setDialog, persisted, saved, remove, error, deleting };

@@ -12,19 +12,28 @@ export type ResourceRecord = { server_id: string; type: string; id: string };
 export type ConditionRecord = { id: string; name: string; server_id: string; tool: string; expression: string; required_bindings: string[]; required_limits: string[] };
 export type PermissionDocument = { scopes: ScopeRecord[]; delegations: DelegationRecord[]; capabilities: CapabilityRecord[]; resources: ResourceRecord[]; conditions: ConditionRecord[] };
 export type Reconciliation = { state: 'effective' | 'pending'; last_attempt_at?: string | null; last_error?: string };
-export type Configuration = { agent_id: string; revision: number; draft?: PermissionDocument; published?: PermissionDocument; published_revision: number; effective_revision: number; reconciliation: Reconciliation };
+// published_by, published_by_name, published_at and note describe the latest published or
+// revoked revision, all null before the first publication (Backend 038).
+export type Configuration = { agent_id: string; revision: number; draft?: PermissionDocument; published?: PermissionDocument; published_revision: number; effective_revision: number; reconciliation: Reconciliation; published_by: string | null; published_by_name: string | null; published_at: string | null; note: string | null };
+// One published or revoked revision of the history (Backend 038). document is set only by the read of one revision.
+export type Revision = { revision: number; action: 'publish' | 'revoke'; published_by: string; published_by_name?: string; published_at: string; effective_at: string | null; note: string | null; document?: PermissionDocument };
+export type RevisionPage = { items: Revision[]; total: number; page: number; page_size: number };
 // A resource that the effective mapping of a managed tool projects (Backend 037).
 export type ServerResourceType = { tool: string; type: string; argument: string | null };
 
 export const emptyDocument = (): PermissionDocument => ({ scopes: [], delegations: [], capabilities: [], resources: [], conditions: [] });
 export const delegationKey = (s: AgentScope, id: string) => ['agent-permissions', s.userId, s.tenantId, s.environmentId, id] as const;
+export const revisionsKey = (s: AgentScope, id: string) => [...delegationKey(s, id), 'revisions'] as const;
 const path = (s: AgentScope, id: string): `/v1/${string}` => `/v1/workspaces/${s.tenantId}/environments/${s.environmentId}/agents/${id}/permissions`;
 
 // Edits stay in the browser until Review & publish saves the draft and publishes it (Admin 026 Resolved Decision 4).
 export const permissionApi = {
   get: (s: AgentScope, id: string, signal: AbortSignal) => httpClient<Configuration>(path(s, id), { signal }),
-  change: (s: AgentScope, id: string, action: 'draft' | 'publish' | 'discard', revision: number, document: PermissionDocument | undefined, signal: AbortSignal) =>
-    httpClient<Configuration>(`${path(s, id)}/${action}`, { method: action === 'draft' ? 'PUT' : 'POST', json: { revision, ...(document ? { document } : {}) }, signal }),
+  // note is the optional reason of a publication (Backend 038).
+  change: (s: AgentScope, id: string, action: 'draft' | 'publish' | 'discard', revision: number, document: PermissionDocument | undefined, signal: AbortSignal, note?: string) =>
+    httpClient<Configuration>(`${path(s, id)}/${action}`, { method: action === 'draft' ? 'PUT' : 'POST', json: { revision, ...(document ? { document } : {}), ...(note ? { note } : {}) }, signal }),
+  revisions: (s: AgentScope, id: string, page: number, signal: AbortSignal) => httpClient<RevisionPage>(`${path(s, id)}/revisions?page=${page}&page_size=20`, { signal }),
+  revision: (s: AgentScope, id: string, revision: number, signal: AbortSignal) => httpClient<Revision>(`${path(s, id)}/revisions/${revision}`, { signal }),
 };
 
 export const resourceTypesApi = {

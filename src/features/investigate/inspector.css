@@ -252,3 +252,9 @@
 .trace-path-relations li { flex-wrap: wrap; align-content: flex-start; row-gap: 4px; }
 .trace-path-relation { flex-basis: 100%; font: 11px var(--cp-admin-font-mono); color: var(--cp-admin-color-text-muted); overflow-wrap: anywhere; }
 .trace-rule-item { display: grid; gap: 4px; }
+
+/* Permission revision of a decision (layout prototype, Backend 038). */
+.trace-revision { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--cp-admin-space-2); }
+.trace-revision small { color: var(--cp-admin-color-text-muted); }
+.trace-revision-link { padding: 0; border: 0; background: none; color: var(--cp-admin-color-action); font: inherit; font-weight: var(--cp-admin-weight-semibold); text-decoration: underline; cursor: pointer; }
+.trace-revision-link:hover { color: var(--cp-admin-color-action-hover); }

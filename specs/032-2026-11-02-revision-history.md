@@ -3,7 +3,7 @@
 - **Specification ID**: 032
 - **Date**: 2026-11-02
 - **Slug**: revision-history
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Access and Permissions, Investigate, design system
 - **Related Specification**: [Backend 038 — Permission Revision History and Agent Soft Delete](../../backend/specs/038-2026-11-02-permission-revision-history.md)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md) (publication bar)
@@ -65,11 +65,11 @@ The delete dialog says that the agent and its access are removed permanently. Wi
 
 ## User Stories
 
-- [ ] 1. As an administrator, I see who published the current revision, when and why, from the publication bar.
-- [ ] 2. As an administrator, I add an optional note when I publish.
-- [ ] 3. As an administrator, I open the revision history of an agent and see what each revision changed.
-- [ ] 4. As an administrator, I open the revision of a decision from Investigate, without leaving it.
-- [ ] 5. As an administrator, I understand before I delete an agent that its access is revoked and its history stays.
+- [x] 1. As an administrator, I see who published the current revision, when and why, from the publication bar.
+- [x] 2. As an administrator, I add an optional note when I publish.
+- [x] 3. As an administrator, I open the revision history of an agent and see what each revision changed.
+- [x] 4. As an administrator, I open the revision of a decision from Investigate, without leaving it.
+- [x] 5. As an administrator, I understand before I delete an agent that its access is revoked and its history stays.
 
 ---
 
@@ -105,16 +105,16 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ## Acceptance Criteria
 
-- [ ] 1. The publication bar shows the author, time and note of the latest revision and opens the history.
-- [ ] 2. Publish sends the optional note.
-- [ ] 3. The history side panel shows the timeline and the computed diff of the selected revision.
-- [ ] 4. The decision inspector shows the permission revision and opens the side panel on it, or shows "Not recorded".
-- [ ] 5. The delete dialog states the soft delete, sends the revision and shows the revocation and conflict errors; a deleted agent leaves the list and shows as deleted in Investigate, exchange items and the Inbox.
-- [ ] 6. The exchange inspector and the Inbox item of a deleted agent explain that its key is still in use and offer no Open the agent action.
-- [ ] 7. The `SidePanel` component and its documentation are in the design system.
-- [ ] 8. No "Waiting backend" chip remains for an implemented item.
-- [ ] 9. `npm run check` and `npm run build` pass.
-- [ ] 10. The user confirms the interface test.
+- [x] 1. The publication bar shows the author, time and note of the latest revision and opens the history.
+- [x] 2. Publish sends the optional note.
+- [x] 3. The history side panel shows the timeline and the computed diff of the selected revision.
+- [x] 4. The decision inspector shows the permission revision and opens the side panel on it, or shows "Not recorded". A revision published before Backend 038 has no event: the panel says that it was published before the history existed (review adjustment, checked in the browser).
+- [x] 5. The delete dialog states the soft delete, sends the revision and shows the revocation and conflict errors; a deleted agent leaves the list and shows as deleted in Investigate, exchange items and the Inbox. The revocation and conflict errors and the Inbox text were checked by code inspection; the rest in the browser.
+- [x] 6. The exchange inspector and the Inbox item of a deleted agent explain that its key is still in use and offer no Open the agent action. The Inbox item by code inspection: no signal was raised during the test.
+- [x] 7. The `SidePanel` component and its documentation are in the design system.
+- [x] 8. No "Waiting backend" chip remains for an implemented item.
+- [x] 9. `npm run check` and `npm run build` pass.
+- [x] 10. The user confirms the interface test. Run by Claude in the built-in browser at the user's request on 2026-11-03.
 
 ---
 
@@ -130,3 +130,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 ## Further Notes
 
 The prototype points its Vite proxy at a local backend on port 8082 and rewrites the request `Origin` (in `vite.config.ts`), because another session used port 8081. These changes are local to the prototype worktree and must not be committed.
+
+### Interface test (2026-11-03)
+
+Run by Claude in the built-in browser at the user's request, on an isolated stack: Backend 038 on port 8083 with its own PostgreSQL (migrations and development seed), Admin at `localhost:5175`, the host Keycloak and OpenFGA. Checked: two publications, one with a note; the publication bar author, time and note; the history panel timeline, effective revision, note and diff (resource removed; first revision with names from the catalog); Escape closes the panel; a decision at revision 6 opens the panel on that revision from Investigate; deletion revokes (revoked event, no OpenFGA tuples left, status deleted with its author), the agent leaves the list, Investigate shows "Example agent (deleted)", and a token request of the deleted agent shows the key warning with no Open the agent action.

@@ -55,3 +55,82 @@
 
 .cp-admin-badge--warning { color: var(--cp-admin-color-warning); background: var(--cp-admin-color-warning-bg); }
 .cp-admin-dialog--wide { --cp-admin-layout-dialog: var(--cp-admin-layout-dialog-wide); }
+
+/* Side panel: a native modal dialog on the right edge of the window. */
+.cp-admin-side-panel {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(var(--cp-admin-layout-side-panel), 100vw);
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-inline-start: 2px solid var(--cp-admin-color-text);
+  background: var(--cp-admin-color-surface);
+  color: var(--cp-admin-color-text);
+  box-shadow: var(--cp-admin-shadow-dialog);
+  animation: cp-admin-side-panel-in var(--cp-admin-duration-normal) var(--cp-admin-ease-out);
+}
+.cp-admin-side-panel[data-width="wide"] {
+  width: min(var(--cp-admin-layout-side-panel-wide), 100vw);
+}
+.cp-admin-side-panel::backdrop {
+  background: var(--cp-admin-color-overlay);
+  animation: cp-admin-side-panel-fade var(--cp-admin-duration-normal) var(--cp-admin-ease-out);
+}
+.cp-admin-side-panel-frame {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+}
+.cp-admin-side-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cp-admin-space-4);
+  padding: var(--cp-admin-space-4) var(--cp-admin-space-6);
+  border-bottom: 1px solid var(--cp-admin-color-border);
+}
+.cp-admin-side-panel-header h2 {
+  margin: 2px 0 0;
+  font-family: var(--cp-admin-font-heading);
+  font-size: var(--cp-admin-type-section);
+}
+.cp-admin-side-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-admin-space-2);
+}
+.cp-admin-side-panel-close {
+  display: grid;
+  place-items: center;
+  width: var(--cp-admin-control-height);
+  height: var(--cp-admin-control-height);
+  border: 0;
+  border-radius: var(--cp-admin-radius-control);
+  background: transparent;
+  color: var(--cp-admin-color-text-muted);
+  cursor: pointer;
+}
+.cp-admin-side-panel-close:hover {
+  background: var(--cp-admin-color-row-hover);
+  color: var(--cp-admin-color-text);
+}
+.cp-admin-side-panel-body {
+  min-height: 0;
+  overflow: auto;
+}
+@keyframes cp-admin-side-panel-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes cp-admin-side-panel-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cp-admin-side-panel,
+  .cp-admin-side-panel::backdrop { animation: none; }
+}

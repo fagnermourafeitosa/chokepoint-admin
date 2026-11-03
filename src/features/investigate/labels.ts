@@ -1,4 +1,4 @@
-import type { ExchangeReasonLabel, ReasonLabel, SubjectRef } from './types';
+import type { AgentRef, ExchangeReasonLabel, ReasonLabel, SubjectRef } from './types';
 
 // Deny reasons in short words (Admin 030 section 2).
 export const denyText: Record<ReasonLabel, string> = {
@@ -42,3 +42,8 @@ export const stateText = { passed: 'Passed', failed: 'Failed', not_evaluated: 'N
 
 export const subjectName = (s: SubjectRef) => s.name || s.subject;
 export const kindText = (s: SubjectRef) => (s.kind === 'service' ? 'Service' : s.kind === 'person' ? 'Person' : undefined);
+
+// agentText names an agent and marks a deleted one, which keeps its name (Backend 038).
+export function agentText(agent: AgentRef): string {
+  return (agent.name || agent.id) + (agent.status === 'deleted' ? ' (deleted)' : '');
+}

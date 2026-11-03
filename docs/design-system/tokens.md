@@ -133,6 +133,8 @@
 | `--cp-admin-layout-prose` | `70ch` | Maximum explanatory prose width |
 | `--cp-admin-layout-dialog` | `32.5rem` | 520px; ordinary dialog |
 | `--cp-admin-layout-dialog-wide` | `46.875rem` | 750px; rule editor |
+| `--cp-admin-layout-side-panel` | `30rem` | 480px; side panel |
+| `--cp-admin-layout-side-panel-wide` | `55rem` | 880px; wide side panel, two columns (list and detail) |
 
 ## Extended control dimensions
 

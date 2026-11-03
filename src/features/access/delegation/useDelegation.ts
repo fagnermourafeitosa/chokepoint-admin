@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { HttpError } from '../../../api/http-client';
 import { usePendingChanges } from '../../auth/pending/PendingChanges';
 import type { AgentScope } from '../agent-api';
-import { delegationKey, emptyDocument, permissionApi, type Configuration } from './api';
+import { delegationKey, emptyDocument, permissionApi, revisionsKey, type Configuration } from './api';
 import { countChanges, fromDocument, toDocument, type Catalog, type Doc } from './model';
 
 function failure(cause: unknown) {
@@ -45,11 +45,14 @@ export function useDelegation(scope: AgentScope, agentId: string, catalog: Catal
       return false;
     } finally { if (!current.signal.aborted) { controller.current = null; setBusy(false); } }
   }
-  // Saves the edits as the draft, then publishes it. A saved draft without edits is published as it is.
-  const publish = () => run(async signal => {
+  // Saves the edits as the draft, then publishes it with the optional note (Backend 038).
+  // A saved draft without edits is published as it is.
+  const publish = (note: string) => run(async signal => {
     let revision = edited?.revision ?? config!.revision;
     if (edited) revision = (await permissionApi.change(scope, agentId, 'draft', revision, toDocument(edited.doc), signal)).revision;
-    return permissionApi.change(scope, agentId, 'publish', revision, undefined, signal);
+    const next = await permissionApi.change(scope, agentId, 'publish', revision, undefined, signal, note.trim());
+    void cache.invalidateQueries({ queryKey: revisionsKey(scope, agentId) });
+    return next;
   });
   const discard = () => (config?.draft ? run(signal => permissionApi.change(scope, agentId, 'discard', config.revision, undefined, signal)) : (setEdited(undefined), Promise.resolve(true)));
   const reload = async () => { setEdited(undefined); setError(''); setConflict(false); await query.refetch(); };

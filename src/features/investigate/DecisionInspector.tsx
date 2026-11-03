@@ -1,5 +1,6 @@
 import './inspector.css';
 import { DecisionBreakdown } from './DecisionBreakdown';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { ArrowLeft, ArrowRight, Check, X } from 'lucide-react';
 import { HttpError } from '../../api/http-client';
@@ -9,10 +10,17 @@ import { problemKey } from './types';
 import type { Decision, DecisionDetail } from './types';
 import type { useInvestigation } from './useInvestigation';
 import { utcTime } from './TraceUI';
-import { denyText, kindText, stateText, stepLabel, subjectName } from './labels';
+import { agentText, denyText, kindText, stateText, stepLabel, subjectName } from './labels';
 import { ExchangeInspector } from './ExchangeInspector';
 
 type State = ReturnType<typeof useInvestigation>;
+
+import { RevisionHistory } from '../access/delegation/RevisionHistory';
+import { CatalogProvider } from '../access/delegation/catalog';
+
+// The history panel names servers and identity providers; it loads no directory.
+const noIssuers: string[] = [];
+
 
 // The relation checked by each step of the path (Backend 034 evidence).
 const relationOfStep: Record<string, 'delegation' | 'capability' | 'resource'> = { delegation: 'delegation', capability: 'capability', resource: 'resource' };
@@ -54,6 +62,7 @@ function reasonAction(d: Decision, detail: DecisionDetail, signalId: string | un
 }
 
 function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentScope; detail: DecisionDetail; state: State; onBack: () => void }) {
+  const [history, setHistory] = useState(false);
   const d = detail.decision;
   const signalId = state.params.get('signal_id') || detail.problem?.signal?.id || undefined;
   // The path shows the four steps of Admin 030. The checks before the PDP
@@ -149,18 +158,25 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
         <DecisionBreakdown key={JSON.stringify(detail.problem && problemKey(detail.problem))} scope={scope} detail={detail} select={state.open} />
         <dl className="trace-facts">
           {[
-            ['Agent', d.agent.name ? `${d.agent.name} (${d.agent.id})` : d.agent.id],
+            ['Agent', d.agent.name ? `${agentText(d.agent)} (${d.agent.id})` : d.agent.id],
             ['On behalf of', d.subject.name ? `${d.subject.name} (${d.subject.subject})` : d.subject.subject],
             ['Identity provider', d.subject.issuer],
             ['Server', server],
             ['Tool', d.tool],
             ['Resource', d.resource ? `${d.resource.type} › ${d.resource.id}` : 'No resource check'],
             ['Decided at (UTC)', utcTime(d.decided_at)],
+            ['Permission revision', d.effective_revision == null ? 'Not recorded' : (
+              <span className="trace-revision">
+                {d.agent.status ? <button type="button" className="trace-revision-link" onClick={() => setHistory(true)}>Revision {d.effective_revision}</button> : `Revision ${d.effective_revision}`}
+                {d.published_revision != null && d.published_revision !== d.effective_revision ? <small>Revision {d.published_revision} was applying</small> : null}
+              </span>
+            )],
           ].map(([name, value]) => (
-            <div key={name}><dt>{name}</dt><dd>{value}</dd></div>
+            <div key={name as string}><dt>{name}</dt><dd>{value}</dd></div>
           ))}
         </dl>
       </article>
+      {history && d.effective_revision != null ? <CatalogProvider scope={scope} issuers={noIssuers}><RevisionHistory scope={scope} agentId={d.agent.id} agentName={agentText(d.agent)} initial={d.effective_revision} onClose={() => setHistory(false)} /></CatalogProvider> : null}
     </>
   );
 }

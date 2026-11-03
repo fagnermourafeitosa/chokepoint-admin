@@ -30,7 +30,8 @@ export const agentApi = {
   get: (scope: AgentScope, id: string, signal: AbortSignal) => httpClient<AgentRecord>(`${agentPath(scope)}/${encodeURIComponent(id)}`, { signal }),
   create: (scope: AgentScope, input: AgentFields) => httpClient<AgentRecord>(agentPath(scope), { method: 'POST', json: input }),
   update: (scope: AgentScope, id: string, input: AgentFields) => httpClient<AgentRecord>(`${agentPath(scope)}/${encodeURIComponent(id)}`, { method: 'PATCH', json: input }),
-  remove: (scope: AgentScope, id: string) => httpClient<void>(`${agentPath(scope)}/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+  // Backend 038: a soft delete with the agent revision; it revokes all access first.
+  remove: (scope: AgentScope, id: string, revision: number) => httpClient<void>(`${agentPath(scope)}/${encodeURIComponent(id)}`, { method: 'DELETE', json: { revision } }),
   upload: (scope: AgentScope, id: string, file: File) => {
     const form = new FormData(); form.set('image', file);
     return httpClient<AgentRecord>(`${agentPath(scope)}/${encodeURIComponent(id)}/image`, { method: 'PUT', form });

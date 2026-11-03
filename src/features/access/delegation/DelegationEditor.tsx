@@ -13,6 +13,7 @@ import { delegationLayout, type Positions, type Selection } from './layout';
 import { ListView } from './ListView';
 import { PublishBar } from './PublishBar';
 import { RelationPanel } from './RelationPanel';
+import { RevisionHistory } from './RevisionHistory';
 import { SectionBar } from './SectionBar';
 import { useDelegation } from './useDelegation';
 import '../../mcp/mcp.css';
@@ -54,6 +55,7 @@ function Editor({ scope, agentId, agentName, target }: Props) {
   const [positions, setPositions] = useState<Positions>({});
   const [maximized, setMaximized] = useState(false);
   const [help, setHelp] = useState(false);
+  const [history, setHistory] = useState(false);
   const [selected, setSelected] = useState<Selection | undefined>(() => targetSelection(target, state.draft));
   const [filters, setFilters] = useState<Filters>(noFilters);
   const readOnly = version === 'published';
@@ -90,6 +92,7 @@ function Editor({ scope, agentId, agentName, target }: Props) {
       {selected ? <fieldset className="delegation-panel-frame" disabled={readOnly || state.busy}><RelationPanel key={JSON.stringify(selected) + version} selected={selected} agentName={agentName} doc={doc} onChange={state.edit} onClose={() => { setSelected(undefined); setBack(undefined); }} onSelect={s => { setBack(selected?.type === 'group' ? selected : undefined); setSelected(s); }} back={back} onBack={() => { setSelected(back); setBack(undefined); }} /></fieldset> : null}
     </div>
     {help ? <GraphHelp onClose={() => setHelp(false)} /> : null}
-    <PublishBar config={state.config} changes={state.changes} busy={state.busy} onPublish={state.publish} onDiscard={() => { void state.discard(); setSelected(undefined); }} />
+    <PublishBar config={state.config} changes={state.changes} busy={state.busy} onPublish={state.publish} onDiscard={() => { void state.discard(); setSelected(undefined); }} onHistory={() => setHistory(true)} />
+    {history ? <RevisionHistory scope={scope} agentId={agentId} agentName={agentName} onClose={() => setHistory(false)} /> : null}
   </section>;
 }

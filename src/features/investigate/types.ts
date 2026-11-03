@@ -19,8 +19,9 @@ export type ExchangeReasonLabel =
   | 'invalid_authorization_details';
 export type ExchangeReason = { label: ExchangeReasonLabel; description: string };
 export type SignalRef = { id: string; status: 'open' | 'reviewed' | 'resolved' };
-// The verified agent of a decision or an exchange (act.sub).
-export type AgentRef = { id: string; name?: string | null };
+// The verified agent of a decision or an exchange (act.sub). Status is null when
+// no agent of the environment has the ID; a deleted agent keeps its name (Backend 038).
+export type AgentRef = { id: string; name?: string | null; status?: 'active' | 'disabled' | 'deleted' | null };
 // The person or service on whose behalf the agent acts. Records written before
 // Backend 034 have no connection and no kind.
 export type SubjectRef = {
@@ -66,6 +67,10 @@ export type Decision = {
   decided_at: string;
   condition?: string | null;
   evidence?: Evidence | null;
+  // The permission revisions of the agent when the PDP decided; null when not
+  // recorded. They differ only while a publication was applying (Backend 038).
+  effective_revision?: number | null;
+  published_revision?: number | null;
 };
 export type ProblemKey = {
   server_id: string;
