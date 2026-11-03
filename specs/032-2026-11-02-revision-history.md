@@ -3,7 +3,7 @@
 - **Specification ID**: 032
 - **Date**: 2026-11-02
 - **Slug**: revision-history
-- **Status**: Proposed
+- **Status**: In Progress
 - **Owner**: Admin — Access and Permissions, Investigate, design system
 - **Related Specification**: [Backend 038 — Permission Revision History and Agent Soft Delete](../../backend/specs/038-2026-11-02-permission-revision-history.md)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md) (publication bar)
@@ -12,6 +12,8 @@
 - **Related Specification**: [030 — Investigate with Agent, Subject and Token Exchanges](030-2026-10-31-investigate-agent-subject-and-token-exchanges.md) (current decision inspector facts)
 - **Related Specification**: [033 — Agent Names in the Inbox](033-2026-11-02-agent-names-in-inbox.md)
 - **Visual reference**: layout prototype on the remote branch [`design/038-revision-history`](https://github.com/fagnermourafeitosa/chokepoint-admin/tree/design/038-revision-history), commit `28bc29c`, based on `main` at `2684d50` (Admin 035). Approved by the user on 2026-11-02. Fixed data in `src/features/access/delegation/RevisionHistory.tsx` and `prototypeRevision` in `src/features/investigate/DecisionInspector.tsx`; the `SidePanel` component and its design system documentation are in the same commit.
+
+> Implementation authorized by the user on 2026-11-03, together with Backend 038, so that the agent deletion contract changes in one publication. Result approval is still required before the merge.
 
 ---
 
