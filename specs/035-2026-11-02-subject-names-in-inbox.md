@@ -3,12 +3,10 @@
 - **Specification ID**: 035
 - **Date**: 2026-11-02
 - **Slug**: subject-names-in-inbox
-- **Status**: Proposed
+- **Status**: In Progress
 - **Owner**: Admin — Overview and Inbox (`src/features/attention`)
 - **Related Specification**: [Backend 043 — Subject Names in Attention Signals](../../backend/specs/043-2026-11-02-subject-names-in-signals.md) (`context.subject_name`)
 - **Related Specification**: [033 — Agent Names in the Inbox](033-2026-11-02-agent-names-in-inbox.md) (the agent of the same line)
-
-> **On hold for Backend 043**, which adds `context.subject_name` to the signals. See [Backend dependencies](#backend-dependencies).
 
 ---
 
