@@ -17,6 +17,9 @@ type State = ReturnType<typeof useInvestigation>;
 // The relation checked by each step of the path (Backend 034 evidence).
 const relationOfStep: Record<string, 'delegation' | 'capability' | 'resource'> = { delegation: 'delegation', capability: 'capability', resource: 'resource' };
 
+// Steps recorded by the PEP before the PDP decision (Backend 034).
+const preDecisionStep = new Set(['identity', 'tool_review']);
+
 // accessPath opens the agent editor of Admin 026 at the place of the fix. It
 // only navigates; it never changes permissions (Admin 030 section 3).
 export function accessPath(params: Record<string, string | undefined>, signalId: string | undefined, returnTo: string) {
@@ -53,7 +56,11 @@ function reasonAction(d: Decision, detail: DecisionDetail, signalId: string | un
 function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentScope; detail: DecisionDetail; state: State; onBack: () => void }) {
   const d = detail.decision;
   const signalId = state.params.get('signal_id') || detail.problem?.signal?.id || undefined;
-  const steps = [...(d.evidence?.steps || [])].sort((a, b) => a.order - b.order);
+  // The path shows the four steps of Admin 030. The checks before the PDP
+  // (identity, tool review) show only when they did not pass.
+  const steps = [...(d.evidence?.steps || [])]
+    .filter((s) => !preDecisionStep.has(s.key) || s.state !== 'passed')
+    .sort((a, b) => a.order - b.order);
   const relations = new Map((d.evidence?.relations || []).map((r) => [r.key, r]));
   const rules = (d.evidence?.policies || []).filter((p) => p.server_id === d.server_id && (!p.tool || p.tool === d.tool));
   const agent = d.agent.name || d.agent.id;
