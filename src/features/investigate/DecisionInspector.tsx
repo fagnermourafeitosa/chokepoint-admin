@@ -1,5 +1,6 @@
 import './inspector.css';
 import { DecisionBreakdown } from './DecisionBreakdown';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { ArrowLeft, ArrowRight, Check, X } from 'lucide-react';
 import { HttpError } from '../../api/http-client';
@@ -13,6 +14,12 @@ import { denyText, kindText, stateText, stepLabel, subjectName } from './labels'
 import { ExchangeInspector } from './ExchangeInspector';
 
 type State = ReturnType<typeof useInvestigation>;
+
+import { RevisionHistory } from '../access/delegation/RevisionHistory';
+import { WaitingBackend } from '../access/delegation/WaitingBackend';
+
+// Layout prototype (Backend 038): the permission revision that applied to the decision. Fixed until the trace records it.
+const prototypeRevision = { effective: 7, published: 7 };
 
 // The relation checked by each step of the path (Backend 034 evidence).
 const relationOfStep: Record<string, 'delegation' | 'capability' | 'resource'> = { delegation: 'delegation', capability: 'capability', resource: 'resource' };
@@ -54,6 +61,7 @@ function reasonAction(d: Decision, detail: DecisionDetail, signalId: string | un
 }
 
 function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentScope; detail: DecisionDetail; state: State; onBack: () => void }) {
+  const [history, setHistory] = useState(false);
   const d = detail.decision;
   const signalId = state.params.get('signal_id') || detail.problem?.signal?.id || undefined;
   // The path shows the four steps of Admin 030. The checks before the PDP
@@ -156,11 +164,13 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
             ['Tool', d.tool],
             ['Resource', d.resource ? `${d.resource.type} › ${d.resource.id}` : 'No resource check'],
             ['Decided at (UTC)', utcTime(d.decided_at)],
+            ['Permission revision', <span className="trace-revision"><button type="button" className="trace-revision-link" onClick={() => setHistory(true)}>Revision {prototypeRevision.effective}</button>{prototypeRevision.published !== prototypeRevision.effective ? <small>Revision {prototypeRevision.published} was applying</small> : null}<WaitingBackend spec="038" tip="The permission revision of the agent that applied when Chokepoint decided this call." /></span>],
           ].map(([name, value]) => (
-            <div key={name}><dt>{name}</dt><dd>{value}</dd></div>
+            <div key={name as string}><dt>{name}</dt><dd>{value}</dd></div>
           ))}
         </dl>
       </article>
+      {history ? <RevisionHistory agentName={agent} initial={prototypeRevision.effective} onClose={() => setHistory(false)} /> : null}
     </>
   );
 }

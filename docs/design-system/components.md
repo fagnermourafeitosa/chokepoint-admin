@@ -24,10 +24,13 @@ The static specimens include [scripts/preview.js](scripts/preview.js) for local 
 | Accordion | `cp-admin-accordion` | Native details/summary expansion |
 | Disclosure links | `cp-admin-disclosure` | Native details with ordinary links; intentionally not an ARIA menu |
 | Dialog | `cp-admin-dialog` | Native modal in the specimen; Escape and close actions supported |
+| Side panel | `cp-admin-side-panel` (`SidePanel`) | Native modal on the right edge, full height; slides in; Escape, the close button and a click on the backdrop close it. `data-width="wide"` for two columns |
 | Notification | `cp-admin-toast` | Polite local status message in the specimen |
 | Action variants | `cp-admin-button--ghost`, `--danger`, `--small` | Secondary emphasis, destructive appearance, compact actions |
 
 Checkboxes, switches, and segmented choices expose state through native inputs. Do not replace their labels with color alone. Range/progress represent different things: a range accepts input, while progress reports a value. Small action buttons retain the 44px coarse-pointer target rule.
+
+The side panel uses the same native modal behavior as the dialog: `showModal()` traps focus and focus returns to the opener on close. Its header has an optional eyebrow (for example the name of the agent), the title, and an actions area before the close button. The body scrolls; the header stays fixed. Use it to inspect or browse something that belongs to the current page (history, details, a long list) without leaving the page. Do not use it for a short confirmation; use a dialog. Do not open a side panel from another side panel.
 
 The dialog specimen uses `showModal()` and a `method="dialog"` form. Do not set `open` by hand to imitate modal focus behavior. The disclosure uses links, not menu roles requiring custom arrow-key navigation. Escape closes an open specimen disclosure. Form validation uses native constraints and reports locally; it never submits to a backend.
 

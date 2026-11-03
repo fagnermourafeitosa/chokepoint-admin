@@ -100,6 +100,8 @@
   --cp-admin-layout-prose: 70ch;
   --cp-admin-layout-dialog: 32.5rem;
   --cp-admin-layout-dialog-wide: 46.875rem;
+  --cp-admin-layout-side-panel: 30rem;
+  --cp-admin-layout-side-panel-wide: 55rem;
   --cp-admin-layout-table-min: 34rem;
   --cp-admin-choice-size: 1.125rem;
   --cp-admin-switch-width: 2.5rem;

@@ -13,6 +13,7 @@ document.addEventListener('click', event => {
   const trigger = event.target.closest('button');
   if (!trigger) return;
   if (trigger.dataset.openDialog) document.getElementById(trigger.dataset.openDialog)?.showModal();
+  if (trigger.dataset.closeDialog) trigger.closest('dialog')?.close();
   if (trigger.hasAttribute('data-show-toast')) notify('Sample notification. No platform changes were made.');
   if (trigger.dataset.selectField) {
     const input = document.getElementById(trigger.dataset.selectField);
@@ -51,4 +52,8 @@ document.addEventListener('click', event => {
   menu.querySelectorAll('.admin-dropdown-option').forEach(el => el.setAttribute('aria-pressed', String(el === option)));
   menu.querySelector('summary > span').textContent = option.textContent;
   menu.open = false;
+});
+// A click on the backdrop of a side panel closes it.
+document.addEventListener('click', event => {
+  if (event.target instanceof HTMLDialogElement && event.target.classList.contains('cp-admin-side-panel')) event.target.close();
 });

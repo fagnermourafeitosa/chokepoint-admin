@@ -65,4 +65,6 @@ Keep space stable when a query is loading; a skeleton should follow the eventual
 
 The CSS supplies dialog appearance only. Use a native modal dialog or the selected accessible UI primitive for focus trapping, Escape, return focus, and accessible naming. Ordinary dialogs cap at 520px; the rule editor caps at 750px. Reserve 16px viewport clearance and scroll within the dialog. Avoid nesting dialogs.
 
+A side panel opens from the right edge over a dimmed page and uses the full window height. The default width is 480px; the wide width is 880px, for a list and a detail side by side (for example the revision history: a timeline on the left, the selected revision on the right). Below 760px a wide panel stacks the list above the detail. On a narrow window the panel takes the full width. Its motion is a slide from the right and is turned off for `prefers-reduced-motion`.
+
 Show the selected navigation item using `aria-current="page"`. An unpublished-change indicator does not replace the normal page title or primary navigation. Avoid recreating the mock's entire application inside the design system.

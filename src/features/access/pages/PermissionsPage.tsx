@@ -10,6 +10,7 @@ import { AgentDetails } from '../components/AgentDetails';
 import { NewAgentDialog } from '../components/NewAgentDialog';
 import { useAgentWorkbench } from '../hooks/useAgentWorkbench';
 import type { AgentScope } from '../agent-api';
+import { WaitingBackend } from '../delegation/WaitingBackend';
 
 export function PermissionsPage() {
   const auth = useAuth();
@@ -41,7 +42,7 @@ function AgentWorkbench({ scope }: { scope: AgentScope }) {
     {workbench.isFetchNextPageError ? <p role="alert">Could not load the next page. Use Load more agents to retry.</p> : null}
     {workbench.dialog === 'new-agent' || workbench.dialog === 'edit-agent' && workbench.selectedAgent ? <NewAgentDialog key={workbench.dialog === 'new-agent' ? 'new' : workbench.selectedAgent!.id} scope={scope} agent={workbench.dialog === 'edit-agent' ? workbench.selectedAgent : undefined} onClose={() => workbench.setDialog(null)} onPersisted={workbench.persisted} onSaved={agent => { workbench.saved(agent); context.select(agent.id); }} /> : null}
     {workbench.dialog === 'delete-agent' && workbench.selectedAgent ? <Dialog title="Delete agent" onClose={() => { if (!workbench.deleting) workbench.setDialog(null); }}>
-      <div className="admin-dialog-body"><p>Delete “{workbench.selectedAgent.name}”? This permanently removes the agent, its image, its published delegation and access, and its saved draft.</p>{workbench.error ? <p role="alert">{workbench.error}</p> : null}</div>
+      <div className="admin-dialog-body"><p>Delete “{workbench.selectedAgent.name}”? The agent loses all delegation and access at once and can not get new tokens. Its saved draft is dropped.</p><p className="cp-admin-muted">Chokepoint keeps the revision history and the recorded decisions of this agent. Investigate shows its name as deleted.</p><WaitingBackend spec="038" tip="Delete becomes a soft delete: access is revoked, and the history stays." />{workbench.error ? <p role="alert">{workbench.error}</p> : null}</div>
       <div className="admin-dialog-actions"><button className="cp-admin-button cp-admin-button--secondary" disabled={workbench.deleting} onClick={() => workbench.setDialog(null)}>Cancel</button><button className="cp-admin-button cp-admin-button--danger" disabled={workbench.deleting} onClick={() => void workbench.remove().then(removed => { if (removed) context.select(null); })}>{workbench.deleting ? 'Deleting…' : 'Delete agent'}</button></div>
     </Dialog> : null}
   </section>;
