@@ -52,10 +52,9 @@ export function AgentDetails({ agent, scope, target, onEdit, onDelete, onChanged
   const [block, setBlock] = useState<BlockRequest>();
   return <section className="cp-admin-panel access-agent-details" aria-label="Selected agent">
     <div className="access-agent-heading"><AgentVisual agent={agent} scope={scope} /><div className="agent-detail-copy"><div className="access-agent-title"><h2>{agent.name}</h2><span className="mcp-badge" data-tone={disabled ? undefined : 'success'}>{disabled ? 'Disabled' : 'Active'}</span></div><p>{agent.description}</p><p className="cp-admin-muted">{disabled ? 'Disabled: it gets no token, and its next call is rejected.' : 'Acts for the subjects that delegate to it'}</p></div><div className="agent-detail-actions"><AgentStatusAction key={agent.id} agent={agent} scope={scope} onChanged={onChanged} onReload={onReload} /><button className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" type="button" onClick={onEdit}><Pencil size={15} aria-hidden="true" />Edit</button><button className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" type="button" onClick={onDelete}><Trash2 size={15} aria-hidden="true" />Delete</button></div></div>
-    <div className="cp-admin-segmented agent-views" role="radiogroup" aria-label="Agent view">
-      <label className="cp-admin-segment"><input type="radio" name={`agent-view-${agent.id}`} checked={view === 'delegation'} onChange={() => choose('delegation')} /><span>Delegation and access</span></label>
-      <label className="cp-admin-segment"><input type="radio" name={`agent-view-${agent.id}`} checked={view === 'identity'} onChange={() => choose('identity')} /><span>Identity</span></label>
-      <label className="cp-admin-segment"><input type="radio" name={`agent-view-${agent.id}`} checked={view === 'sessions'} onChange={() => choose('sessions')} /><span>Harness sessions</span></label>
+    <div className="cp-admin-inner-tabs agent-views" role="group" aria-label="Agent view">
+      {([['delegation', 'Delegation and access'], ['identity', 'Identity'], ['sessions', 'Harness sessions']] as const).map(([value, label]) =>
+        <button key={value} type="button" aria-pressed={view === value} onClick={() => choose(value)}>{label}</button>)}
     </div>
     <div hidden={view !== 'delegation'}><DelegationEditor key={editorKey} scope={scope} agentId={agent.id} agentName={agent.name} target={target} block={block} /></div>
     <div hidden={view !== 'identity'}><AgentIdentity key={editorKey} scope={scope} agentId={agent.id} agentName={agent.name} disabled={disabled} /></div>
