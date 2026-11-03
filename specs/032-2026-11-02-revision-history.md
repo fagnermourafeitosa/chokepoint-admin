@@ -3,7 +3,7 @@
 - **Specification ID**: 032
 - **Date**: 2026-11-02
 - **Slug**: revision-history
-- **Status**: Waiting Approve
+- **Status**: Implemented
 - **Owner**: Admin — Access and Permissions, Investigate, design system
 - **Related Specification**: [Backend 038 — Permission Revision History and Agent Soft Delete](../../backend/specs/038-2026-11-02-permission-revision-history.md)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md) (publication bar)
