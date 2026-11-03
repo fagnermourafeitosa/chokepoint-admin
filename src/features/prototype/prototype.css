@@ -1,4 +1,4 @@
-/* Layout prototypes (Admin 026, 027, 029, 030). */
+/* Layout prototypes (docs/design-system/visual-specification.md). */
 .prototype-nav { display: flex; flex-wrap: wrap; gap: var(--cp-admin-space-2); margin-bottom: var(--cp-admin-space-5); }
 .prototype-nav a { padding: var(--cp-admin-space-2) var(--cp-admin-space-3); border: 1px solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-button); color: var(--cp-admin-color-text); text-decoration: none; font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); }
 .prototype-nav a:hover { background: var(--cp-admin-color-hover); }

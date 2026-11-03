@@ -84,3 +84,6 @@
   gap: var(--cp-admin-space-3);
   flex-basis: 100%;
 }
+
+/* The two views of an agent (Admin 029): Delegation and access, and Identity. */
+.agent-views { width: max-content; max-width: 100%; margin-block: var(--cp-admin-space-4); }

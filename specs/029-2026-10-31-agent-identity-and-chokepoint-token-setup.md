@@ -3,7 +3,7 @@
 - **Specification ID**: 029
 - **Date**: 2026-10-31
 - **Slug**: agent-identity-and-chokepoint-token-setup
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Access and Integrations
 - **Design**: [Agent delegation authorization](../../backend/docs/agent-delegation-authorization.md)
 - **Related Specification**: [Backend 030 — Agent Authorization Server](../../backend/specs/030-2026-10-31-agent-authorization-server.md) (agent client, public key, token exchange)
@@ -71,13 +71,13 @@ flowchart LR
 
 ## User Stories
 
-- [ ] 1. As an administrator, I generate the key of an agent and download one file for it.
-- [ ] 2. As an administrator, I rotate the key of an agent when the file is lost or exposed.
-- [ ] 3. As an administrator with a key in a vault, I register my own public key.
-- [ ] 4. As an administrator, I copy the client ID, the issuer and the token endpoint when I configure an agent by hand.
-- [ ] 5. As an administrator, I connect a custom MCP server and see the three values that my server must trust.
-- [ ] 6. As a developer, I copy a FastMCP example that checks the Chokepoint token and reads the person and the agent.
-- [ ] 7. As an administrator, I understand each item from its help.
+- [x] 1. As an administrator, I generate the key of an agent and download one file for it.
+- [x] 2. As an administrator, I rotate the key of an agent when the file is lost or exposed.
+- [x] 3. As an administrator with a key in a vault, I register my own public key.
+- [x] 4. As an administrator, I copy the client ID, the issuer and the token endpoint when I configure an agent by hand.
+- [x] 5. As an administrator, I connect a custom MCP server and see the three values that my server must trust.
+- [x] 6. As a developer, I copy a FastMCP example that checks the Chokepoint token and reads the person and the agent.
+- [x] 7. As an administrator, I understand each item from its help.
 
 ---
 
@@ -187,19 +187,19 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ## Acceptance Criteria
 
-- [ ] 1. The agent has an Identity view next to Delegation and access.
-- [ ] 2. Generate key and download creates the key pair in the browser, sends only the public key and downloads one file with the values of section 2.
-- [ ] 3. The Admin never shows the private key after the download.
-- [ ] 4. Rotate key asks for confirmation and downloads a new file.
-- [ ] 5. Use my own public key rejects a private key.
-- [ ] 6. The custom server dialog has no None or Bearer option and shows Issuer, JWKS and Audience without scroll.
-- [ ] 7. The server details show the FastMCP example with Copy example.
-- [ ] 8. A click anywhere on a server row opens its details.
-- [ ] 9. Every help opens on hover and focus, also inside a modal dialog.
-- [ ] 10. Every item of Backend dependencies is resolved in a backend specification before implementation.
-- [ ] 11. No "Waiting backend" chip remains for an implemented item.
-- [ ] 12. `npm run check` and `npm run build` pass.
-- [ ] 13. The user confirms the interface test.
+- [x] 1. The agent has an Identity view next to Delegation and access.
+- [x] 2. Generate key and download creates the key pair in the browser, sends only the public key and downloads one file with the values of section 2.
+- [x] 3. The Admin never shows the private key after the download.
+- [x] 4. Rotate key asks for confirmation and downloads a new file.
+- [x] 5. Use my own public key rejects a private key.
+- [x] 6. The custom server dialog has no None or Bearer option and shows Issuer, JWKS and Audience without scroll.
+- [x] 7. The server details show the FastMCP example with Copy example.
+- [x] 8. A click anywhere on a server row opens its details.
+- [x] 9. Every help opens on hover and focus, also inside a modal dialog.
+- [x] 10. Every item of Backend dependencies is resolved in a backend specification before implementation.
+- [x] 11. No "Waiting backend" chip remains for an implemented item.
+- [x] 12. `npm run check` and `npm run build` pass.
+- [x] 13. The user confirms the interface test. (Run by the agent in the built-in browser at the user's request on 2026-11-02, with a temporary agent that was deleted afterwards; the example agent and its key were not changed.)
 
 ---
 

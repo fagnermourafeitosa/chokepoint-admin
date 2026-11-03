@@ -3,8 +3,11 @@ import type { EnvironmentScope } from '../access/environment-scope';
 import type { MCPToolAnnotations } from '../access/types';
 export type ToolContract = { name: string; title?: string; description?: string; annotations?: MCPToolAnnotations; inputSchema: unknown; outputSchema?: unknown; [key: string]: unknown };
 export type ManagedTool = { local_mapping?: import("./mapping-api").MappingVersion; mapping_draft?: import("./mapping-api").MappingVersion; reviewed: boolean; name: string; contract: ToolContract; previous?: ToolContract; change: 'new' | 'changed' | 'removed' | 'unchanged'; selected: boolean; enabled: boolean };
-export type MCPServer = { id: string; name: string; endpoint: string; transport: string; auth_type: 'none' | 'bearer' | 'oauth'; connection_type?: 'custom' | 'enterprise'; provider_id?: string; account?: string; authentication_status?: string; token_configured: boolean; enabled: boolean; revision: number; server_info: unknown; tools: ManagedTool[] };
-export type Connection = { name: string; endpoint: string; transport: string; auth_type: 'none' | 'bearer'; token?: string; revision?: number };
+export type MCPServer = { id: string; name: string; endpoint: string; transport: string; auth_type: 'chokepoint_token' | 'oauth'; connection_type?: 'custom' | 'enterprise'; provider_id?: string; account?: string; authentication_status?: string; enabled: boolean;
+ // Backend 035: what a custom server must trust; read only, never sent back.
+ audience?: string; issuer?: string; jwks_uri?: string; revision: number; server_info: unknown; tools: ManagedTool[] };
+// A custom server has only the Chokepoint token auth type (Backend 035 Resolved Decision 3).
+export type Connection = { name: string; endpoint: string; transport: string; auth_type: 'chokepoint_token'; revision?: number };
 export type Preview = { preview_id: string; expires_at: string; server_info: unknown; tools: ManagedTool[]; revision: number };
 export type ServerPage = { items: MCPServer[]; next_offset: number | null };
 export const mcpKey = (s: EnvironmentScope) => ['mcp-servers', s.userId, s.tenantId, s.environmentId] as const;

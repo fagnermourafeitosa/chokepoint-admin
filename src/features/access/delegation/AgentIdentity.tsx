@@ -1,18 +1,15 @@
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, CircleHelp, Copy, Download, KeyRound, TriangleAlert } from 'lucide-react';
 import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
-// Layout prototype of Admin 029: fixed data.
-const currentAdmin = 'Marina Alves';
-import { WaitingBackend } from './WaitingBackend';
+import { HttpError } from '../../../api/http-client';
+import { agentClientApi, agentClientKey, type AgentClient } from '../agent-client-api';
+import type { EnvironmentScope } from '../environment-scope';
+import { download, fileName, generateKey, parsePublicKey, type Jwk, type ParsedKey } from './agent-key';
 import './delegation.css';
 
-// Layout prototype (Admin A2): the agent as a client of the Chokepoint authorization server (Backend 030).
-// The key pair is generated in the browser. The private key goes only to the downloaded file; nothing is sent.
-type PublicKey = { kid: string; alg: 'ES256' | 'RS256'; addedBy: string; addedAt: string; own?: boolean };
-
-const issuer = 'https://chokepoint.acme.example/as/workspace-a/sandbox';
-const now = () => new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
-const slug = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'agent';
+// The agent as a client of the Chokepoint authorization server (Admin 029, Backend 030 and 040).
+// The key pair is created in the browser. The private key goes only to the downloaded file.
 
 function Help({ text }: { text: string }) {
   return <Tooltip content={text}><CircleHelp size={14} aria-label="Help" /></Tooltip>;
@@ -29,70 +26,102 @@ function CopyValue({ label, value, help }: { label: string; value: string; help:
   </div>;
 }
 
-async function generateKey(agentId: string, agentName: string) {
-  const pair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
-  const privateJwk = await crypto.subtle.exportKey('jwk', pair.privateKey);
-  const kid = `${slug(agentName)}-${new Date().toISOString().slice(0, 10)}-${Math.random().toString(36).slice(2, 6)}`;
-  const config = { client_id: agentId, issuer, token_endpoint: `${issuer}/token`, kid, alg: 'ES256', private_key: { ...privateJwk, kid, alg: 'ES256', use: 'sig' } };
-  const url = URL.createObjectURL(new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' }));
-  const a = document.createElement('a'); a.href = url; a.download = `${slug(agentName)}.chokepoint.json`; a.click(); URL.revokeObjectURL(url);
-  return kid;
+type Failure = { message: string; conflict: boolean };
+function failure(cause: unknown, own: boolean): Failure {
+  if (cause instanceof HttpError && cause.status === 409) return { conflict: true, message: 'The key changed in another session. Reload to see the current key.' };
+  if (cause instanceof HttpError && cause.status === 400) return { conflict: false, message: own ? 'Chokepoint did not accept this key. Use an EC P-256 key or an RSA key of 2048 bits or more, with a key ID that matches the kid of the JWK.' : 'Chokepoint did not accept the new key. Retry.' };
+  return { conflict: false, message: 'Could not register the key. Retry when the service is available.' };
 }
 
-// Only the format is checked here. The backend validates the key.
-function detect(text: string): { alg?: PublicKey['alg']; error?: string } {
-  const t = text.trim();
-  if (!t) return {};
-  if (/PRIVATE KEY/.test(t) || /"d"\s*:/.test(t)) return { error: 'This is a private key. Paste only the public key.' };
-  if (t.startsWith('-----BEGIN PUBLIC KEY-----')) return { alg: t.length > 300 ? 'RS256' : 'ES256' };
-  try { const k = JSON.parse(t); if (k.kty === 'EC') return { alg: 'ES256' }; if (k.kty === 'RSA') return { alg: 'RS256' }; } catch { /* not JSON */ }
-  return { error: 'Paste a public key as a JWK or as PEM (BEGIN PUBLIC KEY).' };
-}
-
-function OwnKeyForm({ onSave }: { onSave: (k: PublicKey) => void }) {
+function OwnKeyForm({ busy, onSave }: { busy: boolean; onSave: (key: JsonWebKey, kid: string) => void }) {
   const [text, setText] = useState('');
   const [kid, setKid] = useState('');
-  const check = detect(text);
+  const [parsed, setParsed] = useState<ParsedKey>();
+  // A PEM is converted asynchronously; only the result of the latest text applies.
+  const latest = useRef(0);
+  async function change(value: string) {
+    setText(value);
+    const sequence = ++latest.current;
+    const result = await parsePublicKey(value);
+    if (sequence === latest.current) setParsed(result);
+  }
+  const valid = parsed && 'jwk' in parsed ? parsed : undefined;
   return <div className="identity-key-form">
-    <label className="relation-field"><span>Public key (JWK or PEM)</span><textarea className="cp-admin-input condition-code" rows={5} spellCheck={false} value={text} onChange={e => setText(e.target.value)} placeholder={'{ "kty": "EC", "crv": "P-256", "x": "…", "y": "…" }'} /></label>
-    {check.error ? <p className="resource-warning"><TriangleAlert size={14} aria-hidden="true" />{check.error}</p> : check.alg ? <p className="rule-sentence"><Check size={14} aria-hidden="true" />Public key · {check.alg}</p> : null}
-    <label className="relation-field"><span>Key ID (kid)</span><input className="cp-admin-input" value={kid} onChange={e => setKid(e.target.value.trim())} placeholder="The kid your agent sends" /></label>
-    <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small identity-own-save" disabled={!check.alg || !kid} onClick={() => onSave({ kid, alg: check.alg!, addedBy: currentAdmin, addedAt: now(), own: true })}>Use this key</button>
+    <label className="relation-field"><span>Public key (JWK or PEM)</span><textarea className="cp-admin-input condition-code" rows={5} spellCheck={false} value={text} disabled={busy} onChange={e => void change(e.target.value)} placeholder={'{ "kty": "EC", "crv": "P-256", "x": "…", "y": "…" }'} /></label>
+    {parsed && 'error' in parsed ? <p className="resource-warning"><TriangleAlert size={14} aria-hidden="true" />{parsed.error}</p> : valid ? <p className="rule-sentence"><Check size={14} aria-hidden="true" />Public key · {valid.alg}</p> : null}
+    <label className="relation-field"><span className="identity-title">Key ID (kid), optional<Help text="The kid that your agent sends. Leave it empty to use the kid of the JWK or, without one, the RFC 7638 thumbprint of the key." /></span><input className="cp-admin-input" value={kid} disabled={busy} onChange={e => setKid(e.target.value.trim())} placeholder="The kid your agent sends" /></label>
+    <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small identity-own-save" disabled={!valid || busy} onClick={() => valid && onSave(valid.jwk, kid)}>Use this key</button>
   </div>;
 }
 
-export function AgentIdentity({ agentId, agentName, disabled }: { agentId: string; agentName: string; disabled: boolean }) {
-  const [key, setKey] = useState<PublicKey | undefined>({ kid: `${slug(agentName)}-2026-10-31-a1b2`, alg: 'ES256', addedBy: currentAdmin, addedAt: '2026-10-31 09:05 UTC' });
-  const [justDownloaded, setJustDownloaded] = useState(false);
+export function AgentIdentity({ scope, agentId, agentName, disabled }: { scope: EnvironmentScope; agentId: string; agentName: string; disabled: boolean }) {
+  const cache = useQueryClient();
+  const key = agentClientKey(scope, agentId);
+  const client = useQuery({ queryKey: key, queryFn: ({ signal }) => agentClientApi.get(scope, agentId, signal), retry: false });
+  const [downloaded, setDownloaded] = useState<string>();
   const [confirmRotate, setConfirmRotate] = useState(false);
-  async function generate() {
-    const kid = await generateKey(agentId, agentName);
-    setKey({ kid, alg: 'ES256', addedBy: currentAdmin, addedAt: now() }); setJustDownloaded(true); setConfirmRotate(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<Failure>();
+
+  async function save(register: () => Promise<AgentClient>, own: boolean) {
+    setBusy(true); setError(undefined);
+    try {
+      const next = await register();
+      cache.setQueryData(key, next);
+      setConfirmRotate(false);
+      return next;
+    } catch (cause) {
+      setError(failure(cause, own));
+      return undefined;
+    } finally { setBusy(false); }
   }
+  // Chokepoint registers the public key first; the file is downloaded only after it accepts it.
+  async function generate(current: AgentClient) {
+    let privateJwk: Jwk | undefined;
+    const next = await save(async () => {
+      const generated = await generateKey();
+      privateJwk = generated.privateJwk;
+      return agentClientApi.saveKey(scope, agentId, generated.publicJwk, generated.kid, current.revision);
+    }, false);
+    if (!next?.key || !privateJwk) return;
+    const name = fileName(agentName);
+    download(name, { client_id: next.client_id, issuer: next.issuer, token_endpoint: next.token_endpoint, kid: next.key.kid, alg: 'ES256', private_key: privateJwk });
+    setDownloaded(name);
+  }
+  async function registerOwn(current: AgentClient, jwk: JsonWebKey, kid: string) {
+    if (await save(() => agentClientApi.saveKey(scope, agentId, jwk, kid || undefined, current.revision), true)) setDownloaded(undefined);
+  }
+
+  const header = <header className="delegation-toolbar"><div className="agent-graph-title"><h3>Identity</h3><Help text="The agent proves who it is to Chokepoint with its own key. Without a key, it can not get a token, so it can not call any tool." /></div></header>;
+  if (client.isPending) return <section className="agent-identity" aria-label="Agent identity">{header}<p role="status">Loading the agent identity…</p></section>;
+  if (client.isError) return <section className="agent-identity" aria-label="Agent identity">{header}<div role="alert" className="cp-admin-notice" data-tone="danger">Could not load the agent identity. <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => void client.refetch()}>Retry</button></div></section>;
+  const current = client.data;
+  const active = current.key;
   return <section className="agent-identity" aria-label="Agent identity">
-    <header className="delegation-toolbar"><div className="agent-graph-title"><h3>Identity</h3><Help text="The agent proves who it is to Chokepoint with its own key. Without a key, it can not get a token, so it can not call any tool." /><WaitingBackend spec="030" tip="Lets the agent prove who it is to the Chokepoint authorization server with its own key." /></div></header>
+    {header}
     {disabled ? <p className="delegation-readonly">This agent is disabled. It gets no token, and its next call is rejected.</p> : null}
 
     <section className="identity-card">
       <Title help="The key is how the agent signs in to Chokepoint. Chokepoint keeps only the public part. The private part is in the file you download, and only there.">Key</Title>
-      {key ? <div className="identity-key">
+      {active ? <div className="identity-key">
         <KeyRound size={18} aria-hidden="true" />
-        <div><strong>{key.own ? 'Your own public key' : 'Active key'}</strong><small>{key.kid} · {key.alg}</small><small>Created by {key.addedBy} · {key.addedAt}</small></div>
+        <div><strong>Active key</strong><small>{active.kid} · {active.alg}</small><small>Created by {active.created_by_name || active.created_by} · {new Date(active.created_at).toLocaleString()}</small></div>
         {!confirmRotate ? <div className="condition-actions">
-          <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" onClick={() => setConfirmRotate(true)}>Rotate key</button>
+          <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" disabled={busy} onClick={() => { setConfirmRotate(true); setError(undefined); }}>Rotate key</button>
           <Help text="Rotate: creates a new key and downloads a new file. The current key stops working at once. Tokens already issued stay valid until they expire (5 minutes). Use it when the file was lost or exposed." />
         </div> : null}
       </div> : <div className="identity-empty"><p>No key yet. The agent can not get a token.</p></div>}
-      {confirmRotate ? <div className="identity-confirm"><p className="resource-warning"><TriangleAlert size={14} aria-hidden="true" />The current key stops working now. Give the new file to the agent at once.</p><div className="condition-actions"><button type="button" className="cp-admin-button cp-admin-button--small" onClick={() => void generate()}><Download size={14} aria-hidden="true" />Rotate and download</button><button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => setConfirmRotate(false)}>Cancel</button></div></div> : null}
-      {!key ? <div className="condition-actions"><button type="button" className="cp-admin-button" onClick={() => void generate()}><Download size={16} aria-hidden="true" />Generate key and download</button><Help text="Creates a key pair in your browser. Chokepoint registers the public key. You download one file with the private key and the connection values. Give this file to the agent." /></div> : null}
-      {justDownloaded ? <p className="consent-record identity-downloaded"><Check size={16} aria-hidden="true" /><span><strong>File downloaded: {slug(agentName)}.chokepoint.json</strong><small>This is the only copy of the private key. Store it like a password. Chokepoint can not show it again.</small></span></p> : null}
+      {active && confirmRotate ? <div className="identity-confirm"><p className="resource-warning"><TriangleAlert size={14} aria-hidden="true" />The current key stops working now. Give the new file to the agent at once.</p><div className="condition-actions"><button type="button" className="cp-admin-button cp-admin-button--small" disabled={busy} onClick={() => void generate(current)}><Download size={14} aria-hidden="true" />{busy ? 'Rotating…' : 'Rotate and download'}</button><button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" disabled={busy} onClick={() => setConfirmRotate(false)}>Cancel</button></div></div> : null}
+      {!active ? <div className="condition-actions"><button type="button" className="cp-admin-button" disabled={busy} onClick={() => void generate(current)}><Download size={16} aria-hidden="true" />{busy ? 'Generating…' : 'Generate key and download'}</button><Help text="Creates a key pair in your browser. Chokepoint registers the public key. You download one file with the private key and the connection values. Give this file to the agent." /></div> : null}
+      {error ? <div role="alert" className="cp-admin-notice" data-tone="danger">{error.message}{error.conflict ? <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => { setError(undefined); setConfirmRotate(false); void client.refetch(); }}>Reload</button> : null}</div> : null}
+      {downloaded ? <p className="consent-record identity-downloaded"><Check size={16} aria-hidden="true" /><span><strong>File downloaded: {downloaded}</strong><small>This is the only copy of the private key. Store it like a password. Chokepoint can not show it again.</small></span></p> : null}
     </section>
 
     <details className="identity-card identity-more">
       <summary><Title help="The values that the file already has. Use them only to configure the agent by hand.">Connection details</Title></summary>
-      <CopyValue label="Client ID" value={agentId} help="The ID of this agent at the Chokepoint authorization server. The agent sends it in every token request." />
-      <CopyValue label="Issuer" value={issuer} help="Who issues the Chokepoint tokens of this environment. A token of Sandbox never works in Production." />
-      <CopyValue label="Token endpoint" value={`${issuer}/token`} help="Where the agent exchanges the token of the person for a Chokepoint token." />
+      <CopyValue label="Client ID" value={current.client_id} help="The ID of this agent at the Chokepoint authorization server. The agent sends it in every token request." />
+      <CopyValue label="Issuer" value={current.issuer} help="Who issues the Chokepoint tokens of this environment. A token of one environment never works in another." />
+      <CopyValue label="Token endpoint" value={current.token_endpoint} help="Where the agent exchanges the token of the person for a Chokepoint token." />
     </details>
 
     <details className="identity-card identity-more">
@@ -107,7 +136,7 @@ export function AgentIdentity({ agentId, agentName, disabled }: { agentId: strin
 
     <details className="identity-card identity-more">
       <summary><Title help="Advanced. Use a key that your team created and keeps, for example in a vault. Then Chokepoint does not create a file.">Use my own public key</Title></summary>
-      <OwnKeyForm onSave={k => { setKey(k); setJustDownloaded(false); }} />
+      <OwnKeyForm busy={busy} onSave={(jwk, kid) => void registerOwn(current, jwk, kid)} />
     </details>
   </section>;
 }

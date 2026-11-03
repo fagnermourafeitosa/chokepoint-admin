@@ -4,24 +4,23 @@ import { mcpApi, mcpError } from './api';
 import type { EnvironmentScope } from '../access/environment-scope';
 import type { Connection, MCPServer, Preview } from './api';
 export function useMCPForm(scope: EnvironmentScope, server: MCPServer | undefined, onRefresh: () => void, onSaved: (server: MCPServer) => void) {
- const [fields, setFields] = useState<Connection>({ name: server?.name ?? '', endpoint: server?.endpoint ?? '', transport: 'streamable-http', auth_type: server?.auth_type === 'bearer' ? 'bearer' : 'none' });
+ const [fields, setFields] = useState<Connection>({ name: server?.name ?? '', endpoint: server?.endpoint ?? '', transport: 'streamable-http', auth_type: 'chokepoint_token' });
  const [initialFields] = useState(() => JSON.stringify(fields));
- const [token, setToken] = useState('');
  const [preview, setPreview] = useState<Preview>();
  const [selected, setSelected] = useState<string[]>([]);
  const [enable, setEnable] = useState(server?.enabled ?? true);
  const [busy, setBusy] = useState(false);
  const [error, setError] = useState('');
- usePendingChanges(busy || !!preview || !!token || JSON.stringify(fields) !== initialFields);
+ usePendingChanges(busy || !!preview || JSON.stringify(fields) !== initialFields);
  const controller = useRef<AbortController | null>(null);
  useEffect(() => () => { controller.current?.abort(); }, []);
  function update<K extends keyof Connection>(key: K, value: Connection[K]) { setFields(old => ({ ...old, [key]: value })); setPreview(undefined); setError(''); }
  async function discover() {
   const request = new AbortController(); controller.current = request; setBusy(true); setError('');
   try {
-   const result = await mcpApi.discover(scope, server?.id, { ...fields, revision: server?.revision, ...(fields.auth_type === 'bearer' && token ? { token } : {}) }, request.signal);
+   const result = await mcpApi.discover(scope, server?.id, { ...fields, revision: server?.revision }, request.signal);
    if (request.signal.aborted) return;
-   setPreview(result); if (!result.tools.some(tool => tool.change !== 'removed')) setEnable(false); setSelected(result.tools.filter(tool => tool.selected && tool.change !== 'removed').map(tool => tool.name)); setToken(''); onRefresh();
+   setPreview(result); if (!result.tools.some(tool => tool.change !== 'removed')) setEnable(false); setSelected(result.tools.filter(tool => tool.selected && tool.change !== 'removed').map(tool => tool.name)); onRefresh();
   } catch (e) { if (!request.signal.aborted) setError(mcpError(e)); }
   finally { if (!request.signal.aborted) setBusy(false); }
  }
@@ -33,5 +32,5 @@ export function useMCPForm(scope: EnvironmentScope, server: MCPServer | undefine
   finally { if (!request.signal.aborted) setBusy(false); }
  }
  function toggle(name: string) { setSelected(old => old.includes(name) ? old.filter(item => item !== name) : [...old, name]); }
- return { fields, update, token, setToken, preview, selected, setSelected, toggle, enable, setEnable, busy, error, discover, confirm };
+ return { fields, update, preview, selected, setSelected, toggle, enable, setEnable, busy, error, discover, confirm };
 }
