@@ -120,7 +120,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 029 | [Agent Identity and Chokepoint Token Setup](specs/029-2026-10-31-agent-identity-and-chokepoint-token-setup.md) | Implemented |
 | 030 | [Investigate with Agent, Subject and Token Exchanges](specs/030-2026-10-31-investigate-agent-subject-and-token-exchanges.md) | Implemented |
 | 031 | [Agent Kill Switch](specs/031-2026-11-02-agent-kill-switch.md) | Implemented |
-| 033 | [Agent Names in the Inbox](specs/033-2026-11-02-agent-names-in-inbox.md) | Proposed |
+| 033 | [Agent Names in the Inbox](specs/033-2026-11-02-agent-names-in-inbox.md) | In Progress |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 

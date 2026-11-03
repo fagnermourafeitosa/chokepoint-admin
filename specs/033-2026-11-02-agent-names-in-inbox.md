@@ -3,12 +3,10 @@
 - **Specification ID**: 033
 - **Date**: 2026-11-02
 - **Slug**: agent-names-in-inbox
-- **Status**: Proposed
+- **Status**: In Progress
 - **Owner**: Admin — Overview and Inbox (`src/features/attention`)
 - **Related Specification**: [Backend 041 — Agent Names in Attention Signals](../../backend/specs/041-2026-11-02-agent-names-in-signals.md) (`context.agent_name`)
 - **Related Specification**: [030 — Investigate with Agent, Subject and Token Exchanges](030-2026-10-31-investigate-agent-subject-and-token-exchanges.md) (the token exchange item, section 5)
-
-> **On hold for Backend 041**, which adds `context.agent_name` to the signals. See [Backend dependencies](#backend-dependencies).
 
 ---
 
