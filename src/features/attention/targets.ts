@@ -35,7 +35,8 @@ export function contextLines(signal: Signal): [string, string] {
     // The count and the detail text of the reason, then the agent and, for an
     // expired or invalid subject token, the subject (Admin 030 section 5). The
     // agent name comes from Backend 041; the ID stays for a deleted agent (Admin 033).
-    case 'token_exchange_denied': return [[c.count ? `${c.count} refused` : '', exchangeText[c.reason as ExchangeReasonLabel] || c.reason || ''].filter(Boolean).join(' · '), [c.agent_name || c.agent, c.subject ? `for ${c.subject}` : ''].filter(Boolean).join(' ')];
+    // The subject name comes from Backend 043; the raw subject stays without it (Admin 035).
+    case 'token_exchange_denied': return [[c.count ? `${c.count} refused` : '', exchangeText[c.reason as ExchangeReasonLabel] || c.reason || ''].filter(Boolean).join(' · '), [c.agent_name || c.agent, c.subject ? `for ${c.subject_name || c.subject}` : ''].filter(Boolean).join(' ')];
     default: return ['', ''];
   }
 }

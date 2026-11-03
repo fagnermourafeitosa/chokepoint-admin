@@ -3,7 +3,7 @@
 - **Specification ID**: 035
 - **Date**: 2026-11-02
 - **Slug**: subject-names-in-inbox
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Overview and Inbox (`src/features/attention`)
 - **Related Specification**: [Backend 043 — Subject Names in Attention Signals](../../backend/specs/043-2026-11-02-subject-names-in-signals.md) (`context.subject_name`)
 - **Related Specification**: [033 — Agent Names in the Inbox](033-2026-11-02-agent-names-in-inbox.md) (the agent of the same line)
@@ -41,7 +41,7 @@ An administrator sees a provider identifier, not the person or the service.
 
 ## User Stories
 
-- [ ] 1. As an administrator, I see the name of the person or service of a denied token exchanges item in the Inbox.
+- [x] 1. As an administrator, I see the name of the person or service of a denied token exchanges item in the Inbox.
 
 ---
 
@@ -83,10 +83,10 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ## Acceptance Criteria
 
-- [ ] 1. A denied token exchanges item with a named subject shows its name, and the raw subject when the name is missing.
-- [ ] 2. The Investigate link of the item is unchanged.
-- [ ] 3. `npm run check` and `npm run build` pass.
-- [ ] 4. The user confirms the interface test.
+- [x] 1. A denied token exchanges item with a named subject shows its name, and the raw subject when the name is missing.
+- [x] 2. The Investigate link of the item is unchanged.
+- [x] 3. `npm run check` and `npm run build` pass.
+- [x] 4. The user confirms the interface test. (Run by the agent in the built-in browser and accepted by the user on 2026-11-02; no local signal names a subject yet, so a subject and a name were added to the responses inside the page only. No data was changed.)
 
 ---
 
