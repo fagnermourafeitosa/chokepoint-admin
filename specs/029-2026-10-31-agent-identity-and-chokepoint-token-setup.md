@@ -9,11 +9,12 @@
 - **Related Specification**: [Backend 030 — Agent Authorization Server](../../backend/specs/030-2026-10-31-agent-authorization-server.md) (agent client, public key, token exchange)
 - **Related Specification**: [Backend 032 — PEP Chokepoint Token and Actor Projection](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md) (agent status)
 - **Related Specification**: [Backend 035 — Upstream Token for Custom MCP Servers](../../backend/specs/035-2026-10-31-upstream-token-for-custom-mcp-servers.md) (Chokepoint token auth type)
+- **Related Specification**: [Backend 040 — Authorization Server Read and Key Author](../../backend/specs/040-2026-11-02-authorization-server-read-and-key-author.md) (key author name, values before a server exists)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md), [027 — Tool Resource Mapping Review](027-2026-10-31-tool-resource-mapping-review.md)
 - **Superseded in part**: [007 — MCP Server Management and Discovery Preview](007-2026-10-25-mcp-server-management-and-discovery-preview.md) (None and Bearer authentication of custom servers)
 - **Visual reference**: layout prototypes at `/prototype/agent` (tab Identity) and `/prototype/mcp-server` in the Admin (`src/features/access/delegation/AgentIdentity.tsx`, `src/features/mcp/ChokepointTokenSetup.tsx`). Known difference: the prototype generates a readable key ID; this text uses the RFC 7638 thumbprint. Fixed data. It is the visual specification of this screen; where it differs from this text, this text wins.
 
-> **On hold for Backend 030 and 035.** Both are decided and not implemented. See [Backend dependencies](#backend-dependencies). This is the second part of Admin A2; Admin 027 is the first.
+> **On hold for Backend 040.** Backend 030 and 035 are implemented. See [Backend dependencies](#backend-dependencies). This is the second part of Admin A2; Admin 027 is the first.
 
 ---
 
@@ -121,7 +122,7 @@ Read the agent client; register, rotate and remove its public key; read the issu
    - the Admin sends only the public key;
    - the browser downloads `<agent>.chokepoint.json` with `client_id`, `issuer`, `token_endpoint`, `kid`, `alg` and `private_key` (JWK);
    - a green record says: "File downloaded … This is the only copy of the private key. Store it like a password. Chokepoint can not show it again."
-3. **Active key:** "Active key", the key ID and the algorithm, "Created by {administrator} · {time}" (the signed-in administrator).
+3. **Active key:** "Active key", the key ID and the algorithm, "Created by {administrator} · {time}" (`created_by_name`, Backend 040; the user ID when the user no longer exists).
 4. **Rotate key**, with a help, asks for confirmation ("The current key stops working now. Give the new file to the agent at once.") and then **Rotate and download**. Tokens already issued stay valid until they expire (5 minutes).
 
 ### 3. Collapsed sections
@@ -133,7 +134,7 @@ Read the agent client; register, rotate and remove its public key; read the issu
 ### 4. Custom MCP server: authentication
 
 1. The connection dialog (Connect and Edit) has no authentication choice and no Bearer token field. It shows **Authentication: Chokepoint token**, with a help: the server accepts only calls that passed through Chokepoint; each call brings who the person is (`sub`) and which agent acts (`act`); it is the only option, because a shared token or no authentication would hide who calls.
-2. Below it, three copyable values with a help each: **Issuer**, **JWKS** (read the URL, do not copy the keys; keys rotate) and **Audience** (the endpoint of the server; a token for another server is rejected). The text says that the server details show an example. The dialog stays short enough to need no scroll.
+2. Below it, three copyable values with a help each: **Issuer**, **JWKS** (read the URL, do not copy the keys; keys rotate) and **Audience** (the endpoint of the server; a token for another server is rejected). Issuer and JWKS come from the authorization server read of the environment (Backend 040), so they show before the server is saved: its first discovery already sends a Chokepoint token. Audience shows the typed endpoint, normalized with the standard URL parser (lower-case scheme and host, no default port, no query or fragment); after save, the server details show the `audience` of the backend (decided 2026-11-02). The text says that the server details show an example. The dialog stays short enough to need no scroll.
 3. **Server details** show the same block and a collapsed **Example: FastMCP** with **Copy example**:
 
    ```python
@@ -173,6 +174,8 @@ The contracts and decisions are written in the backend specifications (2026-11-0
 6. **Chokepoint token auth type:** [Backend 035](../../backend/specs/035-2026-10-31-upstream-token-for-custom-mcp-servers.md), Admin contract (`chokepoint_token`, `audience`, `issuer`, `jwks_uri`).
 7. **Discovery:** resolved in Backend 035 (Admin contract, Resolved decision).
 8. **Existing custom servers:** resolved, [Backend 035](../../backend/specs/035-2026-10-31-upstream-token-for-custom-mcp-servers.md) Resolved Decision 3.
+9. **Key author name:** [Backend 040](../../backend/specs/040-2026-11-02-authorization-server-read-and-key-author.md) Solution 1 (`key.created_by_name`; decided 2026-11-02).
+10. **Issuer and JWKS before a server exists:** [Backend 040](../../backend/specs/040-2026-11-02-authorization-server-read-and-key-author.md) Solution 2 (`GET …/authorization-server`; decided 2026-11-02).
 
 **Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item, remove the chip of each element that it unblocks, in the same change. The real Admin never shows the chip.
 
