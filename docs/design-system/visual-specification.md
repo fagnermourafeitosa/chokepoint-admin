@@ -28,4 +28,4 @@ The component and its style are part of the prototype (`WaitingBackend.tsx`, cla
 
 ## Example
 
-No page is open. Admin 026, 027, 029, 030 and 031 are implemented (Access, Integrations and Investigate); their prototype pages were removed.
+Open pages: `/prototype/harness-access` and `/prototype/harness-login` (Admin 036). Admin 026, 027, 029, 030 and 031 are implemented (Access, Integrations and Investigate); their prototype pages were removed.
