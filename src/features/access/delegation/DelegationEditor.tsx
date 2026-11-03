@@ -93,6 +93,6 @@ function Editor({ scope, agentId, agentName, target }: Props) {
     </div>
     {help ? <GraphHelp onClose={() => setHelp(false)} /> : null}
     <PublishBar config={state.config} changes={state.changes} busy={state.busy} onPublish={state.publish} onDiscard={() => { void state.discard(); setSelected(undefined); }} onHistory={() => setHistory(true)} />
-    {history ? <RevisionHistory agentName={agentName} onClose={() => setHistory(false)} /> : null}
+    {history ? <RevisionHistory scope={scope} agentId={agentId} agentName={agentName} onClose={() => setHistory(false)} /> : null}
   </section>;
 }

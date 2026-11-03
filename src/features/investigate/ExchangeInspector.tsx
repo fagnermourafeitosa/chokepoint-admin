@@ -8,7 +8,7 @@ import { exchangeApi, traceKey } from './api';
 import type { Exchange, ExchangeReasonLabel } from './types';
 import type { useInvestigation } from './useInvestigation';
 import { QueryError, TracePager, utcTime } from './TraceUI';
-import { exchangeText, kindText, subjectName } from './labels';
+import { exchangeText, kindText, subjectName, agentText } from './labels';
 import { accessPath } from './DecisionInspector';
 
 type State = ReturnType<typeof useInvestigation>;
@@ -62,10 +62,12 @@ export function ExchangeInspector({ scope, id, state, onBack }: { scope: Environ
   }
   if (!detail.data) return <div className="trace-loading" role="status">Loading the recorded token exchange…</div>;
   const { exchange: x, repeat, occurrences, problem } = detail.data;
-  const agent = x.agent ? x.agent.name || x.agent.id : 'No agent of this environment';
+  const agent = x.agent ? agentText(x.agent) : 'No agent of this environment';
+  // The key of a deleted agent is still in use: there is no agent to open (Admin 032 section 7).
+  const deleted = x.agent?.status === 'deleted';
   const reason = x.reason?.label;
   const fix = reason ? hints[reason] : undefined;
-  const to = fixPath(x, `/investigate?${state.params}`);
+  const to = deleted ? undefined : fixPath(x, `/investigate?${state.params}`);
   const kind = x.subject ? kindText(x.subject) : undefined;
   return (
     <>
@@ -92,7 +94,9 @@ export function ExchangeInspector({ scope, id, state, onBack }: { scope: Environ
         <div className="trace-detail-columns">
           <section className="trace-rule">
             <h3>{x.permit ? 'What happened' : 'What to check'}</h3>
-            {fix ? (
+            {deleted && !x.permit ? (
+              <p>This agent was deleted, but something still uses its key. Find and stop the deployment that uses it.</p>
+            ) : fix ? (
               <>
                 <p>{fix.hint}</p>
                 {to ? <div className="trace-actions"><Link className="cp-admin-button" to={to}>{fix.label}<ArrowRight size={15} /></Link></div> : <p className="cp-admin-muted">The assertion named no agent of this environment.</p>}
@@ -131,7 +135,7 @@ export function ExchangeInspector({ scope, id, state, onBack }: { scope: Environ
         ) : null}
         <dl className="trace-facts">
           {[
-            ['Agent', x.agent ? (x.agent.name ? `${x.agent.name} (${x.agent.id})` : x.agent.id) : 'No agent of this environment'],
+            ['Agent', x.agent ? (x.agent.name ? `${agentText(x.agent)} (${x.agent.id})` : x.agent.id) : 'No agent of this environment'],
             ['Subject', x.subject ? (x.subject.name ? `${x.subject.name} (${x.subject.subject})` : x.subject.subject) : unverified(reason)],
             ['Identity provider', x.subject?.issuer ?? '—'],
             ['Reason', reason ?? '—'],

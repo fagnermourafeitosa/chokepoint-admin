@@ -10,16 +10,17 @@ import { problemKey } from './types';
 import type { Decision, DecisionDetail } from './types';
 import type { useInvestigation } from './useInvestigation';
 import { utcTime } from './TraceUI';
-import { denyText, kindText, stateText, stepLabel, subjectName } from './labels';
+import { agentText, denyText, kindText, stateText, stepLabel, subjectName } from './labels';
 import { ExchangeInspector } from './ExchangeInspector';
 
 type State = ReturnType<typeof useInvestigation>;
 
 import { RevisionHistory } from '../access/delegation/RevisionHistory';
-import { WaitingBackend } from '../access/delegation/WaitingBackend';
+import { CatalogProvider } from '../access/delegation/catalog';
 
-// Layout prototype (Backend 038): the permission revision that applied to the decision. Fixed until the trace records it.
-const prototypeRevision = { effective: 7, published: 7 };
+// The history panel names servers and identity providers; it loads no directory.
+const noIssuers: string[] = [];
+
 
 // The relation checked by each step of the path (Backend 034 evidence).
 const relationOfStep: Record<string, 'delegation' | 'capability' | 'resource'> = { delegation: 'delegation', capability: 'capability', resource: 'resource' };
@@ -157,20 +158,25 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
         <DecisionBreakdown key={JSON.stringify(detail.problem && problemKey(detail.problem))} scope={scope} detail={detail} select={state.open} />
         <dl className="trace-facts">
           {[
-            ['Agent', d.agent.name ? `${d.agent.name} (${d.agent.id})` : d.agent.id],
+            ['Agent', d.agent.name ? `${agentText(d.agent)} (${d.agent.id})` : d.agent.id],
             ['On behalf of', d.subject.name ? `${d.subject.name} (${d.subject.subject})` : d.subject.subject],
             ['Identity provider', d.subject.issuer],
             ['Server', server],
             ['Tool', d.tool],
             ['Resource', d.resource ? `${d.resource.type} › ${d.resource.id}` : 'No resource check'],
             ['Decided at (UTC)', utcTime(d.decided_at)],
-            ['Permission revision', <span className="trace-revision"><button type="button" className="trace-revision-link" onClick={() => setHistory(true)}>Revision {prototypeRevision.effective}</button>{prototypeRevision.published !== prototypeRevision.effective ? <small>Revision {prototypeRevision.published} was applying</small> : null}<WaitingBackend spec="038" tip="The permission revision of the agent that applied when Chokepoint decided this call." /></span>],
+            ['Permission revision', d.effective_revision == null ? 'Not recorded' : (
+              <span className="trace-revision">
+                {d.agent.status ? <button type="button" className="trace-revision-link" onClick={() => setHistory(true)}>Revision {d.effective_revision}</button> : `Revision ${d.effective_revision}`}
+                {d.published_revision != null && d.published_revision !== d.effective_revision ? <small>Revision {d.published_revision} was applying</small> : null}
+              </span>
+            )],
           ].map(([name, value]) => (
             <div key={name as string}><dt>{name}</dt><dd>{value}</dd></div>
           ))}
         </dl>
       </article>
-      {history ? <RevisionHistory agentName={agent} initial={prototypeRevision.effective} onClose={() => setHistory(false)} /> : null}
+      {history && d.effective_revision != null ? <CatalogProvider scope={scope} issuers={noIssuers}><RevisionHistory scope={scope} agentId={d.agent.id} agentName={agentText(d.agent)} initial={d.effective_revision} onClose={() => setHistory(false)} /></CatalogProvider> : null}
     </>
   );
 }

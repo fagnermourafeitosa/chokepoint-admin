@@ -31,12 +31,15 @@ export function contextLines(signal: Signal): [string, string] {
   const c = signal.context;
   switch (signal.type) {
     case 'tool-discovery': return [c.tool || c.server || '', c.tool ? c.server || '' : discoveryCounts(c)];
-    case 'requests-denied': return [c.tool || '', c.agent_name || c.agent || ''];
+    case 'requests-denied': return [c.tool || '', (c.agent_name || c.agent || '') + (c.agent_status === 'deleted' ? ' (deleted)' : '')];
     // The count and the detail text of the reason, then the agent and, for an
     // expired or invalid subject token, the subject (Admin 030 section 5). The
     // agent name comes from Backend 041; the ID stays for a deleted agent (Admin 033).
     // The subject name comes from Backend 043; the raw subject stays without it (Admin 035).
-    case 'token_exchange_denied': return [[c.count ? `${c.count} refused` : '', exchangeText[c.reason as ExchangeReasonLabel] || c.reason || ''].filter(Boolean).join(' · '), [c.agent_name || c.agent, c.subject ? `for ${c.subject_name || c.subject}` : ''].filter(Boolean).join(' ')];
+    // A deleted agent keeps its signal: something still uses its key (Backend 038, Admin 032 section 7).
+    case 'token_exchange_denied': return c.agent_status === 'deleted'
+      ? [[c.count ? `${c.count} refused` : '', 'This agent was deleted, but something still uses its key. Find and stop the deployment that uses it.'].filter(Boolean).join(' · '), `${c.agent_name || c.agent} (deleted)`]
+      : [[c.count ? `${c.count} refused` : '', exchangeText[c.reason as ExchangeReasonLabel] || c.reason || ''].filter(Boolean).join(' · '), [c.agent_name || c.agent, c.subject ? `for ${c.subject_name || c.subject}` : ''].filter(Boolean).join(' ')];
     default: return ['', ''];
   }
 }

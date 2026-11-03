@@ -2,7 +2,7 @@ import { ArrowRight } from 'lucide-react';
 import type { Decision, Exchange, ExchangeProblem, Problem, SubjectRef } from './types';
 import type { useInvestigation } from './useInvestigation';
 import { QueryError, TracePager, utcTime } from './TraceUI';
-import { denyText, exchangeShort, exchangeText, kindText, subjectName } from './labels';
+import { denyText, exchangeShort, exchangeText, kindText, subjectName, agentText } from './labels';
 type State = ReturnType<typeof useInvestigation>;
 
 // The subject with its Person or Service chip and its identity provider (Admin 030 section 2).
@@ -42,8 +42,8 @@ function Row({ decision, problem, state }: { decision?: Decision; problem?: Prob
         ) : null}
       </div>
       <div role="cell">
-        <button className="trace-filter-link" onClick={() => state.update({ agent: item.agent.id })}>{item.agent.name || item.agent.id}</button>
-        <small>{item.agent.name ? 'Verified agent' : 'Agent not found'}</small>
+        <button className="trace-filter-link" onClick={() => state.update({ agent: item.agent.id })}>{agentText(item.agent)}</button>
+        <small>{item.agent.status === 'deleted' ? 'Deleted agent' : item.agent.name ? 'Verified agent' : 'Agent not found'}</small>
       </div>
       <div role="cell">
         <SubjectCell subject={item.subject} onFilter={() => state.update({ issuer: item.subject.issuer, subject: item.subject.subject })} />
@@ -86,7 +86,7 @@ function ExchangeRow({ exchange, problem, state }: { exchange?: Exchange; proble
       </div>
       <div role="cell">
         {item.agent ? (
-          <button className="trace-filter-link" onClick={() => state.update({ agent_id: item.agent!.id })}>{item.agent.name || item.agent.id}</button>
+          <button className="trace-filter-link" onClick={() => state.update({ agent_id: item.agent!.id })}>{agentText(item.agent)}</button>
         ) : (
           <span className="cp-admin-muted">No agent of this environment</span>
         )}
