@@ -3,7 +3,7 @@
 - **Specification ID**: 029
 - **Date**: 2026-10-31
 - **Slug**: agent-identity-and-chokepoint-token-setup
-- **Status**: Proposed
+- **Status**: In Progress
 - **Owner**: Admin — Access and Integrations
 - **Design**: [Agent delegation authorization](../../backend/docs/agent-delegation-authorization.md)
 - **Related Specification**: [Backend 030 — Agent Authorization Server](../../backend/specs/030-2026-10-31-agent-authorization-server.md) (agent client, public key, token exchange)
@@ -13,8 +13,6 @@
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md), [027 — Tool Resource Mapping Review](027-2026-10-31-tool-resource-mapping-review.md)
 - **Superseded in part**: [007 — MCP Server Management and Discovery Preview](007-2026-10-25-mcp-server-management-and-discovery-preview.md) (None and Bearer authentication of custom servers)
 - **Visual reference**: layout prototypes at `/prototype/agent` (tab Identity) and `/prototype/mcp-server` in the Admin (`src/features/access/delegation/AgentIdentity.tsx`, `src/features/mcp/ChokepointTokenSetup.tsx`). Known difference: the prototype generates a readable key ID; this text uses the RFC 7638 thumbprint. Fixed data. It is the visual specification of this screen; where it differs from this text, this text wins.
-
-> **On hold for Backend 040.** Backend 030 and 035 are implemented. See [Backend dependencies](#backend-dependencies). This is the second part of Admin A2; Admin 027 is the first.
 
 ---
 
