@@ -1,7 +1,7 @@
 import { httpClient } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 import { traceBase } from '../investigate/api';
-import type { Action, Page, Reason } from '../investigate/types';
+import type { Action, AgentRef, Page, Reason } from '../investigate/types';
 export type Totals = { from: string; to: string; allowed: number; denied: number; total: number };
 export type Bucket = {
   from: string;
@@ -14,8 +14,8 @@ export type DeniedRank = {
   server_id: string;
   server_name?: string | null;
   tool: string;
-  agent: string;
-  agent_name?: string | null;
+  // The verified agent (Backend 034 Admin contract item 4).
+  agent: AgentRef;
   reason: Reason;
   count: number;
   latest_decision_id: string;

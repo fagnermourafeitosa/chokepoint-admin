@@ -118,7 +118,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 027 | [Tool Resource Mapping Review](specs/027-2026-10-31-tool-resource-mapping-review.md) | Implemented |
 | 028 | [Remove Lifecycle Sync Screen and Google Warnings](specs/028-2026-10-31-remove-lifecycle-sync-screen-and-google-warnings.md) | Implemented |
 | 029 | [Agent Identity and Chokepoint Token Setup](specs/029-2026-10-31-agent-identity-and-chokepoint-token-setup.md) | Proposed |
-| 030 | [Investigate with Agent, Subject and Token Exchanges](specs/030-2026-10-31-investigate-agent-subject-and-token-exchanges.md) | In Progress |
+| 030 | [Investigate with Agent, Subject and Token Exchanges](specs/030-2026-10-31-investigate-agent-subject-and-token-exchanges.md) | Implemented |
 | 031 | [Agent Kill Switch](specs/031-2026-11-02-agent-kill-switch.md) | Implemented |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
@@ -197,7 +197,7 @@ Enterprise MCPs show one connection per provider in the provider block, with acc
 
 ## Investigation and Overview (Admin 019–021)
 
-The coordinated implementation consumes Backend 022–025. Investigate has paged By problem and All decisions views with exact filters, retained UTC periods and historical evidence. The inspector displays recorded path states and configured condition expressions, never actual arguments or source values. Contextual actions use real permission-group, server, tool and policy references; an OAuth application identifier is not an Agent UUID.
+The coordinated implementation consumes Backend 022–025. Investigate has paged By problem and All decisions views with exact filters, retained UTC periods and historical evidence. The inspector displays recorded path states and configured condition expressions, never actual arguments or source values. Contextual actions use real permission-group, server, tool and policy references; an OAuth application identifier is not an Agent UUID. Since Admin 030 the lists and the inspector show the verified agent, the subject on whose behalf it acted (Person or Service and identity provider) and the resource; the path is Delegation, Tool, Resource and Rules with the relation checked; each deny reason has one action that opens the agent editor at the place of the fix. A third view, Token exchanges, lists the exchanges at the authorization server with their reasons and a detail in the same layout, and the Inbox shows the Token exchange denied signal.
 
 Overview uses backend UTC aggregates for daily comparisons, allowed/denied hourly traffic, most-denied combinations, tool review coverage and distinct granted tools without recorded allowed calls in 30 days. View as table exposes chart values. The unused-tool indicator opens a paged review list. Both Custom and Enterprise tools are reachable through the review catalog.
 

@@ -33,7 +33,17 @@ export function DelegationEditor(props: Props) {
   return <CatalogProvider scope={props.scope} issuers={issuers}><Editor {...props} /></CatalogProvider>;
 }
 
-const targetSelection = (target?: AccessTarget): Selection | undefined => (target?.serverId && target.tool ? { type: 'capability', id: capabilityId(target.serverId, target.tool) } : undefined);
+// targetSelection opens the place of a fix from Investigate (Admin 030): the
+// identity provider of a subject, the tool of a capability, or the panel that
+// adds a tool the agent does not have yet.
+function targetSelection(target: AccessTarget | undefined, doc: Doc): Selection | undefined {
+  if (!target) return undefined;
+  if (target.section === 'people') return target.connectionId ? { type: 'idp', issuer: target.connectionId } : { type: 'add', what: 'delegator' };
+  if (!target.serverId || !target.tool) return undefined;
+  const id = capabilityId(target.serverId, target.tool);
+  if (doc.capabilities.some(c => c.id === id)) return { type: 'capability', id };
+  return target.section === 'grants' ? { type: 'add', what: 'tool' } : undefined;
+}
 
 function Editor({ scope, agentId, agentName, target }: Props) {
   const { catalog, loading, error, retry } = useCatalog();
@@ -44,14 +54,14 @@ function Editor({ scope, agentId, agentName, target }: Props) {
   const [positions, setPositions] = useState<Positions>({});
   const [maximized, setMaximized] = useState(false);
   const [help, setHelp] = useState(false);
-  const [selected, setSelected] = useState<Selection | undefined>(() => targetSelection(target));
+  const [selected, setSelected] = useState<Selection | undefined>(() => targetSelection(target, state.draft));
   const [filters, setFilters] = useState<Filters>(noFilters);
   const readOnly = version === 'published';
   const doc: Doc = readOnly ? state.published : state.draft;
   const view = useMemo(() => (isFiltered(filters) ? filterDoc(doc, filters, catalog) : doc), [doc, filters, catalog]);
   const count = (d: Doc) => d.scopes.length + d.capabilities.length + d.resources.length;
   const layout = useMemo(() => delegationLayout(agentName, view, catalog, positions), [agentName, view, catalog, positions]);
-  useEffect(() => { const next = targetSelection(target); if (next) setSelected(next); }, [target?.serverId, target?.tool]);
+  useEffect(() => { const next = targetSelection(target, state.draft); if (next) setSelected(next); }, [target?.serverId, target?.tool, target?.section, target?.connectionId, !!state.config]);
   useEffect(() => {
     if (!maximized) return;
     const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setMaximized(false); };

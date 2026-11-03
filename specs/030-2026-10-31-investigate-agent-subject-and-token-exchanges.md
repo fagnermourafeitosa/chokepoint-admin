@@ -3,7 +3,7 @@
 - **Specification ID**: 030
 - **Date**: 2026-10-31
 - **Slug**: investigate-agent-subject-and-token-exchanges
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Investigate, Inbox and Overview
 - **Design**: [Agent delegation authorization](../../backend/docs/agent-delegation-authorization.md)
 - **Related Specification**: [Backend 034 — Decision Trace with Actor and Relations](../../backend/specs/034-2026-10-31-decision-trace-actor-and-relations.md)
@@ -61,13 +61,13 @@ A refused exchange stops an agent before any tool call. Nothing shows it.
 
 ## User Stories
 
-- [ ] 1. As an administrator, I see which agent acted for which person or service in each decision.
-- [ ] 2. As an administrator, I see which relation or rule decided, in the order the PDP checks them.
-- [ ] 3. As an administrator, I go from a deny to its fix in one click.
-- [ ] 4. As an administrator, I see refused token exchanges and why.
-- [ ] 5. As an administrator, I see the occurrences of a problem and inspect each one.
-- [ ] 6. As an administrator, the Inbox tells me when an agent keeps failing to get a token.
-- [ ] 7. As an administrator, I open a detail by a click anywhere on its row.
+- [x] 1. As an administrator, I see which agent acted for which person or service in each decision.
+- [x] 2. As an administrator, I see which relation or rule decided, in the order the PDP checks them.
+- [x] 3. As an administrator, I go from a deny to its fix in one click.
+- [x] 4. As an administrator, I see refused token exchanges and why.
+- [x] 5. As an administrator, I see the occurrences of a problem and inspect each one.
+- [x] 6. As an administrator, the Inbox tells me when an agent keeps failing to get a token.
+- [x] 7. As an administrator, I open a detail by a click anywhere on its row.
 
 ---
 
@@ -196,18 +196,18 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ## Acceptance Criteria
 
-- [ ] 1. The decision lists show Agent, On behalf of and Resource with the reasons of section 2.
-- [ ] 2. The inspector shows "{agent} acted for {subject}" and the four steps with the relation checked.
-- [ ] 3. Each deny reason has its action, and the action only navigates.
-- [ ] 4. The Token exchanges view lists exchanges with short reasons and opens a detail with the decision layout.
-- [ ] 5. Both details show the paged occurrences of the problem, and a click shows an occurrence.
-- [ ] 6. A click anywhere on a row opens its detail in every view.
-- [ ] 7. The Inbox shows the Token exchange denied signal with its target.
-- [ ] 8. The Overview groups Most denied by the verified agent and adds no metric.
-- [ ] 9. Every item of Backend dependencies is resolved in a backend specification before implementation.
-- [ ] 10. No "Waiting backend" chip remains for an implemented item.
-- [ ] 11. `npm run check` and `npm run build` pass.
-- [ ] 12. The user confirms the interface test.
+- [x] 1. The decision lists show Agent, On behalf of and Resource with the reasons of section 2.
+- [x] 2. The inspector shows "{agent} acted for {subject}" and the four steps with the relation checked.
+- [x] 3. Each deny reason has its action, and the action only navigates.
+- [x] 4. The Token exchanges view lists exchanges with short reasons and opens a detail with the decision layout.
+- [x] 5. Both details show the paged occurrences of the problem, and a click shows an occurrence.
+- [x] 6. A click anywhere on a row opens its detail in every view.
+- [x] 7. The Inbox shows the Token exchange denied signal with its target.
+- [x] 8. The Overview groups Most denied by the verified agent and adds no metric.
+- [x] 9. Every item of Backend dependencies is resolved in a backend specification before implementation.
+- [x] 10. No "Waiting backend" chip remains for an implemented item.
+- [x] 11. `npm run check` and `npm run build` pass.
+- [x] 12. The user confirms the interface test. Run by Claude in the built-in browser at the user's request (2026-11-02): the three views and their Agent, Reason and Result filters; a click on a row cell opens the decision or exchange; the inspector shows who acted for whom and the four steps; the actions of `condition`, `no_grant`, `no_resource` and `no_delegation` open the Rules, Add tools, tool and identity provider panels of the agent; an occurrence opens in the same detail; Overview Most denied groups by the agent and opens Investigate; the Token exchange denied signal (with a local 1-minute window) shows its count and opens the filtered Token exchanges view. The test found and fixed two defects: the count missing in the Inbox item, and a signal target opened as an unavailable decision.
 
 ---
 
