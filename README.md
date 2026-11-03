@@ -120,7 +120,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 029 | [Agent Identity and Chokepoint Token Setup](specs/029-2026-10-31-agent-identity-and-chokepoint-token-setup.md) | Implemented |
 | 030 | [Investigate with Agent, Subject and Token Exchanges](specs/030-2026-10-31-investigate-agent-subject-and-token-exchanges.md) | Implemented |
 | 031 | [Agent Kill Switch](specs/031-2026-11-02-agent-kill-switch.md) | Implemented |
-| 032 | [Revision History](specs/032-2026-11-02-revision-history.md) | In Progress |
+| 032 | [Revision History](specs/032-2026-11-02-revision-history.md) | Waiting Approve |
 | 033 | [Agent Names in the Inbox](specs/033-2026-11-02-agent-names-in-inbox.md) | Implemented |
 | 034 | [Integrations with One Mapping Read for Each Server](specs/034-2026-11-02-integrations-one-read-per-server.md) | Implemented |
 | 035 | [Subject Names in the Inbox](specs/035-2026-11-02-subject-names-in-inbox.md) | Implemented |
