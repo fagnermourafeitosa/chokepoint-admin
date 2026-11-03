@@ -11,7 +11,7 @@
 - **Related Specification**: [031 — Agent Kill Switch](031-2026-11-02-agent-kill-switch.md) (agent status)
 - **Related Specification**: [030 — Investigate with Agent, Subject and Token Exchanges](030-2026-10-31-investigate-agent-subject-and-token-exchanges.md) (current decision inspector facts)
 - **Related Specification**: [033 — Agent Names in the Inbox](033-2026-11-02-agent-names-in-inbox.md)
-- **Visual reference**: layout prototype on branch `design/038-revision-history` (worktree `admin-038`). Approved by the user on 2026-11-02. Fixed data in `src/features/access/delegation/RevisionHistory.tsx`.
+- **Visual reference**: layout prototype on the remote branch [`design/038-revision-history`](https://github.com/fagnermourafeitosa/chokepoint-admin/tree/design/038-revision-history), commit `28bc29c`, based on `main` at `2684d50` (Admin 035). Approved by the user on 2026-11-02. Fixed data in `src/features/access/delegation/RevisionHistory.tsx` and `prototypeRevision` in `src/features/investigate/DecisionInspector.tsx`; the `SidePanel` component and its design system documentation are in the same commit.
 
 ---
 
@@ -21,7 +21,7 @@ Admin 026 publishes the permission document of an agent. The publication bar sho
 
 Backend 038 keeps each published revision with its snapshot, author, time and optional note, records the revision of each decision, and makes agent deletion a soft delete. This specification is the Admin side.
 
-The prototype was built inside the real screens (Access and Investigate), not under `/prototype`, because it adds to existing screens. The user reviewed it there. The prototype was drawn on the inspector before Admin 030; the implementation adds the Permission revision row to the current facts list of Admin 030.
+The prototype was built inside the real screens (Access and Investigate), not under `/prototype`, because it adds to existing screens. The user reviewed it there. The prototype was rebased on the inspector of Admin 030; the Permission revision row is the last item of its facts list.
 
 ---
 
