@@ -4,18 +4,22 @@ import { HttpError } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 import { mcpKey } from './api';
 import { mappingApi, mappingError, mappingKey, type MappingView } from './mapping-api';
-import { readResource, resourceAgentsKey, resourceApi, writeResource, type ResourceMap } from './resource-api';
+import { readResource, resourceAgentsKey, resourceApi, serverResourcesKey, writeResource, type ResourceMap, type ToolMappingEntry } from './resource-api';
 
 // The Resource block writes into the local mapping draft and uses the COAZ
 // mapping lifecycle (Admin 009, Backend 008). It shares the mapping cache with
 // Configure mapping, so both show the same draft.
-export function useResourceMapping(scope: EnvironmentScope, serverId: string, toolName: string, open: boolean) {
+// The collapsed line comes from the server read (Admin 034, Backend 042); the
+// tool mapping, with the server revision that a write needs, is read only while
+// the block is open. The editor uses that fresh view.
+export function useResourceMapping(scope: EnvironmentScope, serverId: string, toolName: string, entry: ToolMappingEntry, open: boolean) {
   const client = useQueryClient();
   const key = mappingKey(scope, serverId, toolName);
-  const query = useQuery({ queryKey: key, queryFn: ({ signal }) => mappingApi.get(scope, serverId, toolName, signal) });
-  const view = query.data;
-  const active = readResource(view?.effective);
-  const draft = view?.draft ? readResource(view.draft.document) : undefined;
+  const query = useQuery({ queryKey: key, queryFn: ({ signal }) => mappingApi.get(scope, serverId, toolName, signal), enabled: open });
+  const view = open ? query.data : undefined;
+  const line = { source: entry.source, active: readResource(entry.effective), draft: entry.draft ? readResource(entry.draft) : undefined };
+  const active = view ? readResource(view.effective) : line.active;
+  const draft = view ? (view.draft ? readResource(view.draft.document) : undefined) : line.draft;
   const agents = useQuery({
     queryKey: resourceAgentsKey(scope, serverId, active.resource?.type ?? ''),
     queryFn: ({ signal }) => resourceApi.agents(scope, serverId, active.resource!.type, signal),
@@ -36,6 +40,7 @@ export function useResourceMapping(scope: EnvironmentScope, serverId: string, to
       client.setQueryData(key, next);
       // The mapping revision belongs to the server: the other tools of the server need a fresh revision.
       void client.invalidateQueries({ queryKey: key.slice(0, 5), predicate: q => q.queryKey[5] !== toolName });
+      // The server details refetch gives a new server revision, which reloads the Resource lines (Admin 034).
       void client.invalidateQueries({ queryKey: mcpKey(scope) });
       void client.invalidateQueries({ queryKey: ['mcp-detail', scope.userId, scope.tenantId, scope.environmentId, serverId] });
       setConflict(false); setNotice(done);
@@ -48,6 +53,6 @@ export function useResourceMapping(scope: EnvironmentScope, serverId: string, to
   const save = (resource?: ResourceMap) => run((v, signal) => mappingApi.save(scope, serverId, toolName, v.server_revision, writeResource(v.draft?.document ?? v.effective, resource), signal), 'Draft saved. It has no effect until it is approved.');
   const approve = () => run((v, signal) => mappingApi.change(scope, serverId, toolName, v.server_revision, 'approve', signal), 'Approved. New calls use this mapping.');
   const discard = () => run((v, signal) => mappingApi.change(scope, serverId, toolName, v.server_revision, 'discard', signal), 'Draft discarded. The active mapping is unchanged.');
-  const reload = async () => { setError(''); setConflict(false); await query.refetch(); };
-  return { query, view, active, draft, agents: agents.data?.items ?? [], agentsError: agents.isError, error, notice, conflict, pending, save, approve, discard, reload };
+  const reload = async () => { setError(''); setConflict(false); void client.invalidateQueries({ queryKey: serverResourcesKey(scope, serverId) }); await query.refetch(); };
+  return { query, view, line, active, draft, agents: agents.data?.items ?? [], agentsError: agents.isError, error, notice, conflict, pending, save, approve, discard, reload };
 }

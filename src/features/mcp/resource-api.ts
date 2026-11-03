@@ -1,6 +1,6 @@
 import { httpClient } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
-import type { MappingDocument } from './mapping-api';
+import type { MappingDocument, MappingView } from './mapping-api';
 import { object } from './mapping-fields';
 import type { ManagedTool } from './api';
 
@@ -53,10 +53,17 @@ export function toolArguments(tool: ManagedTool): ToolArgument[] {
   });
 }
 
+// The mapping of one managed tool in the resource types read of a server (Backend 042). It draws the
+// collapsed Resource line; an edit still reads the tool mapping, which has the server revision.
+export type ToolMappingEntry = { tool: string; source: MappingView['source']; effective: MappingDocument; draft: MappingDocument | null };
+const serverPath = (s: EnvironmentScope, serverId: string): `/v1/${string}` => `/v1/workspaces/${s.tenantId}/environments/${s.environmentId}/mcp-servers/${encodeURIComponent(serverId)}/resource-types`;
+export const serverResourcesKey = (s: EnvironmentScope, serverId: string) => ['server-resources', s.userId, s.tenantId, s.environmentId, serverId] as const;
+
 const agentsPath = (s: EnvironmentScope): `/v1/${string}` => `/v1/workspaces/${s.tenantId}/environments/${s.environmentId}/resource-types/agents`;
 export const resourceAgentsKey = (s: EnvironmentScope, serverId: string, type: string) => ['resource-type-agents', s.userId, s.tenantId, s.environmentId, serverId, type] as const;
 
 // Agents with published values of one resource type (Backend 033 Admin contract 3).
 export const resourceApi = {
+  server: (s: EnvironmentScope, serverId: string, signal: AbortSignal) => httpClient<{ tools: ToolMappingEntry[] }>(serverPath(s, serverId), { signal }),
   agents: (s: EnvironmentScope, serverId: string, type: string, signal: AbortSignal) => httpClient<{ items: ResourceAgent[] }>(`${agentsPath(s)}?${new URLSearchParams({ server_id: serverId, type })}`, { signal }),
 };

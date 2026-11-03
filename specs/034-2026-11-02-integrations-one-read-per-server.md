@@ -3,7 +3,7 @@
 - **Specification ID**: 034
 - **Date**: 2026-11-02
 - **Slug**: integrations-one-read-per-server
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Integrations (`src/features/mcp`)
 - **Related Specification**: [Backend 042 — Tool Mappings in the Resource Types Read](../../backend/specs/042-2026-11-02-tool-mappings-in-resource-types.md) (`tools`: source, effective, draft)
 - **Related Specification**: [027 — Tool Resource Mapping Review](027-2026-10-31-tool-resource-mapping-review.md) (the Resource block of each tool row)
@@ -44,7 +44,7 @@ A server with many tools opens its details with as many mapping requests (Admin 
 
 ## User Stories
 
-- [ ] 1. As an administrator, I open the details of a server with many tools and the Resource lines appear from one request.
+- [x] 1. As an administrator, I open the details of a server with many tools and the Resource lines appear from one request.
 
 ---
 
@@ -87,11 +87,11 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ## Acceptance Criteria
 
-- [ ] 1. Opening the details of a server sends one resource types request and no tool mapping request.
-- [ ] 2. The collapsed Resource line of each tool shows the same resource, chip and note as before.
-- [ ] 3. Configure resource reads the tool mapping of that tool only, and save, approve and discard update the line.
-- [ ] 4. `npm run check` and `npm run build` pass.
-- [ ] 5. The user confirms the interface test.
+- [x] 1. Opening the details of a server sends one resource types request and no tool mapping request.
+- [x] 2. The collapsed Resource line of each tool shows the same resource, chip and note as before.
+- [x] 3. Configure resource reads the tool mapping of that tool only, and save, approve and discard update the line.
+- [x] 4. `npm run check` and `npm run build` pass.
+- [x] 5. The user confirms the interface test. (Run by the agent in the built-in browser at the user's request on 2026-11-02: one resource types request and no tool mapping request on open; save, discard and approve update the line; the draft written for the test was discarded or approved unchanged, so the mapping of `get_test_item` is the same document.)
 
 ---
 
