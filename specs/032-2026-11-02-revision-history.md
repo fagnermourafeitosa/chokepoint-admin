@@ -108,7 +108,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [x] 1. The publication bar shows the author, time and note of the latest revision and opens the history.
 - [x] 2. Publish sends the optional note.
 - [x] 3. The history side panel shows the timeline and the computed diff of the selected revision.
-- [x] 4. The decision inspector shows the permission revision and opens the side panel on it, or shows "Not recorded". A revision published before Backend 038 has no event: the panel opens with no detail (review finding).
+- [x] 4. The decision inspector shows the permission revision and opens the side panel on it, or shows "Not recorded". A revision published before Backend 038 has no event: the panel says that it was published before the history existed (review adjustment, checked in the browser).
 - [x] 5. The delete dialog states the soft delete, sends the revision and shows the revocation and conflict errors; a deleted agent leaves the list and shows as deleted in Investigate, exchange items and the Inbox. The revocation and conflict errors and the Inbox text were checked by code inspection; the rest in the browser.
 - [x] 6. The exchange inspector and the Inbox item of a deleted agent explain that its key is still in use and offer no Open the agent action. The Inbox item by code inspection: no signal was raised during the test.
 - [x] 7. The `SidePanel` component and its documentation are in the design system.

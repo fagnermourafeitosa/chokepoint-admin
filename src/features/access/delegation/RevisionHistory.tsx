@@ -99,6 +99,9 @@ export function RevisionHistory({ scope, agentId, agentName, initial, onClose }:
               </section>;
             })}</div> : <p className="cp-admin-muted">This revision has the same access as the one before it.</p>}
           </>}
-    </article> : <article className="history-detail" />}
+    </article> : <article className="history-detail">
+      {/* A revision published before Backend 038 has no event, so it is not in the timeline. */}
+      {selected !== undefined && items.length > 0 && !list.hasNextPage && !list.isFetchingNextPage ? <p className="history-note history-note--empty">Revision {selected} was published before the history existed, so Chokepoint has no author, note or snapshot for it.</p> : null}
+    </article>}
   </section></SidePanel>;
 }
