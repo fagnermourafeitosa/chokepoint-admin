@@ -4,7 +4,7 @@ The [reference image](../../specs/assets/022-admin-design-system/reference.png) 
 
 ## Typography and brand
 
-Barlow Condensed Bold is used for page and section titles. IBM Plex Sans is used for interface copy and controls. IBM Plex Mono is used for code, identifiers and technical data. The home wordmark uses Anton in a yellow box with a dark border and offset shadow. Fonts are local; see [assets and licenses](fonts/README.md).
+Barlow Condensed Bold is used for page and section titles. IBM Plex Sans is used for interface copy and controls. IBM Plex Mono is used for code, identifiers and technical data. The Xokepoint wordmark of the home uses Anton in a yellow box with a dark border and offset shadow; its first O is the arrow O of the favicon (frontend specifications 010 and 011). Fonts are local; see [assets and licenses](fonts/README.md).
 
 ## Components
 

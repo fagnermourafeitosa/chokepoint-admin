@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CircleHelp } from 'lucide-react';
 import type { AgentScope } from '../agent-api';
@@ -8,7 +8,7 @@ import { CatalogProvider, useCatalog } from './catalog';
 import { DelegationGraph } from './DelegationGraph';
 import { FilterBar, filterDoc, isFiltered, noFilters, type Filters } from './FilterBar';
 import { GraphHelp } from './GraphHelp';
-import { capabilityId, type Doc } from './model';
+import { capabilityId, harnessWithoutGroups, type Doc } from './model';
 import { delegationLayout, type Positions, type Selection } from './layout';
 import { ListView } from './ListView';
 import { PublishBar } from './PublishBar';
@@ -23,7 +23,10 @@ function Toggle<T extends string>({ label, value, options, onChange }: { label: 
   return <div className="delegation-toggle" role="group" aria-label={label}>{options.map(([v, text]) => <button key={v} type="button" aria-pressed={value === v} onClick={() => onChange(v)}>{text}</button>)}</div>;
 }
 
-type Props = { scope: AgentScope; agentId: string; agentName: string; target?: AccessTarget };
+// A block asked from the Harness sessions view (Admin 036 section 3, point 5). The editor adds it to
+// its local draft, so unsaved edits are kept; id changes for each request.
+export type BlockRequest = { id: number; issuer: string; subject: string };
+type Props = { scope: AgentScope; agentId: string; agentName: string; target?: AccessTarget; block?: BlockRequest };
 
 // Delegation and access (Admin 026): the agent graph as the editor. The catalog loads the
 // directories of the identity providers in the saved document.
@@ -46,7 +49,7 @@ function targetSelection(target: AccessTarget | undefined, doc: Doc): Selection 
   return target.section === 'grants' ? { type: 'add', what: 'tool' } : undefined;
 }
 
-function Editor({ scope, agentId, agentName, target }: Props) {
+function Editor({ scope, agentId, agentName, target, block }: Props) {
   const { catalog, loading, error, retry } = useCatalog();
   const state = useDelegation(scope, agentId, catalog);
   const [back, setBack] = useState<Selection>();
@@ -64,6 +67,14 @@ function Editor({ scope, agentId, agentName, target }: Props) {
   const count = (d: Doc) => d.scopes.length + d.capabilities.length + d.resources.length;
   const layout = useMemo(() => delegationLayout(agentName, view, catalog, positions), [agentName, view, catalog, positions]);
   useEffect(() => { const next = targetSelection(target, state.draft); if (next) setSelected(next); }, [target?.serverId, target?.tool, target?.section, target?.connectionId, !!state.config]);
+  const appliedBlock = useRef(0);
+  useEffect(() => {
+    if (!block || !state.config || appliedBlock.current === block.id) return;
+    appliedBlock.current = block.id;
+    const draft = state.draft;
+    if (draft.blocked.some(b => b.issuer === block.issuer && b.subject === block.subject)) return;
+    state.edit({ ...draft, blocked: [...draft.blocked, { issuer: block.issuer, subject: block.subject, reason: 'Blocked by administrator' }], delegations: draft.delegations.filter(d => !(d.issuer === block.issuer && d.subject === block.subject)) });
+  }, [block, state]);
   useEffect(() => {
     if (!maximized) return;
     const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setMaximized(false); };
@@ -92,7 +103,7 @@ function Editor({ scope, agentId, agentName, target }: Props) {
       {selected ? <fieldset className="delegation-panel-frame" disabled={readOnly || state.busy}><RelationPanel key={JSON.stringify(selected) + version} selected={selected} agentName={agentName} doc={doc} onChange={state.edit} onClose={() => { setSelected(undefined); setBack(undefined); }} onSelect={s => { setBack(selected?.type === 'group' ? selected : undefined); setSelected(s); }} back={back} onBack={() => { setSelected(back); setBack(undefined); }} /></fieldset> : null}
     </div>
     {help ? <GraphHelp onClose={() => setHelp(false)} /> : null}
-    <PublishBar config={state.config} changes={state.changes} busy={state.busy} onPublish={state.publish} onDiscard={() => { void state.discard(); setSelected(undefined); }} onHistory={() => setHistory(true)} />
+    <PublishBar config={state.config} changes={state.changes} busy={state.busy} blocker={harnessWithoutGroups(state.draft) ? 'Harness login is on without a group. Choose at least one group, or turn it off.' : undefined} onPublish={state.publish} onDiscard={() => { void state.discard(); setSelected(undefined); }} onHistory={() => setHistory(true)} />
     {history ? <RevisionHistory scope={scope} agentId={agentId} agentName={agentName} onClose={() => setHistory(false)} /> : null}
   </section>;
 }

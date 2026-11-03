@@ -1,4 +1,4 @@
-/* Layout prototype for harness login (Backend 045). */
+/* Harness login (Admin 036, Backend 045). */
 .harness-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-2); }
 .harness-block { display: grid; gap: var(--cp-admin-space-3); padding-top: var(--cp-admin-space-3); border-top: 1px solid var(--cp-admin-color-border); }
 .harness-list { display: grid; gap: var(--cp-admin-space-2); margin: 0; padding: 0; list-style: none; }
@@ -26,5 +26,5 @@
 .harness-person > div:first-child { display: grid; gap: 2px; }
 .harness-person small { color: var(--cp-admin-color-text-muted); }
 .harness-blocked-note { border-color: #e3a29a; background: #fbe4e2; color: #7a2018; }
-.harness-frame { display: grid; gap: var(--cp-admin-space-3); max-width: 760px; padding: var(--cp-admin-space-4); }
-.harness-frame > header { display: grid; gap: 2px; }
+.harness-missing { margin-left: 4px; color: var(--cp-admin-color-danger, #a3332a); font-size: var(--cp-admin-type-label); }
+.harness-icon { vertical-align: -2px; }

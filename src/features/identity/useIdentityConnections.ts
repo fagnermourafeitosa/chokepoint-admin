@@ -26,7 +26,9 @@ export function useIdentityConnections(scope: EnvironmentScope) {
   const saved = await run(signal => identityApi.save(scope, id, fields, signal));
   if (saved) { setEditor(null); setNotice('Identity connection saved.'); await refresh(); }
  }
- async function toggle(connection: IdentityConnection) { await save(connection.id, { provider: connection.provider, name: connection.name, issuer: connection.issuer, audiences: connection.audiences, groups_claim: connection.groups_claim, directory: connection.directory, revision: connection.revision, enabled: !connection.enabled }); }
+ async function toggle(connection: IdentityConnection) { await save(connection.id, { provider: connection.provider, name: connection.name, issuer: connection.issuer, audiences: connection.audiences, directory: connection.directory, revision: connection.revision, enabled: !connection.enabled,
+  // The login client stays; an omitted secret keeps the stored one (Backend 045).
+  login: connection.login?.client_id ? { enabled: connection.login.enabled, client_id: connection.login.client_id } : null }); }
  async function check(connection: IdentityConnection) {
   const checked = await run(signal => identityApi.check(scope, connection.id, connection, signal));
   if (checked) { setNotice(checked.check_status === 'verified' ? 'Issuer metadata and public keys verified.' : 'Configuration check failed. Check the issuer and network access.'); await refresh(); }

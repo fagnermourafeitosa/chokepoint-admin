@@ -3,9 +3,9 @@
 - **Specification ID**: 036
 - **Date**: 2026-11-03
 - **Slug**: interactive-harness-access
-- **Status**: Proposed
+- **Status**: Implemented
 - **Owner**: Admin — Access and Integrations
-- **Visual reference**: [`/prototype/harness-access`](../src/features/prototype/harness/HarnessAccessPage.tsx) (the four Admin screens, one tab each, with the place of each one in the real screen) and [`/prototype/harness-login`](../src/features/prototype/harness/HarnessLoginPages.tsx) (the pages of the authorization server). Fixed data in `src/features/prototype/harness/data.ts`. Layout approved by the user on 2026-11-03.
+- **Visual reference**: the layout prototype `/prototype/harness-access` and `/prototype/harness-login`, approved by the user on 2026-11-03 and removed at implementation (visual specification, point 7).
 - **Related Specification**: [Backend 045 — Interactive Agent Login](../../backend/specs/045-2026-11-03-interactive-agent-login.md) (every contract of this screen)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md) (identity provider panel), [029 — Agent Identity and Chokepoint Token Setup](029-2026-10-31-agent-identity-and-chokepoint-token-setup.md) (Identity view), [032 — Revision History](032-2026-11-02-revision-history.md) (published blocks and group changes)
 
@@ -72,12 +72,12 @@ Five screens, as in the approved prototype:
 
 ## User Stories
 
-- [ ] 1. As an administrator, I allow the group `developers` of an identity provider to log in to an agent from a harness, and the screen tells me that only members of that group can.
-- [ ] 2. As an administrator, I block a person on an agent and see that publishing revokes their machines.
-- [ ] 3. As an administrator, I allow Claude Code for an agent with one click and copy the MCP URL for developers.
-- [ ] 4. As an administrator, I see the people and machines logged in to an agent and revoke one machine.
-- [ ] 5. As an administrator, I configure the login client of an identity connection and copy its redirect URI.
-- [ ] 6. As a developer, I see what an agent can do before I allow it, and a clear reason when I am refused.
+- [x] 1. As an administrator, I allow the group `developers` of an identity provider to log in to an agent from a harness, and the screen tells me that only members of that group can.
+- [x] 2. As an administrator, I block a person on an agent and see that publishing revokes their machines.
+- [x] 3. As an administrator, I allow Claude Code for an agent with one click and copy the MCP URL for developers. — the MCP URL is one line for each server of the agent, because the ingress needs the server ID.
+- [x] 4. As an administrator, I see the people and machines logged in to an agent and revoke one machine.
+- [x] 5. As an administrator, I configure the login client of an identity connection and copy its redirect URI.
+- [x] 6. As a developer, I see what an agent can do before I allow it, and a clear reason when I am refused.
 
 ---
 
@@ -200,17 +200,17 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ## Acceptance Criteria
 
-- [ ] 1. The Harness login block cannot be published on without a group, and the rule box states that only members of the groups can log in.
-- [ ] 2. Groups come from the groups read, and a missing group is marked.
-- [ ] 3. Blocking a person is part of the draft and shows in the revision history.
-- [ ] 4. The Harness login card is the second card of the Identity view, with the MCP URL on one line and the catalog buttons.
-- [ ] 5. The Harness sessions view lists people and machines and revokes one machine.
-- [ ] 6. The identity connection form has the Harness login section without a groups claim field.
-- [ ] 7. The pages of the authorization server match section 5.
-- [ ] 8. Every help opens on hover and focus.
-- [ ] 9. No "Waiting backend" chip remains for an implemented item.
-- [ ] 10. `npm run check` and `npm run build` pass.
-- [ ] 11. The user confirms the interface test.
+- [x] 1. The Harness login block cannot be published on without a group, and the rule box states that only members of the groups can log in.
+- [x] 2. Groups come from the groups read, and a missing group is marked. — groups read and `ids` checked live; the "Not found" mark by code inspection.
+- [x] 3. Blocking a person is part of the draft and shows in the revision history. — block published from the draft as revision 8; history by code inspection.
+- [x] 4. The Harness login card is the second card of the Identity view, with the MCP URL on one line and the catalog buttons. — one MCP URL line for each server of the agent (deviation, see Further Notes).
+- [x] 5. The Harness sessions view lists people and machines and revokes one machine.
+- [x] 6. The identity connection form has the Harness login section without a groups claim field.
+- [x] 7. The pages of the authorization server match section 5. — consent, connected, blocked and not-allowed pages checked live; provider and agent choice by unit tests.
+- [x] 8. Every help opens on hover and focus. — code inspection: every help uses the shared Tooltip.
+- [x] 9. No "Waiting backend" chip remains for an implemented item.
+- [x] 10. `npm run check` and `npm run build` pass.
+- [ ] 11. The user confirms the interface test. — missing: the user confirms the interface test.
 
 ---
 
@@ -224,6 +224,13 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 ---
 
 ## Further Notes
+
+- **Implementation decisions (2026-11-03):**
+  - The MCP URL for developers is one line for each server of the agent, because the ingress needs the server ID (Backend 045 Resolved Decision 28). Before the first publication of tools, the card says so.
+  - The catalog has Claude Code and Visual Studio Code, the harnesses whose CIMD document was verified (Backend 045 Resolved Decision 29). Their icons are generic Admin icons in `public/brands`, not vendor logos.
+  - Block in the Harness sessions view adds the person to the local draft of the Delegation and access editor, next to its unsaved edits (code review, 2026-11-03).
+  - The group search waits 300 ms after typing before it reads the directory.
+  - The Admin header, favicon and touch icon use the Xokepoint mark of the home (frontend specifications 010 and 011); the pages of the authorization server use it too.
 
 - When the real screens are implemented, remove `src/features/prototype/harness/` and its routes ([visual specification](../docs/design-system/visual-specification.md), point 7).
 - The CIMD URLs in the prototype are placeholders. The real ones come from the catalog (Backend 045 Resolved Decision 27).

@@ -5,11 +5,18 @@ import type { EnvironmentScope } from '../access/environment-scope';
 export type DirectorySettings = { client_id: string; issuing_client_id: string; client_secret?: string; has_secret: boolean; delegated_admin?: string; domain?: string; customer_id?: string; check_status: 'not_checked' | 'verified' | 'failed'; checked_at: string | null };
 export type IssuingClient = { client_id: string; name?: string };
 // The directory check result lists the Keycloak clients that can issue user tokens (Backend 019).
-export type DirectoryCheck = DirectorySettings & { issuing_clients?: IssuingClient[]; truncated?: boolean };
-export type IdentityFields = { provider: string; name: string; issuer: string; audiences: string[]; groups_claim: string; enabled: boolean; revision: number; directory: DirectorySettings | null };
-export type IdentityConnection = IdentityFields & { id: string; created_at: string; updated_at: string; checked_at: string | null; check_status: 'not_checked' | 'verified' | 'failed' };
+// groups_readable is absent for a provider without the groups capability (Backend 045).
+export type DirectoryCheck = DirectorySettings & { issuing_clients?: IssuingClient[]; truncated?: boolean; groups_readable?: boolean };
+// The harness login client (Backend 045 Administration API 1). client_secret is write-only;
+// the read returns has_secret and the redirect URI to register at the provider. null removes the client.
+export type LoginSettings = { enabled: boolean; client_id: string; client_secret?: string; has_secret?: boolean; redirect_uri?: string };
+export type IdentityFields = { provider: string; name: string; issuer: string; audiences: string[]; enabled: boolean; revision: number; directory: DirectorySettings | null; login: LoginSettings | null };
+export type IdentityConnection = Omit<IdentityFields, 'login'> & { login: LoginSettings | null; id: string; created_at: string; updated_at: string; checked_at: string | null; check_status: 'not_checked' | 'verified' | 'failed' };
 export type IdentityPage = { items: IdentityConnection[]; next_offset: number | null };
-export type ProviderCapability = { provider: string; name: string; available: boolean; directory: boolean; runtime_identity: boolean };
+export type ProviderCapability = { provider: string; name: string; available: boolean; directory: boolean; runtime_identity: boolean; groups: boolean };
+// A directory group (Backend 045 Resolved Decision 26). id is the match key; path is set for nested groups (Keycloak).
+export type DirectoryGroup = { id: string; name: string; path?: string };
+export type GroupPage = { items: DirectoryGroup[]; next_cursor: string | null };
 export type DirectoryIdentity = { issuer: string; subject: string };
 export type DirectoryUser = { kind: 'person' | 'service'; identity: DirectoryIdentity; id: string; user_name: string; display_name: string; email?: string; given_name?: string; family_name?: string; active: boolean | null };
 // Service principals of one connection (Backend 027), for example Keycloak clients with service accounts. truncated means the provider has more.
@@ -31,6 +38,14 @@ export const identityApi = {
  user: (s: EnvironmentScope, id: string, user: string, signal: AbortSignal) => httpClient<DirectoryUser>(`${path(s)}/${encodeURIComponent(id)}/users/${encodeURIComponent(user)}`, { signal }),
  // Current directory names of exact identities, at most nameLookupLimit per request; an unreadable name is absent.
  names: (s: EnvironmentScope, identities: DirectoryIdentity[], signal: AbortSignal) => httpClient<{ items: PrincipalName[] }>(`${path(s)}/names`, { method: 'POST', json: { identities }, signal }),
+ // One page of directory groups, or the chosen groups found by ids (Backend 045 Administration API 3a).
+ groups: (s: EnvironmentScope, id: string, query: { q?: string; cursor?: string; ids?: string[] }, signal: AbortSignal) => {
+  const params = new URLSearchParams();
+  if (query.q) params.set('q', query.q);
+  if (query.cursor) params.set('cursor', query.cursor);
+  if (query.ids?.length) params.set('ids', query.ids.join(','));
+  return httpClient<GroupPage>(`${path(s)}/${encodeURIComponent(id)}/groups?${params}`, { signal });
+ },
  remove: (s: EnvironmentScope, c: IdentityConnection, signal: AbortSignal) => httpClient<void>(`${path(s)}/${encodeURIComponent(c.id)}`, { method: 'DELETE', json: { revision: c.revision }, signal }),
 };
 export function identityError(error: unknown): string {
@@ -39,7 +54,8 @@ export function identityError(error: unknown): string {
   if (error.status === 422 && error.code === 'directory_not_authorized') return 'The service account may not read the directory as this administrator. In the Google Admin console, authorize domain-wide delegation with the read-only user scope and check the administrator e-mail. A change can take up to 24 hours.';
   if (error.status === 422 && error.code === 'clients_unavailable') return 'Cannot read the Keycloak clients. Grant the service account the realm-management role view-clients, then check the connection again.';
   if (error.status === 422) return 'Cannot verify Keycloak directory and administrative access. Check the connection and network, grant the service account the realm-management roles view-users and view-clients (or equivalent), and ensure the directory contains a user.';
-  if (error.status === 400) return 'Check the connection and directory fields.';
+  if (error.status === 409 && error.code === 'groups_unsupported') return 'This identity provider can not list groups yet, so harness login is not available for it.';
+  if (error.status === 400) return 'Check the connection, directory and harness login fields.';
   if (error.status === 404) return 'This connection or user is no longer available.';
   if (error.status === 409) return 'The connection changed, or this issuer is already registered. Reload and retry.';
   if (error.status === 501) return 'This provider is not available yet.';

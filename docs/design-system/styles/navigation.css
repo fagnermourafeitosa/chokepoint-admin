@@ -19,6 +19,9 @@
 @font-face { font-family: 'Chokepoint Wordmark'; src: url('../../../src/assets/anton-latin.woff2') format('woff2'); font-display: swap; }
 .cp-admin-brand { min-height: 0; padding: 5px 13px 8px; border: 3px solid var(--cp-admin-color-text); background: var(--cp-admin-color-brand); box-shadow: 3px 3px 0 var(--cp-admin-color-text); font: 400 1.6rem/1 'Chokepoint Wordmark', Impact, sans-serif; white-space: nowrap; }
 @media (max-width: 740px) { .cp-admin-brand { font-size: 1.3rem; } }
+/* The arrow O of the Xokepoint wordmark (frontend specification 011): a solid O with the arrow cut in the brand yellow. */
+.cp-admin-wordmark-o { display: inline-block; width: .4863em; height: .875em; vertical-align: -.0078em; fill: currentColor; }
+.cp-admin-wordmark-arrow { fill: none; stroke: var(--cp-admin-color-brand); stroke-width: 160; stroke-linecap: round; stroke-linejoin: round; }
 
 :is(.access-navigation-links, .cp-admin-section-nav) {
   display: inline-flex;

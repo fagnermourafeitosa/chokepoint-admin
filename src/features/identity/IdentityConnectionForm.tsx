@@ -6,6 +6,7 @@ import { useAuth } from '../auth/AuthContext';
 import type { DirectoryCheck, DirectorySettings, IdentityConnection, IdentityFields, IssuingClient, ProviderCapability } from './api';
 import { GoogleConnectionForm } from './GoogleConnectionForm';
 import { Help } from './Help';
+import { HarnessLoginSection, initialLogin, loginInput } from './HarnessLoginSection';
 import './identity.css';
 
 type Props = {
@@ -24,17 +25,18 @@ export function IdentityConnectionForm({ connection, providers, providerError, p
  const [name, setName] = useState(connection?.name ?? '');
  const [issuer, setIssuer] = useState(connection?.issuer ?? '');
  const [audiences, setAudiences] = useState(connection?.audiences ?? ['']);
- const [groups] = useState(connection?.groups_claim ?? '');
  const [enabled, setEnabled] = useState(connection?.enabled ?? true);
  const [directory, setDirectory] = useState<DirectorySettings>(connection?.directory ?? emptyDirectory);
+ const [login, setLogin] = useState(() => initialLogin(connection?.login));
  const [checked, setChecked] = useState(connection?.check_status === 'verified' && connection.directory?.check_status === 'verified');
  // Realm clients from the last passed check. A saved connection shows its stored
  // issuing client until the next check loads the list.
  const [clients, setClients] = useState<{ items: IssuingClient[]; truncated: boolean } | null>(null);
  const [localError, setLocalError] = useState('');
+ const [groupsReadable, setGroupsReadable] = useState<boolean>();
  // A stored secret is shown masked until the user chooses to replace it.
  const [changingSecret, setChangingSecret] = useState(false);
- const fields = (): IdentityFields => ({ provider, name: name.trim(), issuer, audiences, groups_claim: groups, enabled, revision: connection?.revision ?? 0, directory });
+ const fields = (): IdentityFields => ({ provider, name: name.trim(), issuer, audiences, enabled, revision: connection?.revision ?? 0, directory, login: loginInput(login) });
  const current = JSON.stringify(fields());
  const [initial] = useState(current);
  usePendingChanges(pending || current !== initial);
@@ -65,6 +67,7 @@ export function IdentityConnectionForm({ connection, providers, providerError, p
    const items = result.issuing_clients ?? [];
    setClients({ items, truncated: !!result.truncated });
    if (!items.some(item => item.client_id === directory.issuing_client_id)) setDirectory(value => ({ ...value, issuing_client_id: '' }));
+   setGroupsReadable(result.groups_readable);
    setChecked(true);
   } finally { setChecking(false); }
  }
@@ -86,7 +89,7 @@ export function IdentityConnectionForm({ connection, providers, providerError, p
    </div> : null}
   </div>
   {provider && selected && !selected.available ? <p className="cp-admin-notice" role="status">{selected.name} is not available yet.</p> : null}
-  {provider === 'google' && selected?.available ? <GoogleConnectionForm key={connection?.id ?? 'new'} connection={connection} workspaceLabel={`${auth.workspace?.name} / ${auth.environment?.name === 'production' ? 'Production' : 'Sandbox'}`} pending={pending} error={error} onSave={onSave} onCheck={onCheck} onDirectoryCheck={onDirectoryCheck} onCancel={onCancel} /> : null}
+  {provider === 'google' && selected?.available ? <GoogleConnectionForm key={connection?.id ?? 'new'} connection={connection} groupsCapable={!!selected.groups} workspaceLabel={`${auth.workspace?.name} / ${auth.environment?.name === 'production' ? 'Production' : 'Sandbox'}`} pending={pending} error={error} onSave={onSave} onCheck={onCheck} onDirectoryCheck={onDirectoryCheck} onCancel={onCancel} /> : null}
   {selected?.available && provider !== 'google' ? <form className="cp-admin-panel identity-form identity-form-redesign" onSubmit={event => { event.preventDefault(); if (validate()) { void onSave(fields()); } }}>
    <fieldset disabled={pending || checking}>
     <div className="identity-form-section"><SectionHeading title="Connection" description="Identify this connection in your workspace." help="The connection belongs to the selected workspace and environment." /><div className="identity-form-fields"><label className="cp-admin-field">Connection name<input className="cp-admin-input" required maxLength={80} value={name} onChange={e => { setName(e.target.value); changedAuthentication(); }} /></label><small>{auth.workspace?.name} / {auth.environment?.name === 'production' ? 'Production' : 'Sandbox'}</small>
@@ -101,8 +104,10 @@ export function IdentityConnectionForm({ connection, providers, providerError, p
        : <input className="cp-admin-input" type="password" autoComplete="new-password" required={!directory.has_secret} maxLength={4096} value={directory.client_secret ?? ''} onChange={e => updateDirectory({ client_secret: e.target.value })} />}<small>{provider === 'keycloak' ? 'In Keycloak: Clients, select this client, then Credentials. Stored encrypted. Existing secrets cannot be displayed.' : 'Stored encrypted. Existing secrets cannot be displayed.'}</small></label></div>
      {error || localError ? <p className="cp-admin-notice cp-admin-notice--danger" role="alert">{error || localError}</p> : null}
      <div className="identity-inline-check"><button type="button" className="cp-admin-button cp-admin-button--secondary" disabled={checking} onClick={() => void checkConnection()}>{checking ? 'Checking…' : 'Check connection'}</button><Help label="What the check verifies" text={checkHelp} /><small role="status">{checked ? 'Connection verified.' : 'Not checked'}</small></div>
+     {checked && groupsReadable === false ? <p className="cp-admin-notice" role="status">The directory client can not read groups. Harness login needs it: grant the service account the realm-management role query-groups.</p> : null}
      {provider === 'keycloak' ? <label className="cp-admin-field">Token issuing client<SelectMenu block required triggerClassName="identity-mono" label="Token issuing client" disabled={!clients} value={directory.issuing_client_id ?? ''} onChange={v => setDirectory(value => ({ ...value, issuing_client_id: v }))} options={[{ value: '', label: clients ? 'Choose a client' : 'Check the connection to load clients' }, ...clientOptions.map(item => ({ value: item.client_id, label: item.name ? `${item.client_id} — ${item.name}` : item.client_id }))]} /><small>{clients?.truncated ? 'Only the first 500 realm clients are listed.' : 'The Keycloak client that issues user access tokens for this integration.'}</small></label> : null}
     </div></div>
+    <HarnessLoginSection provider={provider} value={login} stored={connection?.login ?? null} groupsCapable={!!selected?.groups} onChange={setLogin} />
    </fieldset>
    <footer className="identity-form-actions"><span /><button className="cp-admin-button cp-admin-button--ghost" type="button" disabled={pending} onClick={onCancel}>Cancel</button><button className="cp-admin-button" type="submit" disabled={pending}>{pending ? 'Working…' : connection ? 'Save changes' : 'Create connection'}</button></footer>
   </form> : null}

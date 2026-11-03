@@ -6,6 +6,7 @@ import { HttpError } from '../../../api/http-client';
 import { agentClientApi, agentClientKey, type AgentClient } from '../agent-client-api';
 import type { EnvironmentScope } from '../environment-scope';
 import { download, fileName, generateKey, parsePublicKey, type Jwk, type ParsedKey } from './agent-key';
+import { HarnessClients } from './HarnessClients';
 import './delegation.css';
 
 // The agent as a client of the Chokepoint authorization server (Admin 029, Backend 030 and 040).
@@ -110,12 +111,14 @@ export function AgentIdentity({ scope, agentId, agentName, disabled }: { scope: 
           <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" disabled={busy} onClick={() => { setConfirmRotate(true); setError(undefined); }}>Rotate key</button>
           <Help text="Rotate: creates a new key and downloads a new file. The current key stops working at once. Tokens already issued stay valid until they expire (5 minutes). Use it when the file was lost or exposed." />
         </div> : null}
-      </div> : <div className="identity-empty"><p>No key yet. The agent can not get a token.</p></div>}
+      </div> : <div className="identity-empty"><p>No key yet. A service can not get a token for this agent. Harness login does not need a key.</p></div>}
       {active && confirmRotate ? <div className="identity-confirm"><p className="resource-warning"><TriangleAlert size={14} aria-hidden="true" />The current key stops working now. Give the new file to the agent at once.</p><div className="condition-actions"><button type="button" className="cp-admin-button cp-admin-button--small" disabled={busy} onClick={() => void generate(current)}><Download size={14} aria-hidden="true" />{busy ? 'Rotating…' : 'Rotate and download'}</button><button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" disabled={busy} onClick={() => setConfirmRotate(false)}>Cancel</button></div></div> : null}
       {!active ? <div className="condition-actions"><button type="button" className="cp-admin-button" disabled={busy} onClick={() => void generate(current)}><Download size={16} aria-hidden="true" />{busy ? 'Generating…' : 'Generate key and download'}</button><Help text="Creates a key pair in your browser. Chokepoint registers the public key. You download one file with the private key and the connection values. Give this file to the agent." /></div> : null}
       {error ? <div role="alert" className="cp-admin-notice" data-tone="danger">{error.message}{error.conflict ? <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => { setError(undefined); setConfirmRotate(false); void client.refetch(); }}>Reload</button> : null}</div> : null}
       {downloaded ? <p className="consent-record identity-downloaded"><Check size={16} aria-hidden="true" /><span><strong>File downloaded: {downloaded}</strong><small>This is the only copy of the private key. Store it like a password. Chokepoint can not show it again.</small></span></p> : null}
     </section>
+
+    <HarnessClients scope={scope} agentId={agentId} agentName={agentName} issuer={current.issuer} />
 
     <details className="identity-card identity-more">
       <summary><Title help="The values that the file already has. Use them only to configure the agent by hand.">Connection details</Title></summary>

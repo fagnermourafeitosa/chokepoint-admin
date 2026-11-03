@@ -3,6 +3,7 @@ import { ExternalLink, Plus, TriangleAlert, X } from 'lucide-react';
 import { usePendingChanges } from '../auth/pending/PendingChanges';
 import type { DirectoryCheck, DirectorySettings, IdentityConnection, IdentityFields } from './api';
 import { Help } from './Help';
+import { HarnessLoginSection, initialLogin, loginInput } from './HarnessLoginSection';
 import './identity.css';
 
 const enableApiGuide = 'https://developers.google.com/workspace/guides/enable-apis';
@@ -16,7 +17,7 @@ function SectionHeading({ title, description, help }: { title: string; descripti
  return <div className="identity-section-heading"><h2>{title} <Help text={help} /></h2><p>{description}</p></div>;
 }
 type Props = {
- connection?: IdentityConnection; workspaceLabel: string; pending: boolean; error: string;
+ connection?: IdentityConnection; workspaceLabel: string; pending: boolean; error: string; groupsCapable: boolean;
  onSave: (fields: IdentityFields) => Promise<void>; onCheck: (fields: IdentityFields) => Promise<boolean>;
  onDirectoryCheck: (fields: IdentityFields) => Promise<DirectoryCheck | undefined>; onCancel: () => void;
 };
@@ -25,7 +26,7 @@ function keyLooksValid(text: string): boolean {
  try { const key = JSON.parse(text) as { type?: string; client_email?: string; private_key?: string }; return key.type === 'service_account' && !!key.client_email && !!key.private_key; } catch { return false; }
 }
 const domainPattern = /^(?=.{3,253}$)([a-z0-9-]+\.)+[a-z0-9-]+$/i;
-export function GoogleConnectionForm({ connection, workspaceLabel, pending, error, onSave, onCheck, onDirectoryCheck, onCancel }: Props) {
+export function GoogleConnectionForm({ connection, workspaceLabel, groupsCapable, pending, error, onSave, onCheck, onDirectoryCheck, onCancel }: Props) {
  const stored = connection?.directory;
  const [name, setName] = useState(connection?.name ?? '');
  const [enabled, setEnabled] = useState(connection?.enabled ?? true);
@@ -36,11 +37,13 @@ export function GoogleConnectionForm({ connection, workspaceLabel, pending, erro
  // A stored key is shown masked until the administrator chooses to replace it.
  const [changingKey, setChangingKey] = useState(false);
  const [customerId, setCustomerId] = useState(stored?.customer_id ?? '');
+ const [login, setLogin] = useState(() => initialLogin(connection?.login));
+ const [groupsReadable, setGroupsReadable] = useState<boolean>();
  const [checked, setChecked] = useState(connection?.check_status === 'verified' && stored?.check_status === 'verified');
  const [checking, setChecking] = useState(false), [localError, setLocalError] = useState('');
  const hasStoredKey = !!stored?.has_secret && !changingKey;
  const directory = (): DirectorySettings => ({ client_id: '', issuing_client_id: '', client_secret: hasStoredKey ? '' : key, has_secret: !!stored?.has_secret, delegated_admin: adminEmail.trim(), domain: domain.trim().toLowerCase(), customer_id: customerId, check_status: 'not_checked', checked_at: null });
- const fields = (): IdentityFields => ({ provider: 'google', name: name.trim(), issuer: googleIssuer, audiences, groups_claim: '', enabled, revision: connection?.revision ?? 0, directory: directory() });
+ const fields = (): IdentityFields => ({ provider: 'google', name: name.trim(), issuer: googleIssuer, audiences, enabled, revision: connection?.revision ?? 0, directory: directory(), login: loginInput(login) });
  const current = JSON.stringify(fields());
  const [initial] = useState(current);
  usePendingChanges(pending || current !== initial);
@@ -61,6 +64,7 @@ export function GoogleConnectionForm({ connection, workspaceLabel, pending, erro
    const result = await onDirectoryCheck(fields());
    if (!result || result.check_status !== 'verified') return;
    setCustomerId(result.customer_id ?? '');
+   setGroupsReadable(result.groups_readable);
    setChecked(true);
   } finally { setChecking(false); }
  }
@@ -89,7 +93,9 @@ export function GoogleConnectionForm({ connection, workspaceLabel, pending, erro
     {connection ? <div className="cp-admin-notice identity-mapping-warning" role="status"><TriangleAlert size={18} aria-hidden="true" /><div><strong>Changing the Google organization</strong><span>If you change the key or the administrator to another Google organization, the people associated before belong to the previous organization. If you also change the primary domain, they lose access. Chokepoint does not block the change.</span></div></div> : null}
     {error || localError ? <p className="cp-admin-notice cp-admin-notice--danger" role="alert">{error || localError}</p> : null}
     <div className="identity-inline-check"><button type="button" className="cp-admin-button cp-admin-button--secondary" disabled={checking} onClick={() => void checkConnection()}>{checking ? 'Checking…' : 'Check connection'}</button><Help label="What the check verifies" text={'Check connection reads the Google OpenID Connect metadata and signing keys, exchanges a token for the service account as the delegated administrator, and reads one user. It stores the Google account (customer) ID.\n\nIt does not verify a real login, the token audience or the hd claim of a real token.'} /><small role="status">{checked ? 'Connection verified.' : 'Not checked'}</small>{checked && customerId ? <small>Google account <code>{customerId}</code></small> : null}</div>
+    {checked && groupsReadable === false ? <p className="cp-admin-notice" role="status">The service account can not read groups. Harness login needs it: add the scope https://www.googleapis.com/auth/admin.directory.group.readonly to its domain-wide delegation.</p> : null}
    </div></div>
+   <HarnessLoginSection provider="google" value={login} stored={connection?.login ?? null} groupsCapable={groupsCapable} onChange={setLogin} />
   </fieldset>
   <footer className="identity-form-actions"><span /><button className="cp-admin-button cp-admin-button--ghost" type="button" disabled={pending} onClick={onCancel}>Cancel</button><button className="cp-admin-button" type="submit" disabled={pending}>{pending ? 'Working…' : connection ? 'Save changes' : 'Create connection'}</button></footer>
  </form>;

@@ -7,6 +7,7 @@ import { delegationKey, emptyDocument, permissionApi, revisionsKey, type Configu
 import { countChanges, fromDocument, toDocument, type Catalog, type Doc } from './model';
 
 function failure(cause: unknown) {
+  if (cause instanceof HttpError && cause.code === 'person_consent_groups_required') return 'Harness login is on without a group. Choose at least one group, or turn it off. Your edits are kept.';
   if (cause instanceof HttpError && cause.status === 409) return 'The agent changed in another session. Reload to see the latest draft; your unsaved edits are lost.';
   if (cause instanceof HttpError && cause.status === 400) return 'Check the selected subjects, the reviewed tools, the resource types, the rules and their bindings. Your edits are kept.';
   return 'Could not save. Your edits are kept; retry when the service is available.';

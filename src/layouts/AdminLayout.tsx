@@ -17,7 +17,7 @@ export function AdminLayout() {
         className="admin-layout"
         data-environment={environment.toLowerCase()}
       >
-        <title>{`${currentPage?.label ?? "Admin"} | Chokepoint`}</title>
+        <title>{`${currentPage?.label ?? "Admin"} | Xokepoint`}</title>
         <a className="admin-skip-link" href="#main-content">
           Skip to content
         </a>

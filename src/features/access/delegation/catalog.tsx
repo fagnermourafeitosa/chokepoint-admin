@@ -19,7 +19,7 @@ async function pages<T>(load: (offset: number) => Promise<{ items: T[]; next_off
 const ruleType = (type: string) => (type === 'string' ? 'string' : type === 'integer' || type === 'number' ? 'number' : type === 'boolean' ? 'bool' : undefined);
 
 async function loadCatalog(scope: EnvironmentScope, signal: AbortSignal) {
-  const [servers, identities, sources] = await Promise.all([pages(o => mcpApi.list(scope, o, signal)), pages(o => identityApi.list(scope, o, signal)), sourceApi.list(scope, signal)]);
+  const [servers, identities, sources, providers] = await Promise.all([pages(o => mcpApi.list(scope, o, signal)), pages(o => identityApi.list(scope, o, signal)), sourceApi.list(scope, signal), identityApi.providers(scope, signal)]);
   const managed = (s: MCPServer) => s.tools.filter(t => t.selected && t.reviewed && t.change !== 'removed');
   const withTools = servers.filter(s => managed(s).length);
   // One resource types read for each server (Backend 037, Admin 026 Resolved Decision 2).
@@ -36,7 +36,7 @@ async function loadCatalog(scope: EnvironmentScope, signal: AbortSignal) {
   }
   return {
     servers: withTools.map(s => ({ id: s.id, name: s.name, type: s.connection_type === 'enterprise' ? 'enterprise' as const : 'custom' as const })),
-    tools, bindings, idps: identities.map(i => ({ id: i.id, name: i.name, enabled: i.enabled })),
+    tools, bindings, idps: identities.map(i => ({ id: i.id, name: i.name, enabled: i.enabled, provider: i.provider, groups: !!providers.find(p => p.provider === i.provider)?.groups, harnessLogin: !!i.login?.enabled })),
   };
 }
 
@@ -58,7 +58,7 @@ async function loadDirectory(scope: EnvironmentScope, id: string, signal: AbortS
 
 const combineDirectories = (results: { data?: Directory; isError: boolean }[]) => results.map(r => ({ data: r.data, isError: r.isError }));
 
-type CatalogState = { catalog: Catalog; loading: boolean; error: boolean; retry: () => void; request: (issuer: string) => void; directoryFailed: (issuer: string) => boolean };
+type CatalogState = { scope: EnvironmentScope; catalog: Catalog; loading: boolean; error: boolean; retry: () => void; request: (issuer: string) => void; directoryFailed: (issuer: string) => boolean };
 const CatalogContext = createContext<CatalogState | null>(null);
 
 export function CatalogProvider({ scope, issuers, children }: { scope: EnvironmentScope; issuers: string[]; children: ReactNode }) {
@@ -72,12 +72,13 @@ export function CatalogProvider({ scope, issuers, children }: { scope: Environme
     const byIssuer = new Map(wanted.map((id, i) => [id, directories[i]]));
     const data = query.data;
     return {
+      scope,
       catalog: { servers: data?.servers ?? [], tools: data?.tools ?? [], idps: data?.idps ?? [], bindings: (serverId, tool) => data?.bindings[`${serverId}/${tool}`] ?? [], directory: id => byIssuer.get(id)?.data },
       loading: query.isPending, error: query.isError, retry: () => void query.refetch(),
       request,
       directoryFailed: id => !!byIssuer.get(id)?.isError,
     };
-  }, [query.data, query.isPending, query.isError, wanted, directories, request]);
+  }, [scope, query.data, query.isPending, query.isError, wanted, directories, request]);
   return <CatalogContext.Provider value={value}>{children}</CatalogContext.Provider>;
 }
 

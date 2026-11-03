@@ -5,6 +5,7 @@ import { delegationId, formatTime, idpName, idpSubjects, type Doc, type IdpScope
 import { useCatalog } from './catalog';
 import type { Selection } from './layout';
 import { ExpiresField, IncludesField } from './Fields';
+import { HarnessAccess } from './HarnessAccess';
 
 const sectionPage = 10;
 const kindLabel: Record<SubjectKind, string> = { person: 'People', service: 'Services' };
@@ -70,6 +71,7 @@ export function IdpPanel({ doc, issuer, agentName, onChange, onClose }: { doc: D
     <SubjectList issuer={issuer} kinds={scope.kinds} chosen={chosen} onSet={setSubjects} />
     <ExpiresField name="idp-expires" value={scope.expiresAt} onChange={v => set({ expiresAt: v })} dateText="Delegation from this identity provider ends at the end of this day (UTC)." />
     <ConsentRecord scope={scope} agentName={agentName} onConfirm={confirmed => set({ confirmed })} />
-    <footer><button type="button" className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" onClick={() => { onChange({ ...doc, scopes: doc.scopes.filter(s => s.issuer !== issuer), delegations: doc.delegations.filter(d => d.issuer !== issuer) }); onClose(); }}><Trash2 size={14} aria-hidden="true" />Remove {name}</button></footer>
+    <HarnessAccess doc={doc} scope={scope} agentName={agentName} onChange={onChange} />
+    <footer><button type="button" className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" onClick={() => { onChange({ ...doc, scopes: doc.scopes.filter(s => s.issuer !== issuer), delegations: doc.delegations.filter(d => d.issuer !== issuer), blocked: doc.blocked.filter(b => b.issuer !== issuer) }); onClose(); }}><Trash2 size={14} aria-hidden="true" />Remove {name}</button></footer>
   </>;
 }
