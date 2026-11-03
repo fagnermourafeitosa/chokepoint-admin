@@ -3,7 +3,7 @@
 - **Specification ID**: 033
 - **Date**: 2026-11-02
 - **Slug**: agent-names-in-inbox
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Overview and Inbox (`src/features/attention`)
 - **Related Specification**: [Backend 041 — Agent Names in Attention Signals](../../backend/specs/041-2026-11-02-agent-names-in-signals.md) (`context.agent_name`)
 - **Related Specification**: [030 — Investigate with Agent, Subject and Token Exchanges](030-2026-10-31-investigate-agent-subject-and-token-exchanges.md) (the token exchange item, section 5)
@@ -41,7 +41,7 @@ An administrator can not tell which agent an item is about without opening Inves
 
 ## User Stories
 
-- [ ] 1. As an administrator, I see the name of the agent in each denied requests and denied token exchanges item of the Inbox.
+- [x] 1. As an administrator, I see the name of the agent in each denied requests and denied token exchanges item of the Inbox.
 
 ---
 
@@ -83,9 +83,9 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ## Acceptance Criteria
 
-- [ ] 1. Denied requests and denied token exchanges items show the agent name, and the ID for an agent that no longer exists.
-- [ ] 2. `npm run check` and `npm run build` pass.
-- [ ] 3. The user confirms the interface test.
+- [x] 1. Denied requests and denied token exchanges items show the agent name, and the ID for an agent that no longer exists.
+- [x] 2. `npm run check` and `npm run build` pass.
+- [x] 3. The user confirms the interface test. (Run by the agent in the built-in browser at the user's request on 2026-11-02; the fallback to the ID was checked by removing `agent_name` from the responses inside the page. No data was changed.)
 
 ---
 
