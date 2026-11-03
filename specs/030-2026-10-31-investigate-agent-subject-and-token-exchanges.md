@@ -183,6 +183,8 @@ The contracts and decisions are written in the backend specifications (2026-11-0
 4. **Overview grouping:** [Backend 034](../../backend/specs/034-2026-10-31-decision-trace-actor-and-relations.md), Admin contract 4.
 5. **Problem key:** resolved in Backend 034 (Admin contract, Resolved decision).
 6. **Records from before 034:** resolved, [Backend 034](../../backend/specs/034-2026-10-31-decision-trace-actor-and-relations.md) Implementation Decision 1.
+7. **Resource of a problem:** [Backend 039](../../backend/specs/039-2026-11-02-problem-resource.md) (found in the review of this specification, 2026-11-02). The By problem view shows the resource of the latest decision.
+8. **Refused exchanges with their count:** the Token exchanges view, filtered by Refused, lists the problems of `/token-exchanges/problems` with "×N in window · last …" (section 4.1); the other results list each exchange with its time (decided after the review, 2026-11-02).
 
 **Waiting backend chip.** In the prototype, each element that needs one of these items has a "Waiting backend · <spec>" chip. When the backend implements an item, remove the chip of each element that it unblocks, in the same change. The real Admin never shows the chip.
 
