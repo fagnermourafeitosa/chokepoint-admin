@@ -9,7 +9,7 @@ export const denyText: Record<ReasonLabel, string> = {
   tool_not_reviewed: 'The tool has not been reviewed (blocked before the PDP).',
 };
 
-// Token exchange reasons (Admin 030 section 4).
+// Token exchange reasons (Admin 030 section 4, Admin 037).
 export const exchangeShort: Record<ExchangeReasonLabel, string> = {
   invalid_client: 'Agent key did not match',
   subject_token_expired: 'Subject token expired',
@@ -17,6 +17,12 @@ export const exchangeShort: Record<ExchangeReasonLabel, string> = {
   subject_connection_disabled: 'Identity provider disabled',
   no_delegation: 'Subject did not delegate',
   invalid_authorization_details: 'Instance limits not valid',
+  no_group: 'Person not in an allowed group',
+  blocked: 'Person blocked on the agent',
+  not_allowed_client: 'Harness not allowed',
+  code_reuse: 'Authorization code used twice',
+  refresh_reuse: 'Refresh token used twice',
+  dpop_invalid: 'DPoP proof not valid',
 };
 export const exchangeText: Record<ExchangeReasonLabel, string> = {
   invalid_client: 'The agent key did not match. The file may be old or exposed.',
@@ -25,6 +31,12 @@ export const exchangeText: Record<ExchangeReasonLabel, string> = {
   subject_connection_disabled: 'The connection of this identity provider is disabled.',
   no_delegation: 'The subject did not delegate to this agent.',
   invalid_authorization_details: 'The instance asked for limits that are not valid, or for a tool that the agent can not call (RFC 9396).',
+  no_group: 'Harness login: the person is not in an eligible group of an agent of this harness.',
+  blocked: 'Harness login: the person is blocked on the agent.',
+  not_allowed_client: 'Harness login: the harness is not allowed for an agent.',
+  code_reuse: 'An authorization code was used twice. Chokepoint revoked the machine.',
+  refresh_reuse: 'A refresh token was used twice. Chokepoint revoked the machine.',
+  dpop_invalid: 'The DPoP proof is missing, not valid or from another key.',
 };
 
 export const stepLabel: Record<string, string> = {

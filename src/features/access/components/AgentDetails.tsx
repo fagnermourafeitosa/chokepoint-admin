@@ -41,12 +41,13 @@ type AgentView = 'delegation' | 'identity' | 'sessions';
 // switch keeps an unsaved draft. The keyed editor drops scoped drafts and aborts requests when selection changes.
 export function AgentDetails({ agent, scope, target, onEdit, onDelete, onChanged, onReload }: AgentDetailsProps) {
   const disabled = agent.status === 'disabled';
-  // The view resets to Delegation and access for another agent or another navigation target.
+  // The view resets to the view of the target, or Delegation and access, for another agent or another navigation target.
   // The target is a new object on each render, so it is compared by the fields of the URL. The
   // principal is left out: it arrives later from the decision of the same navigation.
-  const place = `${agent.id}|${target ? [target.section, target.serverId, target.tool, target.policyId, target.connectionId].join('|') : ''}`;
-  const [choice, setChoice] = useState<{ place: string; view: AgentView }>({ place, view: 'delegation' });
-  const view = choice.place === place ? choice.view : 'delegation';
+  const place = `${agent.id}|${target ? [target.section, target.serverId, target.tool, target.policyId, target.connectionId, target.view].join('|') : ''}`;
+  const initial: AgentView = target?.view ?? 'delegation';
+  const [choice, setChoice] = useState<{ place: string; view: AgentView }>({ place, view: initial });
+  const view = choice.place === place ? choice.view : initial;
   const choose = (next: AgentView) => setChoice({ place, view: next });
   const editorKey = `${scope.userId}:${scope.tenantId}:${scope.environmentId}:${agent.id}`;
   const [block, setBlock] = useState<BlockRequest>();

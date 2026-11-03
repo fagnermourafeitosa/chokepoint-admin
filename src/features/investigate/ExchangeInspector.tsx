@@ -13,7 +13,7 @@ import { accessPath } from './DecisionInspector';
 
 type State = ReturnType<typeof useInvestigation>;
 
-// What to check for each reason, and the place that fixes it (Admin 030 section 4).
+// What to check for each reason, and the place that fixes it (Admin 030 section 4, Admin 037).
 const hints: Record<ExchangeReasonLabel, { hint: string; label: string }> = {
   invalid_client: { hint: 'If the key file is old or exposed, replace the key and give the new file to the agent.', label: 'Open the agent' },
   subject_token_expired: { hint: 'Check if the provider disabled this user. If not, the agent must renew the token of the user.', label: 'Open the identity provider' },
@@ -21,24 +21,64 @@ const hints: Record<ExchangeReasonLabel, { hint: string; label: string }> = {
   subject_connection_disabled: { hint: 'An administrator disabled this connection. Enable it if its users must use agents again.', label: 'Open the identity provider' },
   no_delegation: { hint: 'Select this subject in the identity provider of the agent if it must use the agent.', label: 'Open who can delegate' },
   invalid_authorization_details: { hint: 'The instance asked for a tool or limits that the agent does not have. Check the servers and tools of the agent.', label: 'Open the servers and tools' },
+  no_group: { hint: 'Check if this person must be in a group chosen in the Harness login of the identity provider.', label: 'Open the harness login' },
+  blocked: { hint: 'Check if the block of this person is still needed. Unblock the person in the Harness login of the identity provider.', label: 'Open the harness login' },
+  not_allowed_client: { hint: 'Check the allowed harnesses of the agent. Add this harness if the agent must accept it.', label: 'Open the agent identity' },
+  code_reuse: { hint: 'Check if the code leaked from the computer of the person. Chokepoint revoked the machine; the person must log in again.', label: 'Open the harness sessions' },
+  refresh_reuse: { hint: 'Check if the refresh token was copied from the computer of the person. Chokepoint revoked the machine; the person must log in again.', label: 'Open the harness sessions' },
+  dpop_invalid: { hint: 'Check if the token was copied from the harness that holds the key.', label: 'Open the harness sessions' },
 };
+
+// noAgent explains an action without an agent. A refused harness login names an
+// agent only when one agent is a candidate for the harness (Backend 045).
+function noAgent(reason?: ExchangeReasonLabel) {
+  if (reason === 'no_group' || reason === 'blocked' || reason === 'not_allowed_client') return 'Several agents or no agent use this harness. Check the Harness login of each agent that must accept this person.';
+  if (reason === 'code_reuse' || reason === 'refresh_reuse' || reason === 'dpop_invalid') return 'The request named no agent of this environment.';
+  return 'The assertion named no agent of this environment.';
+}
+
+// providerFix: a refused harness login has no subject when its connection is
+// disabled or no longer allows harness login (Backend 045), so the fix is the connection.
+function providerFix(x: Exchange) {
+  const reason = x.reason?.label;
+  return reason === 'subject_token_expired' || reason === 'subject_token_invalid' || reason === 'subject_connection_disabled' ||
+    ((reason === 'no_group' || reason === 'blocked') && !x.subject?.identity_connection_id);
+}
 
 function fixPath(x: Exchange, returnTo: string): string | undefined {
   const reason = x.reason?.label;
   if (!reason) return undefined;
-  if (reason === 'subject_token_expired' || reason === 'subject_token_invalid' || reason === 'subject_connection_disabled') return '/access/integrations?type=identity';
+  if (providerFix(x)) return '/access/integrations?type=identity';
   if (!x.agent) return undefined;
   if (reason === 'no_delegation') return accessPath({ agent_id: x.agent.id, section: 'people', connection_id: x.subject?.identity_connection_id ?? undefined }, undefined, returnTo);
   if (reason === 'invalid_authorization_details') return accessPath({ agent_id: x.agent.id, section: 'grants' }, undefined, returnTo);
+  if (reason === 'no_group' || reason === 'blocked') return accessPath({ agent_id: x.agent.id, section: 'people', connection_id: x.subject?.identity_connection_id ?? undefined }, undefined, returnTo);
+  if (reason === 'not_allowed_client') return accessPath({ agent_id: x.agent.id, view: 'identity' }, undefined, returnTo);
+  if (reason === 'code_reuse' || reason === 'refresh_reuse' || reason === 'dpop_invalid') return accessPath({ agent_id: x.agent.id, view: 'sessions' }, undefined, returnTo);
   return accessPath({ agent_id: x.agent.id }, undefined, returnTo);
 }
 
 // unverified explains a missing subject: the backend records it only after a
-// valid signature of the subject token (Backend 034 Solution 6).
+// valid signature of the subject token (Backend 034 Solution 6), or from the
+// login or the machine of a harness (Backend 045).
 function unverified(reason?: ExchangeReasonLabel) {
   if (reason === 'invalid_client') return 'Not checked: the agent key failed first';
   if (reason === 'subject_connection_disabled') return 'Not verified: the identity provider is disabled';
+  if (reason === 'no_group' || reason === 'blocked') return 'Not recorded: the identity provider is disabled or does not allow harness login';
+  if (reason === 'not_allowed_client') return 'Not checked: the harness was refused before the login';
+  if (reason === 'dpop_invalid') return 'Not checked: the DPoP proof failed first';
+  if (reason === 'code_reuse' || reason === 'refresh_reuse') return 'Not recorded: the machine was not found';
   return 'Not verified: the token signature was not valid';
+}
+
+// returned names what the client got (Backend 034 Resolved Decision 4, Backend 045).
+function returned(x: Exchange) {
+  const reason = x.reason?.label;
+  if (x.permit) return 'A Chokepoint token for 5 minutes';
+  if (reason === 'invalid_client' || reason === 'invalid_authorization_details') return reason;
+  if (reason === 'no_group' || reason === 'blocked' || (reason === 'not_allowed_client' && x.reference)) return 'A refused page with the reference code';
+  if (reason === 'dpop_invalid') return 'invalid_dpop_proof or invalid_grant';
+  return 'invalid_grant';
 }
 
 export function ExchangeInspector({ scope, id, state, onBack }: { scope: EnvironmentScope; id: string; state: State; onBack: () => void }) {
@@ -68,6 +108,7 @@ export function ExchangeInspector({ scope, id, state, onBack }: { scope: Environ
   const reason = x.reason?.label;
   const fix = reason ? hints[reason] : undefined;
   const to = deleted ? undefined : fixPath(x, `/investigate?${state.params}`);
+  const label = fix && providerFix(x) ? 'Open the identity provider' : fix?.label;
   const kind = x.subject ? kindText(x.subject) : undefined;
   return (
     <>
@@ -99,7 +140,7 @@ export function ExchangeInspector({ scope, id, state, onBack }: { scope: Environ
             ) : fix ? (
               <>
                 <p>{fix.hint}</p>
-                {to ? <div className="trace-actions"><Link className="cp-admin-button" to={to}>{fix.label}<ArrowRight size={15} /></Link></div> : <p className="cp-admin-muted">The assertion named no agent of this environment.</p>}
+                {to ? <div className="trace-actions"><Link className="cp-admin-button" to={to}>{label}<ArrowRight size={15} /></Link></div> : <p className="cp-admin-muted">{noAgent(reason)}</p>}
               </>
             ) : (
               <p>The agent proved its key, the token of the subject was valid and the subject delegated to the agent.</p>
@@ -139,7 +180,9 @@ export function ExchangeInspector({ scope, id, state, onBack }: { scope: Environ
             ['Subject', x.subject ? (x.subject.name ? `${x.subject.name} (${x.subject.subject})` : x.subject.subject) : unverified(reason)],
             ['Identity provider', x.subject?.issuer ?? '—'],
             ['Reason', reason ?? '—'],
-            ['Returned to the agent', x.permit ? 'A Chokepoint token for 5 minutes' : reason === 'invalid_client' || reason === 'invalid_authorization_details' ? reason : 'invalid_grant'],
+            ...(x.client_id ? [['Harness', x.client_id]] : []),
+            ...(x.reference ? [['Reference', x.reference]] : []),
+            ['Returned to the agent', returned(x)],
             ['At (UTC)', utcTime(x.occurred_at)],
           ].map(([name, value]) => (
             <div key={name}><dt>{name}</dt><dd>{value}</dd></div>

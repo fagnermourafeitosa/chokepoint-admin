@@ -7,11 +7,15 @@ export type AccessTarget = {
   // connectionId names the identity provider of a subject that did not delegate (Admin 030).
   connectionId?: string;
   principal?: { issuer: string; subject: string };
+  // view opens the Identity or the Harness sessions view of the agent (Admin 037).
+  view?: 'identity' | 'sessions';
 };
 export function accessTarget(params: URLSearchParams): AccessTarget | undefined {
   const section = params.get('section');
   if (section && !['grants', 'policies', 'people'].includes(section)) return undefined;
-  if (!section && !params.has('tool') && !params.has('decision_id') && !params.has('signal_id'))
+  const view = params.get('view');
+  const agentView = view === 'identity' || view === 'sessions' ? view : undefined;
+  if (!section && !agentView && !params.has('tool') && !params.has('decision_id') && !params.has('signal_id'))
     return undefined;
   return {
     section: (section as AccessTarget['section']) || 'grants',
@@ -19,6 +23,7 @@ export function accessTarget(params: URLSearchParams): AccessTarget | undefined 
     tool: params.get('tool') || undefined,
     policyId: params.get('policy_id') || undefined,
     connectionId: params.get('connection_id') || undefined,
+    view: agentView,
   };
 }
 export function actionPath(

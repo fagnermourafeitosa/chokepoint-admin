@@ -16,7 +16,14 @@ export type ExchangeReasonLabel =
   | 'subject_token_invalid'
   | 'subject_connection_disabled'
   | 'no_delegation'
-  | 'invalid_authorization_details';
+  | 'invalid_authorization_details'
+  // Denials of a harness login or its tokens (Backend 045).
+  | 'no_group'
+  | 'blocked'
+  | 'not_allowed_client'
+  | 'code_reuse'
+  | 'refresh_reuse'
+  | 'dpop_invalid';
 export type ExchangeReason = { label: ExchangeReasonLabel; description: string };
 export type SignalRef = { id: string; status: 'open' | 'reviewed' | 'resolved' };
 // The verified agent of a decision or an exchange (act.sub). Status is null when
@@ -128,6 +135,9 @@ export type Exchange = {
   permit: boolean;
   reason?: ExchangeReason | null;
   occurred_at: string;
+  // The harness and the code of a refused login page (Backend 045); null for other exchanges.
+  client_id?: string | null;
+  reference?: string | null;
 };
 export type ExchangeProblem = {
   agent?: AgentRef | null;

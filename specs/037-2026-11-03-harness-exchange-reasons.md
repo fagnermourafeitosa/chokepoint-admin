@@ -3,7 +3,7 @@
 - **Specification ID**: 037
 - **Date**: 2026-11-03
 - **Slug**: harness-exchange-reasons
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Investigate (`src/features/investigate`), with the agent view target of Access (`src/features/access`)
 - **Related Specification**: [Backend 045 — Interactive Agent Login](../../backend/specs/045-2026-11-03-interactive-agent-login.md) (the six new issuance denial reasons, `client_id` and `reference` of an issuance)
 - **Related Specification**: [036 — Interactive Harness Access](036-2026-11-03-interactive-harness-access.md) (Harness login block, Harness login card, Harness sessions view)
@@ -76,6 +76,8 @@ Backend 045 records six new denial reasons in the token exchanges list: `no_grou
 | `refresh_reuse` | Check if the refresh token was copied from the computer of the person. Chokepoint revoked the machine; the person must log in again. | Open the harness sessions | `view=sessions` |
 | `dpop_invalid` | Check if the token was copied from the harness that holds the key. | Open the harness sessions | `view=sessions` |
 
+When a `no_group` or `blocked` exchange has no subject, its connection is disabled or no longer allows harness login. The button is then **Open the identity provider** to `/access/integrations?type=identity`, with or without an agent (Formal Code Review Gate, finding 1).
+
 When the exchange has no agent, the inspector shows the hint and this text, without a button:
 
 - `no_group`, `blocked`, `not_allowed_client`: "Several agents or no agent use this harness. Check the Harness login of each agent that must accept this person."
@@ -115,10 +117,10 @@ The rule of a deleted agent does not change (Admin 032 section 7).
 
 ## User Stories
 
-- [ ] 1. As an administrator, I read a short label for each harness login reason in the token exchanges list.
-- [ ] 2. As an administrator, I filter the token exchanges by each harness login reason.
-- [ ] 3. As an administrator, I open the place that fixes a refused harness login from the inspector.
-- [ ] 4. As an administrator, I see the harness and the reference code of a refused login, so I can match the code that a person sends me.
+- [x] 1. As an administrator, I read a short label for each harness login reason in the token exchanges list.
+- [x] 2. As an administrator, I filter the token exchanges by each harness login reason.
+- [x] 3. As an administrator, I open the place that fixes a refused harness login from the inspector.
+- [x] 4. As an administrator, I see the harness and the reference code of a refused login, so I can match the code that a person sends me.
 
 ---
 
@@ -163,13 +165,13 @@ This module has no automated tests (`AGENTS.md`, Verification).
 
 ## Acceptance Criteria
 
-- [ ] 1. Each of the six reasons shows its short label in the token exchanges list and in the problems, with the sentence as hover text.
-- [ ] 2. The Reason filter offers the six reasons and filters by them.
-- [ ] 3. The inspector shows the sentence, the hint and the action of each reason, and the text without a button when there is no agent.
-- [ ] 4. `/access?agent_id=…&view=identity` opens the Identity view and `view=sessions` opens Harness sessions. Without `view`, the Delegation and access view opens.
-- [ ] 5. The inspector shows **Harness** and **Reference** when present, and the **Subject** and **Returned to the agent** texts of this specification.
-- [ ] 6. `npm run check` and `npm run build` pass.
-- [ ] 7. The functional test in the built-in browser passed.
+- [x] 1. Each of the six reasons shows its short label in the token exchanges list and in the problems, with the sentence as hover text. — `blocked`, `not_allowed_client` and `refresh_reuse` checked in the browser, in the list and in the problems; then `no_group`, `code_reuse` and `dpop_invalid` from real harness logins (see Further Notes).
+- [x] 2. The Reason filter offers the six reasons and filters by them. — the twelve options checked in the browser; `reason=refresh_reuse` lists its two exchanges.
+- [x] 3. The inspector shows the sentence, the hint and the action of each reason, and the text without a button when there is no agent. — checked in the browser for `blocked` (with agent), `not_allowed_client` (no agent) and `refresh_reuse` (with and without agent); `no_group`, `code_reuse`, `dpop_invalid` and `not_allowed_client` with an agent were then produced by real harness logins and checked in the browser (see Further Notes).
+- [x] 4. `/access?agent_id=…&view=identity` opens the Identity view and `view=sessions` opens Harness sessions. Without `view`, the Delegation and access view opens. — checked in the browser, also a manual switch of view after a `view` link.
+- [x] 5. The inspector shows **Harness** and **Reference** when present, and the **Subject** and **Returned to the agent** texts of this specification. — checked in the browser on exchanges 73, 67, 72, 64 and 69 (a Backend 034 reason, unchanged).
+- [x] 6. `npm run check` and `npm run build` pass.
+- [x] 7. The functional test in the built-in browser passed. — run by Claude on 2026-11-03 as `admin-a` (see Further Notes).
 
 ---
 
@@ -186,3 +188,10 @@ This module has no automated tests (`AGENTS.md`, Verification).
 
 - The search of the exchanges already matches the reference code (Backend 045), so the reference that a person sends finds the refused login.
 - `no_group`, `blocked` and a login-time `not_allowed_client` have an agent only when one agent is a candidate for the harness (Backend 045, `interactive.go`).
+- Functional test (2026-11-03): sign-in through the Admin on `127.0.0.1:5173` (the only Keycloak redirect URI), then the branch served on `127.0.0.1:5174` with the same session cookie. Only reads and navigation were tested, so no local data changed.
+- Functional test with real harness logins (2026-11-03): the client was `https://claude.ai/oauth/claude-code-client-metadata`, against the local authorization server, with the seed users of `chokepoint-customer-test` in the built-in browser.
+  - `no_group`: Camila (not in `developers`) logged in. The refused page showed a reference, the search of that reference found the exchange, and **Open the harness login** opened the Harness login block.
+  - `dpop_invalid`, `not_allowed_client` with an agent, `code_reuse`: Alice consented, then the token endpoint got a refresh with a DPoP proof that is not valid (`invalid_dpop_proof`), a refresh after Claude Code was removed from the allowlist (`invalid_grant`), and the same code a second time (`invalid_grant`). The inspector of each one, its actions (Identity, Harness sessions) and its facts matched.
+  - The allowlist and Alice's consent were restored after the test.
+  - `claude mcp login` of Claude Code 2.1.222 could not find the authorization server: it reads `/.well-known/oauth-protected-resource/<MCP URL path with the server ID>`, which returns 404. The flow was then run with the same client against the advertised endpoints. This is a backend follow-up, outside this specification.
+- Not covered in the browser: `no_group` or `blocked` without a subject (code inspection only).
