@@ -55,8 +55,9 @@ The delete dialog says that the agent and its access are removed permanently. Wi
    - The panel opens on the latest revision.
 4. **Diff in the Admin.** The Admin computes the changes from the snapshot of the selected revision and the snapshot of the previous revision (Backend 038 Implementation Decision 1). Delegations compare by identity connection, subject and kind; capabilities by server and tool; resources by server, type and value; rules by condition ID (a changed expression or name is "changed"). A revocation lists every removed item. The first revision lists every item as added.
 5. **Decision inspector.** The facts list of a decision gets **Permission revision**: "Revision N" as a link that opens the same side panel on that revision, without leaving Investigate. When the published revision differs from the effective one, add "Revision P was applying". When the decision has no recorded revision, show "Not recorded".
-6. **Delete agent.** The dialog says: the agent loses all delegation and access at once and can not get new tokens; its saved draft is dropped; Chokepoint keeps the revision history and the recorded decisions, and Investigate shows its name as deleted. After deletion the agent leaves the list. In Investigate and in the Inbox, a deleted agent shows its name with "(deleted)".
-7. **Design system.** The `SidePanel` component (`src/components/ui/side-panel/SidePanel.tsx`) and its styles (`cp-admin-side-panel*` in `docs/design-system/styles/components.css`, tokens `--cp-admin-layout-side-panel` and `--cp-admin-layout-side-panel-wide`) are documented in `components.md`, `layouts.md`, `tokens.md` and the `preview.html` specimen. Done in the prototype; keep it.
+6. **Delete agent.** The dialog says: the agent loses all delegation and access at once and can not get new tokens; its saved draft is dropped; Chokepoint keeps the revision history and the recorded decisions, and Investigate shows its name as deleted. The delete action sends the agent `revision` (Backend 038 decision 14). When the backend can not revoke the access (for example OpenFGA is unavailable), the dialog stays open and says: "The access of this agent could not be removed, so it was not deleted. Try again." A revision conflict says that the agent changed and asks for a reload, like the kill switch (Admin 031). After deletion the agent leaves the list. In Investigate, in token exchange items and in the Inbox, a deleted agent shows its name with "(deleted)".
+7. **Token exchange of a deleted agent.** The exchange inspector of Admin 030 offers "Open the agent" for `invalid_client`. When the exchange `agent.status` is `deleted`, it shows no action and says instead: "This agent was deleted, but something still uses its key. Find and stop the deployment that uses it." The same text applies to the Inbox `token_exchange_denied` item of a deleted agent (its signal is kept, Backend 038 decision 18).
+8. **Design system.** The `SidePanel` component (`src/components/ui/side-panel/SidePanel.tsx`) and its styles (`cp-admin-side-panel*` in `docs/design-system/styles/components.css`, tokens `--cp-admin-layout-side-panel` and `--cp-admin-layout-side-panel-wide`) are documented in `components.md`, `layouts.md`, `tokens.md` and the `preview.html` specimen. Done in the prototype; keep it.
 
 ---
 
@@ -79,7 +80,7 @@ All from [Backend 038](../../backend/specs/038-2026-11-02-permission-revision-hi
 3. **History list:** `GET …/permissions/revisions?page=&page_size=` with `revision`, `action`, `published_by`, `published_by_name`, `published_at`, `effective_at`, `note` (Implementation Decision 9).
 4. **Revision snapshot:** `GET …/permissions/revisions/:revision` with `document` (Implementation Decision 9).
 5. **Revision of a decision:** `effective_revision` and `published_revision` on a decision of the decision trace read API, null when not recorded (Implementation Decision 10).
-6. **Soft delete:** `DELETE …/agents/:agent_id` revokes and keeps the agent; deleted agents leave the list; Investigate names stay; the `agent` object of the trace read API gains `status`, and a signal context gains `agent_status`; `deleted` shows "(deleted)" next to the agent name in Investigate and in the Inbox (Implementation Decisions 14 to 18).
+6. **Soft delete:** `DELETE …/agents/:agent_id` takes the agent `revision`, revokes first and keeps the agent, and fails without change when the revocation fails; deleted agents leave the list; Investigate names stay; the `agent` object of the trace read API gains `status`, and the token exchange `agent` gains the same `status`, a signal context gains `agent_status`; `deleted` shows "(deleted)" next to the agent name in Investigate and in the Inbox (Implementation Decisions 14 to 18).
 
 ---
 
@@ -106,11 +107,12 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [ ] 2. Publish sends the optional note.
 - [ ] 3. The history side panel shows the timeline and the computed diff of the selected revision.
 - [ ] 4. The decision inspector shows the permission revision and opens the side panel on it, or shows "Not recorded".
-- [ ] 5. The delete dialog states the soft delete; a deleted agent leaves the list and shows as deleted in Investigate.
-- [ ] 6. The `SidePanel` component and its documentation are in the design system.
-- [ ] 7. No "Waiting backend" chip remains for an implemented item.
-- [ ] 8. `npm run check` and `npm run build` pass.
-- [ ] 9. The user confirms the interface test.
+- [ ] 5. The delete dialog states the soft delete, sends the revision and shows the revocation and conflict errors; a deleted agent leaves the list and shows as deleted in Investigate, exchange items and the Inbox.
+- [ ] 6. The exchange inspector and the Inbox item of a deleted agent explain that its key is still in use and offer no Open the agent action.
+- [ ] 7. The `SidePanel` component and its documentation are in the design system.
+- [ ] 8. No "Waiting backend" chip remains for an implemented item.
+- [ ] 9. `npm run check` and `npm run build` pass.
+- [ ] 10. The user confirms the interface test.
 
 ---
 
