@@ -210,7 +210,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [x] 8. Every help opens on hover and focus. — code inspection: every help uses the shared Tooltip.
 - [x] 9. No "Waiting backend" chip remains for an implemented item.
 - [x] 10. `npm run check` and `npm run build` pass.
-- [ ] 11. The user confirms the interface test. — missing: the user confirms the interface test.
+- [x] 11. The interface test passed. — run by Claude in the built-in browser on 2026-11-03, as the user decided ("quem testa é vc"): harness login, consent, sessions, revoke, block and the connection form.
 
 ---
 
