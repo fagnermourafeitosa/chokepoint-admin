@@ -152,6 +152,8 @@ Run functional tests by hand in the built-in browser, where the user can watch. 
 4. One-time code: run `dev-infra/idps/keycloak/totp.sh`. The code is valid for 30 seconds, so type it at once.
 5. Identity connections are in **Access**, **Integrations**, **Identity providers**.
 
+For a change to harness login screens or settings (identity provider **Harness login**, the agent **Harness login** card, harness sessions), also run the coding harness test with the real Claude Code CLI: [`dev-infra/functional-tests/harness-cli.md`](../dev-infra/functional-tests/harness-cli.md).
+
 Click each field and type into it. The built-in browser does not show native `confirm()` dialogs: it answers "cancel" and logs `Page dialog suppressed` in the console.
 
 ## Formal Code Review Gate
