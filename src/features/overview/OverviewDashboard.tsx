@@ -68,18 +68,18 @@ export function OverviewDashboard({
               {data.most_denied.length ? (
                 data.most_denied.map((row) => (
                   <button
-                    key={JSON.stringify([row.server_id, row.tool, row.agent, row.reason.label])}
+                    key={JSON.stringify([row.server_id, row.tool, row.agent.id, row.reason.label])}
                     className="overview-top-row"
                     onClick={() =>
                       navigate(
-                        `/investigate?${new URLSearchParams({ server_id: row.server_id, tool: row.tool, agent: row.agent, reason: row.reason.label, from: row.from, to: row.to })}`,
+                        `/investigate?${new URLSearchParams({ server_id: row.server_id, tool: row.tool, agent: row.agent.id, reason: row.reason.label, from: row.from, to: row.to })}`,
                       )
                     }
                   >
                     <span>
                       <code>{row.tool}</code>
                       <small>
-                        {row.agent_name || row.agent} · {row.server_name || row.server_id}
+                        {row.agent.name || row.agent.id} · {row.server_name || row.server_id}
                       </small>
                       <small>{row.reason.description}</small>
                     </span>

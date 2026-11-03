@@ -246,3 +246,9 @@
     gap: 6px;
   }
 }
+
+/* Admin 030: who acted for whom, and the relation checked by each step. */
+.trace-who { margin: 0 0 var(--cp-admin-space-4); font-size: var(--cp-admin-type-body); }
+.trace-path-relations li { align-items: flex-start; }
+.trace-path-relation { display: block; margin-top: 4px; font: 11px var(--cp-admin-font-mono); color: var(--cp-admin-color-text-muted); overflow-wrap: anywhere; }
+.trace-rule-item { display: grid; gap: 4px; }

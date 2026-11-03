@@ -241,3 +241,15 @@
     flex-basis: 100%;
   }
 }
+
+/* Admin 030: the agent, the subject and the resource of each record. */
+.trace-row-decision { grid-template-columns: 1.2fr 0.9fr 1.1fr 1.2fr 1.1fr 36px; }
+.trace-row-exchange { grid-template-columns: 1.1fr 1fr 1.4fr 1.2fr 36px; }
+.trace-list-row--open { cursor: pointer; }
+.trace-list-row--open:hover { background: var(--cp-admin-color-row-hover); }
+.trace-subject { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.people-kind-chip { display: inline-flex; align-items: center; padding: var(--cp-admin-space-1) var(--cp-admin-space-2); border-radius: var(--cp-admin-radius-sm); font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-semibold); background: var(--cp-admin-color-surface-muted); color: var(--cp-admin-color-text-muted); vertical-align: middle; }
+.people-kind-chip[data-kind="service"] { background: var(--cp-admin-color-accent-soft); color: var(--cp-admin-color-accent-text); }
+@media (max-width: 740px) {
+  .trace-row-decision, .trace-row-exchange { grid-template-columns: 1fr 1fr; }
+}

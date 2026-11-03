@@ -4,6 +4,8 @@ export type AccessTarget = {
   serverId?: string;
   tool?: string;
   policyId?: string;
+  // connectionId names the identity provider of a subject that did not delegate (Admin 030).
+  connectionId?: string;
   principal?: { issuer: string; subject: string };
 };
 export function accessTarget(params: URLSearchParams): AccessTarget | undefined {
@@ -16,6 +18,7 @@ export function accessTarget(params: URLSearchParams): AccessTarget | undefined 
     serverId: params.get('server_id') || undefined,
     tool: params.get('tool') || undefined,
     policyId: params.get('policy_id') || undefined,
+    connectionId: params.get('connection_id') || undefined,
   };
 }
 export function actionPath(

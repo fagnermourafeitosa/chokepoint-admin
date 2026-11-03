@@ -3,11 +3,12 @@ import { httpClient } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 
 // SignalType mirrors the backend attention_signal_type enum.
-export type SignalType = 'tool-discovery' | 'requests-denied';
+export type SignalType = 'tool-discovery' | 'requests-denied' | 'token_exchange_denied';
 
 export const signalTypeLabels: Record<SignalType, string> = {
   'tool-discovery': 'Tool discovery',
   'requests-denied': 'Requests denied',
+  token_exchange_denied: 'Token exchange denied',
 };
 
 // typeLabel shows the raw value for a type this Admin version does not know yet.

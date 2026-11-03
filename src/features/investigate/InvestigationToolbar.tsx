@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react';
 import { SelectMenu } from '../../components/ui/dropdown/SelectMenu';
 import type { useInvestigation } from './useInvestigation';
+import { denyText, exchangeShort } from './labels';
 type State = ReturnType<typeof useInvestigation>;
 export function InvestigationToolbar({ state }: { state: State }) {
+  const exchanges = state.view === 'exchanges';
   const [query, setQuery] = useState(state.filters.q || '');
   useEffect(() => setQuery(state.filters.q || ''), [state.filters.q]);
+  // The Token exchanges view filters by agent_id, the decision views by agent.
+  const agentParam = exchanges ? 'agent_id' : 'agent';
+  const agentValue = (exchanges ? state.exchangeFilters.agent_id : state.filters.agent) || '';
+  const reasons = exchanges ? Object.entries(exchangeShort) : Object.entries(denyText).map(([label]) => [label, label.replaceAll('_', ' ')]);
   function period(value: string) {
     const days = Number(value);
     if (!days) state.update({ period: 'all', from: undefined, to: undefined });
@@ -22,15 +28,21 @@ export function InvestigationToolbar({ state }: { state: State }) {
       <div className="trace-segments" role="group" aria-label="Investigation view">
         <button
           aria-pressed={state.view === 'problems'}
-          onClick={() => state.update({ view: undefined, result: undefined })}
+          onClick={() => state.update({ view: undefined, result: undefined, agent_id: undefined, reason: undefined })}
         >
           By problem
         </button>
         <button
           aria-pressed={state.view === 'decisions'}
-          onClick={() => state.update({ view: 'decisions' })}
+          onClick={() => state.update({ view: 'decisions', agent_id: undefined, reason: undefined })}
         >
           All decisions
+        </button>
+        <button
+          aria-pressed={exchanges}
+          onClick={() => state.update({ view: 'exchanges', agent: undefined, reason: undefined, result: undefined, server_id: undefined, tool: undefined, issuer: undefined, subject: undefined })}
+        >
+          Token exchanges
         </button>
       </div>
       <form
@@ -42,14 +54,14 @@ export function InvestigationToolbar({ state }: { state: State }) {
         }}
       >
         <label className="attention-sr-only" htmlFor="trace-search">
-          Search agent, server, tool or person
+          {exchanges ? 'Search agent, subject or identity provider' : 'Search agent, server, tool or person'}
         </label>
         <input
           id="trace-search"
           type="search"
           maxLength={256}
           className="cp-admin-input"
-          placeholder="Search agent, server, tool or person…"
+          placeholder={exchanges ? 'Search agent, subject or identity provider…' : 'Search agent, server, tool or person…'}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -63,15 +75,20 @@ export function InvestigationToolbar({ state }: { state: State }) {
       <SelectMenu
         group="investigate-filters"
         label="Agent"
-        value={state.filters.agent || ''}
-        onChange={(value) => state.update({ agent: value || undefined })}
+        value={agentValue}
+        onChange={(value) => state.update({ [agentParam]: value || undefined })}
         options={[
           { value: '', label: 'All agents' },
-          ...(state.filters.agent && !state.agentItems.some((a) => a.agent === state.filters.agent)
-            ? [{ value: state.filters.agent, label: state.filters.agent }]
-            : []),
-          ...state.agentItems.map((a) => ({ value: a.agent, label: a.agent_name || a.agent })),
+          ...(agentValue && !state.agentItems.some((a) => a.agent.id === agentValue) ? [{ value: agentValue, label: agentValue }] : []),
+          ...state.agentItems.map((a) => ({ value: a.agent.id, label: a.agent.name || a.agent.id })),
         ]}
+      />
+      <SelectMenu
+        group="investigate-filters"
+        label="Reason"
+        value={(exchanges ? state.exchangeFilters.reason : state.filters.reason) || ''}
+        onChange={(value) => state.update({ reason: value || undefined })}
+        options={[{ value: '', label: 'All reasons' }, ...reasons.map(([value, label]) => ({ value, label }))]}
       />
       <SelectMenu
         group="investigate-filters"
@@ -88,16 +105,16 @@ export function InvestigationToolbar({ state }: { state: State }) {
             : []),
         ]}
       />
-      {state.view === 'decisions' ? (
+      {state.view !== 'problems' ? (
         <SelectMenu
           group="investigate-filters"
           label="Result"
-          value={state.filters.result || 'all'}
+          value={(exchanges ? state.exchangeFilters.result : state.filters.result) || 'all'}
           onChange={(value) => state.update({ result: value })}
           options={[
             { value: 'all', label: 'All results' },
-            { value: 'deny', label: 'Deny' },
-            { value: 'allow', label: 'Allow' },
+            { value: 'deny', label: exchanges ? 'Refused' : 'Deny' },
+            { value: 'allow', label: exchanges ? 'Issued' : 'Allow' },
           ]}
         />
       ) : null}

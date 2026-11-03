@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router';
-import { traceApi, traceKey } from './api';
+import { exchangeApi, traceApi, traceKey, type ExchangeFilters } from './api';
 import type { EnvironmentScope } from '../access/environment-scope';
 import type { ProblemKey, TraceFilters } from './types';
 const filterKeys = [
@@ -21,8 +21,13 @@ export function useInvestigation(scope: EnvironmentScope) {
   const [params, setParams] = useSearchParams();
   const filters: TraceFilters = {};
   for (const key of filterKeys) if (params.get(key)) filters[key] = params.get(key)!;
-  const view = params.get('view') === 'decisions' ? 'decisions' : 'problems';
-  const canonical = ['server_id', 'tool', 'agent', 'reason', 'window_start'].every((key) =>
+  const raw = params.get('view');
+  const view = raw === 'decisions' ? 'decisions' : raw === 'exchanges' ? 'exchanges' : 'problems';
+  // The Token exchanges view filters by agent_id, as the signal target does (Backend 034).
+  const exchangeFilters: ExchangeFilters = {};
+  for (const key of ['q', 'agent_id', 'reason', 'result', 'from', 'to', 'page'] as const) if (params.get(key)) exchangeFilters[key] = params.get(key)!;
+  const exchangeId = params.get('exchange_id');
+  const canonical = view !== 'exchanges' && ['server_id', 'tool', 'agent', 'reason', 'window_start'].every((key) =>
     params.has(key),
   );
   const key: ProblemKey = {
@@ -40,8 +45,9 @@ export function useInvestigation(scope: EnvironmentScope) {
     retry: false,
   });
   const decisionId = requested || problem.data?.latest_decision_id;
-  const unavailableTarget = params.has('signal_id') && !requested && !canonical;
-  const isDetail = !!requested || canonical || unavailableTarget;
+  // A token exchange signal opens the Token exchanges list, not a decision.
+  const unavailableTarget = view !== 'exchanges' && params.has('signal_id') && !requested && !canonical;
+  const isDetail = !!requested || canonical || unavailableTarget || !!exchangeId;
   const detail = useQuery({
     queryKey: [...traceKey(scope), 'detail', decisionId],
     queryFn: ({ signal }) => traceApi.detail(scope, decisionId!, signal),
@@ -64,6 +70,18 @@ export function useInvestigation(scope: EnvironmentScope) {
     queryKey: [...traceKey(scope), 'problems', filters],
     queryFn: ({ signal }) => traceApi.problems(scope, filters, signal),
     enabled: !isDetail && view === 'problems',
+  });
+  // Refused exchanges are grouped like their signal, with the count in the window.
+  const groupedExchanges = exchangeFilters.result === 'deny';
+  const exchanges = useQuery({
+    queryKey: [...traceKey(scope), 'exchanges', exchangeFilters],
+    queryFn: ({ signal }) => exchangeApi.list(scope, exchangeFilters, signal),
+    enabled: !isDetail && view === 'exchanges' && !groupedExchanges,
+  });
+  const exchangeProblems = useQuery({
+    queryKey: [...traceKey(scope), 'exchange-problems', exchangeFilters],
+    queryFn: ({ signal }) => exchangeApi.problems(scope, exchangeFilters, signal),
+    enabled: !isDetail && view === 'exchanges' && groupedExchanges,
   });
   const decisions = useQuery({
     queryKey: [...traceKey(scope), 'decisions', filters],
@@ -103,6 +121,14 @@ export function useInvestigation(scope: EnvironmentScope) {
       { replace },
     );
   }
+  function openExchange(id: string) {
+    setParams((previous) => {
+      const next = new URLSearchParams(previous);
+      if (!isDetail) next.set('return_to', `/investigate?${previous}`);
+      next.set('exchange_id', id);
+      return next;
+    });
+  }
   function open(id: string, signalId?: string) {
     setParams((previous) => {
       const next = new URLSearchParams(previous);
@@ -121,6 +147,12 @@ export function useInvestigation(scope: EnvironmentScope) {
     detail,
     problems,
     decisions,
+    exchanges,
+    exchangeProblems,
+    groupedExchanges,
+    exchangeFilters,
+    exchangeId,
+    openExchange,
     agents,
     agentItems,
     isDetail,

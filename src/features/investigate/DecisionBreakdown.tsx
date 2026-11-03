@@ -4,6 +4,7 @@ import type { EnvironmentScope } from '../access/environment-scope';
 import { traceApi, traceKey } from './api';
 import { problemKey, type DecisionDetail } from './types';
 import { QueryError, TracePager, utcTime } from './TraceUI';
+import { subjectName } from './labels';
 export function DecisionBreakdown({
   scope,
   detail,
@@ -40,8 +41,8 @@ export function DecisionBreakdown({
               onClick={() => select(d.id)}
             >
               <time dateTime={d.decided_at}>{utcTime(d.decided_at)}</time>
-              <span>{d.principal_name || d.subject}</span>
-              <code>{d.condition || 'No recorded condition'}</code>
+              <span>{subjectName(d.subject)}</span>
+              <code>{d.resource ? `${d.resource.type} › ${d.resource.id}` : d.condition || d.reason?.label || 'allowed'}</code>
             </button>
           ))}
         </div>
