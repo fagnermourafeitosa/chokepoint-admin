@@ -3,12 +3,10 @@
 - **Specification ID**: 034
 - **Date**: 2026-11-02
 - **Slug**: integrations-one-read-per-server
-- **Status**: Proposed
+- **Status**: In Progress
 - **Owner**: Admin — Integrations (`src/features/mcp`)
 - **Related Specification**: [Backend 042 — Tool Mappings in the Resource Types Read](../../backend/specs/042-2026-11-02-tool-mappings-in-resource-types.md) (`tools`: source, effective, draft)
 - **Related Specification**: [027 — Tool Resource Mapping Review](027-2026-10-31-tool-resource-mapping-review.md) (the Resource block of each tool row)
-
-> **On hold for Backend 042**, which adds the tool mappings to the resource types read. See [Backend dependencies](#backend-dependencies).
 
 ---
 
