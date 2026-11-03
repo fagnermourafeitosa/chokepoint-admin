@@ -66,6 +66,7 @@ flowchart TD
     C -- yes --> D["Status Implemented<br/>commit on the task branch"]
     D --> M["Merge the task branch into local main"]
     M --> U["Push main to origin"]
+    U --> PU["Public documentation check"]
 ```
 
 ## Decisions
@@ -191,11 +192,19 @@ After approval:
 5. merge the task branch into `main`;
 6. run `npm run check` and `npm run build` on the merged `main`;
 7. push `main` to origin, without force-push;
-8. report the commits and the publication result.
+8. run the public documentation check;
+9. report the commits and the publication result.
 
 Resolve routine merge conflicts and keep both changes. Ask only when a conflict needs a product decision or would discard unrelated work. Never rewrite remote history.
 
 A change to Markdown files only is committed and pushed directly on `main` under the same approval.
+
+## Public Documentation Check
+
+The public documentation lives in the `frontend` module: the pages in `content/docs/en` and `content/docs/pt-BR`, and the Admin screenshots in `public/docs/platform`. After a specification is `Implemented` and pushed, check whether the change makes any of it out of date: a page that describes an old screen, flow or label, a new screen or capability without a page, or a screenshot of a screen that changed.
+
+* If something is out of date, update it in the `frontend` module, in both languages, by its `AGENTS.md`, and publish it under the user's approval. Recapture a changed screenshot at the size and framing of the original.
+* If nothing is, say that you checked it and that no change is needed.
 
 ---
 
