@@ -9,6 +9,8 @@
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md) (publication bar)
 - **Related Specification**: [020 — Investigate](020-2026-10-29-investigate-problems-and-decisions.md) (decision inspector)
 - **Related Specification**: [031 — Agent Kill Switch](031-2026-11-02-agent-kill-switch.md) (agent status)
+- **Related Specification**: [030 — Investigate with Agent, Subject and Token Exchanges](030-2026-10-31-investigate-agent-subject-and-token-exchanges.md) (current decision inspector facts)
+- **Related Specification**: [033 — Agent Names in the Inbox](033-2026-11-02-agent-names-in-inbox.md)
 - **Visual reference**: layout prototype on branch `design/038-revision-history` (worktree `admin-038`). Approved by the user on 2026-11-02. Fixed data in `src/features/access/delegation/RevisionHistory.tsx`.
 
 ---
@@ -19,7 +21,7 @@ Admin 026 publishes the permission document of an agent. The publication bar sho
 
 Backend 038 keeps each published revision with its snapshot, author, time and optional note, records the revision of each decision, and makes agent deletion a soft delete. This specification is the Admin side.
 
-The prototype was built inside the real screens (Access and Investigate), not under `/prototype`, because it adds to existing screens. The user reviewed it there.
+The prototype was built inside the real screens (Access and Investigate), not under `/prototype`, because it adds to existing screens. The user reviewed it there. The prototype was drawn on the inspector before Admin 030; the implementation adds the Permission revision row to the current facts list of Admin 030.
 
 ---
 
@@ -53,7 +55,7 @@ The delete dialog says that the agent and its access are removed permanently. Wi
    - The panel opens on the latest revision.
 4. **Diff in the Admin.** The Admin computes the changes from the snapshot of the selected revision and the snapshot of the previous revision (Backend 038 Implementation Decision 1). Delegations compare by identity connection, subject and kind; capabilities by server and tool; resources by server, type and value; rules by condition ID (a changed expression or name is "changed"). A revocation lists every removed item. The first revision lists every item as added.
 5. **Decision inspector.** The facts list of a decision gets **Permission revision**: "Revision N" as a link that opens the same side panel on that revision, without leaving Investigate. When the published revision differs from the effective one, add "Revision P was applying". When the decision has no recorded revision, show "Not recorded".
-6. **Delete agent.** The dialog says: the agent loses all delegation and access at once and can not get new tokens; its saved draft is dropped; Chokepoint keeps the revision history and the recorded decisions, and Investigate shows its name as deleted. After deletion the agent leaves the list. In Investigate, a deleted agent shows its name with "(deleted)".
+6. **Delete agent.** The dialog says: the agent loses all delegation and access at once and can not get new tokens; its saved draft is dropped; Chokepoint keeps the revision history and the recorded decisions, and Investigate shows its name as deleted. After deletion the agent leaves the list. In Investigate and in the Inbox, a deleted agent shows its name with "(deleted)".
 7. **Design system.** The `SidePanel` component (`src/components/ui/side-panel/SidePanel.tsx`) and its styles (`cp-admin-side-panel*` in `docs/design-system/styles/components.css`, tokens `--cp-admin-layout-side-panel` and `--cp-admin-layout-side-panel-wide`) are documented in `components.md`, `layouts.md`, `tokens.md` and the `preview.html` specimen. Done in the prototype; keep it.
 
 ---
@@ -77,7 +79,7 @@ All from [Backend 038](../../backend/specs/038-2026-11-02-permission-revision-hi
 3. **History list:** `GET …/permissions/revisions?page=&page_size=` with `revision`, `action`, `published_by`, `published_by_name`, `published_at`, `effective_at`, `note` (Implementation Decision 9).
 4. **Revision snapshot:** `GET …/permissions/revisions/:revision` with `document` (Implementation Decision 9).
 5. **Revision of a decision:** `effective_revision` and `published_revision` on a decision of the decision trace read API, null when not recorded (Implementation Decision 10).
-6. **Soft delete:** `DELETE …/agents/:agent_id` revokes and keeps the agent; deleted agents leave the list; Investigate names stay; decision, problem and agent items of the trace read API return `agent_status`, and `deleted` shows "(deleted)" (Implementation Decisions 14 to 18).
+6. **Soft delete:** `DELETE …/agents/:agent_id` revokes and keeps the agent; deleted agents leave the list; Investigate names stay; the `agent` object of the trace read API gains `status`, and a signal context gains `agent_status`; `deleted` shows "(deleted)" next to the agent name in Investigate and in the Inbox (Implementation Decisions 14 to 18).
 
 ---
 
