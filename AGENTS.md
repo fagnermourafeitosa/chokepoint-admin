@@ -208,6 +208,20 @@ The public documentation lives in the `frontend` module: the pages in `content/d
 * If something is out of date, update it in the `frontend` module, in both languages, by its `AGENTS.md`, and publish it under the user's approval. Recapture a changed screenshot at the size and framing of the original.
 * If nothing is, say that you checked it and that no change is needed.
 
+## Screenshots and Recordings for the Public Documentation
+
+To make a screenshot or a recording of the Admin for the public documentation, use the demo instance in `dev-infra/demo-instance` ([README](../dev-infra/demo-instance/README.md)). Do not capture the development stack: its data are test fixtures (`Development Workspace A`, `Example agent`, `list_test_items`, loopback issuers).
+
+The demo instance is a second local Chokepoint instance that runs next to the development stack and never touches its data. It has its own database (`chokepoint_demo`), API, Admin (`http://acme.localhost:5174`) and company identity provider (the Keycloak realm `acme`). It builds the company Acme the way a customer does: the platform admin Beatriz Nunes signs up through the real flow, creates the workspace, and configures the identity connection, four MCP servers, four agents and their permissions through the product APIs. A traffic script makes real calls, so each allowed and denied call comes from the product. All addresses are in `demo.env`.
+
+1. From `dev-infra/demo-instance`: run `./prepare.sh` once, keep `./up.sh` running, and run `./populate.py` the first time.
+2. Keep `./traffic.py` running for a realistic history. The Overview chart and the Inbox fill after about one day.
+3. Screenshots: `uv run --no-project --with playwright==1.59.0 python screenshot.py [capture-id ...]` saves the regions of the capture list as PNG at device scale factor 2.
+4. Recordings: `uv run --no-project --with playwright==1.59.0 python record.py <scenario>` saves a WebM video with a visible cursor that moves at a human pace and pulses on each click.
+5. Each run writes into a new folder `output/<UTC time, ISO 8601 basic>/`. `./reset.sh --yes` rebuilds the same dataset from zero.
+
+The public documentation images go into the `frontend` module (`public/docs/platform`), by its `AGENTS.md`. Add a capture or a scenario to the demo instance scripts instead of a manual screenshot.
+
 ---
 
 # Engineering Rules
