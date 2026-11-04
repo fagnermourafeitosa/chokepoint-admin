@@ -64,9 +64,9 @@ flowchart TD
     R --> C{"User approves the reviewed result?"}
     C -- no --> W2["Wait with the changes on the branch"]
     C -- yes --> D["Status Implemented<br/>commit on the task branch"]
-    D --> M["Merge the task branch into local main"]
+    D --> DC["Documentation check<br/>backend PRODUCT.md, public documentation"]
+    DC --> M["Merge the task branch into local main"]
     M --> U["Push main to origin"]
-    U --> PU["Public documentation check"]
 ```
 
 ## Decisions
@@ -190,23 +190,31 @@ After approval:
 1. set the specification to `Implemented` and update the `README.md` index (Specification Lifecycle, third row);
 2. review and stage only the approved task changes, without secrets or unrelated files;
 3. commit on the task branch;
-4. fetch origin and update the local `main` without discarding local work;
-5. merge the task branch into `main`;
-6. run `npm run check` and `npm run build` on the merged `main`;
-7. push `main` to origin, without force-push;
-8. run the public documentation check;
-9. report the commits and the publication result.
+4. run the documentation check, before the merge;
+5. fetch origin and update the local `main` without discarding local work;
+6. merge the task branch into `main`;
+7. run `npm run check` and `npm run build` on the merged `main`;
+8. push `main` to origin, without force-push;
+9. report the commits, the documentation check and the publication result.
 
 Resolve routine merge conflicts and keep both changes. Ask only when a conflict needs a product decision or would discard unrelated work. Never rewrite remote history.
 
 A change to Markdown files only is committed and pushed directly on `main` under the same approval.
 
-## Public Documentation Check
+## Documentation Check
 
-The public documentation lives in the `frontend` module: the pages in `content/docs/en` and `content/docs/pt-BR`, and the Admin screenshots in `public/docs/platform`. After a specification is `Implemented` and pushed, check whether the change makes any of it out of date: a page that describes an old screen, flow or label, a new screen or capability without a page, or a screenshot of a screen that changed.
+Run it after the commit on the task branch and before the merge into `main`, for each code change, with or without a specification. Do not merge a change while a document below is out of date. Do not run it after a change to Markdown files only.
 
-* If something is out of date, update it in the `frontend` module, in both languages, by its `AGENTS.md`, and publish it under the user's approval. Recapture a changed screenshot at the size and framing of the original.
-* If nothing is, say that you checked it and that no change is needed.
+Judge what each document must say, not what it already mentions. A topic that a document does not mention can still be missing from it. List the capabilities, behaviors, contracts, fields, errors and limits that the change adds or alters. For each one, decide if each document below must state it, and find every place that describes the old behavior, in the text and in the Mermaid labels.
+
+| Document | What it states |
+| :--- | :--- |
+| [`PRODUCT.md` of the backend](../backend/PRODUCT.md) | The product understanding, with the code facts of Admin specifications. This module's `PRODUCT.md` is design context, not this document. |
+| Public documentation | The `frontend` module: the pages in `content/docs/en` and `content/docs/pt-BR`, and the Admin screenshots in `public/docs/platform`. A page that describes an old screen, flow or label, a new screen or capability without a page, or a screenshot of a screen that changed is out of date. |
+
+* Update the backend `PRODUCT.md` by the backend `AGENTS.md` (a Markdown change on its `main`).
+* Update the public documentation in the `frontend` module, in both languages, by its `AGENTS.md`, and publish it under the user's approval before the merge. Recapture a changed screenshot at the size and framing of the original.
+* For each document without a change, say that you checked it and why it needs none.
 
 ## Screenshots and Recordings for the Public Documentation
 
