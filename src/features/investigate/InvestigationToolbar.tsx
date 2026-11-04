@@ -54,14 +54,14 @@ export function InvestigationToolbar({ state }: { state: State }) {
         }}
       >
         <label className="attention-sr-only" htmlFor="trace-search">
-          {exchanges ? 'Search agent, subject or identity provider' : 'Search agent, server, tool or person'}
+          {exchanges ? 'Search agent, subject, identity provider or code' : 'Search agent, tool, person or code'}
         </label>
         <input
           id="trace-search"
           type="search"
           maxLength={256}
           className="cp-admin-input"
-          placeholder={exchanges ? 'Search agent, subject or identity provider…' : 'Search agent, server, tool or person…'}
+          placeholder={exchanges ? 'Search agent, subject or code…' : 'Search agent, tool, person or code…'}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);

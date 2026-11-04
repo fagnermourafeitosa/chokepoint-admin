@@ -3,3 +3,5 @@
   margin-block-end: var(--cp-admin-space-6);
   border-bottom: var(--cp-admin-border-width) solid var(--cp-admin-color-border);
 }
+/* Quick incident to the right of the Access tabs (Admin 039). */
+.access-navigation { display: flex; align-items: center; gap: var(--cp-admin-space-4); }

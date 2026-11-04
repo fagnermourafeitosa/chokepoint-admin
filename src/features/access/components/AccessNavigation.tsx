@@ -1,6 +1,7 @@
 import './access-navigation.css';
 import { NavLink } from 'react-router';
 import { accessNavigation } from '../navigation';
+import { QuickIncident } from '../../../components/quick-incident/QuickIncident';
 
 export function AccessNavigation() {
   return (
@@ -13,6 +14,7 @@ export function AccessNavigation() {
           </NavLink>
         ))}
       </div>
+      <QuickIncident />
     </nav>
   );
 }

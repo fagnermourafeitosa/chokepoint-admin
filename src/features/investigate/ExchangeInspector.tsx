@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, Check, X } from 'lucide-react';
 import { HttpError } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 import { exchangeApi, traceKey } from './api';
-import type { Exchange, ExchangeReasonLabel } from './types';
+import type { Exchange, ExchangeReasonLabel, LoginErrorCause } from './types';
 import type { useInvestigation } from './useInvestigation';
 import { QueryError, TracePager, utcTime } from './TraceUI';
 import { exchangeText, kindText, subjectName, agentText } from './labels';
@@ -27,6 +27,19 @@ const hints: Record<ExchangeReasonLabel, { hint: string; label: string }> = {
   code_reuse: { hint: 'Check if the code leaked from the computer of the person. Chokepoint revoked the machine; the person must log in again.', label: 'Open the harness sessions' },
   refresh_reuse: { hint: 'Check if the refresh token was copied from the computer of the person. Chokepoint revoked the machine; the person must log in again.', label: 'Open the harness sessions' },
   dpop_invalid: { hint: 'Check if the token was copied from the harness that holds the key.', label: 'Open the harness sessions' },
+  login_error: { hint: 'Check the cause below.', label: 'Open the agent identity' },
+};
+
+// What to check for each cause of a login_error (Admin 039). The first
+// sentence is also the Cause fact.
+const causes: Record<LoginErrorCause, { text: string; hint: string; fix?: 'identity' | 'provider' }> = {
+  invalid_request: { text: 'The harness sent a malformed authorization request.', hint: 'Check the harness version.' },
+  invalid_client_id: { text: 'The harness did not send a valid client metadata URL.', hint: 'Check the harness version.' },
+  client_metadata_invalid: { text: 'The client metadata document of the harness could not be read or is not valid.', hint: 'Check its URL in the allowed harnesses.', fix: 'identity' },
+  redirect_uri_invalid: { text: 'The harness asked to return to an address its metadata document does not list.', hint: 'Check the harness version and its document.', fix: 'identity' },
+  transaction_expired: { text: 'The sign-in expired, was used twice or was continued in another browser.', hint: 'The person must start again from the harness.' },
+  provider_not_available: { text: 'The chosen identity provider does not allow harness login for this harness.', hint: 'Check the Harness login of the identity provider.', fix: 'provider' },
+  server_error: { text: 'Chokepoint could not complete the sign-in.', hint: 'Check the backend logs at this time.' },
 };
 
 // noAgent explains an action without an agent. A refused harness login names an
@@ -41,6 +54,7 @@ function noAgent(reason?: ExchangeReasonLabel) {
 // disabled or no longer allows harness login (Backend 045), so the fix is the connection.
 function providerFix(x: Exchange) {
   const reason = x.reason?.label;
+  if (reason === 'login_error') return !!x.cause && causes[x.cause]?.fix === 'provider';
   return reason === 'subject_token_expired' || reason === 'subject_token_invalid' || reason === 'subject_connection_disabled' ||
     ((reason === 'no_group' || reason === 'blocked') && !x.subject?.identity_connection_id);
 }
@@ -54,6 +68,8 @@ function fixPath(x: Exchange, returnTo: string): string | undefined {
   if (reason === 'invalid_authorization_details') return accessPath({ agent_id: x.agent.id, section: 'grants' }, undefined, returnTo);
   if (reason === 'no_group' || reason === 'blocked') return accessPath({ agent_id: x.agent.id, section: 'people', connection_id: x.subject?.identity_connection_id ?? undefined }, undefined, returnTo);
   if (reason === 'not_allowed_client') return accessPath({ agent_id: x.agent.id, view: 'identity' }, undefined, returnTo);
+  // A login_error opens the agent identity only for a harness document problem.
+  if (reason === 'login_error') return x.cause && causes[x.cause]?.fix === 'identity' ? accessPath({ agent_id: x.agent.id, view: 'identity' }, undefined, returnTo) : undefined;
   if (reason === 'code_reuse' || reason === 'refresh_reuse' || reason === 'dpop_invalid') return accessPath({ agent_id: x.agent.id, view: 'sessions' }, undefined, returnTo);
   return accessPath({ agent_id: x.agent.id }, undefined, returnTo);
 }
@@ -68,6 +84,7 @@ function unverified(reason?: ExchangeReasonLabel) {
   if (reason === 'not_allowed_client') return 'Not checked: the harness was refused before the login';
   if (reason === 'dpop_invalid') return 'Not checked: the DPoP proof failed first';
   if (reason === 'code_reuse' || reason === 'refresh_reuse') return 'Not recorded: the machine was not found';
+  if (reason === 'login_error') return 'Not signed in: the sign-in stopped before the identity provider';
   return 'Not verified: the token signature was not valid';
 }
 
@@ -77,6 +94,7 @@ function returned(x: Exchange) {
   if (x.permit) return 'A Chokepoint token for 5 minutes';
   if (reason === 'invalid_client' || reason === 'invalid_authorization_details') return reason;
   if (reason === 'no_group' || reason === 'blocked' || (reason === 'not_allowed_client' && x.reference)) return 'A refused page with the reference code';
+  if (reason === 'login_error') return 'A generic page with the reference code';
   if (reason === 'dpop_invalid') return 'invalid_dpop_proof or invalid_grant';
   return 'invalid_grant';
 }
@@ -106,7 +124,8 @@ export function ExchangeInspector({ scope, id, state, onBack }: { scope: Environ
   // The key of a deleted agent is still in use: there is no agent to open (Admin 032 section 7).
   const deleted = x.agent?.status === 'deleted';
   const reason = x.reason?.label;
-  const fix = reason ? hints[reason] : undefined;
+  const cause = reason === 'login_error' && x.cause ? causes[x.cause] : undefined;
+  const fix = cause ? { hint: `${cause.text} ${cause.hint}`, label: 'Open the agent identity' } : reason ? hints[reason] : undefined;
   const to = deleted ? undefined : fixPath(x, `/investigate?${state.params}`);
   const label = fix && providerFix(x) ? 'Open the identity provider' : fix?.label;
   const kind = x.subject ? kindText(x.subject) : undefined;
@@ -140,7 +159,7 @@ export function ExchangeInspector({ scope, id, state, onBack }: { scope: Environ
             ) : fix ? (
               <>
                 <p>{fix.hint}</p>
-                {to ? <div className="trace-actions"><Link className="cp-admin-button" to={to}>{label}<ArrowRight size={15} /></Link></div> : <p className="cp-admin-muted">{noAgent(reason)}</p>}
+                {to ? <div className="trace-actions"><Link className="cp-admin-button" to={to}>{label}<ArrowRight size={15} /></Link></div> : reason === 'login_error' ? null : <p className="cp-admin-muted">{noAgent(reason)}</p>}
               </>
             ) : (
               <p>The agent proved its key, the token of the subject was valid and the subject delegated to the agent.</p>
@@ -180,6 +199,7 @@ export function ExchangeInspector({ scope, id, state, onBack }: { scope: Environ
             ['Subject', x.subject ? (x.subject.name ? `${x.subject.name} (${x.subject.subject})` : x.subject.subject) : unverified(reason)],
             ['Identity provider', x.subject?.issuer ?? '—'],
             ['Reason', reason ?? '—'],
+            ...(cause ? [['Cause', cause.text]] : []),
             ...(x.client_id ? [['Harness', x.client_id]] : []),
             ...(x.reference ? [['Reference', x.reference]] : []),
             ['Returned to the agent', returned(x)],

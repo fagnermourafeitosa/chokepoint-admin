@@ -23,6 +23,7 @@ export const exchangeShort: Record<ExchangeReasonLabel, string> = {
   code_reuse: 'Authorization code used twice',
   refresh_reuse: 'Refresh token used twice',
   dpop_invalid: 'DPoP proof not valid',
+  login_error: 'Sign-in could not continue',
 };
 export const exchangeText: Record<ExchangeReasonLabel, string> = {
   invalid_client: 'The agent key did not match. The file may be old or exposed.',
@@ -37,6 +38,7 @@ export const exchangeText: Record<ExchangeReasonLabel, string> = {
   code_reuse: 'An authorization code was used twice. Chokepoint revoked the machine.',
   refresh_reuse: 'A refresh token was used twice. Chokepoint revoked the machine.',
   dpop_invalid: 'The DPoP proof is missing, not valid or from another key.',
+  login_error: 'Harness login: the sign-in stopped before consent. The person saw a generic page with the reference code.',
 };
 
 export const stepLabel: Record<string, string> = {

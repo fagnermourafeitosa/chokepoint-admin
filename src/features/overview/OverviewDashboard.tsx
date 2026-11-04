@@ -1,3 +1,4 @@
+import { QuickIncident } from '../../components/quick-incident/QuickIncident';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
@@ -31,6 +32,7 @@ export function OverviewDashboard({
   const data = query.data;
   return (
     <>
+      <div className="quick-incident-row overview-status-row">
       <div className="overview-status">
         <span className="overview-status-dot" /> <strong>{environment}</strong>
         <span>·</span>
@@ -45,6 +47,8 @@ export function OverviewDashboard({
             {inbox.counts.isError ? 'Attention status unavailable' : 'Loading attention status…'}
           </span>
         )}
+      </div>
+        <QuickIncident />
       </div>
       {query.isError ? (
         <QueryError

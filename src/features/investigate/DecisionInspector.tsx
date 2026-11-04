@@ -164,6 +164,7 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
             ['Server', server],
             ['Tool', d.tool],
             ['Resource', d.resource ? `${d.resource.type} › ${d.resource.id}` : 'No resource check'],
+            ...(d.reference ? [['Reference', d.reference]] : []),
             ['Decided at (UTC)', utcTime(d.decided_at)],
             ['Permission revision', d.effective_revision == null ? 'Not recorded' : (
               <span className="trace-revision">

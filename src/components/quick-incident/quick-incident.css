@@ -1,0 +1,162 @@
+.quick-incident {
+  position: relative;
+  margin-inline-start: auto;
+  flex: 0 0 auto;
+}
+.quick-incident-glyph {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+.quick-incident-glyph-bug {
+  position: absolute;
+  top: 18%;
+  left: 18%;
+}
+.quick-incident-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cp-admin-space-2);
+  height: 34px;
+  padding: 0 var(--cp-admin-space-3);
+  border: 1px solid var(--cp-admin-color-control-border);
+  border-radius: var(--cp-admin-radius-button);
+  background: var(--cp-admin-color-surface);
+  color: var(--cp-admin-color-text);
+  font: inherit;
+  font-size: var(--cp-admin-type-small);
+  font-weight: 700;
+  cursor: pointer;
+}
+.quick-incident-trigger:hover {
+  background: var(--cp-admin-color-hover);
+}
+.quick-incident-trigger kbd {
+  padding: 0 5px;
+  border: 1px solid var(--cp-admin-color-border);
+  border-radius: 4px;
+  color: var(--cp-admin-color-text-muted);
+  font: 600 11px/16px var(--cp-admin-font-mono, ui-monospace, monospace);
+}
+.quick-incident-form {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 34px;
+  padding: 0 2px 0 var(--cp-admin-space-3);
+  border: 1px solid var(--cp-admin-color-action, var(--cp-admin-color-control-border));
+  border-radius: var(--cp-admin-radius-button);
+  background: var(--cp-admin-color-surface);
+  box-shadow: 0 0 0 3px var(--cp-admin-color-accent-soft);
+}
+.quick-incident-input {
+  width: 11ch;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--cp-admin-color-text);
+  font: 600 14px/1 var(--cp-admin-font-mono, ui-monospace, monospace);
+  letter-spacing: 0.06em;
+}
+.quick-incident-input::placeholder {
+  color: var(--cp-admin-color-text-muted);
+  opacity: 0.55;
+}
+.quick-incident-go,
+.quick-incident-close {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: calc(var(--cp-admin-radius-button) - 2px);
+  background: transparent;
+  color: var(--cp-admin-color-text);
+  cursor: pointer;
+}
+.quick-incident-go {
+  background: var(--cp-admin-color-action, var(--cp-admin-color-brand));
+  color: #fff;
+}
+.quick-incident-go:disabled {
+  opacity: 0.6;
+}
+.quick-incident-close {
+  color: var(--cp-admin-color-text-muted);
+}
+.quick-incident-close:hover {
+  background: var(--cp-admin-color-hover);
+}
+.quick-incident-panel {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  right: 0;
+  width: min(340px, calc(100vw - 32px));
+  padding: var(--cp-admin-space-3) var(--cp-admin-space-4);
+  border: 1px solid var(--cp-admin-color-border);
+  border-radius: var(--cp-admin-radius-panel);
+  background: var(--cp-admin-color-surface);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.12);
+  font-size: var(--cp-admin-type-small);
+  color: var(--cp-admin-color-text-muted);
+}
+.quick-incident-panel p {
+  margin: 0;
+}
+.quick-incident-panel ul {
+  display: grid;
+  gap: 6px;
+  margin: var(--cp-admin-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--cp-admin-color-text);
+}
+.quick-incident-panel li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cp-admin-space-2);
+}
+.quick-incident-panel .is-warn {
+  color: var(--cp-admin-color-text);
+}
+.quick-incident-panel code {
+  font-weight: 700;
+}
+/* Rows that host the Quick incident align it to the right of the title. */
+.quick-incident-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cp-admin-space-4);
+}
+.quick-incident-row > :first-child {
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .quick-incident-trigger span,
+  .quick-incident-trigger kbd {
+    display: none;
+  }
+}
+.quick-incident-matches button {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-admin-space-2);
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--cp-admin-color-border);
+  border-radius: var(--cp-admin-radius-control);
+  background: var(--cp-admin-color-surface);
+  color: var(--cp-admin-color-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.quick-incident-matches button:hover {
+  background: var(--cp-admin-color-hover);
+}
+.quick-incident-matches small {
+  margin-inline-start: auto;
+  color: var(--cp-admin-color-text-muted);
+}

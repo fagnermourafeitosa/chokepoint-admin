@@ -23,7 +23,18 @@ export type ExchangeReasonLabel =
   | 'not_allowed_client'
   | 'code_reuse'
   | 'refresh_reuse'
-  | 'dpop_invalid';
+  | 'dpop_invalid'
+  // A harness login that ended on the generic error page (Backend 053).
+  | 'login_error';
+// The closed cause of a login_error (Backend 053). Only the Admin shows it.
+export type LoginErrorCause =
+  | 'invalid_request'
+  | 'invalid_client_id'
+  | 'client_metadata_invalid'
+  | 'redirect_uri_invalid'
+  | 'transaction_expired'
+  | 'provider_not_available'
+  | 'server_error';
 export type ExchangeReason = { label: ExchangeReasonLabel; description: string };
 export type SignalRef = { id: string; status: 'open' | 'reviewed' | 'resolved' };
 // The verified agent of a decision or an exchange (act.sub). Status is null when
@@ -78,6 +89,8 @@ export type Decision = {
   // recorded. They differ only while a publication was applying (Backend 038).
   effective_revision?: number | null;
   published_revision?: number | null;
+  // The incident code of a deny, as the agent got it in its error (Backend 053).
+  reference?: string | null;
 };
 export type ProblemKey = {
   server_id: string;
@@ -135,9 +148,10 @@ export type Exchange = {
   permit: boolean;
   reason?: ExchangeReason | null;
   occurred_at: string;
-  // The harness and the code of a refused login page (Backend 045); null for other exchanges.
+  // The harness of a login (Backend 045), and the incident code of a refusal (Backend 053).
   client_id?: string | null;
   reference?: string | null;
+  cause?: LoginErrorCause | null;
 };
 export type ExchangeProblem = {
   agent?: AgentRef | null;
