@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import { ArrowRight, Bug, Search, X } from 'lucide-react';
+import { ArrowRight, Bug, CircleHelp, Search, X } from 'lucide-react';
 import { HttpError } from '../../api/http-client';
+import { Tooltip } from '../ui/tooltip/Tooltip';
 import { useAuth } from '../../features/auth/AuthContext';
 import { utcTime } from '../../features/investigate/TraceUI';
 import { incidentApi, incidentLabels, incidentRoutes, normalizeCode, type Incident } from './api';
@@ -167,6 +168,11 @@ export function QuickIncident() {
             if (e.key === 'Escape') close();
           }}
         />
+        <span className="quick-incident-help">
+          <Tooltip content="Paste the reference code of a refusal that a person or a developer sent you. It opens the denied call or the refused login in this environment.">
+            <CircleHelp size={14} aria-label="About Quick incident" />
+          </Tooltip>
+        </span>
         <button type="submit" className="quick-incident-go" aria-label="Find incident" disabled={status.kind === 'busy'}>
           <SearchBug />
         </button>
@@ -174,17 +180,8 @@ export function QuickIncident() {
           <X size={14} />
         </button>
       </form>
-      <div id="quick-incident-status" className="quick-incident-panel" role="status" aria-live="polite">
-        {status.kind === 'idle' ? (
-          <>
-            <p>Paste the code a person or a developer sent you.</p>
-            <ul>
-              <li>Refused harness login page</li>
-              <li>Denied tool call</li>
-              <li>Refused token exchange</li>
-            </ul>
-          </>
-        ) : null}
+      {/* The panel shows only the result of a search (Admin 040). */}
+      <div id="quick-incident-status" className="quick-incident-panel" role="status" aria-live="polite" hidden={status.kind === 'idle'}>
         {status.kind === 'busy' ? <p>Looking in {auth.environment?.name}…</p> : null}
         {status.kind === 'format' ? <p className="is-warn">A reference code has 8 characters, like k3f7-x2ab.</p> : null}
         {status.kind === 'missing' ? (

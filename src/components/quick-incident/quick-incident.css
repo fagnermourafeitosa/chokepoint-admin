@@ -160,3 +160,12 @@
   margin-inline-start: auto;
   color: var(--cp-admin-color-text-muted);
 }
+.quick-incident-help {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 6px;
+  color: var(--cp-admin-color-text-muted);
+}
+.quick-incident-panel[hidden] {
+  display: none;
+}
