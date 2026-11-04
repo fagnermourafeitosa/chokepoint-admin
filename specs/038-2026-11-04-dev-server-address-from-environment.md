@@ -3,7 +3,7 @@
 - **Specification ID**: 038
 - **Date**: 2026-11-04
 - **Slug**: dev-server-address-from-environment
-- **Status**: Waiting Approve
+- **Status**: Implemented
 - **Owner**: Admin — development server configuration (`vite.config.ts`, `dev.sh`)
 - **Related Specification**: [Backend 052 — HTTP Address From the Environment](../../backend/specs/052-2026-11-04-http-address-from-environment.md) (the same rule on the API side)
 
