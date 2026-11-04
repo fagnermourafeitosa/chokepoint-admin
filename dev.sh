@@ -1,7 +1,7 @@
 #!/bin/sh
-# Start the Admin development server at http://127.0.0.1:5173.
+# Start the Admin development server on ADMIN_DEV_HOST:ADMIN_DEV_PORT (.env.local).
 # An Admin already running on that port is stopped first.
-# The backend must run at http://127.0.0.1:8081 (backend/dev.sh).
+# The backend must run at ADMIN_API_TARGET (backend/dev.sh).
 set -eu
 cd "$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 
@@ -24,12 +24,17 @@ stop_listeners() {
   done
 }
 
-for tool in node npm nc lsof; do
+for tool in node npm nc lsof curl; do
   command -v "$tool" >/dev/null 2>&1 || fail "$tool is required."
 done
 want=$(cat .nvmrc)
 [ "$(node -v | sed 's/^v//')" = "$want" ] || printf 'Warning: Node.js %s is expected (.nvmrc), found %s.\n' "$want" "$(node -v)" >&2
-stop_listeners 5173
+[ -f .env.local ] || fail ".env.local is missing. Create it from .env.example."
+# The process environment wins over .env.local, as in Vite.
+value() { eval "v=\${$1:-}"; [ -n "$v" ] || v=$(sed -n "s/^$1=//p" .env.local | tail -n 1); [ -n "$v" ] || fail "$1 is missing in .env.local (see .env.example)."; printf '%s' "$v"; }
+port=$(value ADMIN_DEV_PORT)
+target=$(value ADMIN_API_TARGET)
+stop_listeners "$port"
 [ -d node_modules ] || npm ci
-nc -z 127.0.0.1 8081 >/dev/null 2>&1 || printf 'Warning: the backend is not running at 127.0.0.1:8081 (run backend/dev.sh).\n' >&2
+curl -s -o /dev/null --max-time 2 "$target" || printf 'Warning: the backend is not running at %s (run backend/dev.sh).\n' "$target" >&2
 exec npm run dev
