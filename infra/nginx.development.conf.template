@@ -1,0 +1,28 @@
+# Development server of the Admin (infra/Dockerfile.development). The Nginx
+# image writes this template to conf.d/default.conf at start and replaces the
+# environment variables with their values. The variables are the ones of
+# vite.config.ts (Admin 038): ADMIN_DEV_HOST and ADMIN_DEV_PORT for the
+# listen address, ADMIN_API_TARGET for /api, sent with the original Host header.
+server {
+    listen ${ADMIN_DEV_HOST}:${ADMIN_DEV_PORT};
+    root /usr/share/nginx/html;
+
+    location /api/ {
+        proxy_pass ${ADMIN_API_TARGET};
+        proxy_http_version 1.1;
+        proxy_set_header Host $http_host;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_read_timeout 1h;
+    }
+
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-cache";
+    }
+}
