@@ -30,6 +30,28 @@ npm ci
 
 A local `.env.local` is prepared for this checkout and ignored by Git. For a new checkout, copy `.env.example` to `.env.local`. Environment variables will be added when the relevant integrations are defined. Variables prefixed with `VITE_` are exposed to the browser. Never store secrets in public variables.
 
+## Container Images
+
+`infra/` has two images. Build them from this module directory.
+
+| File | Use | Server |
+| :--- | :--- | :--- |
+| `infra/Dockerfile` | Production. The static build only. | static-web-server on port 8080. Unknown paths return `index.html`. It does not route `/api`: the deployment sends `/api` on the same origin to the backend. |
+| `infra/Dockerfile.development` | Local development, through `infra/dev-docker.sh`. | Nginx on `ADMIN_DEV_HOST:ADMIN_DEV_PORT`, `/api` sent to `ADMIN_API_TARGET` with the original `Host` header, as the Vite development server (Admin 038). |
+
+`infra/dev-docker.sh` is the container equivalent of `dev.sh`. It reads the three variables from the process environment or `.env.local` and stops when one is missing. It builds the development image and runs it on the host network. The image holds a build, so run the script again after a source change. The platform Keycloak accepts only the sign-in callbacks registered in its realm, so a new Admin origin needs its callback there.
+
+```sh
+./infra/dev-docker.sh
+ADMIN_DEV_PORT=15173 ADMIN_API_TARGET=http://127.0.0.1:18081 ./infra/dev-docker.sh
+```
+
+Production build:
+
+```sh
+docker build -f infra/Dockerfile -t chokepoint-admin .
+```
+
 ## Application
 
 The admin layout follows the workbench reference layout. Overview and Investigate retain empty pages. Access has Permissions, Context sources and Integrations child routes; its production initial collections remain empty. Development and production both start with empty collections. Navigation uses React Router and browser history. Workspace and profile controls show the authenticated identity and authorized backend workspace records. The environment selector uses the selected authorized workspace’s returned Sandbox and Production records. Search and audit are absent.

@@ -1,0 +1,12 @@
+*
+!package.json
+!package-lock.json
+!.npmrc
+!index.html
+!tsconfig.json
+!vite.config.ts
+!public/
+!src/
+!infra/nginx.development.conf.template
+!docs/design-system/styles/
+!docs/design-system/fonts/
