@@ -48,10 +48,21 @@ export const identityApi = {
  },
  remove: (s: EnvironmentScope, c: IdentityConnection, signal: AbortSignal) => httpClient<void>(`${path(s)}/${encodeURIComponent(c.id)}`, { method: 'DELETE', json: { revision: c.revision }, signal }),
 };
+const entraErrors: Record<string, string> = {
+ entra_tenant_not_found: 'Microsoft Entra does not know this tenant ID. Copy the Directory (tenant) ID from the app Overview.',
+ entra_client_not_found: 'This application is not in the tenant. Check the Application (client) ID and the tenant ID.',
+ entra_secret_invalid: 'Microsoft Entra rejected the secret. Paste the secret Value, not the Secret ID.',
+ entra_secret_expired: 'The client secret expired. Create a new secret (step 2) and paste its value.',
+ entra_permission_missing: 'The app can not read users. Add User.Read.All and grant admin consent (step 3).',
+ entra_member_groups_denied: 'Microsoft Entra does not let the app read the groups of a person with GroupMember.Read.All. Add the Microsoft Graph application permission Directory.Read.All, grant admin consent, then check the connection again.',
+};
 export function identityError(error: unknown): string {
  if (error instanceof HttpError) {
   if (error.status === 422 && error.code === 'directory_api_disabled') return 'The Admin SDK API is not enabled in the Google Cloud project of the service account. Enable it, then check the connection again.';
   if (error.status === 422 && error.code === 'directory_not_authorized') return 'The service account may not read the directory as this administrator. In the Google Admin console, authorize domain-wide delegation with the read-only user scope and check the administrator e-mail. A change can take up to 24 hours.';
+  // Microsoft Entra ID setup errors (Admin 042 Solution 7, Backend 058 Protocol contract 9).
+  const entra = error.status === 422 && error.code ? entraErrors[error.code] : undefined;
+  if (entra) return entra;
   if (error.status === 422 && error.code === 'clients_unavailable') return 'Cannot read the Keycloak clients. Grant the service account the realm-management role view-clients, then check the connection again.';
   if (error.status === 422) return 'Cannot verify Keycloak directory and administrative access. Check the connection and network, grant the service account the realm-management roles view-users and view-clients (or equivalent), and ensure the directory contains a user.';
   if (error.status === 409 && error.code === 'groups_unsupported') return 'This identity provider can not list groups yet, so harness login is not available for it.';

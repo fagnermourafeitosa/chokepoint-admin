@@ -4,6 +4,7 @@ import { ArrowLeft, Check, Plus, X } from 'lucide-react';
 import { usePendingChanges } from '../auth/pending/PendingChanges';
 import { useAuth } from '../auth/AuthContext';
 import type { DirectoryCheck, DirectorySettings, IdentityConnection, IdentityFields, IssuingClient, ProviderCapability } from './api';
+import { EntraConnectionForm } from './EntraConnectionForm';
 import { GoogleConnectionForm } from './GoogleConnectionForm';
 import { Help } from './Help';
 import { HarnessLoginSection, initialLogin, loginInput } from './HarnessLoginSection';
@@ -19,6 +20,8 @@ const checkHelp = 'Check connection verifies the issuer metadata and signing key
 function SectionHeading({ title, description, help }: { title: string; description: string; help: string }) {
  return <div className="identity-section-heading"><h2>{title} <Help text={help} /></h2><p>{description}</p></div>;
 }
+// Identity provider cards: Keycloak, then Microsoft Entra ID (Admin 042), then the others in catalog order.
+const cardOrder = (item: ProviderCapability) => item.provider === 'keycloak' ? 0 : item.provider === 'entra' ? 1 : 2;
 export function IdentityConnectionForm({ connection, providers, providerError, pending, error, onSave, onCheck, onDirectoryCheck, onCancel }: Props) {
  const auth = useAuth();
  const [provider, setProvider] = useState(connection?.provider ?? '');
@@ -82,15 +85,16 @@ export function IdentityConnectionForm({ connection, providers, providerError, p
   {providerError ? <p role="alert" className="cp-admin-notice cp-admin-notice--danger">Provider capabilities are unavailable. Reload and try again.</p> : null}
   <div className="identity-provider-groups">
    <div className="identity-provider-choices" role="group" aria-label="Identity provider">
-    {providers.filter(item => item.provider !== 'google').map(item => choice(item))}
+    {providers.filter(item => item.provider !== 'google').sort((a, b) => cardOrder(a) - cardOrder(b)).map(item => choice(item))}
    </div>
    {providers.some(item => item.provider === 'google') ? <div className="identity-provider-category"><span className="identity-field-label">OIDC integrations</span>
     <div className="identity-provider-choices" role="group" aria-label="OIDC integration">{providers.filter(item => item.provider === 'google').map(item => choice(item))}</div>
    </div> : null}
   </div>
   {provider && selected && !selected.available ? <p className="cp-admin-notice" role="status">{selected.name} is not available yet.</p> : null}
+  {provider === 'entra' && selected?.available ? <EntraConnectionForm key={connection?.id ?? 'new'} connection={connection} groupsCapable={!!selected.groups} workspaceLabel={`${auth.workspace?.name} / ${auth.environment?.name === 'production' ? 'Production' : 'Sandbox'}`} pending={pending} error={error} onSave={onSave} onCheck={onCheck} onDirectoryCheck={onDirectoryCheck} onCancel={onCancel} /> : null}
   {provider === 'google' && selected?.available ? <GoogleConnectionForm key={connection?.id ?? 'new'} connection={connection} groupsCapable={!!selected.groups} workspaceLabel={`${auth.workspace?.name} / ${auth.environment?.name === 'production' ? 'Production' : 'Sandbox'}`} pending={pending} error={error} onSave={onSave} onCheck={onCheck} onDirectoryCheck={onDirectoryCheck} onCancel={onCancel} /> : null}
-  {selected?.available && provider !== 'google' ? <form className="cp-admin-panel identity-form identity-form-redesign" onSubmit={event => { event.preventDefault(); if (validate()) { void onSave(fields()); } }}>
+  {selected?.available && provider !== 'google' && provider !== 'entra' ? <form className="cp-admin-panel identity-form identity-form-redesign" onSubmit={event => { event.preventDefault(); if (validate()) { void onSave(fields()); } }}>
    <fieldset disabled={pending || checking}>
     <div className="identity-form-section"><SectionHeading title="Connection" description="Identify this connection in your workspace." help="The connection belongs to the selected workspace and environment." /><div className="identity-form-fields"><label className="cp-admin-field">Connection name<input className="cp-admin-input" required maxLength={80} value={name} onChange={e => { setName(e.target.value); changedAuthentication(); }} /></label><small>{auth.workspace?.name} / {auth.environment?.name === 'production' ? 'Production' : 'Sandbox'}</small>
      <label className="cp-admin-choice identity-enable"><input className="cp-admin-switch" type="checkbox" role="switch" checked={enabled} onChange={e => setEnabled(e.target.checked)} /><span className="cp-admin-choice-copy"><strong>Enable connection</strong><small>Accept valid access tokens from this issuer in the selected environment.</small></span></label></div></div>
