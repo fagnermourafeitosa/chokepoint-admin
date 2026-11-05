@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Braces, Clock, Plus, Search } from 'lucide-react';
-import type { Doc } from './model';
+import { serverName, type Doc } from './model';
+import { useCatalog } from './catalog';
 import type { Adding, GroupKind, Selection } from './layout';
 
 type Item = { select: Selection; title: string; detail: string; expires?: string; conditions: number };
@@ -15,6 +16,7 @@ function items(doc: Doc, group: GroupKind, key: string): Item[] {
 
 // A group node opens this list. Search and paging keep a column of hundreds usable.
 export function GroupPanel({ doc, group, groupKey, label, onSelect }: { doc: Doc; group: GroupKind; groupKey: string; label: string; onSelect: (s: Selection) => void }) {
+  const { catalog } = useCatalog();
   const [query, setQuery] = useState('');
   const [shown, setShown] = useState(page);
   const all = items(doc, group, groupKey);
@@ -22,7 +24,7 @@ export function GroupPanel({ doc, group, groupKey, label, onSelect }: { doc: Doc
   const found = q ? all.filter(i => `${i.title} ${i.detail}`.toLowerCase().includes(q)) : all;
   const [what, add] = adds[group];
   return <>
-    <header><div><small>Group</small><h4>{label}</h4><p className="cp-admin-muted">{group === 'tools' ? 'Granted tools of this server' : `${groupKey.split('|')[1]} on ${groupKey.split('|')[0]}`}</p></div></header>
+    <header><div><small>Group</small><h4>{label}</h4><p className="cp-admin-muted">{group === 'tools' ? 'Granted tools of this server' : `${groupKey.split('|')[1]} on ${serverName(catalog, groupKey.split('|')[0])}`}</p></div></header>
     <div className="relation-field"><span>Summary</span><small>{all.length} total · {all.filter(i => i.expires).length} expire · {all.filter(i => i.conditions).length} with call conditions</small></div>
     <label className="group-search"><Search size={15} aria-hidden="true" /><input className="cp-admin-input" type="search" placeholder={`Filter ${all.length}…`} value={query} onChange={e => { setQuery(e.target.value); setShown(page); }} aria-label="Filter this group" /></label>
     <ul className="group-list">{found.slice(0, shown).map(i => <li key={JSON.stringify(i.select)}><button type="button" onClick={() => onSelect(i.select)}><span><strong>{i.title}</strong><small>{i.detail}</small></span>{i.expires ? <Clock size={13} aria-label="Has expiration" /> : null}{i.conditions ? <span className="group-cond"><Braces size={13} aria-hidden="true" />{i.conditions}</span> : null}</button></li>)}</ul>

@@ -7,7 +7,7 @@
 .harness-list small { color: var(--cp-admin-color-text-muted); overflow-wrap: anywhere; }
 .harness-shared { display: inline-flex; align-items: center; gap: 4px; }
 .harness-add { display: flex; flex-wrap: wrap; gap: var(--cp-admin-space-2); align-items: center; }
-.harness-add .cp-admin-input { flex: 1; min-width: 180px; }
+.harness-add .admin-select-field { flex: 1; min-width: 180px; }
 .harness-custom summary { cursor: pointer; font-size: var(--cp-admin-type-small); }
 .harness-custom { display: grid; gap: var(--cp-admin-space-2); }
 .harness-switch { display: flex; gap: var(--cp-admin-space-2); align-items: flex-start; }

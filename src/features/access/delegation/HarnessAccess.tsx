@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Ban, CircleHelp, Search, ShieldAlert, TriangleAlert } from 'lucide-react';
 import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
+import { SelectMenu } from '../../../components/ui/dropdown/SelectMenu';
 import { identityApi, type DirectoryGroup } from '../../identity/api';
 import { useCatalog } from './catalog';
 import { idpName, idpSubjects, isBlocked, type ConsentGroup, type Doc, type IdpScope } from './model';
@@ -78,7 +79,7 @@ export function HarnessAccess({ doc, scope, agentName, onChange }: { doc: Doc; s
     <div className="relation-field"><span className="relation-label">Blocked · {blocked.length}{tip('A blocked person can not use this agent, whatever their groups or consent. Blocking revokes their machines at once when you publish.')}</span>
       {blocked.length ? <ul className="harness-list">{blocked.map(b => <li key={b.subject}><Ban size={15} aria-hidden="true" /><div><strong>{subjectName(b.subject)}</strong><small>{b.subject}{b.reason ? ` · ${b.reason}` : ''}</small></div>
         <button type="button" className="rule-switch" onClick={() => onChange({ ...doc, blocked: doc.blocked.filter(x => !(x.issuer === issuer && x.subject === b.subject)) })}>Unblock</button></li>)}</ul> : <p className="cp-admin-muted">Nobody is blocked.</p>}
-      <div className="harness-add"><select className="cp-admin-input" value={pick} onChange={e => setPick(e.target.value)} aria-label="Person to block"><option value="">Choose a person…</option>{candidates.map(d => <option key={d.subject} value={d.subject}>{d.name}</option>)}</select>
+      <div className="harness-add"><SelectMenu label="Person to block" block value={pick} onChange={setPick} options={[{ value: '', label: 'Choose a person…' }, ...candidates.map(d => ({ value: d.subject, label: d.name }))]} />
         <button type="button" className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" disabled={!pick} onClick={() => { block(pick); setPick(''); }}><Ban size={14} aria-hidden="true" />Block</button></div>
     </div>
   </section>;
