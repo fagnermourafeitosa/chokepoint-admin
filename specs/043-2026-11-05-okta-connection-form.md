@@ -3,13 +3,15 @@
 - **Specification ID**: 043
 - **Date**: 2026-11-05
 - **Slug**: okta-connection-form
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Access and Integrations
 - **Related Specification**: [Backend 059 — Okta Integration](../../backend/specs/059-2026-11-05-okta-integration.md)
 - **Related Specification**: [042 — Microsoft Entra ID Connection Form](042-2026-11-04-microsoft-entra-id-connection-form.md)
 - **Related Specification**: [036 — Interactive Harness Access](036-2026-11-03-interactive-harness-access.md)
 
 > Approved for implementation by the user on 2026-11-05, after the layout approval on the prototype in the `admin-043` worktree.
+
+> **PENDING — never proven on a real Okta org.** No test org existed at the merge; the user approved the merge with this caveat on 2026-11-05. The save, the stored key, the users and groups lists, harness login and every check message except a wrong org are verified only against the code and the Backend 059 fakes. The first real connection is the proof; see [Backend 059](../../backend/specs/059-2026-11-05-okta-integration.md) "Pending Verification".
 
 ## Context & Background
 
@@ -117,15 +119,15 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ## Acceptance Criteria
 
-- [ ] 1. Okta is in the identity provider group when the backend catalog lists it as available, in the order Keycloak, Microsoft Entra ID, Okta.
-- [ ] 2. The Okta form has the fields of Solution 2 and no Keycloak-only, Entra-only or Google-only field.
-- [ ] 3. The four setup steps show with their Okta links, opening in a new tab.
-- [ ] 4. The headless fields show only with the switch on, and a save with the switch off sends no token issuer.
-- [ ] 5. The stored private key is never shown; replacing it needs an explicit Change action, or a change of the org URL or the client ID.
-- [ ] 6. Each check message of Solution 6 shows on the test org.
-- [ ] 7. A person of the test org logs in from a harness through the saved connection.
-- [ ] 8. The Microsoft Entra ID, Keycloak and Google forms behave as before, with one footer line.
-- [ ] 9. `npm run check` and `npm run build` pass.
+- [x] 1. Okta is in the identity provider group when the backend catalog lists it as available, in the order Keycloak, Microsoft Entra ID, Okta. — evidence: built-in browser on the Backend 059 API; order Keycloak, Microsoft Entra ID, Okta, then Google Workspace in its own group
+- [x] 2. The Okta form has the fields of Solution 2 and no Keycloak-only, Entra-only or Google-only field. — evidence: built-in browser
+- [x] 3. The four setup steps show with their Okta links, opening in a new tab. — evidence: built-in browser; every link answers 200
+- [x] 4. The headless fields show only with the switch on, and a save with the switch off sends no token issuer. — evidence: built-in browser for the switch; the payload without `token_issuer` by code inspection
+- [ ] 5. The stored private key is never shown; replacing it needs an explicit Change action, or a change of the org URL or the client ID. — needs a saved connection on the Okta test org
+- [ ] 6. Each check message of Solution 6 shows on the test org. — wrong org verified in the built-in browser against Okta; the other messages need the test org
+- [ ] 7. A person of the test org logs in from a harness through the saved connection. — needs the Okta test org
+- [x] 8. The Microsoft Entra ID, Keycloak and Google forms behave as before, with one footer line. — evidence: built-in browser; the Entra form with its four steps, one footer line in the four forms
+- [x] 9. `npm run check` and `npm run build` pass. — evidence: `npm run check` and `npm run build`
 
 ## Out of Scope
 

@@ -2,7 +2,8 @@ import { httpClient, HttpError } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 
 // delegated_admin, domain and customer_id are the Google Workspace settings (Backend 026). customer_id is read by the check, not typed.
-export type DirectorySettings = { client_id: string; issuing_client_id: string; client_secret?: string; has_secret: boolean; delegated_admin?: string; domain?: string; customer_id?: string; check_status: 'not_checked' | 'verified' | 'failed'; checked_at: string | null };
+// private_key is the write-only private JWK of an Okta API Services app (Backend 059 Protocol contract 2).
+export type DirectorySettings = { client_id: string; issuing_client_id: string; client_secret?: string; private_key?: string; has_secret: boolean; delegated_admin?: string; domain?: string; customer_id?: string; check_status: 'not_checked' | 'verified' | 'failed'; checked_at: string | null };
 export type IssuingClient = { client_id: string; name?: string };
 // The directory check result lists the Keycloak clients that can issue user tokens (Backend 019).
 // groups_readable is absent for a provider without the groups capability (Backend 045).
@@ -10,7 +11,8 @@ export type DirectoryCheck = DirectorySettings & { issuing_clients?: IssuingClie
 // The harness login client (Backend 045 Administration API 1). client_secret is write-only;
 // the read returns has_secret and the redirect URI to register at the provider. null removes the client.
 export type LoginSettings = { enabled: boolean; client_id: string; client_secret?: string; has_secret?: boolean; redirect_uri?: string };
-export type IdentityFields = { provider: string; name: string; issuer: string; audiences: string[]; enabled: boolean; revision: number; directory: DirectorySettings | null; login: LoginSettings | null };
+// token_issuer is the custom authorization server of an Okta connection (Backend 059, 060); the backend derives it for Entra.
+export type IdentityFields = { provider: string; name: string; issuer: string; audiences: string[]; enabled: boolean; revision: number; directory: DirectorySettings | null; login: LoginSettings | null; token_issuer?: string };
 export type IdentityConnection = Omit<IdentityFields, 'login'> & { login: LoginSettings | null; id: string; created_at: string; updated_at: string; checked_at: string | null; check_status: 'not_checked' | 'verified' | 'failed' };
 export type IdentityPage = { items: IdentityConnection[]; next_offset: number | null };
 export type ProviderCapability = { provider: string; name: string; available: boolean; directory: boolean; runtime_identity: boolean; groups: boolean };
@@ -56,6 +58,14 @@ const entraErrors: Record<string, string> = {
  entra_permission_missing: 'The app can not read users. Add User.Read.All and grant admin consent (step 3).',
  entra_member_groups_denied: 'Microsoft Entra does not let the app read the groups of a person with GroupMember.Read.All. Add the Microsoft Graph application permission Directory.Read.All, grant admin consent, then check the connection again.',
 };
+// Okta setup errors (Admin 043 Solution 6, Backend 059 Protocol contract 11).
+const oktaErrors: Record<string, string> = {
+ okta_org_not_found: 'Could not read this Okta org. Check the org URL: https://acme.okta.com or your custom domain, without "-admin".',
+ okta_authorization_server_not_found: 'Could not read this custom authorization server. Copy its Issuer from Security, API, Authorization Servers.',
+ okta_client_rejected: 'Okta rejected the app. Check the client ID, paste the private key of this app, and check that its client authentication is Public key / Private key (step 2).',
+ okta_scope_missing: 'A scope is not granted. Grant okta.users.read and okta.groups.read (step 3).',
+ okta_role_missing: 'The app can not read users. Assign it the Read-only Administrator role (step 4).',
+};
 export function identityError(error: unknown): string {
  if (error instanceof HttpError) {
   if (error.status === 422 && error.code === 'directory_api_disabled') return 'The Admin SDK API is not enabled in the Google Cloud project of the service account. Enable it, then check the connection again.';
@@ -63,6 +73,8 @@ export function identityError(error: unknown): string {
   // Microsoft Entra ID setup errors (Admin 042 Solution 7, Backend 058 Protocol contract 9).
   const entra = error.status === 422 && error.code ? entraErrors[error.code] : undefined;
   if (entra) return entra;
+  const okta = error.status === 422 && error.code ? oktaErrors[error.code] : undefined;
+  if (okta) return okta;
   if (error.status === 422 && error.code === 'clients_unavailable') return 'Cannot read the Keycloak clients. Grant the service account the realm-management role view-clients, then check the connection again.';
   if (error.status === 422) return 'Cannot verify Keycloak directory and administrative access. Check the connection and network, grant the service account the realm-management roles view-users and view-clients (or equivalent), and ensure the directory contains a user.';
   if (error.status === 409 && error.code === 'groups_unsupported') return 'This identity provider can not list groups yet, so harness login is not available for it.';

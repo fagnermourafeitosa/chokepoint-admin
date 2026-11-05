@@ -33,3 +33,6 @@
 .identity-provider-groups{display:grid;gap:var(--cp-admin-space-4)}.identity-provider-category{display:grid;gap:var(--cp-admin-space-2)}
 .identity-provider-slot{position:relative;display:inline-flex}.identity-provider-slot .identity-provider-choice{width:8rem}
 .identity-provider-slot[data-tip]:hover::after,.identity-provider-slot[data-tip]:focus-within::after{content:attr(data-tip);position:absolute;z-index:5;top:calc(100% + .25rem);left:50%;transform:translateX(-50%);white-space:nowrap;padding:.4rem .6rem;background:var(--cp-admin-color-surface);border:1px solid var(--cp-admin-color-border);border-radius:var(--cp-admin-radius-control);box-shadow:var(--cp-admin-shadow-panel);color:var(--cp-admin-color-text);font-size:var(--cp-admin-type-small)}
+.identity-key { resize: vertical; min-height: 96px; font-size: 12px; line-height: 1.45; }
+/* The footer draws the line above the actions, so the last section has none (Admin 043). */
+.identity-form-redesign fieldset>.identity-form-section:last-child{border-bottom:0}
