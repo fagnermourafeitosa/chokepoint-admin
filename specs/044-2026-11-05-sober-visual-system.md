@@ -3,7 +3,7 @@
 - **Specification ID**: 044
 - **Date**: 2026-11-05
 - **Slug**: sober-visual-system
-- **Status**: Waiting Approve
+- **Status**: Implemented
 - **Owner**: Admin design system
 - **Related Specification**: [022 — Admin Design System](022-2026-10-30-admin-design-system.md)
 
