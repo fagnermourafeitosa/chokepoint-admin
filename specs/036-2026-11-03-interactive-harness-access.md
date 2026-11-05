@@ -5,7 +5,7 @@
 - **Slug**: interactive-harness-access
 - **Status**: Implemented
 - **Owner**: Admin — Access and Integrations
-- **Visual reference**: the layout prototype `/prototype/harness-access` and `/prototype/harness-login`, approved by the user on 2026-11-03 and removed at implementation (visual specification, point 7).
+- **Visual reference**: the layout prototype `/prototype/harness-access` and `/prototype/harness-login`, approved by the user on 2026-11-03 and removed at implementation (visual specification, point 7). Archived prototype: [`specs/prototypes/036-2026-11-03-interactive-harness-access/`](prototypes/036-2026-11-03-interactive-harness-access/) (see [the prototype index](prototypes/README.md)).
 - **Related Specification**: [Backend 045 — Interactive Agent Login](../../backend/specs/045-2026-11-03-interactive-agent-login.md) (every contract of this screen)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md) (identity provider panel), [029 — Agent Identity and Chokepoint Token Setup](029-2026-10-31-agent-identity-and-chokepoint-token-setup.md) (Identity view), [032 — Revision History](032-2026-11-02-revision-history.md) (published blocks and group changes)
 

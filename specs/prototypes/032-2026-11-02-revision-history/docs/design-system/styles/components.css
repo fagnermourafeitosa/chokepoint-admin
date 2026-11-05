@@ -1,0 +1,136 @@
+/* Visual primitives only. React/Radix/Fumadocs supply interaction semantics. */
+.cp-admin-button {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: var(--cp-admin-control-height); padding: var(--cp-admin-space-2) var(--cp-admin-space-4);
+  gap: var(--cp-admin-space-2); border: 2px solid var(--cp-admin-color-text);
+  border-radius: var(--cp-admin-radius-button); background: var(--cp-admin-color-action); color: var(--cp-admin-color-on-action);
+  font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-bold); line-height: var(--cp-admin-leading-ui);
+  text-align: center; text-decoration: none; box-shadow: var(--cp-admin-shadow-offset);
+  transition: background-color var(--cp-admin-duration-fast) var(--cp-admin-ease-out), box-shadow var(--cp-admin-duration-fast) var(--cp-admin-ease-out), transform var(--cp-admin-duration-fast) var(--cp-admin-ease-out);
+}
+/* Buttons with an offset shadow lift on hover and press into it when active. */
+.cp-admin-button:hover:not(:disabled) { background: var(--cp-admin-color-action-hover); box-shadow: var(--cp-admin-shadow-lift); transform: var(--cp-admin-lift); }
+.cp-admin-button:active:not(:disabled) { box-shadow: var(--cp-admin-shadow-press); transform: var(--cp-admin-press); }
+.cp-admin-button--dark { box-shadow: none; background: var(--cp-admin-color-strong); color: var(--cp-admin-color-text-inverse); }
+.cp-admin-button--dark:hover:not(:disabled) { background: var(--cp-admin-color-text); box-shadow: none; transform: none; }
+.cp-admin-button--secondary { box-shadow: none; background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); border-color: var(--cp-admin-color-control-border); }
+.cp-admin-button--secondary:hover:not(:disabled) { background: var(--cp-admin-color-hover); border-color: var(--cp-admin-color-text); box-shadow: none; transform: none; }
+.cp-admin-button:disabled { box-shadow: none; color: var(--cp-admin-color-text-muted); background: var(--cp-admin-color-surface-muted); border-color: var(--cp-admin-color-border); cursor: not-allowed; }
+.cp-admin-button[aria-busy="true"] { cursor: progress; }
+.cp-admin-icon-button { min-width: var(--cp-admin-control-height); padding: var(--cp-admin-space-2); }
+.cp-admin-icon { width: var(--cp-admin-icon-size); height: var(--cp-admin-icon-size); flex: none; }
+.cp-admin-field { display: grid; gap: var(--cp-admin-space-2); min-width: 0; font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); }
+.cp-admin-field > label, .cp-admin-field > span { font-weight: var(--cp-admin-weight-semibold); }
+.cp-admin-input {
+  width: 100%; min-width: 0; min-height: var(--cp-admin-control-height);
+  border: var(--cp-admin-border-width) solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-control);
+  padding: var(--cp-admin-space-2) var(--cp-admin-space-3); background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text);
+  font-weight: var(--cp-admin-weight-regular);
+}
+.cp-admin-input::placeholder { color: var(--cp-admin-color-text-muted); opacity: 1; }
+.cp-admin-input[aria-invalid="true"] { border-color: var(--cp-admin-color-danger); }
+.cp-admin-input:disabled { background: var(--cp-admin-color-surface-muted); color: var(--cp-admin-color-text-muted); cursor: not-allowed; }
+.cp-admin-field small { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-regular); }
+.cp-admin-field-error { color: var(--cp-admin-color-danger); font-size: var(--cp-admin-type-small); }
+.cp-admin-panel { min-width: 0; border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-panel); background: var(--cp-admin-color-surface); box-shadow: var(--cp-admin-shadow-panel); }
+.cp-admin-panel-body { padding: var(--cp-admin-space-6); }
+.cp-admin-row { display: flex; align-items: center; flex-wrap: wrap; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-4) var(--cp-admin-space-6); }
+.cp-admin-row + .cp-admin-row { border-top: var(--cp-admin-border-width) solid var(--cp-admin-color-border); }
+.cp-admin-badge { display: inline-flex; align-items: center; gap: var(--cp-admin-space-1); padding: var(--cp-admin-space-1) var(--cp-admin-space-2); border-radius: var(--cp-admin-radius-sm); font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-bold); }
+.cp-admin-badge--success { color: var(--cp-admin-color-success); background: var(--cp-admin-color-success-bg); }
+.cp-admin-badge--danger { color: var(--cp-admin-color-danger); background: var(--cp-admin-color-danger-bg); }
+.cp-admin-inline-code { padding: .1em .3em; border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-sm); background: var(--cp-admin-color-surface-muted); font-family: var(--cp-admin-font-mono); font-size: .9em; overflow-wrap: anywhere; }
+.cp-admin-code { border-radius: var(--cp-admin-radius-control); padding: var(--cp-admin-space-5); background: var(--cp-admin-color-code-bg); color: var(--cp-admin-color-code-text); font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-small); line-height: 1.75; white-space: pre; overflow-x: auto; }
+.cp-admin-code:focus-visible { outline-color: var(--cp-admin-color-action); }
+.cp-admin-nav-link { display: inline-flex; align-items: center; min-height: var(--cp-admin-control-height); padding: var(--cp-admin-space-2) var(--cp-admin-space-3); border-radius: var(--cp-admin-radius-control); color: var(--cp-admin-color-text-muted); font-weight: var(--cp-admin-weight-semibold); text-decoration: none; }
+.cp-admin-nav-link:hover { background: var(--cp-admin-color-surface-muted); color: var(--cp-admin-color-text); }
+.cp-admin-nav-link[aria-current="page"] { background: var(--cp-admin-color-accent-soft); color: var(--cp-admin-color-accent-text); }
+.cp-admin-divider { margin: var(--cp-admin-space-6) 0; border: 0; border-top: var(--cp-admin-border-width) solid var(--cp-admin-color-border); }
+.cp-admin-dialog { max-width: min(var(--cp-admin-layout-dialog), calc(100vw - 2rem)); width: 100%; padding: var(--cp-admin-space-6); border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-dialog); background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); box-shadow: var(--cp-admin-shadow-dialog); max-height: calc(100dvh - 2rem); overflow-y: auto; }
+.cp-admin-dialog::backdrop { background: var(--cp-admin-color-overlay); }
+@media (pointer: coarse) {
+  .cp-admin-button, .cp-admin-input, .cp-admin-nav-link { min-height: var(--cp-admin-touch-height); }
+  .cp-admin-icon-button { min-width: var(--cp-admin-touch-height); }
+}
+
+.cp-admin-badge--warning { color: var(--cp-admin-color-warning); background: var(--cp-admin-color-warning-bg); }
+.cp-admin-dialog--wide { --cp-admin-layout-dialog: var(--cp-admin-layout-dialog-wide); }
+
+/* Side panel: a native modal dialog on the right edge of the window. */
+.cp-admin-side-panel {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(var(--cp-admin-layout-side-panel), 100vw);
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-inline-start: 2px solid var(--cp-admin-color-text);
+  background: var(--cp-admin-color-surface);
+  color: var(--cp-admin-color-text);
+  box-shadow: var(--cp-admin-shadow-dialog);
+  animation: cp-admin-side-panel-in var(--cp-admin-duration-normal) var(--cp-admin-ease-out);
+}
+.cp-admin-side-panel[data-width="wide"] {
+  width: min(var(--cp-admin-layout-side-panel-wide), 100vw);
+}
+.cp-admin-side-panel::backdrop {
+  background: var(--cp-admin-color-overlay);
+  animation: cp-admin-side-panel-fade var(--cp-admin-duration-normal) var(--cp-admin-ease-out);
+}
+.cp-admin-side-panel-frame {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+}
+.cp-admin-side-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cp-admin-space-4);
+  padding: var(--cp-admin-space-4) var(--cp-admin-space-6);
+  border-bottom: 1px solid var(--cp-admin-color-border);
+}
+.cp-admin-side-panel-header h2 {
+  margin: 2px 0 0;
+  font-family: var(--cp-admin-font-heading);
+  font-size: var(--cp-admin-type-section);
+}
+.cp-admin-side-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-admin-space-2);
+}
+.cp-admin-side-panel-close {
+  display: grid;
+  place-items: center;
+  width: var(--cp-admin-control-height);
+  height: var(--cp-admin-control-height);
+  border: 0;
+  border-radius: var(--cp-admin-radius-control);
+  background: transparent;
+  color: var(--cp-admin-color-text-muted);
+  cursor: pointer;
+}
+.cp-admin-side-panel-close:hover {
+  background: var(--cp-admin-color-row-hover);
+  color: var(--cp-admin-color-text);
+}
+.cp-admin-side-panel-body {
+  min-height: 0;
+  overflow: auto;
+}
+@keyframes cp-admin-side-panel-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes cp-admin-side-panel-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cp-admin-side-panel,
+  .cp-admin-side-panel::backdrop { animation: none; }
+}

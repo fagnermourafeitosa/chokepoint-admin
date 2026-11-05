@@ -10,7 +10,7 @@
 - **Related Specification**: [032 — Revision History](032-2026-11-02-revision-history.md) (side panel, timeline)
 - **Related Specification**: [030 — Investigate with Agent, Subject and Token Exchanges](030-2026-10-31-investigate-agent-subject-and-token-exchanges.md) (decision lists and inspector)
 - **Related Specification**: [039 — Quick Incident](039-2026-11-04-quick-incident.md) (reference codes)
-- **Visual reference**: layout prototype at `/prototype/report-only` on the remote branch [`design/report-only-mode`](https://github.com/fagnermourafeitosa/chokepoint-admin/tree/design/report-only-mode), commit `e81938f`, based on `main` at `7ff758d`. Fixed data in `src/features/prototype/report-only/`. Reviewed screen by screen with the user on 2026-11-04 against the demo instance (Acme, Production), at desktop and mobile (375 px) width.
+- **Visual reference**: layout prototype at `/prototype/report-only` on the remote branch [`design/report-only-mode`](https://github.com/fagnermourafeitosa/chokepoint-admin/tree/design/report-only-mode), commit `e81938f`, based on `main` at `7ff758d`. Fixed data in `src/features/prototype/report-only/`. Reviewed screen by screen with the user on 2026-11-04 against the demo instance (Acme, Production), at desktop and mobile (375 px) width. Archived prototype: [`specs/prototypes/041-2026-11-04-agent-report-only-mode/`](prototypes/041-2026-11-04-agent-report-only-mode/) (see [the prototype index](prototypes/README.md)).
 
 > Implementation approved by the user on 2026-11-04, together with Backend 057. Reviewed result approved by the user on 2026-11-04.
 

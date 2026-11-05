@@ -67,7 +67,7 @@ The development server binds to `127.0.0.1:5173`. Production hosting must serve 
 
 ## Design System
 
-The application imports [the admin design system](docs/design-system/README.md), including its local fonts and semantic tokens. New screens use a layout prototype on a design branch as their visual reference ([visual specification](docs/design-system/visual-specification.md)).
+The application imports [the admin design system](docs/design-system/README.md), including its local fonts and semantic tokens. The visual reference of a new screen is a layout prototype with fixed data in `specs/prototypes/<specification>/`, written on `main` with its specification and served under the `/prototype/<page>` route of the development server only ([visual specification](docs/design-system/visual-specification.md), [prototype index](specs/prototypes/README.md)).
 
 ## Source Organization
 

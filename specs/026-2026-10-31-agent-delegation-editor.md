@@ -11,7 +11,7 @@
 - **Related Specification**: [Backend 032 — PEP Chokepoint Token and Actor Projection](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md)
 - **Related Specification**: [Backend 033 — Agent Permission Administration and Tuple Publication](../../backend/specs/033-2026-10-31-agent-permission-administration-and-tuple-publication.md)
 - **Superseded in part**: [009](009-2026-10-26-authorization-management-workbench.md) (people, grants and policy editors), [010](010-2026-10-27-enterprise-and-custom-mcp-connections.md) (agent connection graph), [012](012-2026-10-28-scim-people-selection.md) and [024](024-2026-10-30-service-principal-selection.md) (member selection inside the group)
-- **Visual reference**: layout prototype at `/prototype/agent` in the Admin, tab Delegation and access (`src/features/access/delegation`). Fixed data. It is the visual specification of this screen; where it differs from this text, this text wins.
+- **Visual reference**: layout prototype at `/prototype/agent` in the Admin, tab Delegation and access (`src/features/access/delegation`). Fixed data. It is the visual specification of this screen; where it differs from this text, this text wins. Archived prototype: [`specs/prototypes/026-2026-10-31-agent-delegation-editor/`](prototypes/026-2026-10-31-agent-delegation-editor/) (see [the prototype index](prototypes/README.md)).
 
 > The kill switch is in [Admin 031](031-2026-11-02-agent-kill-switch.md) (Resolved Decision 1). The resource types read and the consent author name come from [Backend 037](../../backend/specs/037-2026-11-02-resource-types-read-and-consent-author.md).
 

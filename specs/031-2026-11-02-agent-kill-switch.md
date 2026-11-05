@@ -7,7 +7,7 @@
 - **Owner**: Admin — Access and Permissions
 - **Related Specification**: [Backend 032 — PEP Chokepoint Token and Actor Projection](../../backend/specs/032-2026-10-31-pep-chokepoint-token-and-actor-projection.md) (agent status, Resolved Decision 2 and Admin contract)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md) (moved from section 1, Resolved Decision 1)
-- **Visual reference**: layout prototype at `/prototype/agent` in the Admin (agent header). Fixed data.
+- **Visual reference**: layout prototype at `/prototype/agent` in the Admin (agent header). Fixed data. Archived prototype: [`specs/prototypes/031-2026-11-02-agent-kill-switch/`](prototypes/031-2026-11-02-agent-kill-switch/) (see [the prototype index](prototypes/README.md)).
 
 ---
 
