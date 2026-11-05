@@ -7,6 +7,8 @@
 - **Owner**: Admin — Access and Integrations
 
 > Approved for implementation by the user on 2026-11-04, after the layout approval on the prototype.
+
+> **PENDING — never proven on a real Microsoft Entra tenant.** No test tenant exists (it needs a paid tenant or a card). The save, the stored secret, the users and groups lists and every check message except the wrong tenant are verified only against fakes. The first real connection is the proof; see [Backend 058](../../backend/specs/058-2026-11-04-microsoft-entra-id-integration.md) "Pending verification".
 - **Related Specification**: [Backend 058 — Microsoft Entra ID Integration](../../backend/specs/058-2026-11-04-microsoft-entra-id-integration.md)
 - **Related Specification**: [023 — Google Workspace Connection Form](023-2026-10-30-google-workspace-connection-form.md)
 - **Related Specification**: [036 — Interactive Harness Access](036-2026-11-03-interactive-harness-access.md)
@@ -62,6 +64,7 @@ The customer must configure one app registration in the Microsoft Entra admin ce
    | Wrong secret | Microsoft Entra rejected the secret. Paste the secret Value, not the Secret ID. |
    | Expired secret | The client secret expired. Create a new secret (step 2) and paste its value. |
    | Users not readable | The app can not read users. Add `User.Read.All` and grant admin consent (step 3). |
+   | Groups of a person not readable (`entra_member_groups_denied`) | Microsoft Entra does not let the app read the groups of a person with GroupMember.Read.All. Add the Microsoft Graph application permission Directory.Read.All, grant admin consent, then check the connection again. |
    | Groups not readable | The app can not read groups. Harness login needs it: add `GroupMember.Read.All` and grant admin consent (step 3). |
    | Unavailable | Could not reach Microsoft Entra. Try again. |
 
@@ -90,6 +93,8 @@ The layout was approved by the user on 2026-11-04 on a prototype in the `admin-0
 
 The implementation removes the local catalog entry and the Waiting backend chips, and connects save and check to the Backend 058 API.
 
+The local validation message has priority over the last server error in the Entra form, so that a fixed field never keeps an old error (found in the functional test).
+
 ## Implementation Decisions
 
 1. Reuse `docs/design-system/styles/index.css`, the `cp-admin-*` and `identity-*` classes. No new visual tokens.
@@ -104,15 +109,15 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 ## Acceptance Criteria
 
-- [ ] 1. Microsoft Entra ID is in the identity provider group when the backend catalog lists it.
-- [ ] 2. The Entra form has the fields of Solution 2 and no Keycloak-only or Google-only field.
-- [ ] 3. The four setup steps show with their Microsoft links, opening in a new tab.
-- [ ] 4. The redirect URI, audience and tenant ID help texts show with their links.
-- [ ] 5. The client ID and secret are typed once and saved for directory and login.
-- [ ] 6. Each check error of Solution 7 shows its text.
-- [ ] 7. The stored secret is never shown; replacing it needs an explicit Change action.
-- [ ] 8. The Keycloak and Google forms behave as before.
-- [ ] 9. `npm run check` and `npm run build` pass.
+- [x] 1. Microsoft Entra ID is in the identity provider group when the backend catalog lists it. — evidence: built-in browser on the Backend 058 API; order Keycloak, Microsoft Entra ID, Okta, then Google Workspace in its own group
+- [x] 2. The Entra form has the fields of Solution 2 and no Keycloak-only or Google-only field. — evidence: built-in browser
+- [x] 3. The four setup steps show with their Microsoft links, opening in a new tab. — evidence: built-in browser; every link answers 200
+- [x] 4. The redirect URI, audience and tenant ID help texts show with their links. — evidence: built-in browser
+- [ ] 5. The client ID and secret are typed once and saved for directory and login. — the form sends them in both settings (code inspection); a save needs the Entra test tenant (Backend 058)
+- [ ] 6. Each check error of Solution 7 shows its text. — wrong tenant verified in the built-in browser against Microsoft; the other errors need the Entra test tenant
+- [ ] 7. The stored secret is never shown; replacing it needs an explicit Change action. — needs a saved connection on the Entra test tenant
+- [x] 8. The Keycloak and Google forms behave as before. — evidence: built-in browser; same sections, Google steps and links
+- [x] 9. `npm run check` and `npm run build` pass.
 
 ## Out of Scope
 

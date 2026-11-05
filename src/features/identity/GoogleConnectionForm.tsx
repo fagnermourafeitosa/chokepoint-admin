@@ -1,21 +1,16 @@
 import { useState } from 'react';
-import { ExternalLink, Plus, TriangleAlert, X } from 'lucide-react';
+import { Plus, TriangleAlert, X } from 'lucide-react';
 import { usePendingChanges } from '../auth/pending/PendingChanges';
 import type { DirectoryCheck, DirectorySettings, IdentityConnection, IdentityFields } from './api';
 import { Help } from './Help';
 import { HarnessLoginSection, initialLogin, loginInput } from './HarnessLoginSection';
+import { GuideLink, SectionHeading } from './formParts';
 import './identity.css';
 
 const enableApiGuide = 'https://developers.google.com/workspace/guides/enable-apis';
 const serviceAccountGuide = 'https://developers.google.com/workspace/guides/create-credentials#service-account';
 const delegationGuide = 'https://knowledge.workspace.google.com/admin/apps/control-api-access-with-domain-wide-delegation';
-function GuideLink({ href, children }: { href: string; children: string }) {
- return <a href={href} target="_blank" rel="noreferrer">{children} <ExternalLink size={13} aria-hidden="true" /></a>;
-}
 const googleIssuer = 'https://accounts.google.com';
-function SectionHeading({ title, description, help }: { title: string; description: string; help: string }) {
- return <div className="identity-section-heading"><h2>{title} <Help text={help} /></h2><p>{description}</p></div>;
-}
 type Props = {
  connection?: IdentityConnection; workspaceLabel: string; pending: boolean; error: string; groupsCapable: boolean;
  onSave: (fields: IdentityFields) => Promise<void>; onCheck: (fields: IdentityFields) => Promise<boolean>;
