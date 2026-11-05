@@ -3,7 +3,7 @@
 - **Specification ID**: 042
 - **Date**: 2026-11-04
 - **Slug**: microsoft-entra-id-connection-form
-- **Status**: Waiting Approve
+- **Status**: Implemented
 - **Owner**: Admin — Access and Integrations
 
 > Approved for implementation by the user on 2026-11-04, after the layout approval on the prototype.
