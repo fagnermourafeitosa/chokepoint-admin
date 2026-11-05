@@ -80,6 +80,7 @@ Manually verify UTC today/yesterday data, zero denominators, all chart/table buc
 - [x] 5. Review/resolution follows the shared explicit modal flow and preserves signal identity.
 - [x] 6. No recording-completeness warning or obsolete permit warning is shown; the unused-tools detail states what its indicator does not prove.
 - [x] 7. Check/build and manual browser verification pass during implementation.
+- [x] 8. Functional test: [021-2026-10-29-overview-dashboard](functional-tests/021-2026-10-29-overview-dashboard.md).
 
 ## Out of Scope
 
@@ -94,4 +95,4 @@ Release Backend 025 and Admin 021 together after Backend 022–024 and Admin 019
 
 ## Verification Evidence
 
-Implementation and verification completed on 2026-10-30. See the [verification record](../docs/verification/2026-10-30-investigation-overview.md) for executed checks, manual observations, source inspection and limitations. The user approved the result on 2026-10-30.
+Implementation and verification completed on 2026-10-30. See the [verification record](../docs/verification/2026-10-30-investigation-overview.md) for executed checks and limitations, and [021-2026-10-29-overview-dashboard](functional-tests/021-2026-10-29-overview-dashboard.md) for the functional test. The user approved the result on 2026-10-30.

@@ -117,6 +117,7 @@ This module has no automated tests. Verify with `npm run check`, `npm run build`
 - [x] 6. The Admin sign-in page and the Keycloak theme show the Xokepoint wordmark and name; user-visible help text says Xokepoint.
 - [x] 7. `docs/design-system/DESIGN.md` and `tokens.md` describe the new rules.
 - [x] 8. `npm run check` and `npm run build` pass, and the manual browser check covers the screens above.
+- [x] 9. Functional test: [044-2026-11-05-sober-visual-system](functional-tests/044-2026-11-05-sober-visual-system.md).
 
 ---
 

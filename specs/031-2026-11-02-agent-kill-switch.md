@@ -58,7 +58,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [x] 2. Disable agent and Enable agent call the Backend 032 API with the revision, and a conflict asks for a reload.
 - [x] 3. No "Waiting backend" chip remains for an implemented item.
 - [x] 4. `npm run check` and `npm run build` pass.
-- [x] 5. The user confirms the interface test. Run by Claude in the built-in browser at the user's request (2026-11-02): Disable agent showed Disabled, a token issued before got HTTP 401 and a new exchange got `invalid_client`; a stale revision showed the conflict with Reload, which loaded the current status; Enable agent restored the calls with the same delegations and key.
+- [x] 5. Functional test: [031-2026-11-02-agent-kill-switch](functional-tests/031-2026-11-02-agent-kill-switch.md).
 
 ---
 

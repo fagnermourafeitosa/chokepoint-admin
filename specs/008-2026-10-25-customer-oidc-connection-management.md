@@ -153,6 +153,7 @@ Preserve platform login, authorized scope selection and existing MCP connection 
 - [ ] 6. Signed JWT is identified as the only operational credential-validation capability in this delivery.
 - [ ] 7. Discovery results do not claim a login, directory import or complete runtime authentication test.
 - [ ] 8. Applicable checks pass with recorded evidence; unexecuted integration checks remain explicit.
+- [x] 9. Functional test: [008-2026-10-25-customer-oidc-connection-management](functional-tests/008-2026-10-25-customer-oidc-connection-management.md).
 
 ## Implemented CRUD Contract
 

@@ -115,6 +115,7 @@ Manually cover both views, all filters, pagination and exact row filters; two re
 - [x] 5. Opening an Inbox detail reviews it; leaving offers the specified modal and explicit resolution.
 - [x] 6. Priority and Watching this problem are absent; no recording-completeness warning is shown.
 - [x] 7. Check/build and manual browser verification pass during implementation.
+- [x] 8. Functional test: [020-2026-10-29-investigate-problems-and-decisions](functional-tests/020-2026-10-29-investigate-problems-and-decisions.md).
 
 ## Out of Scope
 
@@ -129,4 +130,4 @@ Release with Backend 022–024 and Admin 019 after individual specification appr
 
 ## Verification Evidence
 
-Implementation and verification completed on 2026-10-30. See the [verification record](../docs/verification/2026-10-30-investigation-overview.md) for executed checks, manual observations, source inspection and limitations. The user approved the result on 2026-10-30.
+Implementation and verification completed on 2026-10-30. See the [verification record](../docs/verification/2026-10-30-investigation-overview.md) for executed checks and limitations, and [020-2026-10-29-investigate-problems-and-decisions](functional-tests/020-2026-10-29-investigate-problems-and-decisions.md) for the functional test. The user approved the result on 2026-10-30.

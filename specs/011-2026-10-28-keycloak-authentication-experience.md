@@ -32,6 +32,7 @@ The public site links to Admin sign-in and signup. Admin initiates the backend-o
 - [x] The established backend OIDC, session and onboarding contracts remain intact, except for explicitly approved changes.
 - [x] Keyboard access, focus, errors and responsive layouts are verified.
 - [x] The implementation and deployment location for the Keycloak theme is documented; local fixtures are not represented as a production deployment.
+- [x] Functional test: [011-2026-10-28-keycloak-authentication-experience](functional-tests/011-2026-10-28-keycloak-authentication-experience.md).
 
 ## Out of scope
 

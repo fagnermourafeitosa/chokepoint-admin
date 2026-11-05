@@ -73,6 +73,7 @@ Application source changes are limited to deleting unused local-preview code and
 - [x] 7. `.agents/skills/tdd/` no longer exists.
 - [x] 8. `README.md` no longer describes local preview drafts.
 - [x] 9. The production CSS bundle contains the `access-tool-tag` rules, and a manual desktop browser check shows styled annotation tags in an MCP server's tool rows.
+- [x] 10. Functional test: [016-2026-10-29-remove-automated-interface-tests](functional-tests/016-2026-10-29-remove-automated-interface-tests.md).
 
 ---
 

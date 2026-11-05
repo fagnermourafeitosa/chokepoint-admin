@@ -158,6 +158,7 @@ Use rendered routes with a real isolated QueryClient and controlled HTTP respons
 - [ ] Accessibility behavior, required checks and real desktop login/logout verification pass.
 - [ ] README documents the new flow and required backend/provider setup; its spec index matches this lifecycle.
 - [ ] Formal reviewer gate completes before Waiting Approve. This document does not claim implementation, test evidence or publication.
+- [x] Functional test: [004-2026-10-24-login-and-authorized-workspace-selection](functional-tests/004-2026-10-24-login-and-authorized-workspace-selection.md).
 
 ## Out of Scope
 

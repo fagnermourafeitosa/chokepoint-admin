@@ -91,7 +91,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [x] 2. The collapsed Resource line of each tool shows the same resource, chip and note as before.
 - [x] 3. Configure resource reads the tool mapping of that tool only, and save, approve and discard update the line.
 - [x] 4. `npm run check` and `npm run build` pass.
-- [x] 5. The user confirms the interface test. (Run by the agent in the built-in browser at the user's request on 2026-11-02: one resource types request and no tool mapping request on open; save, discard and approve update the line; the draft written for the test was discarded or approved unchanged, so the mapping of `get_test_item` is the same document.)
+- [x] 5. Functional test: [034-2026-11-02-integrations-one-read-per-server](functional-tests/034-2026-11-02-integrations-one-read-per-server.md).
 
 ---
 

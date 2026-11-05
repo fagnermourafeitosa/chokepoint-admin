@@ -95,7 +95,7 @@ Production requires a reviewed same-origin admin/API host with TLS, secure cooki
 
 Open `/access` for Permissions, `/access/context-sources` for Context sources or `/access/integrations` for Integrations. Shared navigation supports direct entry, active links and browser history. Permissions uses the existing Agent rail and backend-connected people, server/tool and fine-grained policy editors. New Agent edits metadata; the selected grouping's permission editor saves an inactive draft and offers separate review/publication, discard and published-access revocation. The workbench mock remains unchanged; no demonstration records seed the application.
 
-This module has no automated interface tests; see the Testing Policy in `AGENTS.md`. Validate changes with `npm run check`, `npm run build` and manual desktop browser checks.
+This module has no automated interface tests; see the Testing Policy in `AGENTS.md`. Validate changes with `npm run check`, `npm run build` and the functional test of the specification, in `specs/functional-tests/<specification file name>.md` (see `AGENTS.md`, Functional Test Files).
 
 ## State and Data Organization
 

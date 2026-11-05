@@ -118,7 +118,7 @@ Rules:
 * Mark a checkbox only with evidence: a build or type check that you ran, a code inspection, or a manual browser check. Do not mark checkboxes only to end a turn.
 * Before each push to `main`, check that each specification whose code is in `main` is `Implemented`, in its header and in the `README.md` index.
 * Change the content of a specification (decisions, rules, contracts) on `main`. Status and checkbox changes go with the code, on the task branch.
-* An `Implemented` specification is a historical record. Do not edit it. A behavior change goes in a new specification that supersedes it. New context goes in the documentation (`README.md`, `docs/`).
+* An `Implemented` specification is a historical record. Do not edit it, except for the link to its functional test file (see Functional Test Files). A behavior change goes in a new specification that supersedes it. New context goes in the documentation (`README.md`, `docs/`).
 
 ## Branching
 
@@ -148,15 +148,30 @@ npm run build
 
 and a functional test in the built-in browser. Report only the checks that you ran.
 
+### Functional Test Files
+
+Each specification that changes a screen has its functional test in `specs/functional-tests/<specification file name>.md`, from the template [`specs/functional-tests/000-YYYY-MM-DD-template.md`](specs/functional-tests/000-YYYY-MM-DD-template.md).
+
+* The stack of every file is the demo instance (see Local Functional Test). Scenarios use its Acme data.
+* The YAML front matter holds the scenarios. A file has one or more scenarios. Each scenario names the acceptance criteria that it covers, its steps, its expected results and its last run (`passed`, `failed`, `blocked` or `not_run`, with the date and notes).
+* The specification has one acceptance criterion that links the file: `Functional test: [<file name>](functional-tests/<file name>.md)`. Mark it only when each scenario has `passed` as its last run; next to an unmet checkbox, name the scenarios that are not `passed` and why.
+* Write the scenarios with the specification. After each run, update `last_run` of each scenario that you ran, in the same change as the code.
+* Do not write test evidence elsewhere: not in the specification text, not in `docs/`. The criteria of the specification keep only a short evidence note.
+* When a newer specification changes a behavior, remove or rewrite the scenarios of the older file that it changes, in the same change. A scenario describes current behavior.
+* This file is not a historical record: unlike an `Implemented` specification, you update it.
+* A backend specification has no functional test. It links the Admin specification that tests its behavior in the browser.
+* The tests of a coding harness and of the authorization rules from a terminal are in [`dev-infra/functional-tests/`](../dev-infra/functional-tests/), in the same format.
+
 ### Local Functional Test
 
-Run functional tests by hand in the built-in browser, where the user can watch. Do not automate them.
+Run functional tests by hand in the built-in browser, where the user can watch. Do not automate them. Always run them on the demo instance ([`dev-infra/demo-instance`](../dev-infra/demo-instance/README.md)), never on the development seed: its Acme data is the realistic data of the product.
 
-1. Open `http://127.0.0.1:5173` and click **Continue to sign in**. The sign-in page is the Keycloak realm `chokepoint-platform` on `127.0.0.1:8180`.
-2. Sign in as `admin-a`. It has access to Workspace A, which holds the local identity connections.
-3. Password: `CP_SEED_PASSWORD` in `dev-infra/idps/keycloak/.env` (`sed -n 's/^CP_SEED_PASSWORD=//p' .env`). Do not print it in a reply.
-4. One-time code: run `dev-infra/idps/keycloak/totp.sh`. The code is valid for 30 seconds, so type it at once.
-5. Identity connections are in **Access**, **Integrations**, **Identity providers**.
+1. Start it with `dev-infra/demo-instance/up.sh` (the development stack `dev-infra/up.sh` must be up). The first time, run `prepare.sh` and `populate.py`; run `traffic.py --once` for recent calls.
+2. Open `http://acme.localhost:5174` and click **Continue to sign in**. Sign in as `beatriz@acme.test`.
+3. Password: `admin_password` in `dev-infra/demo-instance/.local/credentials.json`. Do not print it in a reply.
+4. One-time code: run `dev-infra/demo-instance/totp.py`. It prints the seconds left; type the code at once.
+5. The Admin opens in Sandbox: switch to **Production**, where the Acme data is. A full page load opens Sandbox again.
+6. Restore the Acme data that a scenario changes (mode, review date, delegations, rules). To start again from zero: `reset.sh --yes`, `up.sh`, `populate.py`.
 
 For a change to harness login screens or settings (identity provider **Harness login**, the agent **Harness login** card, harness sessions), also run the coding harness test with the real Claude Code CLI: [`dev-infra/functional-tests/harness-cli.md`](../dev-infra/functional-tests/harness-cli.md).
 

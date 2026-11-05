@@ -209,7 +209,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [x] 9. Every item of Backend dependencies is resolved in a backend specification before implementation.
 - [x] 10. No "Waiting backend" chip remains for an implemented item.
 - [x] 11. `npm run check` and `npm run build` pass.
-- [x] 12. The user confirms the interface test. Run by Claude in the built-in browser at the user's request (2026-11-02): the three views and their Agent, Reason and Result filters; a click on a row cell opens the decision or exchange; the inspector shows who acted for whom and the four steps; the actions of `condition`, `no_grant`, `no_resource` and `no_delegation` open the Rules, Add tools, tool and identity provider panels of the agent; an occurrence opens in the same detail; Overview Most denied groups by the agent and opens Investigate; the Token exchange denied signal (with a local 1-minute window) shows its count and opens the filtered Token exchanges view. The test found and fixed two defects: the count missing in the Inbox item, and a signal target opened as an unavailable decision.
+- [x] 12. Functional test: [030-2026-10-31-investigate-agent-subject-and-token-exchanges](functional-tests/030-2026-10-31-investigate-agent-subject-and-token-exchanges.md).
 
 ---
 

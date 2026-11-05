@@ -200,7 +200,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`, a
 - [x] 9. Every screen of this specification works at 375 px as section 10 states. *Checked at 375 px: banner, Overview, Access header and notice, Inbox rows.*
 - [x] 10. No "Waiting backend" chip and no prototype page remain. *The prototype stays only on the design branch; main has no prototype page.*
 - [x] 11. `npm run check` and `npm run build` pass. *Both pass.*
-- [x] 12. Functional test in the built-in browser, run by Claude, at desktop and mobile width. *Run on the demo instance (Acme, Production) at desktop and 375 px width.*
+- [x] 12. Functional test: [041-2026-11-04-agent-report-only-mode](functional-tests/041-2026-11-04-agent-report-only-mode.md).
 
 ---
 

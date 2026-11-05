@@ -128,6 +128,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [ ] 7. A person of the test org logs in from a harness through the saved connection. — needs the Okta test org
 - [x] 8. The Microsoft Entra ID, Keycloak and Google forms behave as before, with one footer line. — evidence: built-in browser; the Entra form with its four steps, one footer line in the four forms
 - [x] 9. `npm run check` and `npm run build` pass. — evidence: `npm run check` and `npm run build`
+- [ ] 10. Functional test: [043-2026-11-05-okta-connection-form](functional-tests/043-2026-11-05-okta-connection-form.md). — open: S4 blocked, S5 blocked, S6 blocked, S9 blocked (see the file)
 
 ## Out of Scope
 

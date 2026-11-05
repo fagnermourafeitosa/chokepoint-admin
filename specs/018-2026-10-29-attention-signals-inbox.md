@@ -121,14 +121,7 @@ The Admin adds no new backend endpoint for the second counter. If the existing r
 
 Per Admin specification 016, validate with `npm run check`, `npm run build` and manual checks in the built-in browser. Use the local development credentials from `AGENTS.md`. Report only checks that were run.
 
-Manual checks:
-
-- The counters show the backend values.
-- The Inbox shows 5 rows and pages through all signals.
-- The type filter limits the rows, and the pager follows the filter.
-- A click on the action opens the target page and removes the signal from the Inbox.
-- Empty, loading and error states appear as specified.
-- The page works at a narrow width.
+Functional test: [018-2026-10-29-attention-signals-inbox](functional-tests/018-2026-10-29-attention-signals-inbox.md).
 
 ---
 
@@ -141,6 +134,7 @@ Manual checks:
 - [x] 5. No temporary warning is shown, because both signal producers exist.
 - [x] 6. The Overview has no page title, no "New agent" button, no top bar search button, and no block of recent changes.
 - [x] 7. `npm run check` and `npm run build` pass, and the manual checks pass.
+- [x] 8. Functional test: [018-2026-10-29-attention-signals-inbox](functional-tests/018-2026-10-29-attention-signals-inbox.md).
 
 ---
 

@@ -178,7 +178,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [x] 7. Every item of Backend dependencies is resolved in a backend specification before implementation.
 - [x] 8. No "Waiting backend" chip remains for an implemented item.
 - [x] 9. `npm run check` and `npm run build` pass.
-- [x] 10. The user confirms the interface test. Run by Claude in the built-in browser at the user's request (2026-11-02).
+- [x] 10. Functional test: [027-2026-10-31-tool-resource-mapping-review](functional-tests/027-2026-10-31-tool-resource-mapping-review.md).
 
 ---
 

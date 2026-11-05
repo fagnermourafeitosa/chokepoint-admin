@@ -114,7 +114,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [x] 7. The `SidePanel` component and its documentation are in the design system.
 - [x] 8. No "Waiting backend" chip remains for an implemented item.
 - [x] 9. `npm run check` and `npm run build` pass.
-- [x] 10. The user confirms the interface test. Run by Claude in the built-in browser at the user's request on 2026-11-03.
+- [x] 10. Functional test: [032-2026-11-02-revision-history](functional-tests/032-2026-11-02-revision-history.md).
 
 ---
 
@@ -131,6 +131,6 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 The prototype points its Vite proxy at a local backend on port 8082 and rewrites the request `Origin` (in `vite.config.ts`), because another session used port 8081. These changes are local to the prototype worktree and must not be committed.
 
-### Interface test (2026-11-03)
+### Interface test
 
-Run by Claude in the built-in browser at the user's request, on an isolated stack: Backend 038 on port 8083 with its own PostgreSQL (migrations and development seed), Admin at `localhost:5175`, the host Keycloak and OpenFGA. Checked: two publications, one with a note; the publication bar author, time and note; the history panel timeline, effective revision, note and diff (resource removed; first revision with names from the catalog); Escape closes the panel; a decision at revision 6 opens the panel on that revision from Investigate; deletion revokes (revoked event, no OpenFGA tuples left, status deleted with its author), the agent leaves the list, Investigate shows "Example agent (deleted)", and a token request of the deleted agent shows the key warning with no Open the agent action.
+The scenarios and the run of 2026-11-03 are in [032-2026-11-02-revision-history](functional-tests/032-2026-11-02-revision-history.md).

@@ -120,6 +120,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [ ] 7. The stored secret is never shown; replacing it needs an explicit Change action. — needs a saved connection on the Entra test tenant
 - [x] 8. The Keycloak and Google forms behave as before. — evidence: built-in browser; same sections, Google steps and links
 - [x] 9. `npm run check` and `npm run build` pass.
+- [ ] 10. Functional test: [042-2026-11-04-microsoft-entra-id-connection-form](functional-tests/042-2026-11-04-microsoft-entra-id-connection-form.md). — open: S4 blocked, S5 blocked, S6 blocked, S9 blocked (see the file)
 
 ## Out of Scope
 

@@ -125,6 +125,7 @@ Check Access navigation, existing agent CRUD, workspace/environment switching, c
 - [ ] 6. Changed/removed tools and disabled servers show correct management states; re-enable requires discovery/review; no delete exists.
 - [ ] 7. Scope changes reset private UI state and requests; credentials are not exposed or cached.
 - [ ] 8. Unit tests, TypeScript/build and documented manual browser checks pass, as explicitly requested by the user.
+- [x] 9. Functional test: [007-2026-10-25-mcp-server-management-and-discovery-preview](functional-tests/007-2026-10-25-mcp-server-management-and-discovery-preview.md).
 
 ## Out of Scope
 
