@@ -1,0 +1,141 @@
+/* Report-only prototype (Admin 041). */
+.report-only-prototype { display: grid; gap: var(--cp-admin-space-4); }
+.report-only-controls { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-2) var(--cp-admin-space-3); border: 1px dashed var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); }
+
+.report-only-banner { display: flex; align-items: center; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-3) var(--cp-admin-space-4); border: var(--cp-admin-border-width) solid var(--cp-admin-color-warning); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-warning-bg); color: var(--cp-admin-color-warning); font-size: var(--cp-admin-type-small); }
+.report-only-banner[data-environment="production"][data-state="active"] { border-color: var(--cp-admin-color-text); box-shadow: var(--cp-admin-shadow-offset); }
+.report-only-banner[data-state="quiet"] { border-color: var(--cp-admin-color-success); background: var(--cp-admin-color-success-bg); color: var(--cp-admin-color-success); }
+.report-only-banner-copy { display: grid; gap: 2px; flex: 1; min-width: 0; color: var(--cp-admin-color-text); }
+.report-only-banner > svg { flex: none; }
+.report-only-banner-close { display: inline-grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: var(--cp-admin-radius-button); background: transparent; color: var(--cp-admin-color-text); cursor: pointer; }
+.report-only-banner-close:hover { background: var(--cp-admin-color-hover); }
+
+.report-only-chip { gap: 4px; width: max-content; }
+.access-agent-row-copy .report-only-chip { margin-top: 2px; }
+.report-only-rail-tag { padding: var(--cp-admin-space-2) var(--cp-admin-space-4) var(--cp-admin-space-4); }
+.report-only-agent-notice { align-items: flex-start; margin: 0 var(--cp-admin-space-4) var(--cp-admin-space-4); background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); }
+.report-only-agent-notice > div { flex: 1; }
+.report-only-row-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.report-only-review { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 2px 0 4px; color: var(--cp-admin-color-text); }
+.report-only-review strong { display: inline; margin: 0; }
+.report-only-agent-notice[data-overdue] { border-color: var(--cp-admin-color-danger); }
+.report-only-overdue { display: inline-block; margin-left: var(--cp-admin-space-2); padding: 0 var(--cp-admin-space-2); border-radius: var(--cp-admin-radius-sm); background: var(--cp-admin-color-danger-bg); color: var(--cp-admin-color-danger); font-size: var(--cp-admin-type-label); }
+.report-only-date { width: max-content; }
+.report-only-placeholder { padding: var(--cp-admin-space-4); }
+.report-only-dialog { display: grid; gap: var(--cp-admin-space-3); }
+.report-only-always { list-style: none; margin: 0; padding: 0; font-size: var(--cp-admin-type-small); }
+.report-only-always li { display: flex; gap: var(--cp-admin-space-2); align-items: flex-start; }
+.report-only-note { display: grid; gap: var(--cp-admin-space-1); }
+
+.report-only-screens { display: flex; gap: 4px; }
+.report-only-screens button { padding: 2px 10px; border: 1px solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-button); background: var(--cp-admin-color-surface); font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); cursor: pointer; }
+.report-only-screens button[aria-pressed="true"] { background: var(--cp-admin-color-brand); }
+
+/* Report-only palette (warning tokens) for every Report-only mark: the would-deny outcome is dashed, because nothing was blocked. */
+.trace-would-deny { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); border-style: dashed; color: var(--cp-admin-color-warning); }
+.trace-list-row .report-only-chip { margin-top: 4px; }
+.report-only-filter-row { display: flex; flex-wrap: wrap; gap: var(--cp-admin-space-2); padding: 0 var(--cp-admin-space-6) var(--cp-admin-space-3); }
+.report-only-filter-chip { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); padding: 2px 4px 2px 10px; border: 1px solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-pill); background: var(--cp-admin-color-accent-soft); font-size: var(--cp-admin-type-small); }
+.report-only-filter-chip button { display: inline-grid; place-items: center; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
+.report-only-filter-chip button:hover { background: var(--cp-admin-color-hover); }
+.report-only-foot { padding: var(--cp-admin-space-3) var(--cp-admin-space-6) var(--cp-admin-space-4); font-size: var(--cp-admin-type-small); }
+
+/* Inbox kinds of Report-only use the same palette: Would deny dashed, like its outcome chip; Review due solid. */
+.attention-tag--report-only { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); border-style: dashed; color: var(--cp-admin-color-warning); }
+.attention-tag--review-due { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); color: var(--cp-admin-color-warning); }
+
+@media (max-width: 720px) {
+  .report-only-banner { flex-wrap: wrap; }
+}
+.attention-tag { white-space: nowrap; }
+.attention-tag:has(svg) { display: inline-flex; align-items: center; gap: 4px; }
+/* The Waiting backend chip keeps its own height next to the 40px selects. */
+.report-only-prototype .attention-filters, .report-only-prototype .trace-toolbar { align-items: center; }
+.report-only-prototype .admin-tooltip-trigger:has(.waiting-backend) { align-self: center; }
+
+/* Overview: a fourth metric, Report-only, in the Report-only palette. */
+.report-only-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.report-only-metric { border-color: var(--cp-admin-color-warning); background: var(--cp-admin-color-warning-bg); }
+.report-only-metric > span:first-child { display: inline-flex; align-items: center; gap: 4px; color: var(--cp-admin-color-warning); }
+.report-only-metric .admin-tooltip-trigger { align-self: flex-start; }
+@media (max-width: 1100px) { .report-only-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 720px) { .report-only-metrics { grid-template-columns: 1fr; } }
+
+/* History timeline: chips wrap as whole chips in the 280px column. */
+.report-only-prototype .history-entry-head { flex-wrap: wrap; row-gap: 4px; }
+.report-only-prototype .history-entry-head > * { white-space: nowrap; }
+
+/* History timeline: the path runs through the dot centers and stays above the selected row background. */
+.report-only-prototype .history-timeline li::before { inset-inline-start: 30px; z-index: 1; }
+.report-only-prototype .history-dot { position: relative; z-index: 2; }
+/* A mode change event has the eye of Report-only in place of the dot. */
+.report-only-prototype .report-only-event-dot { display: grid; place-items: center; width: 22px; height: 22px; margin-top: -1px; border-color: var(--cp-admin-color-warning); background: var(--cp-admin-color-warning-bg); color: var(--cp-admin-color-warning); }
+/* The note and the meta wrap instead of being cut. */
+.report-only-prototype .history-entry-note { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.report-only-prototype .history-entry-meta { flex-wrap: wrap; }
+
+/* Timeline selection without a filled row (Admin 041 changes the real History too): a bar on the left
+   and the title in ink; the other titles are muted. The path between the dots stays continuous. */
+.report-only-prototype .history-timeline button:hover,
+.report-only-prototype .history-timeline button[aria-current] { background: none; }
+.report-only-prototype .history-timeline button:hover { border-inline-start-color: var(--cp-admin-color-border); }
+.report-only-prototype .history-timeline button[aria-current] { border-inline-start-color: var(--cp-admin-color-text); }
+.report-only-prototype .history-timeline .history-entry-head strong { color: var(--cp-admin-color-text-muted); }
+.report-only-prototype .history-timeline button[aria-current] .history-entry-head strong,
+.report-only-prototype .history-timeline button:hover .history-entry-head strong { color: var(--cp-admin-color-text); }
+
+/* Hover: the row fills and a muted bar shows. The path stays above the fill. */
+.report-only-prototype .history-timeline button:not([aria-current]):hover { background: var(--cp-admin-color-row-hover); border-inline-start-color: var(--cp-admin-color-text-muted); }
+
+/* Entry order: title, why (note), author (initials and name), date. */
+.report-only-entry-date { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); }
+.report-only-prototype .history-entry-meta { flex-wrap: nowrap; color: var(--cp-admin-color-text); }
+
+.report-only-remove { margin-inline-end: auto; }
+
+/* Banner on narrow screens: icon, text and close on the first row; the chip and the action below the text. */
+@media (max-width: 720px) {
+  .report-only-banner { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; column-gap: var(--cp-admin-space-3); row-gap: var(--cp-admin-space-2); }
+  .report-only-banner > svg { grid-column: 1; grid-row: 1; margin-top: 2px; }
+  .report-only-banner-copy { grid-column: 2; grid-row: 1; }
+  .report-only-banner-close { grid-column: 3; grid-row: 1; }
+  .report-only-banner > .admin-tooltip-trigger { grid-column: 2; grid-row: 2; justify-self: start; }
+  .report-only-banner > .cp-admin-button { grid-column: 2 / 4; grid-row: 3; justify-self: start; }
+  .report-only-overdue { margin-left: 0; margin-top: 2px; width: max-content; }
+  .report-only-banner-copy strong { display: grid; gap: 2px; }
+}
+
+/* Chips never break inside; on narrow screens the title row wraps and the notice puts its chip under the text. */
+.report-only-prototype .mcp-badge, .report-only-prototype .waiting-backend { white-space: nowrap; }
+.report-only-prototype .access-agent-title { flex-wrap: wrap; row-gap: 4px; }
+@media (max-width: 720px) {
+  .report-only-agent-notice { flex-wrap: wrap; }
+  .report-only-agent-notice > div { flex: 1 1 calc(100% - 40px); }
+  .report-only-agent-notice > .admin-tooltip-trigger { margin-inline-start: 30px; }
+}
+
+/* Dialog actions: buttons keep one line; Remove date stays on the same row, on the left. */
+.report-only-prototype .admin-dialog-actions .cp-admin-button { white-space: nowrap; }
+
+/* Inbox rows on narrow screens: tag, subject and context stacked; the time and the action share the last row. */
+@media (max-width: 740px) {
+  .report-only-prototype .attention-row { grid-template-columns: minmax(0, 1fr) auto; row-gap: var(--cp-admin-space-2); }
+  .report-only-prototype .attention-row > :nth-child(1),
+  .report-only-prototype .attention-row > :nth-child(2),
+  .report-only-prototype .attention-row > :nth-child(3) { grid-column: 1 / -1; }
+  .report-only-prototype .attention-row > :nth-child(4) { grid-column: 1; }
+  .report-only-prototype .attention-row > :nth-child(5) { grid-column: 2; }
+  .report-only-prototype .attention-when time { white-space: nowrap; }
+}
+
+/* Would deny inspector: the failed step of the path keeps the Report-only palette; the notice sits under the title. */
+.report-only-prototype .trace-path [data-report-only] .trace-path-dot { background: var(--cp-admin-color-warning-bg); border: 2px dashed var(--cp-admin-color-warning); }
+.report-only-prototype .trace-path [data-report-only] small { color: var(--cp-admin-color-warning); }
+.report-only-inspector-notice { margin: 0 var(--cp-admin-space-6) var(--cp-admin-space-4); background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); }
+.report-only-inspector-notice > div { flex: 1; color: var(--cp-admin-color-text); }
+.trace-outcome-large.trace-would-deny { gap: var(--cp-admin-space-2); }
+@media (max-width: 720px) {
+  .report-only-inspector-notice { flex-wrap: wrap; margin-inline: var(--cp-admin-space-4); }
+  .report-only-inspector-notice > div { flex: 1 1 calc(100% - 40px); }
+  .report-only-inspector-notice > .admin-tooltip-trigger { margin-inline-start: 30px; }
+}

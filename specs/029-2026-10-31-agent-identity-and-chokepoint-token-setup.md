@@ -12,7 +12,7 @@
 - **Related Specification**: [Backend 040 — Authorization Server Read and Key Author](../../backend/specs/040-2026-11-02-authorization-server-read-and-key-author.md) (key author name, values before a server exists)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md), [027 — Tool Resource Mapping Review](027-2026-10-31-tool-resource-mapping-review.md)
 - **Superseded in part**: [007 — MCP Server Management and Discovery Preview](007-2026-10-25-mcp-server-management-and-discovery-preview.md) (None and Bearer authentication of custom servers)
-- **Visual reference**: layout prototypes at `/prototype/agent` (tab Identity) and `/prototype/mcp-server` in the Admin (`src/features/access/delegation/AgentIdentity.tsx`, `src/features/mcp/ChokepointTokenSetup.tsx`). Known difference: the prototype generates a readable key ID; this text uses the RFC 7638 thumbprint. Fixed data. It is the visual specification of this screen; where it differs from this text, this text wins.
+- **Visual reference**: layout prototypes at `/prototype/agent` (tab Identity) and `/prototype/mcp-server` in the Admin (`src/features/access/delegation/AgentIdentity.tsx`, `src/features/mcp/ChokepointTokenSetup.tsx`). Known difference: the prototype generates a readable key ID; this text uses the RFC 7638 thumbprint. Fixed data. It is the visual specification of this screen; where it differs from this text, this text wins. Archived prototype: [`specs/prototypes/029-2026-10-31-agent-identity-and-chokepoint-token-setup/`](prototypes/029-2026-10-31-agent-identity-and-chokepoint-token-setup/) (see [the prototype index](prototypes/README.md)).
 
 ---
 

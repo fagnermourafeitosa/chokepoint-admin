@@ -27,14 +27,14 @@ Before you implement or review an interface, read [the module design system](doc
 
 ## Visual Specification (Prototype)
 
-The visual specification of a new screen is a **layout prototype** in the Admin, under the `/prototype` route, with fixed data. Follow [the visual specification rules](docs/design-system/visual-specification.md).
+The visual specification of a new screen is a **layout prototype** in the Admin, under the `/prototype` route, with fixed data. It is an optional step of the [Flow](#flow): after the grilling, ask the user if the change creates or changes a screen. Make a prototype only when the user says yes. Follow [the visual specification rules](docs/design-system/visual-specification.md) and use the [`visual-spec` skill](.agents/skills/visual-spec/SKILL.md) for each prototype task: it reconciles the open chips with the backend specifications and records each backend gap in the backend specification in the same pass.
 
-* The prototype lives in `src/features/prototype` and its own feature folders, and renders only under `/prototype/<page>`. It is not in the navigation and never replaces a real screen.
-* The specification links its page (`/prototype/<page>`) as its visual reference.
+* The prototype lives in `specs/prototypes/<specification file name without .md>/`, on `main` with its specification, with no branch of its own. It renders only under `/prototype/<page>`, registered in `src/features/prototype/PrototypePage.tsx`. It is not in the navigation and never replaces a real screen. Read [`specs/prototypes/README.md`](specs/prototypes/README.md) before you use any file there: prototypes are records of one moment, not current behavior.
+* The specification links its prototype folder and page (`/prototype/<page>`) as its visual reference.
 * Use the design system and realistic data from the central use case. Sign in to the local Admin yourself to run it.
 * Define the layout with the user first. Do not block on backend endpoints or field names: write them into the backend specification in the same pass.
 * Mark each element whose data the backend does not serve yet with the "Waiting backend · <spec>" chip. Its hover text says what the element is for and names the backend specification.
-* When a screen is implemented, the real screen replaces its prototype page: remove the page and its fixed data in the same change.
+* When a screen is implemented, the real screen replaces its prototype page: remove the route of the page in the same change and mark the prototype as Archived in `specs/prototypes/README.md`. Keep the folder as a record of the layout.
 
 ## Temporary Implementation Warnings
 
@@ -54,7 +54,12 @@ The order is fixed. Each decision in this flow belongs to the user: stop and wai
 
 ```mermaid
 flowchart TD
-    G["/grilling on main<br/>until shared understanding"] --> S["/to-spec on main"]
+    G["/grilling on main<br/>until shared understanding"] --> Q{"Ask the user:<br/>does this change a screen?"}
+    Q -- no --> S["/to-spec on main"]
+    Q -- yes --> VS["Optional step: visual-spec on main<br/>layout prototype with the user"]
+    VS --> LA{"User approves the layout?"}
+    LA -- no --> VS
+    LA -- yes --> S
     S --> A{"User approves implementation?"}
     A -- no --> W1["Wait"]
     A -- yes --> P["Status In Progress<br/>create the task branch from main"]
@@ -82,7 +87,7 @@ flowchart TD
 All code creation and behavior changes start from an approved specification. Do not create or use native `Walkthrough` or `Implementation Plan` artifacts.
 
 * Location: `specs/<ID>-YYYY-MM-DD-<slug>.md`, from the template `specs/000-YYYY-MM-DD-template.md`.
-* Write a specification and its grilling on `main`. Never create a branch to write a specification.
+* Write a specification, its grilling and its layout prototype on `main`. Never create a branch to write a specification or a prototype.
 * Register each specification in the `## Specifications` table at the end of `README.md`.
 * A specification that consumes a backend API links the backend specification that defines it.
 
@@ -127,7 +132,8 @@ Project skills are in `.agents/skills/`. Look there before you say that a skill 
 
 1. `/grilling` to challenge and refine the requirements;
 2. `/to-spec` to write or update the specification;
-3. `react-best-practices` for React work.
+3. `react-best-practices` for React work;
+4. `visual-spec` to build or change a layout prototype and its Waiting backend chips.
 
 ## Verification
 
