@@ -28,4 +28,4 @@ The component and its style are part of the prototype (`WaitingBackend.tsx`, cla
 
 ## Example
 
-No prototype page is open. The archived prototypes of Admin 026, 027, 029, 030, 031, 036 and 041 are in `specs/prototypes/`. The index is in [`specs/prototypes/README.md`](../../specs/prototypes/README.md).
+No prototype page is open. The archived prototypes of Admin 026, 027, 029, 030, 031, 032, 036 and 041 are in `specs/prototypes/`. The index is in [`specs/prototypes/README.md`](../../specs/prototypes/README.md).
