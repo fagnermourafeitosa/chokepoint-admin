@@ -3,7 +3,7 @@
 - **Specification ID**: 042
 - **Date**: 2026-11-04
 - **Slug**: microsoft-entra-id-connection-form
-- **Status**: In Progress
+- **Status**: Waiting Approve
 - **Owner**: Admin — Access and Integrations
 
 > Approved for implementation by the user on 2026-11-04, after the layout approval on the prototype.
@@ -94,6 +94,8 @@ The layout was approved by the user on 2026-11-04 on a prototype in the `admin-0
 The implementation removes the local catalog entry and the Waiting backend chips, and connects save and check to the Backend 058 API.
 
 The local validation message has priority over the last server error in the Entra form, so that a fixed field never keeps an old error (found in the functional test).
+
+On a saved connection, a change of the tenant ID or the client ID opens the secret field and asks for the secret value of that app: the backend reuses a stored secret only for the same tenant and client ID (code review, finding A).
 
 ## Implementation Decisions
 

@@ -44,7 +44,10 @@ export function EntraConnectionForm({ connection, workspaceLabel, groupsCapable,
  const [checked, setChecked] = useState(connection?.check_status === 'verified' && stored?.check_status === 'verified');
  const [checking, setChecking] = useState(false), [localError, setLocalError] = useState('');
  const shownAudiences = audiences ?? (clientId ? [clientId, `api://${clientId}`] : ['']);
- const hasStoredSecret = !!stored?.has_secret && !changingSecret;
+ // The backend reuses a stored secret only for the same tenant and client ID, so a change
+ // of either asks for the secret value again (Admin 042 review, finding A).
+ const credentialsMoved = !!connection && (tenant.trim().toLowerCase() !== tenantOf(connection.issuer).toLowerCase() || clientId.trim().toLowerCase() !== (stored?.client_id ?? '').toLowerCase());
+ const hasStoredSecret = !!stored?.has_secret && !changingSecret && !credentialsMoved;
  const directory = (): DirectorySettings => ({ client_id: clientId, issuing_client_id: '', client_secret: hasStoredSecret ? '' : secret, has_secret: !!stored?.has_secret, check_status: 'not_checked', checked_at: null });
  // The login client is the same app; a new secret is sent for both. null removes the client.
  const loginFields = (): LoginSettings | null => !login.enabled && !connection?.login ? null : { enabled: login.enabled, client_id: clientId, ...(hasStoredSecret ? {} : { client_secret: secret }) };
@@ -59,7 +62,7 @@ export function EntraConnectionForm({ connection, workspaceLabel, groupsCapable,
   if (!guid.test(tenant.trim())) { setLocalError('Enter the Directory (tenant) ID, a GUID such as 00000000-0000-0000-0000-000000000000.'); return false; }
   if (tenant.trim().toLowerCase() === personalTenant) { setLocalError('This is the tenant of personal Microsoft accounts. Enter the tenant ID of your organization.'); return false; }
   if (!guid.test(clientId.trim())) { setLocalError('Enter the Application (client) ID, a GUID.'); return false; }
-  if (!hasStoredSecret && !secret) { setLocalError('Paste the client secret value.'); return false; }
+  if (!hasStoredSecret && !secret) { setLocalError(credentialsMoved && stored?.has_secret ? 'You changed the tenant ID or the client ID. Paste the client secret value of that app.' : 'Paste the client secret value.'); return false; }
   if (shownAudiences.some(a => !a.trim())) { setLocalError('Enter each accepted audience, or remove the empty one.'); return false; }
   if (login.enabled && hasStoredSecret && !connection?.login?.has_secret) { setLocalError('To turn on harness login, select Change and paste the secret value again.'); return false; }
   return true;
@@ -96,7 +99,7 @@ export function EntraConnectionForm({ connection, workspaceLabel, groupsCapable,
     </div>
     {hasStoredSecret
      ? <label className="cp-admin-field">Client secret value<span className="identity-secret-row"><input className="cp-admin-input" type="password" disabled value="••••••••••••" aria-label="Stored client secret" /><button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => { setChangingSecret(true); changed(); }}>Change</button></span><small>Stored encrypted. Existing secrets cannot be displayed.</small></label>
-     : <label className="cp-admin-field">Client secret value<input className="cp-admin-input" type="password" autoComplete="new-password" maxLength={4096} value={secret} onChange={e => { setSecret(e.target.value); changed(); }} /><small>The Value column, not the Secret ID. Stored encrypted. Existing secrets cannot be displayed.</small></label>}
+     : <label className="cp-admin-field">Client secret value<input className="cp-admin-input" type="password" autoComplete="new-password" maxLength={4096} value={secret} onChange={e => { setSecret(e.target.value); changed(); }} /><small>{credentialsMoved && stored?.has_secret ? 'The tenant ID or the client ID changed: paste the secret value of that app. ' : ''}The Value column, not the Secret ID. Stored encrypted. Existing secrets cannot be displayed.</small></label>}
     {connection ? <div className="cp-admin-notice identity-mapping-warning" role="status"><TriangleAlert size={18} aria-hidden="true" /><div><strong>Changing the tenant</strong><span>If you change the tenant ID, the people associated before belong to the previous tenant and lose access. Chokepoint does not block the change.</span></div></div> : null}
     {localError || error ? <p className="cp-admin-notice cp-admin-notice--danger" role="alert">{localError || error}</p> : null}
     <div className="identity-inline-check"><button type="button" className="cp-admin-button cp-admin-button--secondary" disabled={checking} onClick={() => void checkConnection()}>{checking ? 'Checking…' : 'Check connection'}</button><Help label="What the check verifies" text={'Check connection reads the Microsoft Entra metadata and signing keys of your tenant, gets a Microsoft Graph token with the client secret, reads one user and reads the groups.\n\nIt tells you which step is missing: a wrong tenant ID, a wrong client ID, a wrong or expired secret, or a permission without admin consent.'} /><small role="status">{checked ? 'Connection verified.' : 'Not checked'}</small></div>
