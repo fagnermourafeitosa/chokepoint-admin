@@ -3,13 +3,19 @@ import { httpClient } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 
 // SignalType mirrors the backend attention_signal_type enum.
-export type SignalType = 'tool-discovery' | 'requests-denied' | 'token_exchange_denied';
+export type SignalType = 'tool-discovery' | 'requests-denied' | 'token_exchange_denied' | 'report-only-would-deny' | 'report-only-review-due';
 
 export const signalTypeLabels: Record<SignalType, string> = {
   'tool-discovery': 'Tool discovery',
   'requests-denied': 'Requests denied',
   token_exchange_denied: 'Token exchange denied',
+  // Backend 057: Report-only signals; never denials.
+  'report-only-would-deny': 'Would deny',
+  'report-only-review-due': 'Review due',
 };
+
+// A Report-only signal type shows the eye of Report-only (Admin 041).
+export const reportOnlyTypes = new Set<string>(['report-only-would-deny', 'report-only-review-due']);
 
 // typeLabel shows the raw value for a type this Admin version does not know yet.
 export const typeLabel = (type: string) => (signalTypeLabels as Record<string, string>)[type] ?? type;

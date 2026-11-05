@@ -1,0 +1,21 @@
+/* The Report-only banner (Admin 041 section 3): under the header, on every screen. */
+.report-only-banner-slot { width: 100%; max-width: var(--cp-admin-layout-max); margin-inline: auto; padding: var(--cp-admin-space-4) var(--cp-admin-layout-gutter) 0; box-sizing: border-box; }
+.report-only-banner { display: flex; align-items: center; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-3) var(--cp-admin-space-4); border: var(--cp-admin-border-width) solid var(--cp-admin-color-warning); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-warning-bg); color: var(--cp-admin-color-warning); font-size: var(--cp-admin-type-small); box-sizing: border-box; }
+.report-only-banner[data-environment="production"][data-state="active"] { border-color: var(--cp-admin-color-text); box-shadow: var(--cp-admin-shadow-offset); }
+.report-only-banner[data-state="quiet"] { border-color: var(--cp-admin-color-success); background: var(--cp-admin-color-success-bg); color: var(--cp-admin-color-success); }
+.report-only-banner > svg { flex: none; }
+.report-only-banner-copy { display: grid; gap: 2px; flex: 1; min-width: 0; color: var(--cp-admin-color-text); }
+.report-only-banner .cp-admin-button { white-space: nowrap; }
+.report-only-overdue { display: inline-block; margin-left: var(--cp-admin-space-2); padding: 0 var(--cp-admin-space-2); border-radius: var(--cp-admin-radius-sm); background: var(--cp-admin-color-danger-bg); color: var(--cp-admin-color-danger); font-size: var(--cp-admin-type-label); }
+.report-only-banner-close { display: inline-grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: var(--cp-admin-radius-button); background: transparent; color: var(--cp-admin-color-text); cursor: pointer; }
+.report-only-banner-close:hover { background: var(--cp-admin-color-hover); }
+/* Narrow screens: icon, text and close on the first row; the action below the text. */
+@media (max-width: 720px) {
+  .report-only-banner { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; column-gap: var(--cp-admin-space-3); row-gap: var(--cp-admin-space-2); }
+  .report-only-banner > svg { grid-column: 1; grid-row: 1; margin-top: 2px; }
+  .report-only-banner-copy { grid-column: 2; grid-row: 1; }
+  .report-only-banner-close { grid-column: 3; grid-row: 1; }
+  .report-only-banner > .cp-admin-button { grid-column: 2 / 4; grid-row: 2; justify-self: start; }
+  .report-only-banner-copy strong { display: grid; gap: 2px; }
+  .report-only-overdue { margin-left: 0; width: max-content; }
+}

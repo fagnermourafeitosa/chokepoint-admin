@@ -134,3 +134,12 @@
   .cp-admin-side-panel,
   .cp-admin-side-panel::backdrop { animation: none; }
 }
+
+/* Report-only (Admin 041): one palette, the warning tokens, for every mark of an
+   agent in Report-only. A would-deny mark is dashed, because nothing was blocked. */
+.cp-report-only-chip { display: inline-flex; align-items: center; gap: 4px; width: max-content; padding: var(--cp-admin-space-1) var(--cp-admin-space-2); border-radius: var(--cp-admin-radius-sm); background: var(--cp-admin-color-warning-bg); color: var(--cp-admin-color-warning); font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-semibold); line-height: 1.5; white-space: nowrap; }
+.cp-report-only-chip[data-tone="danger"] { background: var(--cp-admin-color-danger-bg); color: var(--cp-admin-color-danger); }
+.cp-would-deny { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); border-style: dashed; color: var(--cp-admin-color-warning); }
+.cp-report-only-notice { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); }
+.cp-report-only-notice > div { flex: 1; color: var(--cp-admin-color-text); }
+.cp-report-only-notice[data-overdue] { border-color: var(--cp-admin-color-danger); }

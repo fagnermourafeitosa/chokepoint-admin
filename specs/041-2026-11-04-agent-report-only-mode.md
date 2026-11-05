@@ -3,7 +3,7 @@
 - **Specification ID**: 041
 - **Date**: 2026-11-04
 - **Slug**: agent-report-only-mode
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Access and Permissions, Investigate, Overview, Inbox
 - **Related Specification**: [Backend 057 — Agent Report-only Mode](../../backend/specs/057-2026-11-04-agent-report-only-mode.md) (defines every backend item below; Proposed)
 - **Related Specification**: [031 — Agent Kill Switch](031-2026-11-02-agent-kill-switch.md) (agent status, revision conflict)
@@ -12,7 +12,7 @@
 - **Related Specification**: [039 — Quick Incident](039-2026-11-04-quick-incident.md) (reference codes)
 - **Visual reference**: layout prototype at `/prototype/report-only` on the remote branch [`design/report-only-mode`](https://github.com/fagnermourafeitosa/chokepoint-admin/tree/design/report-only-mode), commit `e81938f`, based on `main` at `7ff758d`. Fixed data in `src/features/prototype/report-only/`. Reviewed screen by screen with the user on 2026-11-04 against the demo instance (Acme, Production), at desktop and mobile (375 px) width.
 
-> Implementation approved by the user on 2026-11-04, together with Backend 057.
+> Implementation approved by the user on 2026-11-04, together with Backend 057. Reviewed result approved by the user on 2026-11-04.
 
 ---
 
@@ -87,7 +87,7 @@ An agent can stay in Report-only and be forgotten. In Production this is a secur
 
 1. The Result filter of All decisions has **All results, Deny, Would deny, Allow**.
 2. A would-deny row shows the outcome chip **WOULD DENY** (Report-only palette, dashed border, eye icon), its reason, and "The call ran". The agent cell shows the **Report-only** chip for an agent that was in Report-only at decision time.
-3. An agent filter set by the banner shows as a removable chip: "Agents in Report-only: {names}".
+3. An agent filter set by the banner shows as a removable chip: "Agents in Report-only: {names}". *Implementation: the decision list filters one agent (Backend 034). With one agent in Report-only the banner filters on it; with several it filters on Would deny only, which already holds only the calls of agents in Report-only, and no chip is shown.*
 4. **By problem** and the **Deny** filter never include would-deny calls.
 5. **Decision inspector of a would-deny call.** The same layout as the inspector of Admin 030, with these differences:
    - the large outcome chip **Would deny** (Report-only palette, dashed, eye icon) in place of Allowed or Denied; under the tool name: "{reason}. The call ran because {agent} was in Report-only.";
@@ -189,18 +189,18 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`, a
 
 ## Acceptance Criteria
 
-- [ ] 1. An administrator switches an agent to Report-only and back with the dialog, with an optional review date and note; a conflict asks for a reload.
-- [ ] 2. The agent list, the header and the notice show the mode, the review date and the overdue state; the review date dialog sets, changes and removes the date.
-- [ ] 3. The banner shows on every screen while the environment has an agent in Report-only, in both states, stronger in Production, and hides for the session only.
-- [ ] 4. Investigate filters Would deny, shows the WOULD DENY chip, and never mixes would-deny calls into By problem or Deny; the inspector of a would-deny call follows section 4 item 5.
-- [ ] 5. The Inbox shows the Would deny and Review due types, apart from Requests denied.
-- [ ] 6. Denied today excludes would-deny calls; the Report-only metric shows only while an agent is in Report-only.
-- [ ] 7. A mode change shows as an event in the revision history, with author, time, note and review date.
-- [ ] 8. The timeline changes of section 8 apply to every agent.
-- [ ] 9. Every screen of this specification works at 375 px as section 10 states.
-- [ ] 10. No "Waiting backend" chip and no prototype page remain.
-- [ ] 11. `npm run check` and `npm run build` pass.
-- [ ] 12. Functional test in the built-in browser, run by Claude, at desktop and mobile width.
+- [x] 1. An administrator switches an agent to Report-only and back with the dialog, with an optional review date and note; a conflict asks for a reload. *Checked in the browser: support-assistant to Report-only with a review date and a note, and back to Enforce. The conflict path by code inspection (same mapping as the kill switch).*
+- [x] 2. The agent list, the header and the notice show the mode, the review date and the overdue state; the review date dialog sets, changes and removes the date. *Checked in the browser: chips in the list and the header, the notice with author, date and would-deny count, Change date and Remove date. The overdue chip by code inspection and in the prototype (no agent was overdue in the real data during the test).*
+- [x] 3. The banner shows on every screen while the environment has an agent in Report-only, in both states, stronger in Production, and hides for the session only. *Checked: shown on Overview, Access and Investigate in Production with the stronger style, hidden in Sandbox (no agent there), View report, and Hide for this session across screens. The quiet state by code inspection: every real agent in Report-only had would-deny calls in 7 days.*
+- [x] 4. Investigate filters Would deny, shows the WOULD DENY chip, and never mixes would-deny calls into By problem or Deny; the inspector of a would-deny call follows section 4 item 5. *Checked: the Would deny filter, the WOULD DENY chip and the Report-only chip on the agent, and the inspector (Not blocked, Failed · not enforced, 1 would deny, Mode and Reference). Problems never include would deny (Backend 057).*
+- [x] 5. The Inbox shows the Would deny and Review due types, apart from Requests denied. *Checked: the Would deny item with its subject, note, context and the Investigate target. Review due by code inspection: its item was resolved by the backend during the test.*
+- [x] 6. Denied today excludes would-deny calls; the Report-only metric shows only while an agent is in Report-only. *Checked: Denied today says blocked calls only, the Report-only metric with 2 agents, and the traffic chart with the Would deny segment.*
+- [x] 7. A mode change shows as an event in the revision history, with author, time, note and review date. *Checked: the mode changes of refunds-assistant in the timeline and the event detail.*
+- [x] 8. The timeline changes of section 8 apply to every agent. *Checked: entry order, absolute UTC time, no filled selection, the eye dot, and the diff of Revision 6 against Revision 4 across mode events.*
+- [x] 9. Every screen of this specification works at 375 px as section 10 states. *Checked at 375 px: banner, Overview, Access header and notice, Inbox rows.*
+- [x] 10. No "Waiting backend" chip and no prototype page remain. *The prototype stays only on the design branch; main has no prototype page.*
+- [x] 11. `npm run check` and `npm run build` pass. *Both pass.*
+- [x] 12. Functional test in the built-in browser, run by Claude, at desktop and mobile width. *Run on the demo instance (Acme, Production) at desktop and 375 px width.*
 
 ---
 
@@ -219,3 +219,13 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`, a
 ## Further Notes
 
 The prototype runs against the demo instance: its Admin runs from the `admin-041` worktree on `http://acme.localhost:5174` (launch configuration `admin-041-demo`), in place of the demo Admin of `dev-infra/demo-instance/up.sh`. The screens around the prototype use real Acme data; the prototype data are fixed.
+
+### Implementation notes (2026-11-04)
+
+- The Inbox subject and note of the two Report-only types are written by the Admin from the signal context (`targets.ts`), like the context lines of the other types.
+- The Overview traffic chart stacks the would-deny calls of each hour in the Report-only palette, after the Backend 057 review decision that counts them in the volume.
+- A would-deny Inbox item opens All decisions filtered on Would deny, the agent, the tool and the closed hour; it is not a problem, so Investigate does not look one up for it (`useInvestigation`).
+- The functional test found and fixed one defect: the banner and the Inbox detail guard shared a React key in `AdminLayout`.
+- Review adjustments (2026-11-04): the Enforce access dialog says that it is counting while the would-deny count loads and shows an error when it fails, instead of "No call would have been denied"; a mode change also refreshes the Overview (checked: the Report-only metric went from 2 to 3 agents without a reload).
+- Found in the user's review (2026-11-04): a filter menu at the start of a wrapped toolbar row was cut at the left edge of Investigate (the Result menu). `Dropdown` now aligns an open panel to the start of its trigger when the end alignment would leave its clipping container; the design system documents `admin-dropdown-panel[data-align="start"]`. Checked: the Result menu opens whole; a menu at the end of the row keeps the end alignment.
+- The path line of the timeline uses the muted text color, so it stays visible on the timeline background (user review, 2026-11-04).

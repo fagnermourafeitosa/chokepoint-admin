@@ -201,3 +201,15 @@
     width: 100%;
   }
 }
+/* Admin 041: Report-only tags keep one line; the review tag uses the warning palette; would deny is dashed (cp-would-deny). */
+.attention-tag { white-space: nowrap; }
+.attention-tag:has(svg) { display: inline-flex; align-items: center; gap: 4px; }
+.attention-tag--report-only-review-due { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); color: var(--cp-admin-color-warning); }
+/* Narrow screens: tag, subject and context stacked; the time and the action share the last row. */
+@media (max-width: 740px) {
+  .attention-row { row-gap: var(--cp-admin-space-2); }
+  .attention-row > :nth-child(1), .attention-row > :nth-child(2), .attention-row > :nth-child(3) { grid-column: 1 / -1; }
+  .attention-row > :nth-child(4) { grid-column: 1; }
+  .attention-row > :nth-child(5) { grid-column: 2; }
+  .attention-when time { white-space: nowrap; }
+}

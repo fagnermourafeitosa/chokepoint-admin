@@ -22,7 +22,8 @@ export type Reconciliation = { state: 'effective' | 'pending'; last_attempt_at?:
 // revoked revision, all null before the first publication (Backend 038).
 export type Configuration = { agent_id: string; revision: number; draft?: PermissionDocument; published?: PermissionDocument; published_revision: number; effective_revision: number; reconciliation: Reconciliation; published_by: string | null; published_by_name: string | null; published_at: string | null; note: string | null };
 // One published or revoked revision of the history (Backend 038). document is set only by the read of one revision.
-export type Revision = { revision: number; action: 'publish' | 'revoke'; published_by: string; published_by_name?: string; published_at: string; effective_at: string | null; note: string | null; document?: PermissionDocument };
+// Backend 057: the history also lists mode changes (kind enforcement), which have no revision number.
+export type Revision = { kind?: 'revision' | 'enforcement'; revision: number; action: 'publish' | 'revoke' | 'enforcement'; published_by: string; published_by_name?: string; published_at: string; effective_at: string | null; note: string | null; document?: PermissionDocument; from?: 'enforce' | 'report_only'; to?: 'enforce' | 'report_only'; review_by?: string };
 export type RevisionPage = { items: Revision[]; total: number; page: number; page_size: number };
 // A resource that the effective mapping of a managed tool projects (Backend 037).
 export type ServerResourceType = { tool: string; type: string; argument: string | null };

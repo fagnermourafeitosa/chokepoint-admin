@@ -189,3 +189,15 @@
     margin-left: 0;
   }
 }
+/* Admin 041: would-deny calls ran; they stack in the Report-only palette, dashed. */
+.overview-bar-would-deny {
+  border: var(--cp-admin-border-width) dashed var(--cp-admin-color-warning);
+  border-radius: var(--cp-admin-radius-button) var(--cp-admin-radius-button) 0 0;
+  background: var(--cp-admin-color-warning-bg);
+}
+.overview-legend > span.overview-legend-would-deny i,
+.overview-traffic-tip i.overview-tip-would-deny {
+  background: var(--cp-admin-color-warning-bg);
+  border-style: dashed;
+  border-color: var(--cp-admin-color-warning);
+}

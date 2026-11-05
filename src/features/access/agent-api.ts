@@ -18,8 +18,16 @@ export type AgentRecord = {
   status: AgentStatus;
   status_changed_by: string | null;
   status_changed_at: string | null;
+  // Backend 057: the enforcement mode, its author (name read by the backend) and the optional review date (UTC, YYYY-MM-DD).
+  enforcement: Enforcement;
+  enforcement_changed_by: string | null;
+  enforcement_changed_by_name: string | null;
+  enforcement_changed_at: string | null;
+  review_by: string | null;
 };
 export type AgentStatus = 'active' | 'disabled';
+export type Enforcement = 'enforce' | 'report_only';
+export type EnforcementChange = { enforcement: Enforcement; review_by?: string; note?: string };
 export type AgentPage = { items: AgentRecord[]; next_offset: number | null };
 export type AgentScope = { userId: string; tenantId: string; environmentId: string };
 export type AgentFields = { name: string; description: string; icon_key?: AgentIconKey };
@@ -38,5 +46,7 @@ export const agentApi = {
   },
   // A disable applies to the next token exchange and the next call (Backend 032 Resolved Decision 2).
   setStatus: (scope: AgentScope, id: string, status: AgentStatus, revision: number) => httpClient<AgentRecord>(`${agentPath(scope)}/${encodeURIComponent(id)}/${status === 'disabled' ? 'disable' : 'enable'}`, { method: 'POST', json: { revision } }),
+  // Backend 057: the mode applies at the next call; a change is an event in the history.
+  setEnforcement: (scope: AgentScope, id: string, revision: number, change: EnforcementChange) => httpClient<AgentRecord>(`${agentPath(scope)}/${encodeURIComponent(id)}/enforcement`, { method: 'POST', json: { revision, ...change } }),
   image: (scope: AgentScope, id: string, signal: AbortSignal) => httpClient<Blob>(`${agentPath(scope)}/${encodeURIComponent(id)}/image`, { signal, responseType: 'blob' }),
 };

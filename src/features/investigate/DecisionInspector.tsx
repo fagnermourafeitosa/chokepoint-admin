@@ -2,7 +2,8 @@ import './inspector.css';
 import { DecisionBreakdown } from './DecisionBreakdown';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { ArrowLeft, ArrowRight, Check, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Eye, X } from 'lucide-react';
+import { ReportOnlyChip } from '../../components/report-only/ReportOnlyChip';
 import { HttpError } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 import { actionPath } from '../access/target-context';
@@ -75,6 +76,9 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
   const agent = d.agent.name || d.agent.id;
   const server = d.server_name || d.server_id;
   const kind = kindText(d.subject);
+  // Backend 057: three outcomes; a would deny ran in Report-only.
+  const permit = d.outcome === 'permit';
+  const wouldDeny = d.outcome === 'would_deny';
   const action = reasonAction(d, detail, signalId, `/investigate?${state.params}`);
   return (
     <>
@@ -88,13 +92,23 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
           <code>{d.id} · {utcTime(d.decided_at)}</code>
         </header>
         <div className="trace-title">
-          <span className={`trace-outcome trace-outcome-large ${d.permit ? 'trace-allow' : 'trace-deny'}`}>
-            {d.permit ? <Check size={19} /> : <X size={19} />}
-            {d.permit ? 'Allowed' : 'Denied'}
-          </span>
+          {wouldDeny ? (
+            <span className="trace-outcome trace-outcome-large cp-would-deny"><Eye size={19} aria-hidden="true" />Would deny</span>
+          ) : (
+            <span className={`trace-outcome trace-outcome-large ${permit ? 'trace-allow' : 'trace-deny'}`}>
+              {permit ? <Check size={19} /> : <X size={19} />}
+              {permit ? 'Allowed' : 'Denied'}
+            </span>
+          )}
           <h2>{d.tool}</h2>
-          <p>{d.reason ? denyText[d.reason.label] ?? d.reason.description : d.permit ? 'Every check passed.' : 'The deny reason was not recorded for this historical call.'}</p>
+          <p>{d.reason ? denyText[d.reason.label] ?? d.reason.description : permit ? 'Every check passed.' : 'The deny reason was not recorded for this historical call.'}{wouldDeny ? ` The call ran because ${agent} was in Report-only.` : ''}</p>
         </div>
+        {wouldDeny ? (
+          <div className="cp-admin-notice cp-report-only-notice trace-report-only-notice">
+            <Eye size={18} aria-hidden="true" />
+            <div><strong>Not blocked</strong>Chokepoint evaluated this call and its policy denies it, but {agent} was in Report-only, so the call reached {server}. In Enforce, the same call is denied and the caller gets a reference code.</div>
+          </div>
+        ) : null}
         <p className="trace-who">
           <strong>{agent}</strong> acted for <strong>{subjectName(d.subject)}</strong> ({[kind, d.subject.issuer].filter(Boolean).join(' · ')})
         </p>
@@ -103,10 +117,10 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
             {steps.map((step, i) => {
               const relation = relationOfStep[step.key] ? relations.get(relationOfStep[step.key]) : undefined;
               return (
-                <li key={`${step.key}-${i}`} data-state={step.state} tabIndex={0}>
+                <li key={`${step.key}-${i}`} data-state={step.state} data-report-only={wouldDeny && step.state === 'failed' ? '' : undefined} tabIndex={0}>
                   <span className="trace-path-dot" />
                   <strong>{stepLabel[step.key] || step.key.replaceAll('_', ' ')}</strong>
-                  <small>{stateText[step.state]}</small>
+                  <small>{wouldDeny && step.state === 'failed' ? 'Failed · not enforced' : stateText[step.state]}</small>
                   {relation?.display ? <span className="trace-path-relation">{relation.display}</span> : null}
                 </li>
               );
@@ -149,7 +163,7 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
           <section className="trace-repetition">
             <h3>Repeated in this window</h3>
             <p>Same agent, server, tool{d.reason ? ', reason' : ''} and result.</p>
-            <strong>{detail.repeat.count} {d.permit ? 'allowed' : 'denied'}</strong>
+            <strong>{detail.repeat.count} {wouldDeny ? 'would deny' : permit ? 'allowed' : 'denied'}</strong>
             <small>Window {utcTime(detail.repeat.window_start)} – {utcTime(detail.repeat.window_end)}</small>
             <small>First {utcTime(detail.repeat.first_at)}</small>
             <small>Last {utcTime(detail.repeat.last_at)}</small>
@@ -165,6 +179,9 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
             ['Tool', d.tool],
             ['Resource', d.resource ? `${d.resource.type} › ${d.resource.id}` : 'No resource check'],
             ...(d.reference ? [['Reference', d.reference]] : []),
+            // Backend 057: the mode of the agent at decision time; a would deny has no code.
+            ...(d.enforcement ? [['Mode', d.enforcement === 'report_only' ? <ReportOnlyChip key="mode" /> : 'Enforce']] : []),
+            ...(wouldDeny ? [['Reference', 'None: the caller was not refused']] : []),
             ['Decided at (UTC)', utcTime(d.decided_at)],
             ['Permission revision', d.effective_revision == null ? 'Not recorded' : (
               <span className="trace-revision">
