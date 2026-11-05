@@ -1,4 +1,5 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Eye } from 'lucide-react';
+import { ReportOnlyChip } from '../../components/report-only/ReportOnlyChip';
 import type { Decision, Exchange, ExchangeProblem, Problem, SubjectRef } from './types';
 import type { useInvestigation } from './useInvestigation';
 import { QueryError, TracePager, utcTime } from './TraceUI';
@@ -26,7 +27,9 @@ function openRow(open: () => void) {
 
 function Row({ decision, problem, state }: { decision?: Decision; problem?: Problem; state: State }) {
   const item = problem || decision!;
-  const permit = decision?.permit || false;
+  // A problem groups denies; a decision has its own outcome (Backend 057).
+  const outcome = decision?.outcome ?? 'deny';
+  const permit = outcome === 'permit';
   const id = problem?.latest_decision_id || decision!.id;
   const at = problem?.last_at || decision!.decided_at;
   const open = () => state.open(id, problem?.signal?.id);
@@ -34,16 +37,20 @@ function Row({ decision, problem, state }: { decision?: Decision; problem?: Prob
   return (
     <div className="trace-list-row trace-list-row--open trace-row-decision" role="row" title="Open the decision details" onClick={openRow(open)}>
       <div role="cell">
-        <span className={`trace-outcome ${permit ? 'trace-allow' : 'trace-deny'}`}>{permit ? 'ALLOW' : 'DENY'}</span>
+        {outcome === 'would_deny'
+          ? <span className="trace-outcome cp-would-deny"><Eye size={12} aria-hidden="true" />WOULD DENY</span>
+          : <span className={`trace-outcome ${permit ? 'trace-allow' : 'trace-deny'}`}>{permit ? 'ALLOW' : 'DENY'}</span>}
         {item.reason ? (
           <small className="trace-reason" title={item.reason.description}>{denyText[item.reason.label] ?? item.reason.description}</small>
         ) : !permit ? (
           <small className="trace-reason">Deny reason not recorded</small>
         ) : null}
+        {outcome === 'would_deny' ? <small className="trace-reason">The call ran</small> : null}
       </div>
       <div role="cell">
         <button className="trace-filter-link" onClick={() => state.update({ agent: item.agent.id })}>{agentText(item.agent)}</button>
         <small>{item.agent.status === 'deleted' ? 'Deleted agent' : item.agent.name ? 'Verified agent' : 'Agent not found'}</small>
+        {decision?.enforcement === 'report_only' ? <ReportOnlyChip /> : null}
       </div>
       <div role="cell">
         <SubjectCell subject={item.subject} onFilter={() => state.update({ issuer: item.subject.issuer, subject: item.subject.subject })} />

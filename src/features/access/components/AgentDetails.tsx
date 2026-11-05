@@ -1,7 +1,12 @@
 import type { AccessTarget } from '../target-context';
 import './agent-details.css';
 import { useState } from 'react';
-import { Pencil, Power, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Power, ShieldCheck, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { ReportOnlyChip } from '../../../components/report-only/ReportOnlyChip';
+import { ModeDialog, ReportOnlyNotice, ReviewDateDialog } from './EnforcementControls';
+import { RevisionHistory } from '../delegation/RevisionHistory';
+import { CatalogProvider } from '../delegation/catalog';
 import { HttpError } from '../../../api/http-client';
 import { agentApi, type AgentRecord, type AgentScope } from '../agent-api';
 import { AgentVisual } from './AgentVisual';
@@ -33,6 +38,9 @@ function AgentStatusAction({ agent, scope, onChanged, onReload }: Pick<AgentDeta
 }
 
 type AgentView = 'delegation' | 'identity' | 'sessions';
+// The dialogs and the panel of the enforcement mode (Admin 041).
+type ModePanel = 'mode' | 'date' | 'history';
+const noIssuers: string[] = [];
 
 // Agent metadata remains separate from the revisioned permission document.
 // One "Delegation and access" view replaces the connection graph and the permission editors (Admin 026).
@@ -51,14 +59,22 @@ export function AgentDetails({ agent, scope, target, onEdit, onDelete, onChanged
   const choose = (next: AgentView) => setChoice({ place, view: next });
   const editorKey = `${scope.userId}:${scope.tenantId}:${scope.environmentId}:${agent.id}`;
   const [block, setBlock] = useState<BlockRequest>();
+  const [panel, setPanel] = useState<ModePanel>();
+  const navigate = useNavigate();
+  const reportOnly = agent.enforcement === 'report_only';
   return <section className="cp-admin-panel access-agent-details" aria-label="Selected agent">
-    <div className="access-agent-heading"><AgentVisual agent={agent} scope={scope} /><div className="agent-detail-copy"><div className="access-agent-title"><h2>{agent.name}</h2><span className="mcp-badge" data-tone={disabled ? undefined : 'success'}>{disabled ? 'Disabled' : 'Active'}</span></div><p>{agent.description}</p><p className="cp-admin-muted">{disabled ? 'Disabled: it gets no token, and its next call is rejected.' : 'Acts for the subjects that delegate to it'}</p></div><div className="agent-detail-actions"><AgentStatusAction key={agent.id} agent={agent} scope={scope} onChanged={onChanged} onReload={onReload} /><button className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" type="button" onClick={onEdit}><Pencil size={15} aria-hidden="true" />Edit</button><button className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" type="button" onClick={onDelete}><Trash2 size={15} aria-hidden="true" />Delete</button></div></div>
+    <div className="access-agent-heading"><AgentVisual agent={agent} scope={scope} /><div className="agent-detail-copy"><div className="access-agent-title"><h2>{agent.name}</h2><span className="mcp-badge" data-tone={disabled ? undefined : 'success'}>{disabled ? 'Disabled' : 'Active'}</span>{reportOnly ? <ReportOnlyChip /> : null}</div><p>{agent.description}</p><p className="cp-admin-muted">{disabled ? 'Disabled: it gets no token, and its next call is rejected.' : reportOnly ? 'Report-only: its calls run, and Chokepoint records the calls that its policy would deny.' : 'Acts for the subjects that delegate to it'}</p></div><div className="agent-detail-actions"><button className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" type="button" onClick={() => setPanel('mode')}>{reportOnly ? <><ShieldCheck size={15} aria-hidden="true" />Enforce access</> : <><Eye size={15} aria-hidden="true" />Report-only</>}</button><AgentStatusAction key={agent.id} agent={agent} scope={scope} onChanged={onChanged} onReload={onReload} /><button className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" type="button" onClick={onEdit}><Pencil size={15} aria-hidden="true" />Edit</button><button className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" type="button" onClick={onDelete}><Trash2 size={15} aria-hidden="true" />Delete</button></div></div>
+    {reportOnly ? <ReportOnlyNotice scope={scope} agent={agent} onChangeDate={() => setPanel('date')} onHistory={() => setPanel('history')}
+      onViewCalls={() => navigate(`/investigate?${new URLSearchParams({ view: 'decisions', result: 'would_deny', agent: agent.id })}`)} /> : null}
     <div className="cp-admin-inner-tabs agent-views" role="group" aria-label="Agent view">
       {([['delegation', 'Delegation and access'], ['identity', 'Identity'], ['sessions', 'Harness sessions']] as const).map(([value, label]) =>
         <button key={value} type="button" aria-pressed={view === value} onClick={() => choose(value)}>{label}</button>)}
     </div>
     <div hidden={view !== 'delegation'}><DelegationEditor key={editorKey} scope={scope} agentId={agent.id} agentName={agent.name} target={target} block={block} /></div>
     <div hidden={view !== 'identity'}><AgentIdentity key={editorKey} scope={scope} agentId={agent.id} agentName={agent.name} disabled={disabled} /></div>
+    {panel === 'mode' ? <ModeDialog scope={scope} agent={agent} onClose={() => setPanel(undefined)} onChanged={onChanged} onReload={onReload} /> : null}
+    {panel === 'date' ? <ReviewDateDialog scope={scope} agent={agent} onClose={() => setPanel(undefined)} onChanged={onChanged} onReload={onReload} /> : null}
+    {panel === 'history' ? <CatalogProvider scope={scope} issuers={noIssuers}><RevisionHistory scope={scope} agentId={agent.id} agentName={agent.name} onClose={() => setPanel(undefined)} /></CatalogProvider> : null}
     {view === 'sessions' ? <HarnessSessions key={editorKey} scope={scope} agentId={agent.id} agentName={agent.name} onBlock={(issuer, subject) => setBlock(v => ({ id: (v?.id ?? 0) + 1, issuer, subject }))} /> : null}
   </section>;
 }

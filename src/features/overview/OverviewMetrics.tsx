@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import type { Overview } from './api';
 import { Sparkline } from './TrafficChart';
@@ -15,8 +15,11 @@ export function OverviewMetrics({ data }: { data: Overview }) {
     (b) => new Date(b.from).getTime() >= new Date(data.today.from).getTime(),
   );
   const deniedPath = `/investigate?${new URLSearchParams({ view: 'decisions', result: 'deny', from: data.today.from, to: data.today.to })}`;
+  // Backend 057: present only while an agent is in Report-only; its calls ran.
+  const reportOnly = data.report_only;
+  const wouldDenyPath = `/investigate?${new URLSearchParams({ view: 'decisions', result: 'would_deny', from: data.today.from, to: data.today.to })}`;
   return (
-    <div className="overview-metrics">
+    <div className="overview-metrics" data-report-only={reportOnly ? '' : undefined}>
       <section className="overview-metric">
         <span>Calls today</span>
         <strong>{count.format(data.today.total)}</strong>
@@ -26,7 +29,7 @@ export function OverviewMetrics({ data }: { data: Overview }) {
             : `${data.denied_share.toFixed(1)}% denied`}{' '}
           · {comparison(data.total_change_percent)}
         </small>
-        <Sparkline values={today.map((b) => b.allowed + b.denied)} />
+        <Sparkline values={today.map((b) => b.allowed + b.denied + (b.would_deny ?? 0))} />
       </section>
       <button
         className="overview-metric overview-metric--denied"
@@ -35,11 +38,24 @@ export function OverviewMetrics({ data }: { data: Overview }) {
         <span>Denied today</span>
         <strong>{count.format(data.today.denied)}</strong>
         <small>
-          {count.format(data.yesterday_same_time.denied)} yesterday at this time{' '}
+          {count.format(data.yesterday_same_time.denied)} yesterday at this time
+          {reportOnly ? ' · blocked calls only' : ''}{' '}
           <ArrowRight size={14} aria-hidden="true" />
         </small>
         <Sparkline denied values={today.map((b) => b.denied)} />
       </button>
+      {reportOnly ? (
+        <button className="overview-metric overview-metric--report-only" onClick={() => navigate(wouldDenyPath)}>
+          <span><Eye size={13} aria-hidden="true" /> Report-only</span>
+          <strong>
+            {count.format(reportOnly.agents)} <em>{reportOnly.agents === 1 ? 'agent' : 'agents'}</em>
+          </strong>
+          <small>
+            {count.format(reportOnly.would_deny_today)} {reportOnly.would_deny_today === 1 ? 'call' : 'calls'} would be denied today{' '}
+            <ArrowRight size={14} aria-hidden="true" />
+          </small>
+        </button>
+      ) : null}
       <button
         className="overview-metric"
         onClick={() => navigate('/access/integrations?review=tools')}

@@ -114,6 +114,8 @@ export function InvestigationToolbar({ state }: { state: State }) {
           options={[
             { value: 'all', label: 'All results' },
             { value: 'deny', label: exchanges ? 'Refused' : 'Deny' },
+            // Backend 057: the calls of an agent in Report-only that its policy denies.
+            ...(exchanges ? [] : [{ value: 'would_deny', label: 'Would deny' }]),
             { value: 'allow', label: exchanges ? 'Issued' : 'Allow' },
           ]}
         />

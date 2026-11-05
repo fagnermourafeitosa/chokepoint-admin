@@ -70,6 +70,7 @@ export type Evidence = {
   relations?: { key: 'delegation' | 'capability' | 'resource'; state: StepState; display?: string }[];
 };
 export type ResourceRef = { type: string; id: string };
+export type Outcome = 'permit' | 'deny' | 'would_deny';
 export type Decision = {
   id: string;
   server_id: string;
@@ -78,7 +79,10 @@ export type Decision = {
   agent: AgentRef;
   subject: SubjectRef;
   resource?: ResourceRef | null;
-  permit: boolean;
+  // Backend 057: a would_deny is a deny of the policy of an agent in Report-only; the call ran.
+  outcome: Outcome;
+  // The mode of the agent at decision time; null for a block before the PDP and before Backend 057.
+  enforcement?: 'enforce' | 'report_only' | null;
   reason?: Reason | null;
   group_id?: string | null;
   policy_id?: string | null;

@@ -1,8 +1,28 @@
 import type { Signal } from './api';
-import { exchangeText } from '../investigate/labels';
+import { denyText, exchangeText } from '../investigate/labels';
+import type { ReasonLabel } from '../investigate/types';
+import { reviewDay } from '../../components/report-only/ReportOnlyChip';
 import type { ExchangeReasonLabel } from '../investigate/types';
 import { actionPath } from '../access/target-context';
 export function targetPath(signal: Signal): string | undefined {
+  // Backend 057: would-deny calls are decisions, not a problem: open them in
+  // All decisions, filtered on the agent, the tool and the closed hour.
+  if (signal.type === 'report-only-would-deny') {
+    const p = signal.target_params;
+    const query = new URLSearchParams({ view: 'decisions', result: 'would_deny', signal_id: signal.id, return_to: '/' });
+    if (p.agent) query.set('agent', p.agent);
+    if (p.server_id && p.tool) { query.set('server_id', p.server_id); query.set('tool', p.tool); }
+    if (p.window_start) {
+      const from = new Date(p.window_start);
+      query.set('from', from.toISOString());
+      query.set('to', new Date(from.getTime() + 3600000).toISOString());
+    }
+    return `/investigate?${query}`;
+  }
+  // The review date of the mode passed: open the agent (Backend 057).
+  if (signal.type === 'report-only-review-due' && signal.target_params.agent_id) {
+    return `/access?${new URLSearchParams({ agent_id: signal.target_params.agent_id, signal_id: signal.id, return_to: '/' })}`;
+  }
   if (signal.target_route === 'decision-detail') {
     const p = signal.target_params;
     if (!p.server_id || !p.tool || !p.agent || !p.reason || !p.window_start) return `/investigate?${new URLSearchParams({ signal_id: signal.id, return_to: '/' })}`;
@@ -40,6 +60,24 @@ export function contextLines(signal: Signal): [string, string] {
     case 'token_exchange_denied': return c.agent_status === 'deleted'
       ? [[c.count ? `${c.count} refused` : '', 'This agent was deleted, but something still uses its key. Find and stop the deployment that uses it.'].filter(Boolean).join(' · '), `${c.agent_name || c.agent} (deleted)`]
       : [[c.count ? `${c.count} refused` : '', exchangeText[c.reason as ExchangeReasonLabel] || c.reason || ''].filter(Boolean).join(' · '), [c.agent_name || c.agent, c.subject ? `for ${c.subject_name || c.subject}` : ''].filter(Boolean).join(' ')];
+    // Admin 041: the context of the Report-only signals.
+    case 'report-only-would-deny': return [c.tool || '', [denyText[c.reason as ReasonLabel] || c.reason || '', c.people ? `${c.people} ${c.people === '1' ? 'person' : 'people'}` : ''].filter(Boolean).join(' · ')];
+    case 'report-only-review-due': return [c.agent_name || c.agent || '', c.review_by ? `Review date ${reviewDay(c.review_by)}` : ''];
     default: return ['', ''];
   }
+}
+
+// subjectLine and noteLine say what a Report-only signal means in words (Admin
+// 041 section 5); other types keep the stored subject and the enriched note.
+export function subjectLine(signal: Signal): string {
+  const agent = signal.context.agent_name || signal.context.agent || 'An agent';
+  if (signal.type === 'report-only-would-deny') return `${agent} would be denied on ${signal.context.tool || 'a tool'}`;
+  if (signal.type === 'report-only-review-due') return `${agent} is still in Report-only`;
+  return signal.subject;
+}
+export function noteLine(signal: Signal): string | undefined {
+  const c = signal.context;
+  if (signal.type === 'report-only-would-deny') return `Report-only agent: ${c.count || 'some'} ${c.count === '1' ? 'call' : 'calls'} ran that its policy denies, in this hour.`;
+  if (signal.type === 'report-only-review-due') return `Its review date was ${c.review_by ? reviewDay(c.review_by) : 'set'}. Enforce access, or set a new date.`;
+  return signal.note ?? undefined;
 }

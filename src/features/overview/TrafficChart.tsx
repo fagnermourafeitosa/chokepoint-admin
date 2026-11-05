@@ -45,7 +45,10 @@ function range(b: Bucket) {
 export function TrafficChart({ buckets }: { buckets: Bucket[] }) {
   const [active, setActive] = useState(-1);
   const current = buckets[active];
-  const maximum = Math.max(1, ...buckets.map((b) => b.allowed + b.denied));
+  // Backend 057: would-deny calls ran; they stack on the bar in the Report-only palette.
+  const wouldDeny = (b: Bucket) => b.would_deny ?? 0;
+  const anyWouldDeny = buckets.some((b) => wouldDeny(b) > 0);
+  const maximum = Math.max(1, ...buckets.map((b) => b.allowed + b.denied + wouldDeny(b)));
   const step = Math.max(1, Math.ceil(maximum / 4));
   const ceiling = step * 4;
   return (
@@ -62,6 +65,12 @@ export function TrafficChart({ buckets }: { buckets: Bucket[] }) {
             <i />
             Denied
           </span>
+          {anyWouldDeny ? (
+            <span className="overview-legend-would-deny">
+              <i />
+              Would deny
+            </span>
+          ) : null}
           <small>UTC · partial hours marked *</small>
         </p>
       </header>
@@ -81,7 +90,7 @@ export function TrafficChart({ buckets }: { buckets: Bucket[] }) {
               className={`overview-hour ${active === i ? 'overview-hour--active' : ''}`}
               key={b.from}
               tabIndex={0}
-              aria-label={`${range(b)}: ${b.allowed} allowed, ${b.denied} denied`}
+              aria-label={`${range(b)}: ${b.allowed} allowed, ${b.denied} denied${wouldDeny(b) ? `, ${wouldDeny(b)} would deny` : ''}`}
               onMouseEnter={() => setActive(i)}
               onFocus={() => setActive(i)}
               onBlur={() => setActive(-1)}
@@ -91,6 +100,12 @@ export function TrafficChart({ buckets }: { buckets: Bucket[] }) {
                   className="overview-bar-denied"
                   style={{ height: `${(b.denied / ceiling) * 100}%` }}
                 />
+                {wouldDeny(b) ? (
+                  <span
+                    className="overview-bar-would-deny"
+                    style={{ height: `${(wouldDeny(b) / ceiling) * 100}%` }}
+                  />
+                ) : null}
                 <span
                   className="overview-bar-allowed"
                   style={{ height: `${(b.allowed / ceiling) * 100}%` }}
@@ -120,6 +135,12 @@ export function TrafficChart({ buckets }: { buckets: Bucket[] }) {
                 <i className="overview-tip-denied" />
                 <strong>{current.denied}</strong> denied
               </span>
+              {wouldDeny(current) ? (
+                <span>
+                  <i className="overview-tip-would-deny" />
+                  <strong>{wouldDeny(current)}</strong> would deny
+                </span>
+              ) : null}
             </div>
           ) : null}
         </div>
@@ -134,6 +155,7 @@ export function TrafficChart({ buckets }: { buckets: Bucket[] }) {
                 <th>To (UTC)</th>
                 <th>Allowed</th>
                 <th>Denied</th>
+                {anyWouldDeny ? <th>Would deny</th> : null}
               </tr>
             </thead>
             <tbody>
@@ -146,6 +168,7 @@ export function TrafficChart({ buckets }: { buckets: Bucket[] }) {
                   <td>{utcTime(b.to)}</td>
                   <td>{b.allowed}</td>
                   <td>{b.denied}</td>
+                  {anyWouldDeny ? <td>{wouldDeny(b)}</td> : null}
                 </tr>
               ))}
             </tbody>

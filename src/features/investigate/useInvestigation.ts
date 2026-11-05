@@ -45,8 +45,10 @@ export function useInvestigation(scope: EnvironmentScope) {
     retry: false,
   });
   const decisionId = requested || problem.data?.latest_decision_id;
-  // A token exchange signal opens the Token exchanges list, not a decision.
-  const unavailableTarget = view !== 'exchanges' && params.has('signal_id') && !requested && !canonical;
+  // A token exchange signal opens the Token exchanges list, and a would-deny signal
+  // the would-deny decisions (Admin 041): neither names one decision.
+  const listTarget = view === 'exchanges' || params.get('result') === 'would_deny';
+  const unavailableTarget = !listTarget && params.has('signal_id') && !requested && !canonical;
   const isDetail = !!requested || canonical || unavailableTarget || !!exchangeId;
   const detail = useQuery({
     queryKey: [...traceKey(scope), 'detail', decisionId],

@@ -1,0 +1,14 @@
+/* The enforcement mode of an agent (Admin 041). Palette: cp-report-only-* in the design system. */
+.agent-report-only-notice { align-items: flex-start; margin: 0 var(--cp-admin-space-4) var(--cp-admin-space-4); }
+.agent-report-only-notice > div { display: grid; gap: 4px; }
+.report-only-review { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.report-only-review strong { display: inline; margin: 0; }
+.report-only-dialog { display: grid; gap: var(--cp-admin-space-3); }
+.report-only-always { display: flex; gap: var(--cp-admin-space-2); align-items: flex-start; margin: 0; font-size: var(--cp-admin-type-small); }
+.report-only-field { display: grid; gap: var(--cp-admin-space-1); }
+.report-only-date { width: max-content; }
+.report-only-remove { margin-inline-end: auto; }
+.admin-dialog-actions .cp-admin-button { white-space: nowrap; }
+.access-agent-row-copy .report-only-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.access-agent-title { flex-wrap: wrap; row-gap: 4px; }
+.access-agent-title .mcp-badge { white-space: nowrap; }

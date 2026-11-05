@@ -63,3 +63,11 @@ Destructive actions that open a confirmation use `cp-admin-button--danger-soft` 
 ## Notices, fields and menu triggers
 
 `cp-admin-notice` without a tone is the neutral information notice; do not add one-off info colors. Success and danger tones use the `--success`/`--danger` modifiers or `data-tone="success|danger"`. Field labels are semibold; the value typed in `cp-admin-input` is always regular, even inside a label. A `small` inside `cp-admin-field` is helper text: label size, muted, regular weight. Menu triggers such as the identity row's More button use the ghost button treatment: dark border, offset shadow and lift.
+
+## Report-only
+
+Every mark of an agent in Report-only (Admin 041) uses the warning tokens and the `Eye` icon: `cp-report-only-chip` (the agent chip, and with `data-tone="danger"` the overdue review chip), `cp-report-only-notice` (the notice of the agent and of a would-deny decision, with a danger border when the review is overdue) and `cp-would-deny` (added to an outcome chip or an Inbox type tag: dashed, because the call ran). ALLOW keeps the brand yellow and DENY the action pink. Chips never wrap inside; a row of chips wraps between chips.
+
+## Dropdown panels
+
+A dropdown panel opens under its trigger, aligned to the end of the trigger. When that would cut it at the left edge of the nearest container that clips its overflow, for example a filter at the start of a wrapped toolbar row, `Dropdown` sets `data-align="start"` and the panel aligns to the start of the trigger.

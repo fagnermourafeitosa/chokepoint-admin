@@ -258,3 +258,9 @@
 .trace-revision small { color: var(--cp-admin-color-text-muted); }
 .trace-revision-link { padding: 0; border: 0; background: none; color: var(--cp-admin-color-action); font: inherit; font-weight: var(--cp-admin-weight-semibold); text-decoration: underline; cursor: pointer; }
 .trace-revision-link:hover { color: var(--cp-admin-color-action-hover); }
+/* Admin 041: a would-deny decision. The notice sits under the title; the failed step is dashed in the Report-only palette. */
+.trace-report-only-notice { margin: 0 var(--cp-admin-space-6) var(--cp-admin-space-4); }
+.trace-path [data-report-only] .trace-path-dot { background: var(--cp-admin-color-warning-bg); border: 2px dashed var(--cp-admin-color-warning); }
+.trace-path [data-report-only] small { color: var(--cp-admin-color-warning); }
+.trace-outcome-large.cp-would-deny { gap: var(--cp-admin-space-2); }
+@media (max-width: 720px) { .trace-report-only-notice { margin-inline: var(--cp-admin-space-4); } }

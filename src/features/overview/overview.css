@@ -271,3 +271,9 @@ button.overview-metric:hover {
 /* Quick incident to the right of the status line (Admin 039). */
 .overview-status-row { align-items: center; margin: 0 0 var(--cp-admin-space-6); }
 .overview-status-row .overview-status { margin: 0; }
+/* Admin 041: a fourth metric while an agent is in Report-only, in the Report-only palette. */
+.overview-metrics[data-report-only] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.overview-metric--report-only { border-color: var(--cp-admin-color-warning); background: var(--cp-admin-color-warning-bg); }
+.overview-metric--report-only > span:first-child { display: inline-flex; align-items: center; gap: 4px; color: var(--cp-admin-color-warning); }
+@media (max-width: 1100px) { .overview-metrics[data-report-only] { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 720px) { .overview-metrics[data-report-only] { grid-template-columns: 1fr; } }

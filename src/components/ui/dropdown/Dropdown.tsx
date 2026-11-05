@@ -10,6 +10,21 @@ type DropdownProps = {
   disabled?: boolean;
 };
 
+// alignPanel keeps an open panel inside its clipping container: the panel is
+// aligned to the end of its trigger, and to its start when the end would cut it
+// at the left edge (a trigger at the start of a wrapped toolbar row).
+function alignPanel(details: HTMLDetailsElement) {
+  const panel = details.querySelector<HTMLElement>('.admin-dropdown-panel');
+  if (!panel) return;
+  delete panel.dataset.align;
+  if (!details.open) return;
+  let edge = 0;
+  for (let node = details.parentElement; node; node = node.parentElement) {
+    if (getComputedStyle(node).overflowX !== 'visible') { edge = node.getBoundingClientRect().left; break; }
+  }
+  if (panel.getBoundingClientRect().left < edge) panel.dataset.align = 'start';
+}
+
 export function Dropdown({ label, trigger, triggerClassName, children, group, disabled = false }: DropdownProps) {
   const { disclosure, closeOnSelection } = useDropdown();
   return (
@@ -17,6 +32,7 @@ export function Dropdown({ label, trigger, triggerClassName, children, group, di
       ref={disclosure}
       name={group}
       className="cp-admin-disclosure admin-dropdown"
+      onToggle={(event) => alignPanel(event.currentTarget)}
       onKeyDown={(event) => {
         // Escape closes only the open menu, not a dialog that contains it.
         if (event.key === 'Escape' && disclosure.current?.open) {

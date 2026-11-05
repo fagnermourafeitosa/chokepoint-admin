@@ -283,3 +283,18 @@ li[data-kind="removed"] .history-sign { color: var(--cp-admin-color-danger); }
 li[data-kind="changed"] .history-sign { color: var(--cp-admin-color-warning); }
 .history-diff code { font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-label); color: var(--cp-admin-color-text-muted); overflow-wrap: anywhere; }
 @media (max-width: 760px) { .history { grid-template-columns: minmax(0, 1fr); } .history-timeline { border-inline-end: 0; border-bottom: 1px solid var(--cp-admin-color-border); } .history-timeline ol { max-height: 260px; } .history-detail { padding: var(--cp-admin-space-4); } }
+/* Admin 041 section 8: entry order (title, note, author, time), selection by a bar, hover fill,
+   a continuous path above any fill, and the eye of a mode change in place of the dot. */
+.history-timeline li::before { inset-inline-start: 30px; z-index: 1; background: var(--cp-admin-color-text-muted); }
+.history-dot { position: relative; z-index: 2; }
+.history-dot--mode { display: grid; place-items: center; width: 22px; height: 22px; margin-top: -1px; border-color: var(--cp-admin-color-warning); background: var(--cp-admin-color-warning-bg); color: var(--cp-admin-color-warning); }
+.history-timeline button[aria-current] { background: none; }
+.history-timeline button:not([aria-current]):hover { background: var(--cp-admin-color-row-hover); border-inline-start-color: var(--cp-admin-color-text-muted); }
+.history-timeline .history-entry-head { flex-wrap: wrap; row-gap: 4px; }
+.history-timeline .history-entry-head > * { white-space: nowrap; }
+.history-timeline .history-entry-head strong { color: var(--cp-admin-color-text-muted); }
+.history-timeline button[aria-current] .history-entry-head strong,
+.history-timeline button:hover .history-entry-head strong { color: var(--cp-admin-color-text); }
+.history-timeline .history-entry-note { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.history-timeline .history-entry-meta { color: var(--cp-admin-color-text); }
+.history-entry-time { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); }

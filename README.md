@@ -151,7 +151,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 038 | [Dev Server Address From the Environment](specs/038-2026-11-04-dev-server-address-from-environment.md) | Implemented |
 | 039 | [Quick Incident](specs/039-2026-11-04-quick-incident.md) | Implemented |
 | 040 | [Quick Incident Help Tip](specs/040-2026-11-04-quick-incident-help-tip.md) | Implemented |
-| 041 | [Agent Report-only Mode](specs/041-2026-11-04-agent-report-only-mode.md) | In Progress |
+| 041 | [Agent Report-only Mode](specs/041-2026-11-04-agent-report-only-mode.md) | Implemented |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 

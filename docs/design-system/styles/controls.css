@@ -73,6 +73,11 @@
   max-height: 20rem;
   overflow-y: auto;
 }
+/* A panel that would be cut at the left edge of its container aligns to the start of its trigger (Dropdown alignPanel). */
+.admin-dropdown-panel[data-align="start"] {
+  inset-inline-start: 0;
+  inset-inline-end: auto;
+}
 /* Filter menus share the header environment selector's outlined trigger. */
 .admin-select {
   display: inline-flex;
