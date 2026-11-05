@@ -60,6 +60,7 @@ Okta is the only screen of this specification. People and group selection, harne
    | Backend code | Text |
    | :--- | :--- |
    | `okta_org_not_found` | Chokepoint could not read this Okta org. Check the org URL: https://acme.okta.com or your custom domain, without "-admin". |
+   | `okta_authorization_server_not_found` | Chokepoint could not read this custom authorization server. Copy its Issuer from Security, API, Authorization Servers. |
    | `okta_client_rejected` | Okta rejected the app. Check the client ID, paste the private key of this app, and check that its client authentication is Public key / Private key (step 2). |
    | `okta_scope_missing` | A scope is not granted. Grant okta.users.read and okta.groups.read (step 3). |
    | `okta_role_missing` | The app can not read users. Assign it the Read-only Administrator role (step 4). |
