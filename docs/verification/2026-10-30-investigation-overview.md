@@ -26,20 +26,7 @@ The user requested a senior code review against the specifications. Its findings
 
 ## Manual behavior observed
 
-1. Signed in as admin-a through the real Keycloak password and one-time-code flow, in Workspace A / Sandbox.
-2. Alice's echo call was permitted. Bruno's list_test_items call was denied by its configured condition. The authorization outcomes were unchanged after the trace changes.
-3. Inspected the new records: executed path and configured expression were present; the sentinel echo argument and the actual source value were absent. A permit identified the actual supporting group reference.
-4. A missing-grant call and an unreviewed-tool call retained their original customer responses. The unreviewed-tool inspector showed the failed Tool review step and subsequent Not evaluated steps.
-5. Disabled local fixture Alice in the real Keycloak console while retaining her valid token. The lifecycle receiver applied the disable event, the call returned 401, and a user_disabled record showed Identity failed and later steps Not evaluated. Re-enabled Alice immediately; the receiver state returned to enabled and the same token could call echo again. The fixture was restored.
-6. The same server/tool/application/hour appeared as separate no_grant and condition problems. Older retained rows displayed missing historical condition/path evidence explicitly.
-7. Current directory names appeared for Alice, Bruno and Camila. Searching Bruno returned only his matching retained problems. All decisions showed permits/denies; page 2 worked, and the Allow filter reset the page and returned the three recorded permits present at verification time.
-8. Adjust permissions selected the actual SCIM Functional Test group and highlighted its recorded policy. Review tool opened the actual Signal test connection with echo focused. Unused-tool review selected the actual group and server-qualified tool. The person target selected the exact associated principal.
-9. Opening an Inbox item persisted Reviewed. Cancel kept the detail open. Keep reviewed allowed departure. Mark resolved persisted actor/time, removed the item from the active list and exposed it under Resolved. Reopening a resolved item did not reopen its workflow state.
-10. Historical reason-free signals were converted to canonical reason-qualified targets. An administrator's manual resolved actor/time and existing reviewed states survived conversion. No known-reason copy retained an expired-history marker.
-11. Overview metrics reflected actual recorded calls and denials. The chart covered exactly 24 hours with clipped UTC boundary buckets; yesterday used the matching UTC interval. Unused tools were counted once per server/tool across published groups. The warning stated the recorder's actual completeness/retention limit.
-12. A request for an inaccessible scope returned 404; an invalid page returned 400.
-13. Session expiry exposed an existing cache-observer removal loop. Preserving the observed session query fixed the redirect to login and stopped the repeated private requests. A fresh sign-in succeeded.
-14. The narrow-screen investigation filters were checked at a 390-pixel emulated viewport, with no document overflow and readable controls. No further layout changes are part of task completion.
+The scenarios of the manual run and their results are in the functional test files of [Admin 018](../../specs/functional-tests/018-2026-10-29-attention-signals-inbox.md), [019](../../specs/functional-tests/019-2026-10-29-contextual-access-navigation.md), [020](../../specs/functional-tests/020-2026-10-29-investigate-problems-and-decisions.md) and [021](../../specs/functional-tests/021-2026-10-29-overview-dashboard.md). The lifecycle receiver (removed by Admin 028) and the SCIM group targets (replaced by Admin 026) were not migrated.
 
 ## Runtime isolation during verification
 

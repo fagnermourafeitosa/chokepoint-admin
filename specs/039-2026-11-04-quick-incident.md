@@ -163,7 +163,7 @@ All in [Backend 053](../../backend/specs/053-2026-11-04-incident-codes.md): code
 ## Testing Decisions
 
 - No automated tests: the Admin has none (Admin AGENTS.md, Verification). `npm run check` and `npm run build`.
-- Browser functional test against the local backend with Backend 053: a denied tool call code opens the decision inspector; a refused login code and a refused token exchange code open the exchange inspector; a `login_error` shows its cause; malformed and unknown codes show their messages; `/` opens the control on the three pages; `?incident=` opens on load; the Investigate search still works and also finds the code.
+- Functional test in the built-in browser: [039-2026-11-04-quick-incident](functional-tests/039-2026-11-04-quick-incident.md).
 
 ---
 
@@ -174,7 +174,7 @@ All in [Backend 053](../../backend/specs/053-2026-11-04-incident-codes.md): code
 - [ ] 3. Format, not-found and multiple-match behaviors as in Solution. — format (`k3f9-x2ab`) and not found (`zzzz-zzzz`) checked in the browser. The list of several matches is checked by code inspection only: no environment has two equal codes.
 - [x] 4. `login_error` has its label, sentence, hints by cause and the **Cause** fact; decisions show **Reference**. — exchange 163 (`redirect_uri_invalid`) and decision 83.
 - [x] 5. `?incident=` and `/` work. — `/investigate?incident=x4av-75q6` opened exchange 162 and cleared the parameter; the `/` key opened the field on Access.
-- [x] 6. Checked in the built-in browser. — with `npm run check` and `npm run build`.
+- [ ] 6. Functional test: [039-2026-11-04-quick-incident](functional-tests/039-2026-11-04-quick-incident.md). — open: S3 blocked (see the file)
 - [x] 7. **Merge gate**: the public documentation (Frontend 019) is updated before this work is merged to main. — Frontend 019 merged first (frontend `95e617b`), with the `quick-incident` capture and the `quick-incident` recording scenario of the demo instance.
 
 ---

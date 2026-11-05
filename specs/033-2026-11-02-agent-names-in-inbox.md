@@ -85,7 +85,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 
 - [x] 1. Denied requests and denied token exchanges items show the agent name, and the ID for an agent that no longer exists.
 - [x] 2. `npm run check` and `npm run build` pass.
-- [x] 3. The user confirms the interface test. (Run by the agent in the built-in browser at the user's request on 2026-11-02; the fallback to the ID was checked by removing `agent_name` from the responses inside the page. No data was changed.)
+- [x] 3. Functional test: [033-2026-11-02-agent-names-in-inbox](functional-tests/033-2026-11-02-agent-names-in-inbox.md).
 
 ---
 

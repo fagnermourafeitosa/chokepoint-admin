@@ -59,11 +59,7 @@ Each existing local `.env.local` must add the three variables once.
 
 ## Testing Decisions
 
-Verify with `npm run check`, `npm run build` and a functional test in the built-in browser:
-
-- With `.env.local`, `npm run dev` starts on `127.0.0.1:5173` and signs in through the API on `127.0.0.1:8081`.
-- With `ADMIN_DEV_PORT` missing, the server stops with an error that names it.
-- With the three variables set in the process environment to other values, the server starts on that host and port and proxies to that target.
+Verify with `npm run check`, `npm run build` and a functional test in the built-in browser: [038-2026-11-04-dev-server-address-from-environment](functional-tests/038-2026-11-04-dev-server-address-from-environment.md).
 
 ---
 
@@ -74,6 +70,7 @@ Verify with `npm run check`, `npm run build` and a functional test in the built-
 - [x] Process environment values win over `.env.local`.
 - [x] `.env.example` documents the three variables.
 - [x] `npm run check` and `npm run build` pass.
+- [x] Functional test: [038-2026-11-04-dev-server-address-from-environment](functional-tests/038-2026-11-04-dev-server-address-from-environment.md).
 
 ---
 

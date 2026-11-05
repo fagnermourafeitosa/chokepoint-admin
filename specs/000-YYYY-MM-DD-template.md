@@ -118,8 +118,9 @@ type <FeaturePort> interface {
 - [ ] 1. <Acceptance criterion 1>
 - [ ] 2. <Acceptance criterion 2>
 - [ ] 3. <Acceptance criterion 3>
-- [ ] 4. All unit, integration, and regression tests pass.
-- [ ] 5. Quality checks (`go fmt && go vet && go test`) pass with 0 errors.
+- [ ] 4. Functional test: [000-YYYY-MM-DD-template](functional-tests/000-YYYY-MM-DD-template.md).
+- [ ] 5. All unit, integration, and regression tests pass.
+- [ ] 6. Quality checks (`go fmt && go vet && go test`) pass with 0 errors.
 
 ---
 

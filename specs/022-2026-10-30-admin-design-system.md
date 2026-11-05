@@ -74,6 +74,7 @@ Hover follows the visual language rather than a generic tint. Yellow is reserved
 - [x] The design-system documentation and visual specimen match the implementation.
 - [x] `npm run check` and `npm run build` pass.
 - [x] Functional browser review covers the shell and representative screens, controls and narrow viewport. Record any unavailable checks and their limits.
+- [x] Functional test: [022-2026-10-30-admin-design-system](functional-tests/022-2026-10-30-admin-design-system.md).
 
 ## Verification notes
 

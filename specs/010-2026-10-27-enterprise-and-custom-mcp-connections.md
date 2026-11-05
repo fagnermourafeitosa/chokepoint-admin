@@ -158,6 +158,7 @@ Follow this module's policy: no new automated tests, test fixtures or test infra
 - [x] 9. The Agent graph reflects real scoped associations, published grants and connection metadata, distinguishing enterprise and custom connections.
 - [x] 10. Node selection, detail navigation, pan/zoom/fit, empty and incomplete-data states work in manual browser checks; interactive graph nodes support keyboard access without a duplicate list.
 - [x] 11. Drafts, configured grants and runtime access decisions are not conflated; provider logos and displayed counts match their actual source data.
+- [ ] 12. Functional test: [010-2026-10-27-enterprise-and-custom-mcp-connections](functional-tests/010-2026-10-27-enterprise-and-custom-mcp-connections.md). — open: S2 blocked (see the file)
 
 ## Open Contract Work
 

@@ -345,7 +345,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [x] 12. Every item of Backend dependencies is resolved in a backend specification before implementation.
 - [x] 13. No "Waiting backend" chip remains for an implemented item.
 - [x] 14. `npm run check` and `npm run build` pass.
-- [x] 15. The user confirms the interface test. Run by Claude in the built-in browser at the user's request (2026-11-02).
+- [ ] 15. Functional test: [026-2026-10-31-agent-delegation-editor](functional-tests/026-2026-10-31-agent-delegation-editor.md). — open: S5 blocked (see the file)
 
 ---
 

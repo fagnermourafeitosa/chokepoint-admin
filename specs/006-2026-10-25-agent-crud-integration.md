@@ -114,6 +114,7 @@ The user directs that test work be left aside for this task. Do not add or rerun
 - [ ] Loading, empty, errors, pending submission and delete confirmation are truthful and accessible.
 - [ ] No fake lifecycle status, tools, people or policy publication is introduced.
 - [ ] Connected open decisions are resolved before implementation; README records actual build evidence and limitations.
+- [x] Functional test: [006-2026-10-25-agent-crud-integration](functional-tests/006-2026-10-25-agent-crud-integration.md).
 
 ## Out of Scope
 

@@ -75,11 +75,7 @@ Rules:
 
 ## Testing Decisions
 
-Following the module Testing Policy, there are no automated tests. Validation uses `npm run check`, `npm run build` and a manual check in the built-in browser against the local Backend 019 stack:
-
-- Create a Keycloak connection with only name, issuer, audience, SCIM client ID and secret; run **Check connection**; pick the issuing client; save.
-- Edit it: the saved issuing client shows; changing the secret clears the list until the next check.
-- Remove `view-clients` from the service account: the check shows the plain message, and save is blocked.
+Following the module Testing Policy, there are no automated tests. Validation uses `npm run check`, `npm run build` and a manual check in the built-in browser against the local Backend 019 stack. Scenarios: [017-2026-10-29-simplified-keycloak-connection-form](functional-tests/017-2026-10-29-simplified-keycloak-connection-form.md).
 
 ---
 
@@ -91,6 +87,7 @@ Following the module Testing Policy, there are no automated tests. Validation us
 - [x] 4. Without `view-clients`, the form shows a plain message that names `view-clients` and blocks save. Verified in the browser with the role removed: the check showed the administrative-access message, the select stayed disabled, and the status showed "Not checked". A defect was found and fixed here: the status kept "Connection verified." from the previous check; a new check now clears it. The `clients_unavailable` message is verified by code inspection, because it needs a connection without a selected issuing client.
 - [x] 5. Notices follow Implementation Decision 7. Verified in the browser: the help next to **Check connection** and next to **Lifecycle sync** open on hover; only the administrative access notice stays visible.
 - [x] 6. Check and build pass; the browser checks above pass. Verified: `npm run check` and `npm run build` pass, and criteria 1 to 5 were checked in the browser.
+- [x] 7. Functional test: [017-2026-10-29-simplified-keycloak-connection-form](functional-tests/017-2026-10-29-simplified-keycloak-connection-form.md).
 
 ---
 

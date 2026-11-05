@@ -159,7 +159,7 @@ The rule of a deleted agent does not change (Admin 032 section 7).
 This module has no automated tests (`AGENTS.md`, Verification).
 
 - `npm run check` and `npm run build`.
-- Functional test in the built-in browser as `admin-a`: the list rows, the Reason filter, and the inspector of each new reason that local data can produce (a refused harness login gives `no_group`, `blocked` or `not_allowed_client`). Each action opens the expected place. A reason that local data can not produce is checked by code inspection and recorded here.
+- Functional test in the built-in browser as `admin-a`: [037-2026-11-03-harness-exchange-reasons](functional-tests/037-2026-11-03-harness-exchange-reasons.md).
 
 ---
 
@@ -171,7 +171,7 @@ This module has no automated tests (`AGENTS.md`, Verification).
 - [x] 4. `/access?agent_id=…&view=identity` opens the Identity view and `view=sessions` opens Harness sessions. Without `view`, the Delegation and access view opens. — checked in the browser, also a manual switch of view after a `view` link.
 - [x] 5. The inspector shows **Harness** and **Reference** when present, and the **Subject** and **Returned to the agent** texts of this specification. — checked in the browser on exchanges 73, 67, 72, 64 and 69 (a Backend 034 reason, unchanged).
 - [x] 6. `npm run check` and `npm run build` pass.
-- [x] 7. The functional test in the built-in browser passed. — run by Claude on 2026-11-03 as `admin-a` (see Further Notes).
+- [ ] 7. Functional test: [037-2026-11-03-harness-exchange-reasons](functional-tests/037-2026-11-03-harness-exchange-reasons.md). — open: S5 blocked (see the file)
 
 ---
 
@@ -188,10 +188,4 @@ This module has no automated tests (`AGENTS.md`, Verification).
 
 - The search of the exchanges already matches the reference code (Backend 045), so the reference that a person sends finds the refused login.
 - `no_group`, `blocked` and a login-time `not_allowed_client` have an agent only when one agent is a candidate for the harness (Backend 045, `interactive.go`).
-- Functional test (2026-11-03): sign-in through the Admin on `127.0.0.1:5173` (the only Keycloak redirect URI), then the branch served on `127.0.0.1:5174` with the same session cookie. Only reads and navigation were tested, so no local data changed.
-- Functional test with real harness logins (2026-11-03): the client was `https://claude.ai/oauth/claude-code-client-metadata`, against the local authorization server, with the seed users of `chokepoint-customer-test` in the built-in browser.
-  - `no_group`: Camila (not in `developers`) logged in. The refused page showed a reference, the search of that reference found the exchange, and **Open the harness login** opened the Harness login block.
-  - `dpop_invalid`, `not_allowed_client` with an agent, `code_reuse`: Alice consented, then the token endpoint got a refresh with a DPoP proof that is not valid (`invalid_dpop_proof`), a refresh after Claude Code was removed from the allowlist (`invalid_grant`), and the same code a second time (`invalid_grant`). The inspector of each one, its actions (Identity, Harness sessions) and its facts matched.
-  - The allowlist and Alice's consent were restored after the test.
-  - `claude mcp login` of Claude Code 2.1.222 could not find the authorization server: it reads `/.well-known/oauth-protected-resource/<MCP URL path with the server ID>`, which returns 404. The flow was then run with the same client against the advertised endpoints. This is a backend follow-up, outside this specification.
-- Not covered in the browser: `no_group` or `blocked` without a subject (code inspection only).
+- The functional test runs of 2026-11-03 and what they did not cover are in [037-2026-11-03-harness-exchange-reasons](functional-tests/037-2026-11-03-harness-exchange-reasons.md). The `claude mcp login` follow-up found then is a backend matter, outside this specification.

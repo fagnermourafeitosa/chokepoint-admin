@@ -90,7 +90,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build` wh
 - [x] 7. In the edit form, the warning about a change to another Google organization shows near the User directory fields. — evidence: code inspection, same reason as 4
 - [x] 8. The Keycloak form behaves as before. — evidence: live edit form
 - [x] 9. `npm run check` and `npm run build` pass.
-- [ ] 10. The user confirms the interface test. — waiting for the user
+- [ ] 10. Functional test: [023-2026-10-30-google-workspace-connection-form](functional-tests/023-2026-10-30-google-workspace-connection-form.md). — open: S1 blocked, S2 blocked, S3 blocked (see the file)
 
 ## Out of Scope
 

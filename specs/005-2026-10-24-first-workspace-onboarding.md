@@ -70,6 +70,7 @@ Use rendered routes and an isolated QueryClient as in admin 004. Verify signup n
 - [ ] Admin design system, accessibility and session/cache rules remain consistent with 004.
 - [ ] Required behavior checks, real desktop flow and reviewer gate complete before Waiting Approve.
 - [ ] README spec index and connected contracts match this lifecycle.
+- [ ] Functional test: [005-2026-10-24-first-workspace-onboarding](functional-tests/005-2026-10-24-first-workspace-onboarding.md). — open: S2 blocked (see the file)
 
 ## Out of Scope
 

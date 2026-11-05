@@ -199,7 +199,7 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`. T
 - [x] 10. Every item of Backend dependencies is resolved in a backend specification before implementation.
 - [x] 11. No "Waiting backend" chip remains for an implemented item.
 - [x] 12. `npm run check` and `npm run build` pass.
-- [x] 13. The user confirms the interface test. (Run by the agent in the built-in browser at the user's request on 2026-11-02, with a temporary agent that was deleted afterwards; the example agent and its key were not changed.)
+- [x] 13. Functional test: [029-2026-10-31-agent-identity-and-chokepoint-token-setup](functional-tests/029-2026-10-31-agent-identity-and-chokepoint-token-setup.md).
 
 ---
 

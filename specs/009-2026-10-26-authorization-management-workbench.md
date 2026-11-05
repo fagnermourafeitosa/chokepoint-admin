@@ -106,6 +106,7 @@ Preserve Agent CRUD, MCP review and OIDC connection management. Existing mock da
 - [ ] 3. The UI does not claim grants, evaluation or source trust from local fixtures.
 - [ ] 4. Sensitive data and scoped query state follow current Admin protections.
 - [ ] 5. Applicable build/static/manual checks have recorded evidence.
+- [x] 6. Functional test: [009-2026-10-26-authorization-management-workbench](functional-tests/009-2026-10-26-authorization-management-workbench.md).
 
 ## Out of Scope
 

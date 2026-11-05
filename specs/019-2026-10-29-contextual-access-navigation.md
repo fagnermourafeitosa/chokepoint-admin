@@ -76,6 +76,7 @@ Manually open a real condition deny, a missing-grant call, an unreviewed tool an
 - [x] 4. Deep links work after refresh and on a requested group outside the first page.
 - [x] 5. Originating signal state and list return context survive navigation without duplicate modals.
 - [x] 6. Check/build and manual browser verification pass during implementation.
+- [x] 7. Functional test: [019-2026-10-29-contextual-access-navigation](functional-tests/019-2026-10-29-contextual-access-navigation.md).
 
 ## Out of Scope
 
@@ -89,4 +90,4 @@ Deliver with Backend 022–024 and Admin 020. Admin 021 reuses these targets. Th
 
 ## Verification Evidence
 
-Implementation and verification completed on 2026-10-30. See the [verification record](../docs/verification/2026-10-30-investigation-overview.md) for executed checks, manual observations, source inspection and limitations. The user approved the result on 2026-10-30.
+Implementation and verification completed on 2026-10-30. See the [verification record](../docs/verification/2026-10-30-investigation-overview.md) for executed checks and limitations, and [019-2026-10-29-contextual-access-navigation](functional-tests/019-2026-10-29-contextual-access-navigation.md) for the functional test. The user approved the result on 2026-10-30.

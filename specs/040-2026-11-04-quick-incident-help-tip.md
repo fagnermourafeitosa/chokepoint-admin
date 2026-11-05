@@ -68,6 +68,7 @@ No automated tests (Admin AGENTS.md, Verification). `npm run check`, `npm run bu
 - [x] 2. The help icon shows the tooltip on hover and on keyboard focus. — hover checked in the browser; keyboard focus comes from the design system `Tooltip` (focusable trigger).
 - [ ] 3. Format, not found and several matches still show their message under the field. — format (`k3f7`) and not found (`k3f7-zzzz`) checked in the browser; several matches by code inspection only.
 - [x] 4. The documentation capture and its demo instance capture match the new control. — `quick-incident` capture now hovers the help icon (dev-infra `feat/040-quick-incident-capture`); new `quick-incident.png` in frontend `feat/040-quick-incident-capture`.
+- [ ] 5. Functional test: [040-2026-11-04-quick-incident-help-tip](functional-tests/040-2026-11-04-quick-incident-help-tip.md). — open: S3 blocked (see the file)
 
 ---
 
