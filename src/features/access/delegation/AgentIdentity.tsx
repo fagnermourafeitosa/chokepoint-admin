@@ -9,7 +9,7 @@ import { download, fileName, generateKey, parsePublicKey, type Jwk, type ParsedK
 import { HarnessClients } from './HarnessClients';
 import './delegation.css';
 
-// The agent as a client of the Chokepoint authorization server (Admin 029, Backend 030 and 040).
+// The agent as a client of the Xokepoint authorization server (Admin 029, Backend 030 and 040).
 // The key pair is created in the browser. The private key goes only to the downloaded file.
 
 function Help({ text }: { text: string }) {
@@ -30,7 +30,7 @@ function CopyValue({ label, value, help }: { label: string; value: string; help:
 type Failure = { message: string; conflict: boolean };
 function failure(cause: unknown, own: boolean): Failure {
   if (cause instanceof HttpError && cause.status === 409) return { conflict: true, message: 'The key changed in another session. Reload to see the current key.' };
-  if (cause instanceof HttpError && cause.status === 400) return { conflict: false, message: own ? 'Chokepoint did not accept this key. Use an EC P-256 key or an RSA key of 2048 bits or more, with a key ID that matches the kid of the JWK.' : 'Chokepoint did not accept the new key. Retry.' };
+  if (cause instanceof HttpError && cause.status === 400) return { conflict: false, message: own ? 'Xokepoint did not accept this key. Use an EC P-256 key or an RSA key of 2048 bits or more, with a key ID that matches the kid of the JWK.' : 'Xokepoint did not accept the new key. Retry.' };
   return { conflict: false, message: 'Could not register the key. Retry when the service is available.' };
 }
 
@@ -76,7 +76,7 @@ export function AgentIdentity({ scope, agentId, agentName, disabled }: { scope: 
       return undefined;
     } finally { setBusy(false); }
   }
-  // Chokepoint registers the public key first; the file is downloaded only after it accepts it.
+  // Xokepoint registers the public key first; the file is downloaded only after it accepts it.
   async function generate(current: AgentClient) {
     let privateJwk: Jwk | undefined;
     const next = await save(async () => {
@@ -93,7 +93,7 @@ export function AgentIdentity({ scope, agentId, agentName, disabled }: { scope: 
     if (await save(() => agentClientApi.saveKey(scope, agentId, jwk, kid || undefined, current.revision), true)) setDownloaded(undefined);
   }
 
-  const header = <header className="delegation-toolbar"><div className="agent-graph-title"><h3>Identity</h3><Help text="The agent proves who it is to Chokepoint with its own key. Without a key, it can not get a token, so it can not call any tool." /></div></header>;
+  const header = <header className="delegation-toolbar"><div className="agent-graph-title"><h3>Identity</h3><Help text="The agent proves who it is to Xokepoint with its own key. Without a key, it can not get a token, so it can not call any tool." /></div></header>;
   if (client.isPending) return <section className="agent-identity" aria-label="Agent identity">{header}<p role="status">Loading the agent identity…</p></section>;
   if (client.isError) return <section className="agent-identity" aria-label="Agent identity">{header}<div role="alert" className="cp-admin-notice" data-tone="danger">Could not load the agent identity. <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => void client.refetch()}>Retry</button></div></section>;
   const current = client.data;
@@ -103,7 +103,7 @@ export function AgentIdentity({ scope, agentId, agentName, disabled }: { scope: 
     {disabled ? <p className="delegation-readonly">This agent is disabled. It gets no token, and its next call is rejected.</p> : null}
 
     <section className="identity-card">
-      <Title help="The key is how the agent signs in to Chokepoint. Chokepoint keeps only the public part. The private part is in the file you download, and only there.">Key</Title>
+      <Title help="The key is how the agent signs in to Xokepoint. Xokepoint keeps only the public part. The private part is in the file you download, and only there.">Key</Title>
       {active ? <div className="identity-key">
         <KeyRound size={18} aria-hidden="true" />
         <div><strong>Active key</strong><small>{active.kid} · {active.alg}</small><small>Created by {active.created_by_name || active.created_by} · {new Date(active.created_at).toLocaleString()}</small></div>
@@ -113,32 +113,32 @@ export function AgentIdentity({ scope, agentId, agentName, disabled }: { scope: 
         </div> : null}
       </div> : <div className="identity-empty"><p>No key yet. A service can not get a token for this agent. Harness login does not need a key.</p></div>}
       {active && confirmRotate ? <div className="identity-confirm"><p className="resource-warning"><TriangleAlert size={14} aria-hidden="true" />The current key stops working now. Give the new file to the agent at once.</p><div className="condition-actions"><button type="button" className="cp-admin-button cp-admin-button--small" disabled={busy} onClick={() => void generate(current)}><Download size={14} aria-hidden="true" />{busy ? 'Rotating…' : 'Rotate and download'}</button><button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" disabled={busy} onClick={() => setConfirmRotate(false)}>Cancel</button></div></div> : null}
-      {!active ? <div className="condition-actions"><button type="button" className="cp-admin-button" disabled={busy} onClick={() => void generate(current)}><Download size={16} aria-hidden="true" />{busy ? 'Generating…' : 'Generate key and download'}</button><Help text="Creates a key pair in your browser. Chokepoint registers the public key. You download one file with the private key and the connection values. Give this file to the agent." /></div> : null}
+      {!active ? <div className="condition-actions"><button type="button" className="cp-admin-button" disabled={busy} onClick={() => void generate(current)}><Download size={16} aria-hidden="true" />{busy ? 'Generating…' : 'Generate key and download'}</button><Help text="Creates a key pair in your browser. Xokepoint registers the public key. You download one file with the private key and the connection values. Give this file to the agent." /></div> : null}
       {error ? <div role="alert" className="cp-admin-notice" data-tone="danger">{error.message}{error.conflict ? <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => { setError(undefined); setConfirmRotate(false); void client.refetch(); }}>Reload</button> : null}</div> : null}
-      {downloaded ? <p className="consent-record identity-downloaded"><Check size={16} aria-hidden="true" /><span><strong>File downloaded: {downloaded}</strong><small>This is the only copy of the private key. Store it like a password. Chokepoint can not show it again.</small></span></p> : null}
+      {downloaded ? <p className="consent-record identity-downloaded"><Check size={16} aria-hidden="true" /><span><strong>File downloaded: {downloaded}</strong><small>This is the only copy of the private key. Store it like a password. Xokepoint can not show it again.</small></span></p> : null}
     </section>
 
     <HarnessClients scope={scope} agentId={agentId} agentName={agentName} issuer={current.issuer} />
 
     <details className="identity-card identity-more">
       <summary><Title help="The values that the file already has. Use them only to configure the agent by hand.">Connection details</Title></summary>
-      <CopyValue label="Client ID" value={current.client_id} help="The ID of this agent at the Chokepoint authorization server. The agent sends it in every token request." />
-      <CopyValue label="Issuer" value={current.issuer} help="Who issues the Chokepoint tokens of this environment. A token of one environment never works in another." />
-      <CopyValue label="Token endpoint" value={current.token_endpoint} help="Where the agent exchanges the token of the person for a Chokepoint token." />
+      <CopyValue label="Client ID" value={current.client_id} help="The ID of this agent at the Xokepoint authorization server. The agent sends it in every token request." />
+      <CopyValue label="Issuer" value={current.issuer} help="Who issues the Xokepoint tokens of this environment. A token of one environment never works in another." />
+      <CopyValue label="Token endpoint" value={current.token_endpoint} help="Where the agent exchanges the token of the person for a Xokepoint token." />
     </details>
 
     <details className="identity-card identity-more">
       <summary><Title help="How the agent uses the file. An SDK does these steps for you.">How the agent connects</Title></summary>
       <ol className="identity-steps">
         <li><strong>The person signs in</strong> to the identity provider, as today. The agent gets that token.</li>
-        <li><strong>The agent exchanges it</strong> at Chokepoint, signed with the private key of the file. Chokepoint checks the key, the token and the delegation.</li>
-        <li><strong>The agent calls the tools</strong> with the Chokepoint token. It is valid for 5 minutes, then the agent exchanges again.</li>
+        <li><strong>The agent exchanges it</strong> at Xokepoint, signed with the private key of the file. Xokepoint checks the key, the token and the delegation.</li>
+        <li><strong>The agent calls the tools</strong> with the Xokepoint token. It is valid for 5 minutes, then the agent exchanges again.</li>
       </ol>
       <p className="cp-admin-muted relation-note">A refused exchange returns <code>invalid_client</code> or <code>invalid_grant</code>. Investigate shows the reason.</p>
     </details>
 
     <details className="identity-card identity-more">
-      <summary><Title help="Advanced. Use a key that your team created and keeps, for example in a vault. Then Chokepoint does not create a file.">Use my own public key</Title></summary>
+      <summary><Title help="Advanced. Use a key that your team created and keeps, for example in a vault. Then Xokepoint does not create a file.">Use my own public key</Title></summary>
       <OwnKeyForm busy={busy} onSave={(jwk, kid) => void registerOwn(current, jwk, kid)} />
     </details>
   </section>;

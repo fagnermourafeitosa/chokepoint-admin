@@ -106,7 +106,7 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
         {wouldDeny ? (
           <div className="cp-admin-notice cp-report-only-notice trace-report-only-notice">
             <Eye size={18} aria-hidden="true" />
-            <div><strong>Not blocked</strong>Chokepoint evaluated this call and its policy denies it, but {agent} was in Report-only, so the call reached {server}. In Enforce, the same call is denied and the caller gets a reference code.</div>
+            <div><strong>Not blocked</strong>Xokepoint evaluated this call and its policy denies it, but {agent} was in Report-only, so the call reached {server}. In Enforce, the same call is denied and the caller gets a reference code.</div>
           </div>
         ) : null}
         <p className="trace-who">

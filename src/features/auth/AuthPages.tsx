@@ -4,13 +4,14 @@ import { useWorkspaceOnboarding } from "./useWorkspaceOnboarding";
 import { Link, Navigate } from "react-router";
 import { useAuth } from "./AuthContext";
 
+import { Wordmark } from "../../components/brand/Wordmark";
 import "./auth.css";
 
 export function AuthFrame({ children, publicEntry = false }: { children: ReactNode; publicEntry?: boolean }) {
   return (
     <main className={publicEntry ? "auth-page auth-page--public" : "auth-page"}>
       <div className="auth-region">
-        <span className="auth-public-logo">CHOKEPOINT</span>
+        <span className="auth-public-logo" role="img" aria-label="Xokepoint"><Wordmark /></span>
         {children}
       </div>
     </main>
@@ -58,7 +59,7 @@ export function LoginPage({ signup = false }: { signup?: boolean }) {
   if (a.session) return <Navigate to="/workspaces" replace />;
   return (
     <AuthFrame publicEntry>
-      <h1>{signup ? "Create your account" : "Sign in to Chokepoint"}</h1>
+      <h1>{signup ? "Create your account" : "Sign in"}</h1>
       <p>
         {signup
           ? "Create an account to set up your workspace."
@@ -83,7 +84,7 @@ export function LoginPage({ signup = false }: { signup?: boolean }) {
         </button>
       </form>
       <p className="auth-secondary">
-        {signup ? "Already have an account?" : "New to Chokepoint?"}{" "}
+        {signup ? "Already have an account?" : "New to Xokepoint?"}{" "}
         <Link to={signup ? "/login" : "/signup"}>
           {signup ? "Sign in" : "Create an account"}
         </Link>

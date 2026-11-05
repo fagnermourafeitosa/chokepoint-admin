@@ -19,7 +19,7 @@ export function PublishBar({ config, changes, busy, blocker, onPublish, onDiscar
       <span>{changes ? <><strong>Draft</strong> · {changes} unpublished {changes === 1 ? 'change' : 'changes'}</> : 'No unpublished changes'}</span>
       <span className="delegation-publish-sep" aria-hidden="true" />
       {!config.published_revision ? <span className="mcp-badge">Not published yet</span>
-        : pending ? <span className="mcp-badge" data-tone="warning" title="Chokepoint is writing this revision to OpenFGA. This takes a moment; no approval is needed."><RefreshCw size={13} aria-hidden="true" /> Applying revision {config.published_revision} · {config.effective_revision ? `revision ${config.effective_revision} still applies` : 'no revision applies yet'}</span>
+        : pending ? <span className="mcp-badge" data-tone="warning" title="Xokepoint is writing this revision to OpenFGA. This takes a moment; no approval is needed."><RefreshCw size={13} aria-hidden="true" /> Applying revision {config.published_revision} · {config.effective_revision ? `revision ${config.effective_revision} still applies` : 'no revision applies yet'}</span>
           : <span className="mcp-badge" data-tone="success"><CircleCheck size={13} aria-hidden="true" /> Revision {config.effective_revision} effective</span>}
       {author && config.published_at ? <button type="button" className="delegation-publish-author" title="Open the revision history" onClick={onHistory}>by <strong>{author}</strong> · {utc(config.published_at)}{config.note ? <> · <em>“{config.note}”</em></> : null}</button> : null}
       {config.published_revision ? <button type="button" className="rule-switch" onClick={onHistory}><History size={14} aria-hidden="true" />History</button> : null}

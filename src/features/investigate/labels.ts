@@ -35,8 +35,8 @@ export const exchangeText: Record<ExchangeReasonLabel, string> = {
   no_group: 'Harness login: the person is not in an eligible group of an agent of this harness.',
   blocked: 'Harness login: the person is blocked on the agent.',
   not_allowed_client: 'Harness login: the harness is not allowed for an agent.',
-  code_reuse: 'An authorization code was used twice. Chokepoint revoked the machine.',
-  refresh_reuse: 'A refresh token was used twice. Chokepoint revoked the machine.',
+  code_reuse: 'An authorization code was used twice. Xokepoint revoked the machine.',
+  refresh_reuse: 'A refresh token was used twice. Xokepoint revoked the machine.',
   dpop_invalid: 'The DPoP proof is missing, not valid or from another key.',
   login_error: 'Harness login: the sign-in stopped before consent. The person saw a generic page with the reference code.',
 };

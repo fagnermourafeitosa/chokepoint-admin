@@ -3,7 +3,7 @@
 - **Specification ID**: 044
 - **Date**: 2026-11-05
 - **Slug**: sober-visual-system
-- **Status**: In Progress
+- **Status**: Waiting Approve
 - **Owner**: Admin design system
 - **Related Specification**: [022 — Admin Design System](022-2026-10-30-admin-design-system.md)
 
@@ -45,7 +45,7 @@ The sign-in page shows "CHOKEPOINT" and "Sign in to Chokepoint", and the Keycloa
 4. **Outcomes use state colors.** New tokens `--cp-admin-color-allow` / `--cp-admin-color-deny` (solid, for chart bars and path dots) and their `-bg` pairs (for chips). Allowed is green, denied is red, always with text.
 5. **Neutral counters.** The "denied" count badge uses the deny pair. The tool review meter uses ink. Inbox tags that are not outcomes (tool discovery) are neutral.
 6. **Danger actions are outlined.** `cp-admin-button--danger-soft` keeps red text and gets a red border on a surface background.
-7. **Product name.** User-visible text says Xokepoint. The sign-in page uses the wordmark of the header. The Keycloak theme in `dev-infra` uses the same wordmark and name. Code identifiers, realm names and URLs stay as they are.
+7. **Product name.** User-visible text says Xokepoint. The sign-in page uses the wordmark of the header, and its title is "Sign in": the wordmark already names the product. The Keycloak theme in `dev-infra` uses the same wordmark and name. Code identifiers, realm names and URLs stay as they are.
 
 ---
 
@@ -65,9 +65,9 @@ The sign-in page shows "CHOKEPOINT" and "Sign in to Chokepoint", and the Keycloa
 
 ## User Stories
 
-- [ ] 1. As an administrator, I want allowed and denied calls in green and red, so that I read outcomes the same way on every screen.
-- [ ] 2. As an administrator, I want one strong action on a screen, so that I see the next step without competing colors.
-- [ ] 3. As an administrator, I want the product name and wordmark to be Xokepoint at sign-in, so that I trust that I am on the right service.
+- [x] 1. As an administrator, I want allowed and denied calls in green and red, so that I read outcomes the same way on every screen.
+- [x] 2. As an administrator, I want one strong action on a screen, so that I see the next step without competing colors.
+- [x] 3. As an administrator, I want the product name and wordmark to be Xokepoint at sign-in, so that I trust that I am on the right service.
 
 ---
 
@@ -109,14 +109,14 @@ This module has no automated tests. Verify with `npm run check`, `npm run build`
 
 ## Acceptance Criteria
 
-- [ ] 1. The primary button is ink with cream text and a grey shadow on every screen.
-- [ ] 2. Yellow appears only in the wordmark, the active primary navigation item and text selection.
-- [ ] 3. Allowed outcomes are green and denied outcomes red in the traffic chart, sparklines, outcome chips, path dots, policy results and the denied count; each keeps its text label.
-- [ ] 4. Section navigation, inner tabs, toggles, pressed buttons, the selected agent and the agent node use the neutral selected tone.
-- [ ] 5. Danger-soft buttons are outlined in red.
-- [ ] 6. The Admin sign-in page and the Keycloak theme show the Xokepoint wordmark and name; user-visible help text says Xokepoint.
-- [ ] 7. `docs/design-system/DESIGN.md` and `tokens.md` describe the new rules.
-- [ ] 8. `npm run check` and `npm run build` pass, and the manual browser check covers the screens above.
+- [x] 1. The primary button is ink with cream text and a grey shadow on every screen.
+- [x] 2. Yellow appears only in the wordmark, the active primary navigation item and text selection.
+- [x] 3. Allowed outcomes are green and denied outcomes red in the traffic chart, sparklines, outcome chips, path dots, policy results and the denied count; each keeps its text label.
+- [x] 4. Section navigation, inner tabs, toggles, pressed buttons, the selected agent and the agent node use the neutral selected tone.
+- [x] 5. Danger-soft buttons are outlined in red.
+- [x] 6. The Admin sign-in page and the Keycloak theme show the Xokepoint wordmark and name; user-visible help text says Xokepoint.
+- [x] 7. `docs/design-system/DESIGN.md` and `tokens.md` describe the new rules.
+- [x] 8. `npm run check` and `npm run build` pass, and the manual browser check covers the screens above.
 
 ---
 

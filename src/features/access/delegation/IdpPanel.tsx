@@ -44,12 +44,12 @@ export function SubjectList({ issuer, kinds, chosen, onSet }: { issuer: string; 
 export function ConsentRecord({ scope, agentName, onConfirm }: { scope: IdpScope; agentName: string; onConfirm: (on: boolean) => void }) {
   const { catalog } = useCatalog();
   const name = idpName(catalog, scope.issuer);
-  if (!scope.consent) return <label className="relation-consent"><input type="checkbox" checked={!!scope.confirmed} onChange={e => onConfirm(e.target.checked)} /><span>I confirm that these subjects agreed to let <strong>{agentName}</strong> act for them.<small>{name} can not record this consent itself, so Chokepoint records your name and the time when you publish.</small></span></label>;
+  if (!scope.consent) return <label className="relation-consent"><input type="checkbox" checked={!!scope.confirmed} onChange={e => onConfirm(e.target.checked)} /><span>I confirm that these subjects agreed to let <strong>{agentName}</strong> act for them.<small>{name} can not record this consent itself, so Xokepoint records your name and the time when you publish.</small></span></label>;
   const by = scope.consent.name ?? scope.consent.recordedBy;
   return <div className="consent-record" role="note" aria-label="Consent record">
     <ShieldCheck size={18} aria-hidden="true" />
     <div><strong>Last consent recorded</strong><small>by {by} · {formatTime(scope.consent.recordedAt)}</small></div>
-    <Tooltip content={`${by} confirmed that these subjects agreed to let ${agentName} act for them. ${name} can not record this consent itself, so Chokepoint records who confirmed and when, from the signed-in administrator.`}><CircleHelp size={15} aria-label="About consent" /></Tooltip>
+    <Tooltip content={`${by} confirmed that these subjects agreed to let ${agentName} act for them. ${name} can not record this consent itself, so Xokepoint records who confirmed and when, from the signed-in administrator.`}><CircleHelp size={15} aria-label="About consent" /></Tooltip>
   </div>;
 }
 

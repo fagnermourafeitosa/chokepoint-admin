@@ -26,7 +26,7 @@ function AddIdentityProvider({ agentName, doc, onChange, onDone }: Omit<Props, '
     <IncludesField value={kinds} onChange={setKinds} />
     <SubjectList key={issuer} issuer={issuer} kinds={kinds} chosen={chosen} onSet={(subjects, on) => setChosen(c => { const n = new Set(c); subjects.forEach(x => (on ? n.add(x.subject) : n.delete(x.subject))); return n; })} />
     <ExpiresField name="add-idp-expires" value={expires} onChange={setExpires} dateText="Delegation from this identity provider ends at the end of this day (UTC)." />
-    <label className="relation-consent"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /><span>I confirm that these subjects agreed to let <strong>{agentName}</strong> act for them.<small>{idpName(catalog, issuer)} can not record this consent itself, so Chokepoint records your name and the time when you publish.</small></span></label>
+    <label className="relation-consent"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /><span>I confirm that these subjects agreed to let <strong>{agentName}</strong> act for them.<small>{idpName(catalog, issuer)} can not record this consent itself, so Xokepoint records your name and the time when you publish.</small></span></label>
     <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!consent || !picked.length} onClick={add}>Add {picked.length || ''} to draft</button>
   </>;
 }
