@@ -154,6 +154,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 041 | [Agent Report-only Mode](specs/041-2026-11-04-agent-report-only-mode.md) | Implemented |
 | 042 | [Microsoft Entra ID Connection Form](specs/042-2026-11-04-microsoft-entra-id-connection-form.md) | Implemented |
 | 043 | [Okta Connection Form](specs/043-2026-11-05-okta-connection-form.md) | Implemented |
+| 044 | [Sober Visual System](specs/044-2026-11-05-sober-visual-system.md) | Implemented |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 

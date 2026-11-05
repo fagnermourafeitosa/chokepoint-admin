@@ -144,7 +144,7 @@ export type DecisionDetail = {
   approximate: boolean;
   retention_days: number;
 };
-// One request of an agent to the Chokepoint authorization server (Backend 034).
+// One request of an agent to the Xokepoint authorization server (Backend 034).
 export type Exchange = {
   id: string;
   agent?: AgentRef | null;

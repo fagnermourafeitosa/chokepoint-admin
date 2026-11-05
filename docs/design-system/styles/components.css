@@ -5,14 +5,14 @@
   gap: var(--cp-admin-space-2); border: 2px solid var(--cp-admin-color-text);
   border-radius: var(--cp-admin-radius-button); background: var(--cp-admin-color-action); color: var(--cp-admin-color-on-action);
   font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-bold); line-height: var(--cp-admin-leading-ui);
-  text-align: center; text-decoration: none; box-shadow: var(--cp-admin-shadow-offset);
+  text-align: center; text-decoration: none; box-shadow: var(--cp-admin-shadow-action);
   transition: background-color var(--cp-admin-duration-fast) var(--cp-admin-ease-out), box-shadow var(--cp-admin-duration-fast) var(--cp-admin-ease-out), transform var(--cp-admin-duration-fast) var(--cp-admin-ease-out);
 }
 /* Buttons with an offset shadow lift on hover and press into it when active. */
-.cp-admin-button:hover:not(:disabled) { background: var(--cp-admin-color-action-hover); box-shadow: var(--cp-admin-shadow-lift); transform: var(--cp-admin-lift); }
-.cp-admin-button:active:not(:disabled) { box-shadow: var(--cp-admin-shadow-press); transform: var(--cp-admin-press); }
-.cp-admin-button--dark { box-shadow: none; background: var(--cp-admin-color-strong); color: var(--cp-admin-color-text-inverse); }
-.cp-admin-button--dark:hover:not(:disabled) { background: var(--cp-admin-color-text); box-shadow: none; transform: none; }
+.cp-admin-button:hover:not(:disabled) { background: var(--cp-admin-color-action-hover); box-shadow: var(--cp-admin-shadow-action-lift); transform: var(--cp-admin-lift); }
+.cp-admin-button:active:not(:disabled) { box-shadow: var(--cp-admin-shadow-action-press); transform: var(--cp-admin-press); }
+.cp-admin-button--dark { box-shadow: none; background: var(--cp-admin-color-action); color: var(--cp-admin-color-on-action); }
+.cp-admin-button--dark:hover:not(:disabled) { background: var(--cp-admin-color-action-hover); box-shadow: none; transform: none; }
 .cp-admin-button--secondary { box-shadow: none; background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); border-color: var(--cp-admin-color-control-border); }
 .cp-admin-button--secondary:hover:not(:disabled) { background: var(--cp-admin-color-hover); border-color: var(--cp-admin-color-text); box-shadow: none; transform: none; }
 .cp-admin-button:disabled { box-shadow: none; color: var(--cp-admin-color-text-muted); background: var(--cp-admin-color-surface-muted); border-color: var(--cp-admin-color-border); cursor: not-allowed; }
@@ -41,7 +41,7 @@
 .cp-admin-badge--danger { color: var(--cp-admin-color-danger); background: var(--cp-admin-color-danger-bg); }
 .cp-admin-inline-code { padding: .1em .3em; border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-sm); background: var(--cp-admin-color-surface-muted); font-family: var(--cp-admin-font-mono); font-size: .9em; overflow-wrap: anywhere; }
 .cp-admin-code { border-radius: var(--cp-admin-radius-control); padding: var(--cp-admin-space-5); background: var(--cp-admin-color-code-bg); color: var(--cp-admin-color-code-text); font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-small); line-height: 1.75; white-space: pre; overflow-x: auto; }
-.cp-admin-code:focus-visible { outline-color: var(--cp-admin-color-action); }
+.cp-admin-code:focus-visible { outline-color: var(--cp-admin-color-focus); }
 .cp-admin-nav-link { display: inline-flex; align-items: center; min-height: var(--cp-admin-control-height); padding: var(--cp-admin-space-2) var(--cp-admin-space-3); border-radius: var(--cp-admin-radius-control); color: var(--cp-admin-color-text-muted); font-weight: var(--cp-admin-weight-semibold); text-decoration: none; }
 .cp-admin-nav-link:hover { background: var(--cp-admin-color-surface-muted); color: var(--cp-admin-color-text); }
 .cp-admin-nav-link[aria-current="page"] { background: var(--cp-admin-color-accent-soft); color: var(--cp-admin-color-accent-text); }

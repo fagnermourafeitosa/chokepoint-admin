@@ -6,7 +6,7 @@ export type ManagedTool = { local_mapping?: import("./mapping-api").MappingVersi
 export type MCPServer = { id: string; name: string; endpoint: string; transport: string; auth_type: 'chokepoint_token' | 'oauth'; connection_type?: 'custom' | 'enterprise'; provider_id?: string; account?: string; authentication_status?: string; enabled: boolean;
  // Backend 035: what a custom server must trust; read only, never sent back.
  audience?: string; issuer?: string; jwks_uri?: string; revision: number; server_info: unknown; tools: ManagedTool[] };
-// A custom server has only the Chokepoint token auth type (Backend 035 Resolved Decision 3).
+// A custom server has only the Xokepoint token auth type (Backend 035 Resolved Decision 3).
 export type Connection = { name: string; endpoint: string; transport: string; auth_type: 'chokepoint_token'; revision?: number };
 export type Preview = { preview_id: string; expires_at: string; server_info: unknown; tools: ManagedTool[]; revision: number };
 export type ServerPage = { items: MCPServer[]; next_offset: number | null };

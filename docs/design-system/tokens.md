@@ -17,14 +17,17 @@
 | `--cp-admin-color-border` | `#d6d6cf` | Mock decorative separator; not a control boundary |
 | `--cp-admin-color-control-border` | `#34363a` | Mock muted primitive repurposed for visible controls |
 | `--cp-admin-color-brand` | `#ffe342` | Yellow navigation and brand |
-| `--cp-admin-color-action` | `#f574a8` | Pink primary button fill |
-| `--cp-admin-color-action-hover` | `#ee5e99` | Normalized primary hover fill |
-| `--cp-admin-color-on-action` | `#15161b` | Text on primary action |
+| `--cp-admin-color-action` | `#15161b` | Ink primary button fill (Admin 044) |
+| `--cp-admin-color-action-hover` | `#34363a` | Primary hover fill |
+| `--cp-admin-color-on-action` | `#fbfaf7` | Cream text on the ink primary action |
 | `--cp-admin-color-accent-text` | `#292a29` | Normalized link and small accent text |
-| `--cp-admin-color-accent-soft` | `#fff3c7` | Soft yellow highlight |
-| `--cp-admin-color-hover` | `#e6e5dc` | Neutral hover surface; yellow stays reserved for current and selected items |
+| `--cp-admin-color-accent-soft` | `#efeee6` | Soft neutral highlight |
+| `--cp-admin-color-hover` | `#e6e5dc` | Neutral hover surface |
 | `--cp-admin-color-row-hover` | `var(--cp-admin-color-hover)` | Hovered list rows, table rows and menu links |
-| `--cp-admin-color-row-selected` | `#ffedb9` | Selected table rows; takes precedence over hover |
+| `--cp-admin-color-row-selected` | `#e6e4d9` | Selected rows; takes precedence over hover |
+| `--cp-admin-color-selected` | `#e6e4d9` | Selected control that is not the primary navigation: section navigation, toggles, pressed buttons, the agent node |
+| `--cp-admin-color-allow` / `-allow-bg` / `-allow-text` | `#3f8f2a` / `#ddf2e3` / `#1f5c14` | Allowed outcome: chart bars and path dots, chip fill, chip text |
+| `--cp-admin-color-deny` / `-deny-bg` | `#c8243f` / `#fbe4e2` | Denied outcome: chart bars, path dots, chips, the denied count |
 | `--cp-admin-color-strong` | `#15161b` | Mock dark action |
 | `--cp-admin-color-focus` | `#784160` | Keyboard focus on light surfaces |
 | `--cp-admin-color-success` | `#08744d` | Mock ALLOW text |
@@ -109,7 +112,8 @@
 | `--cp-admin-z-floating` | `110` | Toast or floating controls |
 | `--cp-admin-shadow-panel` | `none` | Mock quiet panel elevation |
 | `--cp-admin-shadow-dialog` | `0 35px 85px rgba(23, 32, 25, .25)` | Mock dialog elevation |
-| `--cp-admin-shadow-offset` | `3px 3px 0 var(--cp-admin-color-text)` | Resting offset shadow of prominent actions and current primary navigation |
+| `--cp-admin-shadow-offset` | `3px 3px 0 var(--cp-admin-color-text)` | Resting offset shadow of the current primary navigation and the wordmark |
+| `--cp-admin-shadow-action` / `-lift` / `-press` | `3px` / `4px` / `1px` offset in `#6d685e` | Shadow of the ink primary button. `cp-admin-button--dark` is the same ink action without a shadow, for actions inside a dark or dense group |
 | `--cp-admin-shadow-lift` | `4px 4px 0 var(--cp-admin-color-text)` | Hovered offset shadow |
 | `--cp-admin-shadow-press` | `1px 1px 0 var(--cp-admin-color-text)` | Pressed offset shadow |
 | `--cp-admin-lift` | `translate(-1px, -1px)` | Hover movement paired with `shadow-lift` |

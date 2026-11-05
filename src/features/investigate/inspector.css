@@ -65,10 +65,10 @@
   background: var(--cp-admin-color-surface);
 }
 .trace-path [data-state='passed'] .trace-path-dot {
-  background: var(--cp-admin-color-brand);
+  background: var(--cp-admin-color-allow);
 }
 .trace-path [data-state='failed'] .trace-path-dot {
-  background: var(--cp-admin-color-action);
+  background: var(--cp-admin-color-deny);
 }
 .trace-path [data-state='not_evaluated'] .trace-path-dot {
   border-style: dashed;
@@ -144,10 +144,12 @@
   font-weight: var(--cp-admin-weight-bold);
 }
 .trace-policy > .trace-policy-pass {
-  background: var(--cp-admin-color-brand);
+  background: var(--cp-admin-color-allow-bg);
+  color: var(--cp-admin-color-allow-text);
 }
 .trace-policy > .trace-policy-fail {
-  background: var(--cp-admin-color-action);
+  background: var(--cp-admin-color-deny-bg);
+  color: var(--cp-admin-color-deny);
 }
 .trace-actions {
   display: flex;
@@ -191,7 +193,8 @@
   font-size: 0.75rem;
 }
 .trace-breakdown-list .is-selected {
-  background: var(--cp-admin-color-warning-bg);
+  background: var(--cp-admin-color-row-selected);
+  box-shadow: inset 3px 0 0 var(--cp-admin-color-text);
 }
 .trace-breakdown-list code {
   overflow-wrap: anywhere;
@@ -256,8 +259,8 @@
 /* Permission revision of a decision (layout prototype, Backend 038). */
 .trace-revision { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--cp-admin-space-2); }
 .trace-revision small { color: var(--cp-admin-color-text-muted); }
-.trace-revision-link { padding: 0; border: 0; background: none; color: var(--cp-admin-color-action); font: inherit; font-weight: var(--cp-admin-weight-semibold); text-decoration: underline; cursor: pointer; }
-.trace-revision-link:hover { color: var(--cp-admin-color-action-hover); }
+.trace-revision-link { padding: 0; border: 0; background: none; color: var(--cp-admin-color-text); text-decoration: underline; font: inherit; font-weight: var(--cp-admin-weight-semibold); text-decoration: underline; cursor: pointer; }
+.trace-revision-link:hover { color: var(--cp-admin-color-text-muted); }
 /* Admin 041: a would-deny decision. The notice sits under the title; the failed step is dashed in the Report-only palette. */
 .trace-report-only-notice { margin: 0 var(--cp-admin-space-6) var(--cp-admin-space-4); }
 .trace-path [data-report-only] .trace-path-dot { background: var(--cp-admin-color-warning-bg); border: 2px dashed var(--cp-admin-color-warning); }

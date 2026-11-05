@@ -1,10 +1,9 @@
-/* Brand palette: allowed is the brand yellow, denied the action pink, both
-   outlined in ink like buttons and navigation. Chart, legend, tooltip and
-   sparklines share these tokens. */
+/* State colors: allowed is green, denied is red, both outlined in ink.
+   Chart, legend, tooltip and sparklines share these tokens. */
 .overview-traffic,
 .overview-metrics {
-  --overview-allowed: var(--cp-admin-color-brand);
-  --overview-denied: var(--cp-admin-color-action);
+  --overview-allowed: var(--cp-admin-color-allow);
+  --overview-denied: var(--cp-admin-color-deny);
 }
 .overview-traffic h2 {
   margin: var(--cp-admin-space-1) 0 var(--cp-admin-space-4);

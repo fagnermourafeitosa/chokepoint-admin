@@ -58,7 +58,7 @@
 :is(.access-navigation-links, .cp-admin-section-nav) a { border-radius: 0; color: var(--cp-admin-color-text); }
 :is(.access-navigation-links, .cp-admin-section-nav) a + a { border-left: 1px solid var(--cp-admin-color-text); }
 :is(.access-navigation-links, .cp-admin-section-nav) a:hover:not([aria-current='page']) { background: var(--cp-admin-color-hover); box-shadow: inset 0 -3px 0 var(--cp-admin-color-text); }
-:is(.access-navigation-links, .cp-admin-section-nav) a[aria-current='page'] { background: var(--cp-admin-color-brand); box-shadow: inset 0 -2px 0 var(--cp-admin-color-text); }
+:is(.access-navigation-links, .cp-admin-section-nav) a[aria-current='page'] { background: var(--cp-admin-color-selected); box-shadow: inset 0 -3px 0 var(--cp-admin-color-text); font-weight: var(--cp-admin-weight-bold); }
 @media (max-width: 740px) { :is(.access-navigation-links, .cp-admin-section-nav) { display: flex; overflow-x: auto; } }
 
 :is(.access-navigation-links, .cp-admin-section-nav) svg { width: 1.125rem; height: 1.125rem; flex: none; stroke-width: 2.25; }

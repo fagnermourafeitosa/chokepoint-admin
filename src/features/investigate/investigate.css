@@ -52,7 +52,7 @@
   box-shadow: inset 0 -3px 0 var(--cp-admin-color-text);
 }
 .trace-segments button[aria-pressed='true'] {
-  background: var(--cp-admin-color-brand);
+  background: var(--cp-admin-color-selected);
   box-shadow: inset 0 -2px 0 var(--cp-admin-color-text);
 }
 .trace-search {
@@ -124,7 +124,7 @@
   font-size: 0.75rem;
   font-weight: 600;
 }
-/* Outcome chips match the Inbox tags: ink outline, deny in action pink, allow in brand yellow. */
+/* Outcome chips: deny red, allow green, always with their text. */
 .trace-outcome {
   display: inline-flex;
   gap: var(--cp-admin-space-2);
@@ -138,10 +138,14 @@
   font-weight: var(--cp-admin-weight-bold);
 }
 .trace-deny {
-  background: var(--cp-admin-color-action);
+  background: var(--cp-admin-color-deny-bg);
+  border-color: var(--cp-admin-color-deny);
+  color: var(--cp-admin-color-deny);
 }
 .trace-allow {
-  background: var(--cp-admin-color-brand);
+  background: var(--cp-admin-color-allow-bg);
+  border-color: var(--cp-admin-color-allow);
+  color: var(--cp-admin-color-allow-text);
 }
 .trace-list-row .trace-reason {
   margin-top: 5px;

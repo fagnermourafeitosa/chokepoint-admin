@@ -99,10 +99,10 @@ button.overview-metric:hover {
 .overview-metric meter::-webkit-meter-optimum-value,
 .overview-metric meter::-webkit-meter-suboptimum-value,
 .overview-metric meter::-webkit-meter-even-less-good-value {
-  background: var(--cp-admin-color-brand);
+  background: var(--cp-admin-color-text);
 }
 .overview-metric meter::-moz-meter-bar {
-  background: var(--cp-admin-color-brand);
+  background: var(--cp-admin-color-text);
 }
 /* Sparklines: an ink line over a brand-color area. */
 .overview-spark {
@@ -165,15 +165,15 @@ button.overview-metric:hover {
   color: var(--cp-admin-color-text-muted);
   overflow-wrap: anywhere;
 }
-/* Denied count: an ink-outlined action-pink badge with the short offset shadow. */
+/* Denied count: a red-outlined badge on the deny tone. */
 .overview-top-row > strong {
   flex: none;
   padding: var(--cp-admin-space-1) var(--cp-admin-space-2);
-  border: 2px solid var(--cp-admin-color-text);
+  border: 2px solid var(--cp-admin-color-deny);
   border-radius: var(--cp-admin-radius-button);
-  background: var(--cp-admin-color-action);
-  color: var(--cp-admin-color-on-action);
-  box-shadow: var(--cp-admin-shadow-offset);
+  background: var(--cp-admin-color-deny-bg);
+  color: var(--cp-admin-color-deny);
+  box-shadow: none;
   font-family: var(--cp-admin-font-mono);
   font-size: var(--cp-admin-type-label);
   font-weight: var(--cp-admin-weight-bold);

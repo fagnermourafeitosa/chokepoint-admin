@@ -122,10 +122,12 @@
   font-weight: var(--cp-admin-weight-bold);
 }
 .attention-tag--tool-discovery {
-  background: var(--cp-admin-color-brand);
+  background: var(--cp-admin-color-surface-muted);
 }
 .attention-tag--requests-denied {
-  background: var(--cp-admin-color-action);
+  background: var(--cp-admin-color-deny-bg);
+  border-color: var(--cp-admin-color-deny);
+  color: var(--cp-admin-color-deny);
 }
 .attention-pager {
   display: flex;

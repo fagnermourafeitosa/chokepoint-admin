@@ -75,7 +75,7 @@ export function ModeDialog({ scope, agent, onClose, onChanged, onReload }: Dialo
             : recent.isError ? 'The would-deny calls of the last 24 hours could not be counted. Check them in Investigate before you enforce.'
               : recent.data.total ? `${recent.data.total} ${recent.data.total === 1 ? 'call' : 'calls'} would have been denied in the last 24 hours. After this change, those calls fail with a reference code.`
                 : 'No call would have been denied in the last 24 hours.'}</p></>
-        : <><p><strong>{agent.name}</strong> runs each call. Chokepoint still evaluates the tool grants, resources and call rules and records a denied call as <em>Would deny</em>, but it does not block it.</p>
+        : <><p><strong>{agent.name}</strong> runs each call. Xokepoint still evaluates the tool grants, resources and call rules and records a denied call as <em>Would deny</em>, but it does not block it.</p>
           <p className="report-only-always"><ShieldCheck size={14} aria-hidden="true" />Always enforced: delegation, a valid token, an enabled identity connection and the kill switch.</p>
           {production ? <p className="cp-admin-notice" data-tone="danger">In Production, this agent is not protected by its policy until you switch it back to Enforce.</p> : null}
           <label className="report-only-field"><span className="cp-admin-muted">Review by (optional)</span><input className="cp-admin-input report-only-date" type="date" min={todayUTC()} value={reviewBy} onChange={e => setReviewBy(e.target.value)} /><small className="cp-admin-muted">On this date, the Inbox reminds you to review the mode. The agent stays in Report-only until you change it.</small></label></>}

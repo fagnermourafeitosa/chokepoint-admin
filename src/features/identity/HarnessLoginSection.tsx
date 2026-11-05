@@ -5,7 +5,7 @@ import { Help } from './Help';
 import { GuideLink } from './formParts';
 
 // The harness login client of an identity connection (Admin 036 section 4, Backend 045
-// Administration API 1). Chokepoint is a confidential OIDC client of the provider: it sends the
+// Administration API 1). Xokepoint is a confidential OIDC client of the provider: it sends the
 // person to the provider, reads who they are and their groups, then asks for their consent.
 // sharedClient: the login client is the directory app of the form (Entra, Admin 042), so its
 // client ID and secret are not asked again.
@@ -21,7 +21,7 @@ export function HarnessLoginSection({ provider, value, stored, groupsCapable, on
   const redirect = stored?.redirect_uri ?? '';
   const keepsSecret = !!stored?.has_secret && stored.client_id === value.client_id && !changingSecret;
   return <div className="identity-form-section">
-    <div className="identity-section-heading"><h2>Harness login <Help text="People log in from a coding harness (Claude Code, VS Code and similar) through this identity provider. Chokepoint is an OIDC client here: it sends the person to the provider, reads who they are and their groups, then asks for their consent." /></h2>
+    <div className="identity-section-heading"><h2>Harness login <Help text="People log in from a coding harness (Claude Code, VS Code and similar) through this identity provider. Xokepoint is an OIDC client here: it sends the person to the provider, reads who they are and their groups, then asks for their consent." /></h2>
       <p>Let people log in from a coding harness through this provider.</p></div>
     <div className="identity-form-fields">
       {!groupsCapable ? <p className="cp-admin-notice" role="status"><TriangleAlert size={16} aria-hidden="true" />This provider can not list groups yet, so harness login is not available for it.</p> : <>
@@ -38,7 +38,7 @@ export function HarnessLoginSection({ provider, value, stored, groupsCapable, on
             : <input className="cp-admin-input" type="password" autoComplete="new-password" required={value.enabled} maxLength={4096} value={value.client_secret ?? ''} onChange={e => onChange({ ...value, client_secret: e.target.value })} />}
             <small>Stored encrypted. Existing secrets cannot be displayed.</small></label>
         </div>}
-        <p className="cp-admin-muted">At each login, Chokepoint reads the groups of the person from the directory, with the {google ? 'service account' : provider === 'entra' ? 'app' : okta ? 'API Services app' : 'directory client'} above. {provider === 'entra' ? 'It needs GroupMember.Read.All with admin consent (step 3).' : okta ? 'It needs okta.groups.read (step 3).' : google ? 'It needs the read-only groups scope of the Directory API (https://www.googleapis.com/auth/admin.directory.group.readonly).' : 'It needs permission to read groups (realm-management roles query-groups and view-users).'} Check connection tells you when it is missing.</p>
+        <p className="cp-admin-muted">At each login, Xokepoint reads the groups of the person from the directory, with the {google ? 'service account' : provider === 'entra' ? 'app' : okta ? 'API Services app' : 'directory client'} above. {provider === 'entra' ? 'It needs GroupMember.Read.All with admin consent (step 3).' : okta ? 'It needs okta.groups.read (step 3).' : google ? 'It needs the read-only groups scope of the Directory API (https://www.googleapis.com/auth/admin.directory.group.readonly).' : 'It needs permission to read groups (realm-management roles query-groups and view-users).'} Check connection tells you when it is missing.</p>
       </>}
     </div>
   </div>;

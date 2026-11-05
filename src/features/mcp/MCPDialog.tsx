@@ -18,7 +18,7 @@ export function MCPDialog({ scope, server, onClose, onRefresh, onSaved }: { scop
  const all = available.length > 0 && form.selected.length === available.length;
  useEffect(() => { if (selectAll.current) selectAll.current.indeterminate = form.selected.length > 0 && !all; }, [form.selected.length, all]);
  const noTools = form.preview && available.length === 0;
- // The server must trust these values before its first discovery, which already sends a Chokepoint token (Backend 040).
+ // The server must trust these values before its first discovery, which already sends a Xokepoint token (Backend 040).
  const trust = useQuery({ queryKey: authorizationServerKey(scope), queryFn: ({ signal }) => agentClientApi.authorizationServer(scope, signal), retry: false, staleTime: Infinity });
  return <dialog ref={ref} className="cp-admin-dialog admin-dialog mcp-dialog" aria-labelledby={titleId} onCancel={event => { event.preventDefault(); if (!form.busy) onClose(); }}>
   <div className="admin-dialog-header"><div><h2 id={titleId}>{form.preview ? 'Review discovered tools' : server ? 'Edit MCP server' : 'Connect MCP server'}</h2><p className="cp-admin-muted">{form.preview ? form.fields.name : 'Saved to the current workspace and environment.'}</p></div><button className="admin-dialog-close" aria-label="Close dialog" disabled={form.busy} onClick={onClose}><X size={18} /></button></div>
@@ -28,11 +28,11 @@ export function MCPDialog({ scope, server, onClose, onRefresh, onSaved }: { scop
     <label>Server name<input className="cp-admin-input" name="name" required maxLength={80} value={form.fields.name} disabled={form.busy} onChange={e => form.update('name', e.target.value)} placeholder="e.g. Inventory MCP" /></label>
     <label>MCP endpoint<input className="cp-admin-input" name="endpoint" type="url" required maxLength={2048} value={form.fields.endpoint} disabled={form.busy} onChange={e => form.update('endpoint', e.target.value)} placeholder="https://mcp.example.com/mcp" /></label>
     <label>Transport<SelectMenu block label="Transport" value={form.fields.transport} disabled={form.busy} onChange={v => form.update('transport', v)} options={[{ value: 'streamable-http', label: 'Streamable HTTP' }, { value: 'stdio', label: 'stdio — unsupported', disabled: true }]} /></label>
-    <p className="cp-admin-muted">stdio is not supported. Chokepoint connects to an HTTP endpoint.</p>
+    <p className="cp-admin-muted">stdio is not supported. Xokepoint connects to an HTTP endpoint.</p>
     <ChokepointTokenSetup compact issuer={trust.data?.issuer} jwksUri={trust.data?.jwks_uri} audience={typedAudience(form.fields.endpoint)} unavailable={trust.isError} />
    </> : <>
     <div className="mcp-preview-summary"><strong>{available.length} available tools</strong><span>{form.selected.length} selected</span></div>
-    {server ? <p className="cp-admin-notice">New, changed, and removed rows are highlighted. Changed and removed tools stay disabled until reviewed. Unchanged settings are retained.</p> : <p>Select the tools to place under Chokepoint management. All available tools start selected.</p>}
+    {server ? <p className="cp-admin-notice">New, changed, and removed rows are highlighted. Changed and removed tools stay disabled until reviewed. Unchanged settings are retained.</p> : <p>Select the tools to place under Xokepoint management. All available tools start selected.</p>}
     {noTools ? <p role="status" className="cp-admin-notice">No tools available. {server ? 'Missing tools are retained and disabled. This server cannot be re-enabled.' : 'This server cannot be registered.'}</p> : <label className="mcp-select-all"><input ref={selectAll} type="checkbox" checked={all} disabled={form.busy} onChange={e => form.setSelected(e.target.checked ? available.map(tool => tool.name) : [])} />Select all available tools</label>}
     <ToolRows tools={form.preview.tools} selected={form.selected} onToggle={form.toggle} disabled={form.busy} />
     {server ? <label className="mcp-select-all"><input type="checkbox" checked={form.enable} disabled={form.busy || Boolean(noTools)} onChange={e => form.setEnable(e.target.checked)} />Enable server after review</label> : null}

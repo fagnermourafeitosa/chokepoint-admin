@@ -75,8 +75,8 @@
   cursor: pointer;
 }
 .quick-incident-go {
-  background: var(--cp-admin-color-action, var(--cp-admin-color-brand));
-  color: #fff;
+  background: var(--cp-admin-color-action);
+  color: var(--cp-admin-color-on-action);
 }
 .quick-incident-go:disabled {
   opacity: 0.6;

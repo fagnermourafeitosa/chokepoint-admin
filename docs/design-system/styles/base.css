@@ -24,7 +24,7 @@
   outline: var(--cp-admin-focus-width) solid var(--cp-admin-color-focus);
   outline-offset: var(--cp-admin-focus-offset);
 }
-[data-cp-admin] ::selection { background: var(--cp-admin-color-action); color: var(--cp-admin-color-on-action); }
+[data-cp-admin] ::selection { background: var(--cp-admin-color-brand); color: var(--cp-admin-color-text); }
 .cp-admin-title, .cp-admin-section-title { font-family: var(--cp-admin-font-heading); font-weight: var(--cp-admin-weight-heavy); letter-spacing: var(--cp-admin-tracking-heading); }
 .cp-admin-section-title { font-size: var(--cp-admin-type-section); line-height: 1.3; }
 .cp-admin-muted { color: var(--cp-admin-color-text-muted); }

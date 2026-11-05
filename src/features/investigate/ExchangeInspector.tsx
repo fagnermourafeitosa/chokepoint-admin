@@ -24,8 +24,8 @@ const hints: Record<ExchangeReasonLabel, { hint: string; label: string }> = {
   no_group: { hint: 'Check if this person must be in a group chosen in the Harness login of the identity provider.', label: 'Open the harness login' },
   blocked: { hint: 'Check if the block of this person is still needed. Unblock the person in the Harness login of the identity provider.', label: 'Open the harness login' },
   not_allowed_client: { hint: 'Check the allowed harnesses of the agent. Add this harness if the agent must accept it.', label: 'Open the agent identity' },
-  code_reuse: { hint: 'Check if the code leaked from the computer of the person. Chokepoint revoked the machine; the person must log in again.', label: 'Open the harness sessions' },
-  refresh_reuse: { hint: 'Check if the refresh token was copied from the computer of the person. Chokepoint revoked the machine; the person must log in again.', label: 'Open the harness sessions' },
+  code_reuse: { hint: 'Check if the code leaked from the computer of the person. Xokepoint revoked the machine; the person must log in again.', label: 'Open the harness sessions' },
+  refresh_reuse: { hint: 'Check if the refresh token was copied from the computer of the person. Xokepoint revoked the machine; the person must log in again.', label: 'Open the harness sessions' },
   dpop_invalid: { hint: 'Check if the token was copied from the harness that holds the key.', label: 'Open the harness sessions' },
   login_error: { hint: 'Check the cause below.', label: 'Open the agent identity' },
 };
@@ -39,7 +39,7 @@ const causes: Record<LoginErrorCause, { text: string; hint: string; fix?: 'ident
   redirect_uri_invalid: { text: 'The harness asked to return to an address its metadata document does not list.', hint: 'Check the harness version and its document.', fix: 'identity' },
   transaction_expired: { text: 'The sign-in expired, was used twice or was continued in another browser.', hint: 'The person must start again from the harness.' },
   provider_not_available: { text: 'The chosen identity provider does not allow harness login for this harness.', hint: 'Check the Harness login of the identity provider.', fix: 'provider' },
-  server_error: { text: 'Chokepoint could not complete the sign-in.', hint: 'Check the backend logs at this time.' },
+  server_error: { text: 'Xokepoint could not complete the sign-in.', hint: 'Check the backend logs at this time.' },
 };
 
 // noAgent explains an action without an agent. A refused harness login names an
@@ -91,7 +91,7 @@ function unverified(reason?: ExchangeReasonLabel) {
 // returned names what the client got (Backend 034 Resolved Decision 4, Backend 045).
 function returned(x: Exchange) {
   const reason = x.reason?.label;
-  if (x.permit) return 'A Chokepoint token for 5 minutes';
+  if (x.permit) return 'A Xokepoint token for 5 minutes';
   if (reason === 'invalid_client' || reason === 'invalid_authorization_details') return reason;
   if (reason === 'no_group' || reason === 'blocked' || (reason === 'not_allowed_client' && x.reference)) return 'A refused page with the reference code';
   if (reason === 'login_error') return 'A generic page with the reference code';
@@ -146,7 +146,7 @@ export function ExchangeInspector({ scope, id, state, onBack }: { scope: Environ
             {x.permit ? 'Issued' : 'Refused'}
           </span>
           <h2>{agent}</h2>
-          <p>{reason ? exchangeText[reason] ?? x.reason!.description : 'Chokepoint issued a token for 5 minutes.'}</p>
+          <p>{reason ? exchangeText[reason] ?? x.reason!.description : 'Xokepoint issued a token for 5 minutes.'}</p>
         </div>
         {x.subject ? (
           <p className="trace-who"><strong>{agent}</strong> asked for a token for <strong>{subjectName(x.subject)}</strong> ({[kind, x.subject.issuer].filter(Boolean).join(' · ')})</p>

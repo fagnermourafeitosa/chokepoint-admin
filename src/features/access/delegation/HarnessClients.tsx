@@ -71,7 +71,7 @@ export function HarnessClients({ scope, agentId, agentName, issuer }: { scope: E
     <details className="harness-custom"><summary>Another harness (client metadata URL){tip('Use it for a harness that is not in the buttons above. A harness identifies itself with a public HTTPS URL, its client metadata document: a small file published by the harness vendor with its name and the addresses it returns to after login. Ask the vendor for this URL or find it in their docs. Only harnesses listed here can log in to this agent.')}</summary>
       <div className="harness-add"><input className="cp-admin-input" type="url" placeholder="https://…" value={custom} onChange={e => setCustom(e.target.value.trim())} aria-label="Client metadata URL" />
         <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" disabled={busy || !validUrl(custom) || allowed.includes(custom)} onClick={() => void save(current, [...allowed, custom]).then(ok => { if (ok) setCustom(''); })}>Add</button></div>
-      <small className="cp-admin-muted">The harness publishes this URL. Chokepoint reads it at each login and accepts only loopback redirects.</small>
+      <small className="cp-admin-muted">The harness publishes this URL. Xokepoint reads it at each login and accepts only loopback redirects.</small>
     </details>
     {error ? <div role="alert" className="cp-admin-notice" data-tone="danger">{error.message}{error.conflict ? <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => { setError(undefined); void allowlist.refetch(); }}>Reload</button> : null}</div> : null}
   </section>;

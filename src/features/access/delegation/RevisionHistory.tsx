@@ -102,7 +102,7 @@ export function RevisionHistory({ scope, agentId, agentName, initial, onClose }:
         <dl className="history-facts">
           <div><dt>{current.action === 'revoke' ? 'Revoked by' : 'Published by'}</dt><dd>{initials(current) ? <span className="history-avatar" aria-hidden="true">{initials(current)}</span> : null}{author(current)}</dd></div>
           <div><dt>When</dt><dd>{utc(current.published_at)}</dd></div>
-          <div><dt>Applied</dt><dd>{current.effective_at ? utc(current.effective_at) : <span className="cp-admin-muted">{current.revision === items[0]?.revision ? 'Not yet. Chokepoint is writing it to OpenFGA.' : 'Never. A newer revision replaced it before OpenFGA confirmed it.'}</span>}</dd></div>
+          <div><dt>Applied</dt><dd>{current.effective_at ? utc(current.effective_at) : <span className="cp-admin-muted">{current.revision === items[0]?.revision ? 'Not yet. Xokepoint is writing it to OpenFGA.' : 'Never. A newer revision replaced it before OpenFGA confirmed it.'}</span>}</dd></div>
         </dl>
       </header>
       {current.note ? <blockquote className="history-note"><span className="cp-admin-label">Why</span><p>{current.note}</p></blockquote> : <p className="history-note history-note--empty">No note was added to this revision.</p>}
@@ -121,7 +121,7 @@ export function RevisionHistory({ scope, agentId, agentName, initial, onClose }:
           </>}
     </article> : <article className="history-detail">
       {/* A revision published before Backend 038 has no event, so it is not in the timeline. */}
-      {selected !== undefined && items.length > 0 && !list.hasNextPage && !list.isFetchingNextPage ? <p className="history-note history-note--empty">Revision {selected.replace('revision-', '')} was published before the history existed, so Chokepoint has no author, note or snapshot for it.</p> : null}
+      {selected !== undefined && items.length > 0 && !list.hasNextPage && !list.isFetchingNextPage ? <p className="history-note history-note--empty">Revision {selected.replace('revision-', '')} was published before the history existed, so Xokepoint has no author, note or snapshot for it.</p> : null}
     </article>}
   </section></SidePanel>;
 }

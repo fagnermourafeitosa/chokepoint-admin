@@ -1,7 +1,7 @@
 import { httpClient } from '../../api/http-client';
 import type { EnvironmentScope } from './environment-scope';
 
-// The agent as a client of the Chokepoint authorization server (Backend 030 Admin contract, Backend 040).
+// The agent as a client of the Xokepoint authorization server (Backend 030 Admin contract, Backend 040).
 export type ClientKey = { kid: string; alg: 'ES256' | 'RS256'; thumbprint: string; created_by: string; created_by_name?: string; created_at: string };
 export type AgentClient = { client_id: string; issuer: string; token_endpoint: string; jwks_uri: string; revision: number; key: ClientKey | null };
 export type AuthorizationServer = { issuer: string; token_endpoint: string; jwks_uri: string };

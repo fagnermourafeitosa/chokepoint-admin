@@ -47,8 +47,8 @@
 .cp-admin-button--danger:hover:not(:disabled) { background: var(--cp-admin-color-danger); filter: brightness(.95); }
 .cp-admin-button--ghost { background: transparent; color: var(--cp-admin-color-accent-text); }
 .cp-admin-button--ghost:hover:not(:disabled) { background: var(--cp-admin-color-surface); }
-.cp-admin-button--danger-soft { background: var(--cp-admin-color-danger-bg); color: var(--cp-admin-color-danger); }
-.cp-admin-button--danger-soft:hover:not(:disabled) { background: var(--cp-admin-color-danger-bg-hover); }
+.cp-admin-button--danger-soft { background: var(--cp-admin-color-surface); color: var(--cp-admin-color-danger); border-color: var(--cp-admin-color-danger); box-shadow: none; }
+.cp-admin-button--danger-soft:hover:not(:disabled) { background: var(--cp-admin-color-danger-bg); box-shadow: none; transform: none; }
 .cp-admin-button--small { min-height: var(--cp-admin-control-compact-height); padding: var(--cp-admin-space-1) var(--cp-admin-space-3); font-size: var(--cp-admin-type-label); }
 .cp-admin-toast { position: fixed; inset-inline-end: var(--cp-admin-space-4); bottom: var(--cp-admin-space-4); z-index: var(--cp-admin-z-floating); width: min(var(--cp-admin-toast-max-width), calc(100vw - 2rem)); padding: var(--cp-admin-space-4); border: 1px solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); box-shadow: var(--cp-admin-shadow-dialog); font-size: var(--cp-admin-type-small); }
 .cp-admin-toast[hidden] { display: none; }

@@ -1,5 +1,5 @@
 // Agent keys in the browser (Admin 029 section 2). The private key never leaves the browser:
-// it goes only into the downloaded file. Chokepoint receives the public JWK.
+// it goes only into the downloaded file. Xokepoint receives the public JWK.
 
 // WebCrypto's JsonWebKey has no kid or use (RFC 7517 §4.5, §4.2).
 export type Jwk = JsonWebKey & { kid?: string; use?: string };
