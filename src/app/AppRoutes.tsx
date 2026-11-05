@@ -2,8 +2,14 @@ import { createBrowserRouter, createRoutesFromElements, Navigate, Outlet, Route,
 import { AdminLayout } from '../layouts/AdminLayout';
 import { AuthProvider, RequireSession } from '../features/auth/AuthRoutes';
 import { LoginPage, WorkspacePage, WorkspaceOnboarding } from '../features/auth/AuthPages';
+import { lazy, Suspense } from 'react';
 import { navigation } from './navigation';
-import { PrototypePage } from '../features/prototype/PrototypePage';
+
+// Layout prototypes exist only in the development server: a production build has no
+// /prototype route and no prototype code (the dead branch and its chunk are removed).
+const PrototypePage = import.meta.env.DEV
+  ? lazy(() => import('../features/prototype/PrototypePage').then(module => ({ default: module.PrototypePage })))
+  : undefined;
 
 // A data router provides one navigation blocker for the shared Inbox detail flow.
 const router = createBrowserRouter(createRoutesFromElements(
@@ -16,8 +22,8 @@ const router = createBrowserRouter(createRoutesFromElements(
       {navigation.map(({ path, Page, children }) => <Route key={path} path={path} element={<Page />}>
         {children?.map(({ path: childPath, Page: ChildPage }) => childPath ? <Route key={childPath} path={childPath} element={<ChildPage />} /> : <Route key="index" index element={<ChildPage />} />)}
       </Route>)}
-      {/* Layout prototypes: not in the navigation; the specifications link them. */}
-      <Route path="/prototype/*" element={<PrototypePage />} />
+      {/* Layout prototypes: development server only, not in the navigation; the specifications link them. */}
+      {PrototypePage ? <Route path="/prototype/*" element={<Suspense fallback={null}><PrototypePage /></Suspense>} /> : null}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Route></Route>
   </Route>,

@@ -34,7 +34,7 @@ Do this first, each time you use this skill, also when the task is about a diffe
 ## 2. Open the prototype page
 
 1. Create the folder `specs/prototypes/<specification file name without .md>/` on `main`, with the specification. Do not create a branch. Read `specs/prototypes/README.md` first.
-2. Register the page under `/prototype/<page>` in `src/features/prototype/PrototypePage.tsx`, and add the prototype as Active to the index in `specs/prototypes/README.md`. The page is not in the navigation and never replaces a real screen.
+2. Register the page in the `pages` map of `src/features/prototype/PrototypePage.tsx` (specification ID, path under `/prototype/<page>`, page), and add the prototype as Active to the index in `specs/prototypes/README.md`, with a one-sentence Summary. The `/prototype` page reads that index and shows it in two tabs, Active and Archived, with the summary and the specification status. The page is not in the navigation and never replaces a real screen. The `/prototype` route exists only in the development server (`src/app/AppRoutes.tsx`): do not register it in a production build.
 3. Reuse the design system (`docs/design-system/`) and the real components where they fit.
 4. Keep the fixed data in one file in the prototype folder. Use realistic data from the central use case. No API call writes data.
 5. Sign in to the local Admin yourself and open the page in the built-in browser (see "Local Functional Test" in AGENTS.md).
