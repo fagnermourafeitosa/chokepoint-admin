@@ -18,3 +18,8 @@
 .source-title{display:inline-flex;align-items:center;gap:var(--cp-admin-space-2)}.source-title .admin-tooltip-trigger{display:inline-flex;color:var(--cp-admin-color-text-muted)}
 .source-connection{display:grid;gap:22px}.source-delete{padding-top:22px;border-top:1px solid var(--cp-admin-color-border)}
 .source-actions--split{justify-content:space-between}.source-actions--split>span{display:flex;gap:10px}
+.source-mono{font-family:var(--cp-admin-font-mono)}
+.source-attribute-list{display:grid;gap:2px}
+.source-tool{display:grid;gap:4px}.source-tool>span{display:inline-flex;align-items:center;gap:6px}
+.source-attribute-list>span{display:inline-flex;align-items:center;gap:6px}
+.source-describes-line{font-size:var(--cp-admin-type-label);font-weight:var(--cp-admin-weight-semibold)}

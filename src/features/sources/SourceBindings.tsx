@@ -3,12 +3,15 @@ import { useQuery } from '@tanstack/react-query';
 import { ConfirmDialog } from '../../components/ui/dialog/ConfirmDialog';
 import { Dialog } from '../../components/ui/dialog/Dialog';
 import { Notice } from '../../components/ui/notice/Notice';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { Server, Wrench } from 'lucide-react';
+import { mcpApi, mcpKey } from '../mcp/api';
 import { sourceApi, type Source, type Binding, type BindingVersion } from './api';
 import { BindingEditor } from './BindingEditor';
 import type { EnvironmentScope } from '../access/environment-scope';
 import type { SourceActions } from './useSources';
 
-const about = (v?: BindingVersion) => (v?.entity === 'subject' ? 'The subject' : 'The object of the call');
+const about = (v?: BindingVersion) => (v?.entity === 'subject' ? 'Of the subject' : 'Of the object of the call');
 
 // The status of one binding (Admin 048, item 32): On, Draft or Needs review.
 function status(item: Binding, source: Source): { label: string; tone?: string } {
@@ -26,6 +29,9 @@ function reads(v: BindingVersion) {
 export function SourceBindings({ source, scope, actions }: { source: Source; scope: EnvironmentScope; actions: SourceActions }) {
   const [editing, setEditing] = useState<string>();
   const [review, setReview] = useState<{ id: string; action: 'approve' | 'retire' }>();
+  // Server names for the Tool column, from the same cached list as the editor.
+  const servers = useInfiniteQuery({ queryKey: mcpKey(scope), queryFn: ({ signal, pageParam }) => mcpApi.list(scope, pageParam, signal), initialPageParam: 0, getNextPageParam: last => last.next_offset ?? undefined });
+  const serverName = (id?: string) => servers.data?.pages.flatMap(p => p.items).find(x => x.id === id)?.name ?? '';
   const binding = source.bindings.find(b => b.id === editing), reviewed = source.bindings.find(b => b.id === review?.id);
   // The published rules that read the attributes are fetched when Turn off opens, never from a cached
   // document. A failed lookup is not shown as "no rule".
@@ -40,21 +46,21 @@ export function SourceBindings({ source, scope, actions }: { source: Source; sco
   const rules = dependencies.data?.items ?? [];
   return <section>
     <div className="source-section-heading"><div><h2>Trusted attributes</h2><p className="cp-admin-muted">Each operation reads trusted attributes from this API for one tool, before its rules are checked.</p></div><button className="cp-admin-button" onClick={() => setEditing('new')}>Add trusted attributes</button></div>
-    {source.bindings.length ? <div className="cp-admin-table-scroll"><table className="cp-admin-table">
-      <thead><tr><th>Name</th><th>Tool</th><th>Describes</th><th>Status</th><th aria-label="Actions" /></tr></thead>
+    {source.bindings.length ? <div className="cp-admin-table-scroll"><table className="cp-admin-table source-table">
+      <thead><tr><th>Name</th><th>MCP server · tool</th><th>Attributes</th><th>Status</th><th className="source-actions-head">Actions</th></tr></thead>
       <tbody>{source.bindings.map(item => {
         const version = item.draft ?? item.approved, st = status(item, source);
         return <tr key={item.id}>
-          <td><strong>{version?.name}</strong><small>{version?.attributes.map(a => a.name).join(', ')}</small></td>
-          <td><code>{version?.tool_name}</code></td>
-          <td>{about(version)}</td>
+          <td><strong>{version?.name}</strong><small className="source-mono">GET {version?.path}</small></td>
+          <td><div className="source-tool"><span><Server size={14} aria-hidden="true" />{serverName(version?.server_id)}</span><span><Wrench size={14} aria-hidden="true" /><code>{version?.tool_name}</code></span></div></td>
+          <td><div className="source-attribute-list"><strong className="source-describes-line">{about(version)}</strong>{version?.attributes.map(a => <span key={a.name}><code>{a.name}</code><span className="mcp-badge">{a.type}</span></span>)}</div></td>
           <td><span className="mcp-badge" data-tone={st.tone}>{st.label}</span></td>
-          <td className="source-row-actions">
+          <td><div className="source-row-actions">
             <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" disabled={actions.busy} onClick={() => setEditing(item.id)}>Edit</button>
             {item.draft ? <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" disabled={actions.busy} onClick={() => setReview({ id: item.id, action: 'approve' })}>Turn on</button> : null}
             {item.draft ? <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" disabled={actions.busy} onClick={() => void change(item, 'discard')}>Discard draft</button> : null}
             {item.approved ? <button type="button" className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" disabled={actions.busy} onClick={() => setReview({ id: item.id, action: 'retire' })}>Turn off</button> : null}
-          </td>
+          </div></td>
         </tr>;
       })}</tbody>
     </table></div> : <p className="cp-admin-muted">No trusted attributes yet. Add them by hand, or import an operation from an OpenAPI description.</p>}
