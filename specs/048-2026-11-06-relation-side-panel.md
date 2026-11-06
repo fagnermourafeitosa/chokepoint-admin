@@ -102,6 +102,18 @@ The tool editor shows Resource mapping, Resources and Rules side by side. Allowe
 27. Investigate keeps the deny reason `no_resource` (the backend can still return it for a tool mapped in Integrations) and says "The value of the call is not one of the allowed values of the agent." instead of "The agent can not act on this resource."
 28. Context sources says trusted attributes come from context sources; it never says "Trusted data for your policies" or "from your APIs". The tab Attribute bindings, the button Add attribute binding and the editor title are **Trusted attributes**, **Add trusted attributes** and **Edit trusted attributes**, the same words as the link of the tool panel. The binding entity is **Object of the call** or **Subject**. Its texts say rule, never policy or decision.
 
+
+### Context sources (user review, 2026-11-06)
+
+29. The list page is titled **Context sources**, with a help icon beside the title (credentials stay in Xokepoint; saving does not test the API; a changed connection needs its trusted attributes turned on again). Its table follows the Identity providers and Integrations tables: **Source** (icon, name, base URL), **Authentication**, **Trusted attributes** ("<n> attributes · <n> tools", a **Draft** badge when a draft exists), **Status** (an Enabled or Disabled badge) and **Actions**, right aligned: **Edit** (opens the Connection tab) and a red **Delete**. The page action **Connect API source** is a primary button of normal size; the empty state says "Connect the API that knows your customers and orders."
+30. A source page is titled with the source name ("New context source" before the first save) and has **Back to sources**, a secondary button of normal size on one line.
+31. The Connection form uses the full width: **Enabled** first, then the fields; its footer has **Review connection** on the left and **Cancel** and a red **Delete source** on the right. The review of the connection shows below the form.
+32. Delete, from the list or the form, opens a `ConfirmDialog`. The backend deletes only a source without bindings, so Delete first turns off or discards each of its trusted attributes and then deletes the source; the dialog says so with a warning that names them and that rules reading them deny their calls.
+33. The Trusted attributes tab lists one row per binding: **Name** (and its attributes), **Tool**, **About** (Subject or Object of the call) and a status badge **On**, **Draft** or **Needs review**; row actions are small ghost buttons **Edit**, **Turn on**, **Discard draft** and a red **Turn off**. "Retire" and "Approved" are not used.
+34. The trusted attributes editor asks, in order: MCP server and **Tool**, **About**, **GET path** and Import an OpenAPI description, **Identifiers** (**URI parameter**, Location, and **Value from**, whose options say where each value comes from: Verified subject ID · from the token (sub), Verified issuer · from the token (iss), Resource ID · from the call (resource.id), Tool argument · from the call arguments), **Attributes** (name, **Field in the response**, type string, number, integer or boolean), **Try with a sample response**, then **Name**; footer Cancel and Save draft on the right. Identifiers and Attributes share one grid, so their columns line up, and Remove has the height of the fields. The AuthZEN entity type is not shown: it is saved as identity for the subject and tool for the object of the call, the types that the COAZ projection gives the call.
+35. Turning trusted attributes on is a dialog with a primary **Turn on**, which says what the draft reads and for which tool; turning them off is a `ConfirmDialog` with a warning `Notice` that lists the published rules that read them ("<agent> · <rule>").
+36. The Access heading has no "ACCESS WORKBENCH" label.
+
 ---
 
 ## Resolved Decision 1: the resource editor of Integrations (user, 2026-11-06)
@@ -155,6 +167,7 @@ Not chosen: keeping Integrations as it is, which leaves a mapping that blocks ev
 - [x] 7. The `Notice` component, tokens and docs exist (item 25).
 - [x] 8. The copy of items 26 to 28 is in place; no screen of the Admin says "Resource mapping", "Resources", "call conditions" or "trusted attributes from your APIs".
 - [x] 9. Resolved Decision 1 is applied: Integrations offers only no resource for a new or changed mapping, and a tool with a concrete resource shows the warning. (The warning was checked by code inspection; no Acme tool has a concrete resource.)
+- [x] 10. Context sources match items 29 to 36.
 
 ---
 
