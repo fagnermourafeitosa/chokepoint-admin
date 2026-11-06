@@ -59,6 +59,27 @@ Use rows with separators for a catalog or audit list. A panel groups a real task
 
 Long tables and code can scroll inside a named region. Preserve column headers and provide accessible labels when the meaning is not clear from surrounding content. Never solve page overflow by applying `overflow-x: hidden` to the body.
 
+
+## List tables
+
+Decided on Context sources (Admin 048, 2026-11-06); Identity providers and Integrations follow the same rules.
+
+- **First column**: an icon, the bold name, and one muted line of real detail (a base URL, a GET path in mono). The rest of the columns hold only data that helps choose a row, one idea per column. A qualifier goes inside the column it qualifies ("Of the subject" above the attributes), not in a separate vague column.
+- **Status** is always a badge with a tone (`mcp-badge`: success for On or Enabled, warning for Draft or a review, neutral for Disabled), never plain text. Kinds and types are neutral badges.
+- **Server and tool** read server first, then tool, each with its icon (`Server`, `Wrench`).
+- **Actions** is the last column, with the header "Actions" right aligned over its buttons. Edit is a small ghost button and opens the form of the row. A destructive action is a small red button (`--danger-soft --small`) that opens a `ConfirmDialog`. Do not disable an action with an excuse ("Turn off X first"): do the steps it needs and say them in the confirmation.
+- **Cells** are vertically centered.
+- **Pager**: every list has the Investigate pager (`TracePager`) under the table: the record count, Previous, page / pages and Next. With one page, Previous and Next are disabled; a search goes back to page 1.
+
+## Forms
+
+- A form uses the full width of its container; do not leave an empty side column. Its name comes first; an on/off field such as Enabled sits at the top.
+- **Footer**: the primary action on the left and, after the space, Cancel and the red destructive action on the right. An editor of one item has Cancel and Save on the right.
+- **Repeated rows** (parameters, attributes) of a form share one grid, so their columns line up from one section to the next. Remove has the height of the fields and the same width in every row; the buttons of one row have one size.
+- **Sections** of a form have a title and a one-line explanation under it. Each option of a select says what it means ("Verified subject ID · from the token (sub)"); an example of the chosen option can follow as helper text.
+- **Page heading**: its action keeps the normal size and one line (`access-primary-action`). Help about the whole page sits behind a help icon beside the title, not in a side box.
+- Use the select for a choice from a list; `cp-admin-segmented` is not used on product screens. Never show a free-text field for a value that the system must compute.
+
 ## States and overlays
 
 Keep space stable when a query is loading; a skeleton should follow the eventual row geometry. Empty states explain the missing item and offer the relevant action. Error states preserve entered values. ALLOW/DENY/PENDING include text or an icon; color is supplementary.

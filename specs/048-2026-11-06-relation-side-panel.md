@@ -114,6 +114,7 @@ The tool editor shows Resource mapping, Resources and Rules side by side. Allowe
 35. Turning trusted attributes on is a dialog with a primary **Turn on**, which says what the draft reads and for which tool; turning them off is a `ConfirmDialog` with a warning `Notice` that lists the published rules that read them ("<agent> · <rule>").
 36. The Access heading has no "ACCESS WORKBENCH" label.
 37. The lists of sources and of trusted attributes show 10 rows a page with the Investigate pager (records, Previous, page / pages, Next); with one page, Previous and Next are disabled. A search of sources goes back to page 1.
+38. The design system records these rules for every Admin screen: `docs/design-system/layouts.md` gains **List tables** and **Forms**, and `components.md` lists the Pager and says that the segmented control is not used on product screens.
 
 ---
 

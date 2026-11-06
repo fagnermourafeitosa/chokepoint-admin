@@ -15,7 +15,7 @@ The static specimens include [scripts/preview.js](scripts/preview.js) for local 
 | Checkbox | `cp-admin-choice` | Native checked/unchecked/disabled states; whole label is clickable |
 | Radio group | `cp-admin-choice-group` | Native exclusive selection with fieldset/legend |
 | Switch | `cp-admin-switch` | Native checkbox with switch role and visible label |
-| Segmented selection | `cp-admin-segmented`, `cp-admin-segment` | Native radio choices; selected segment and visible keyboard focus |
+| Segmented selection | `cp-admin-segmented`, `cp-admin-segment` | Native radio choices; selected segment and visible keyboard focus. Not used on product screens: a choice from a list is a Select ([Layouts › Forms](layouts.md#forms)) |
 | Input/textarea | `cp-admin-input`, `cp-admin-field` | Existing default, readonly, disabled, invalid, and focus styling |
 | Select | `admin-select` (`SelectMenu`) | Every choice from a list, in filters and forms. Never a native `select`: its platform chrome ignores the system. Same outlined trigger and option panel as the header environment selector, defined in `styles/controls.css` and shown in the specimen; the current option shows a check. `block` fills a form field, `required` keeps native form validation, and disabled options stay visible |
 | Range | `cp-admin-range` | Native keyboard/pointer input; specimen output updates locally |
@@ -26,6 +26,7 @@ The static specimens include [scripts/preview.js](scripts/preview.js) for local 
 | Dialog | `cp-admin-dialog` | Native modal in the specimen; Escape and close actions supported |
 | Confirmation dialog | `ConfirmDialog` (`src/components/ui/dialog`) | Dialog that confirms a destructive action: one sentence on what the action does, with each value that comes from the data (names, identifiers) in bold and no product name, an optional warning notice (`cp-admin-notice--warning` with `TriangleAlert`) for a consequence, then Cancel and the danger button named after the action. Escape and Cancel keep everything |
 | Side panel | `cp-admin-side-panel` (`SidePanel`) | Native modal on the right edge, full height; slides in; Escape, the close button and a click on the backdrop close it. `data-width="wide"` for two columns |
+| Pager | `TracePager` (`src/features/investigate/TraceUI.tsx`), `trace-pager` | Under every list table: record count, Previous, page / pages, Next; Previous and Next are disabled on the first and last page. See [Layouts › List tables](layouts.md#list-tables) |
 | Notification | `cp-admin-toast` | Polite local status message in the specimen |
 | Action variants | `cp-admin-button--ghost`, `--danger`, `--small` | Secondary emphasis, destructive appearance, compact actions |
 
