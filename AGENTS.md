@@ -10,7 +10,7 @@ This module is the React application that manages the Chokepoint platform. Platf
 
 * Use ASD-STE100 Simplified Technical English when you explain anything to the user.
 * Write documentation, instructions, comments, specifications, identifiers and project artifacts in English.
-* Use the existing Chokepoint domain terms. Do not invent synonyms.
+* Use the existing Chokepoint domain terms. Do not invent synonyms. Every name in the user experience comes from the canonical names in [backend/docs/authorization-domain-model.md](../backend/docs/authorization-domain-model.md). API and specification names, such as resource, stay out of the user experience.
 
 ## Technology Baseline
 
