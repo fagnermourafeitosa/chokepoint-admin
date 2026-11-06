@@ -3,7 +3,7 @@
 - **Specification ID**: 048
 - **Date**: 2026-11-06
 - **Slug**: relation-side-panel
-- **Status**: Waiting Approve
+- **Status**: Implemented
 - **Owner**: Admin — Access, Delegation and access
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md)
 - **Related Specification**: [027 — Tool Resource Mapping Review](027-2026-10-31-tool-resource-mapping-review.md)
