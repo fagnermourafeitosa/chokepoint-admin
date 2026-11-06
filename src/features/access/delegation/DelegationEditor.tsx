@@ -67,6 +67,17 @@ function Editor({ scope, agentId, agentName, target, block }: Props) {
   const count = (d: Doc) => d.scopes.length + d.capabilities.length + d.resources.length;
   const layout = useMemo(() => delegationLayout(agentName, view, catalog, positions), [agentName, view, catalog, positions]);
   useEffect(() => { const next = targetSelection(target, state.draft); if (next) setSelected(next); }, [target?.serverId, target?.tool, target?.section, target?.connectionId, !!state.config]);
+  // Open the rule shows the rule: scroll once to the rules field (a condition)
+  // or to the panel of the selected relation (Admin 045).
+  const panel = useRef<HTMLFieldSetElement>(null);
+  const scrolled = useRef<string | undefined>(undefined);
+  const targetKey = target ? JSON.stringify(target) : undefined;
+  useEffect(() => {
+    if (!targetKey || !selected || !state.config || scrolled.current === targetKey || !panel.current) return;
+    scrolled.current = targetKey;
+    const node = (target?.section === 'policies' && panel.current.querySelector('[data-field="rules"]')) || panel.current;
+    node.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }, [targetKey, selected, state.config]);
   const appliedBlock = useRef(0);
   useEffect(() => {
     if (!block || !state.config || appliedBlock.current === block.id) return;
@@ -100,7 +111,7 @@ function Editor({ scope, agentId, agentName, target, block }: Props) {
       {mode === 'graph'
         ? <DelegationGraph layout={layout} selected={selected} onSelect={setSelected} onMove={(key, x, y) => setPositions(p => ({ ...p, [key]: { x, y } }))} readOnly={readOnly} maximized={maximized} onMaximize={() => setMaximized(v => !v)} />
         : <ListView doc={view} source={doc} selected={selected} onSelect={setSelected} onChange={state.edit} readOnly={readOnly} />}
-      {selected ? <fieldset className="delegation-panel-frame" disabled={readOnly || state.busy}><RelationPanel key={JSON.stringify(selected) + version} selected={selected} agentName={agentName} doc={doc} onChange={state.edit} onClose={() => { setSelected(undefined); setBack(undefined); }} onSelect={s => { setBack(selected?.type === 'group' ? selected : undefined); setSelected(s); }} back={back} onBack={() => { setSelected(back); setBack(undefined); }} /></fieldset> : null}
+      {selected ? <fieldset ref={panel} className="delegation-panel-frame" disabled={readOnly || state.busy}><RelationPanel key={JSON.stringify(selected) + version} selected={selected} agentName={agentName} doc={doc} onChange={state.edit} onClose={() => { setSelected(undefined); setBack(undefined); }} onSelect={s => { setBack(selected?.type === 'group' ? selected : undefined); setSelected(s); }} back={back} onBack={() => { setSelected(back); setBack(undefined); }} /></fieldset> : null}
     </div>
     {help ? <GraphHelp onClose={() => setHelp(false)} /> : null}
     <PublishBar config={state.config} changes={state.changes} busy={state.busy} blocker={harnessWithoutGroups(state.draft) ? 'Harness login is on without a group. Choose at least one group, or turn it off.' : undefined} onPublish={state.publish} onDiscard={() => { void state.discard(); setSelected(undefined); }} onHistory={() => setHistory(true)} />

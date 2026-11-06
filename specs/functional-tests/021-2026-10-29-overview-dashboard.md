@@ -35,14 +35,14 @@ scenarios:
     criteria: [4, 5]
     steps:
       - Use each status and type filter and the pager of the Inbox.
-      - Open an item, leave it (Cancel, Keep reviewed), then open one and Mark resolved.
+      - Open an item from its Inbox action, then return; click Mark resolved on another row.
     expected:
       - The Inbox defaults to Open and Reviewed.
-      - Opening an item makes it Reviewed; Cancel keeps the detail; Keep reviewed leaves; Mark resolved stores the actor and time and moves the item to Resolved.
+      - Opening an item makes it Reviewed without a dialog; Mark resolved stores the actor and time and moves the item to Resolved (Admin 045).
     last_run:
-      date: 2026-10-30
+      date: 2026-11-06
       result: passed
-      notes: null
+      notes: Rewritten for Admin 045; run with the Admin 045 scenarios S2 and S3.
   - id: S4
     title: Errors, scope and narrow screen
     criteria: []

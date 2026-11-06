@@ -47,3 +47,6 @@
   padding: var(--cp-admin-space-4) var(--cp-admin-space-6);
   border-top: 1px solid var(--cp-admin-color-border);
 }
+
+/* Admin 045: a name in bold inside the confirmation warning stays in the sentence. */
+.confirm-dialog-warning strong { display: inline; margin: 0; }

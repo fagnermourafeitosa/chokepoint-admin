@@ -20,7 +20,9 @@
 .relation-panel > header small { font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-heavy); letter-spacing: var(--cp-admin-tracking-label); text-transform: uppercase; color: var(--cp-admin-color-text-muted); }
 .relation-panel h4 { font: var(--cp-admin-weight-bold) 1.0625rem var(--cp-admin-font-heading); overflow-wrap: anywhere; }
 .relation-panel > header p { font-size: var(--cp-admin-type-small); }
-.relation-panel > footer { border-top: 1px solid var(--cp-admin-color-border); padding-top: var(--cp-admin-space-3); }
+/* Admin 045: space under the border before the Remove tool button, aligned right. */
+.confirm-resource-list { margin: var(--cp-admin-space-2) 0 0; padding-inline-start: var(--cp-admin-space-5); }
+.relation-panel > footer { display: grid; justify-items: end; gap: var(--cp-admin-space-3); border-top: 1px solid var(--cp-admin-color-border); padding-top: var(--cp-admin-space-4); }
 .relation-field { display: grid; gap: var(--cp-admin-space-1); font-size: var(--cp-admin-type-small); }
 .relation-field > span { font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-bold); color: var(--cp-admin-color-text-muted); }
 .relation-field > div { display: grid; gap: var(--cp-admin-space-1); overflow-wrap: anywhere; }

@@ -12,3 +12,7 @@
 .access-agent-row-copy .report-only-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
 .access-agent-title { flex-wrap: wrap; row-gap: 4px; }
 .access-agent-title .mcp-badge { white-space: nowrap; }
+/* Admin 045: the Report-only button stands out with the Report-only palette; its help sits next to it. */
+.agent-mode-action { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); }
+/* The ghost button keeps the Edit hover (offset shadow and lift); only the palette changes. */
+.cp-admin-button.agent-report-only-button, .cp-admin-button.agent-report-only-button:hover:not(:disabled) { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); color: var(--cp-admin-color-warning); }

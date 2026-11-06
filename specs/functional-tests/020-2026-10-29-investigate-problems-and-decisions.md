@@ -35,13 +35,13 @@ scenarios:
     title: Review and resolution from the Inbox
     criteria: [5]
     steps:
-      - Open an Inbox item in Investigate; leave with Cancel, then Keep reviewed; open another and Mark resolved.
+      - Open an Inbox item in Investigate; click Back to the list; open another and click Mark resolved in the inspector header.
     expected:
-      - The item is Reviewed when it opens; the modal follows the specification; a resolved item does not reopen its workflow.
+      - The item is Reviewed when it opens; no dialog opens when leaving (Admin 045); Mark resolved shows Resolved; a resolved item stays Resolved when viewed.
     last_run:
-      date: 2026-10-30
+      date: 2026-11-06
       result: passed
-      notes: null
+      notes: Rewritten for Admin 045; run with the Admin 045 scenarios S2 and S3.
   - id: S4
     title: No priority, no watching, no completeness warning
     criteria: [6]

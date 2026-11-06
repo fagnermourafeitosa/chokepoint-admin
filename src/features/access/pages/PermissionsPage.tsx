@@ -4,7 +4,7 @@ import { useAccessTarget } from '../hooks/useAccessTarget';
 import { Bot, Plus } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
 import { EmptyState } from '../../../components/ui/empty-state/EmptyState';
-import { Dialog } from '../../../components/ui/dialog/Dialog';
+import { ConfirmDialog } from '../../../components/ui/dialog/ConfirmDialog';
 import { AgentList } from '../components/AgentList';
 import { AgentDetails } from '../components/AgentDetails';
 import { NewAgentDialog } from '../components/NewAgentDialog';
@@ -40,9 +40,8 @@ function AgentWorkbench({ scope }: { scope: AgentScope }) {
     </div>}
     {workbench.isFetchNextPageError ? <p role="alert">Could not load the next page. Use Load more agents to retry.</p> : null}
     {workbench.dialog === 'new-agent' || workbench.dialog === 'edit-agent' && workbench.selectedAgent ? <NewAgentDialog key={workbench.dialog === 'new-agent' ? 'new' : workbench.selectedAgent!.id} scope={scope} agent={workbench.dialog === 'edit-agent' ? workbench.selectedAgent : undefined} onClose={() => workbench.setDialog(null)} onPersisted={workbench.persisted} onSaved={agent => { workbench.saved(agent); context.select(agent.id); }} /> : null}
-    {workbench.dialog === 'delete-agent' && workbench.selectedAgent ? <Dialog title="Delete agent" onClose={() => { if (!workbench.deleting) workbench.setDialog(null); }}>
-      <div className="admin-dialog-body"><p>Delete “{workbench.selectedAgent.name}”? The agent loses all delegation and access at once and can not get new tokens. Its saved draft is dropped.</p><p className="cp-admin-muted">Xokepoint keeps the revision history and the recorded decisions of this agent. Investigate shows its name as deleted.</p>{workbench.error ? <p role="alert">{workbench.error}</p> : null}</div>
-      <div className="admin-dialog-actions"><button className="cp-admin-button cp-admin-button--secondary" disabled={workbench.deleting} onClick={() => workbench.setDialog(null)}>Cancel</button><button className="cp-admin-button cp-admin-button--danger" disabled={workbench.deleting} onClick={() => void workbench.remove().then(removed => { if (removed) context.select(null); })}>{workbench.deleting ? 'Deleting…' : 'Delete agent'}</button></div>
-    </Dialog> : null}
+    {workbench.dialog === 'delete-agent' && workbench.selectedAgent ? <ConfirmDialog title="Delete agent" confirmLabel="Delete agent" busyLabel="Deleting…" busy={workbench.deleting} error={workbench.error || undefined} warning="The agent loses all delegation and access at once and can not get new tokens. Its saved draft is dropped." onClose={() => workbench.setDialog(null)} onConfirm={() => void workbench.remove().then(removed => { if (removed) context.select(null); })}>
+      <p>Delete <strong>{workbench.selectedAgent.name}</strong>?</p><p className="cp-admin-muted">The revision history and the recorded decisions of this agent are kept. Investigate shows its name as deleted.</p>
+    </ConfirmDialog> : null}
   </section>;
 }

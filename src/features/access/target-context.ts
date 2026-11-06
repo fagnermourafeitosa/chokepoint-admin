@@ -15,7 +15,7 @@ export function accessTarget(params: URLSearchParams): AccessTarget | undefined 
   if (section && !['grants', 'policies', 'people'].includes(section)) return undefined;
   const view = params.get('view');
   const agentView = view === 'identity' || view === 'sessions' ? view : undefined;
-  if (!section && !agentView && !params.has('tool') && !params.has('decision_id') && !params.has('signal_id'))
+  if (!section && !agentView && !params.has('tool') && !params.has('decision_id'))
     return undefined;
   return {
     section: (section as AccessTarget['section']) || 'grants',
@@ -28,7 +28,6 @@ export function accessTarget(params: URLSearchParams): AccessTarget | undefined 
 }
 export function actionPath(
   action: Action,
-  signalId?: string,
   returnTo?: string,
 ): string | undefined {
   if (!action.available) return undefined;
@@ -44,7 +43,6 @@ export function actionPath(
   const params = new URLSearchParams(
     Object.entries(action.params).filter(([key]) => permitted.has(key)),
   );
-  if (signalId) params.set('signal_id', signalId);
   if (returnTo && (returnTo === '/' || returnTo.startsWith('/investigate?')))
     params.set('return_to', returnTo);
   if (action.route === 'permissions') {

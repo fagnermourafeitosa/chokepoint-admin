@@ -1,7 +1,9 @@
 import type { AccessTarget } from '../target-context';
 import './agent-details.css';
 import { useState } from 'react';
-import { Eye, Pencil, Power, ShieldCheck, Trash2 } from 'lucide-react';
+import { CircleHelp, Eye, Pencil, Power, ShieldCheck, Trash2 } from 'lucide-react';
+import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
+import { ConfirmDialog } from '../../../components/ui/dialog/ConfirmDialog';
 import { useNavigate } from 'react-router';
 import { ReportOnlyChip } from '../../../components/report-only/ReportOnlyChip';
 import { ModeDialog, ReportOnlyNotice, ReviewDateDialog } from './EnforcementControls';
@@ -21,19 +23,23 @@ type AgentDetailsProps = { agent: AgentRecord; scope: AgentScope; target?: Acces
 function AgentStatusAction({ agent, scope, onChanged, onReload }: Pick<AgentDetailsProps, 'agent' | 'scope' | 'onChanged' | 'onReload'>) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<{ message: string; conflict: boolean }>();
+  // Disable agent asks for confirmation (Admin 045); Enable agent does not.
+  const [confirming, setConfirming] = useState(false);
   const disabled = agent.status === 'disabled';
   async function change() {
     setBusy(true); setError(undefined);
     try {
       onChanged(await agentApi.setStatus(scope, agent.id, disabled ? 'active' : 'disabled', agent.revision));
+      setConfirming(false);
     } catch (cause) {
       const conflict = cause instanceof HttpError && cause.status === 409;
       setError({ conflict, message: conflict ? 'The agent changed in another session. Reload to see its current status.' : `Could not ${disabled ? 'enable' : 'disable'} the agent. Retry when the service is available.` });
     } finally { setBusy(false); }
   }
   return <>
-    <button className={`cp-admin-button cp-admin-button--small ${disabled ? 'cp-admin-button--secondary' : 'cp-admin-button--danger-soft'}`} type="button" disabled={busy} onClick={() => void change()}><Power size={15} aria-hidden="true" />{disabled ? 'Enable agent' : 'Disable agent'}</button>
-    {error ? <div role="alert" className="cp-admin-notice access-agent-status-error" data-tone="danger">{error.message}{error.conflict ? <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => { setError(undefined); onReload(); }}>Reload</button> : null}</div> : null}
+    <button className={`cp-admin-button cp-admin-button--small ${disabled ? 'cp-admin-button--secondary' : 'cp-admin-button--danger-soft'}`} type="button" disabled={busy} onClick={() => { if (disabled) void change(); else { setError(undefined); setConfirming(true); } }}><Power size={15} aria-hidden="true" />{disabled ? 'Enable agent' : 'Disable agent'}</button>
+    {confirming ? <ConfirmDialog title="Disable agent" confirmLabel="Disable agent" busyLabel="Disabling…" busy={busy} error={error?.message} warning="It gets no token, and its next call is rejected." onConfirm={() => void change()} onClose={() => { setConfirming(false); setError(undefined); }}><p>Disable <strong>{agent.name}</strong>?</p></ConfirmDialog> : null}
+    {error && !confirming ? <div role="alert" className="cp-admin-notice access-agent-status-error" data-tone="danger">{error.message}{error.conflict ? <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => { setError(undefined); onReload(); }}>Reload</button> : null}</div> : null}
   </>;
 }
 
@@ -63,7 +69,7 @@ export function AgentDetails({ agent, scope, target, onEdit, onDelete, onChanged
   const navigate = useNavigate();
   const reportOnly = agent.enforcement === 'report_only';
   return <section className="cp-admin-panel access-agent-details" aria-label="Selected agent">
-    <div className="access-agent-heading"><AgentVisual agent={agent} scope={scope} /><div className="agent-detail-copy"><div className="access-agent-title"><h2>{agent.name}</h2><span className="mcp-badge" data-tone={disabled ? undefined : 'success'}>{disabled ? 'Disabled' : 'Active'}</span>{reportOnly ? <ReportOnlyChip /> : null}</div><p>{agent.description}</p><p className="cp-admin-muted">{disabled ? 'Disabled: it gets no token, and its next call is rejected.' : reportOnly ? 'Report-only: its calls run, and Xokepoint records the calls that its policy would deny.' : 'Acts for the subjects that delegate to it'}</p></div><div className="agent-detail-actions"><button className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" type="button" onClick={() => setPanel('mode')}>{reportOnly ? <><ShieldCheck size={15} aria-hidden="true" />Enforce access</> : <><Eye size={15} aria-hidden="true" />Report-only</>}</button><AgentStatusAction key={agent.id} agent={agent} scope={scope} onChanged={onChanged} onReload={onReload} /><button className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" type="button" onClick={onEdit}><Pencil size={15} aria-hidden="true" />Edit</button><button className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" type="button" onClick={onDelete}><Trash2 size={15} aria-hidden="true" />Delete</button></div></div>
+    <div className="access-agent-heading"><AgentVisual agent={agent} scope={scope} /><div className="agent-detail-copy"><div className="access-agent-title"><h2>{agent.name}</h2><span className="mcp-badge" data-tone={disabled ? undefined : 'success'}>{disabled ? 'Disabled' : 'Active'}</span>{reportOnly ? <ReportOnlyChip /> : null}</div><p>{agent.description}</p><p className="cp-admin-muted">{disabled ? 'Disabled: it gets no token, and its next call is rejected.' : reportOnly ? 'Report-only: its calls run, and Xokepoint records the calls that its policy would deny.' : 'Acts for the subjects that delegate to it'}</p></div><div className="agent-detail-actions"><span className="agent-detail-actions-group"><span className="agent-mode-action"><button className={`cp-admin-button cp-admin-button--small ${reportOnly ? 'cp-admin-button--secondary' : 'cp-admin-button--ghost agent-report-only-button'}`} type="button" onClick={() => setPanel('mode')}>{reportOnly ? <><ShieldCheck size={15} aria-hidden="true" />Enforce access</> : <><Eye size={15} aria-hidden="true" />Report-only</>}</button><Tooltip content="Report-only lets the calls of this agent run and records each call that its policy would deny, so that you can check a policy before you enforce it. Delegation, a valid token, an enabled identity connection and the kill switch stay enforced."><CircleHelp size={14} aria-label="About Report-only" /></Tooltip></span><button className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" type="button" onClick={onEdit}><Pencil size={15} aria-hidden="true" />Edit</button></span><span className="agent-detail-actions-group"><AgentStatusAction key={agent.id} agent={agent} scope={scope} onChanged={onChanged} onReload={onReload} /><button className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" type="button" onClick={onDelete}><Trash2 size={15} aria-hidden="true" />Delete</button></span></div></div>
     {reportOnly ? <ReportOnlyNotice scope={scope} agent={agent} onChangeDate={() => setPanel('date')} onHistory={() => setPanel('history')}
       onViewCalls={() => navigate(`/investigate?${new URLSearchParams({ view: 'decisions', result: 'would_deny', agent: agent.id })}`)} /> : null}
     <div className="cp-admin-inner-tabs agent-views" role="group" aria-label="Agent view">

@@ -8,9 +8,10 @@ import { GroupPanel } from './GroupPanel';
 import { IdpPanel } from './IdpPanel';
 import { ConditionEditor } from './ConditionEditor';
 import { ExpiresField } from './Fields';
+import { ConfirmDialog } from '../../../components/ui/dialog/ConfirmDialog';
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return <div className="relation-field"><span>{label}</span><div>{children}</div></div>;
+function Field({ label, children, name }: { label: string; children: ReactNode; name?: string }) {
+  return <div className="relation-field" data-field={name}><span>{label}</span><div>{children}</div></div>;
 }
 
 function Expiration({ id, value, onChange }: { id: string; value?: string; onChange: (v?: string) => void }) {
@@ -39,6 +40,7 @@ type PanelProps = { selected: Selection; onClose: () => void; agentName: string;
 
 export function RelationPanel({ selected, onClose, agentName, doc, onChange, onSelect, back, onBack }: PanelProps) {
   const { catalog } = useCatalog();
+  const [removing, setRemoving] = useState(false);
   let head: ReactNode = null, body: ReactNode = null;
   const header = (kind: string, title: string, relation?: string) => <header><div><small>{kind}</small><h4>{title}</h4>{relation ? <p className="cp-admin-muted">{relation}</p> : null}</div></header>;
   const start = 'addCondition' in selected && !!selected.addCondition;
@@ -60,9 +62,10 @@ export function RelationPanel({ selected, onClose, agentName, doc, onChange, onS
     body = <><Field label="Server">{server}</Field>
       <Field label="Resource mapping">{c.mapping ? <span>{c.mapping.pointer ? <><code>{c.mapping.pointer}</code> → </> : null}{c.mapping.kind}</span> : 'None. This tool has no resource check.'}</Field>
       <Expiration id={c.id} value={c.expiresAt} onChange={v => set({ expiresAt: v })} />
-      <Field label="Rules for this agent on this server tool"><Conditions items={c.conditions} onRemove={id => set({ conditions: c.conditions.filter(k => k.id !== id) })} /><small className="cp-admin-muted">Every rule must pass. They apply only when {agentName} calls {server} · {c.tool}.</small></Field>
+      <Field label="Rules for this agent on this server tool" name="rules"><Conditions items={c.conditions} onRemove={id => set({ conditions: c.conditions.filter(k => k.id !== id) })} /><small className="cp-admin-muted">Every rule must pass. They apply only when {agentName} calls {server} · {c.tool}.</small></Field>
       <AddCondition key={c.id + start} serverId={c.serverId} tool={c.tool} start={start} expiration={!c.expiresAt} cel onExpiration={() => set({ expiresAt: inAMonth() })} onRule={k => set({ conditions: [...c.conditions, k] })} />
-      <footer>{(() => { const removal = withoutCapability(doc, c.id); return <>{removal.orphans.length ? <small className="cp-admin-muted">Also removes {removal.orphans.length} {removal.orphans.length === 1 ? 'resource' : 'resources'} of {[...new Set(removal.orphans.map(r => r.kind))].join(', ')} that no other granted tool uses.</small> : null}<button type="button" className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" onClick={() => { onChange(removal.doc); onClose(); }}><Trash2 size={14} aria-hidden="true" />Remove tool</button></>; })()}</footer></>;
+      <footer><button type="button" className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" onClick={() => setRemoving(true)}><Trash2 size={14} aria-hidden="true" />Remove tool</button>
+        {removing ? (() => { const removal = withoutCapability(doc, c.id); return <ConfirmDialog title="Remove tool" confirmLabel="Remove tool" onClose={() => setRemoving(false)} onConfirm={() => { setRemoving(false); onChange(removal.doc); onClose(); }} warning={removal.orphans.length ? <><strong>{agentName}</strong> also loses access to these resources, because no other granted tool uses them:<ul className="confirm-resource-list">{removal.orphans.map(r => <li key={r.id}><strong>{r.kind} · {r.value}</strong></li>)}</ul></> : undefined}><p>Remove <strong>{c.tool}</strong> from the tools of <strong>{agentName}</strong>? The change goes into the draft.</p></ConfirmDialog>; })() : null}</footer></>;
   } else {
     const r = doc.resources.find(x => x.id === selected.id);
     if (!r) return null;
