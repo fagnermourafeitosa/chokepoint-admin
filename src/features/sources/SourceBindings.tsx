@@ -8,6 +8,8 @@ import { Server, Wrench } from 'lucide-react';
 import { mcpApi, mcpKey } from '../mcp/api';
 import { sourceApi, type Source, type Binding, type BindingVersion } from './api';
 import { BindingEditor } from './BindingEditor';
+import { TracePager } from '../investigate/TraceUI';
+import { pageSize } from './SourcesPage';
 import type { EnvironmentScope } from '../access/environment-scope';
 import type { SourceActions } from './useSources';
 
@@ -29,6 +31,7 @@ function reads(v: BindingVersion) {
 export function SourceBindings({ source, scope, actions }: { source: Source; scope: EnvironmentScope; actions: SourceActions }) {
   const [editing, setEditing] = useState<string>();
   const [review, setReview] = useState<{ id: string; action: 'approve' | 'retire' }>();
+  const [page, setPage] = useState(1);
   // Server names for the Tool column, from the same cached list as the editor.
   const servers = useInfiniteQuery({ queryKey: mcpKey(scope), queryFn: ({ signal, pageParam }) => mcpApi.list(scope, pageParam, signal), initialPageParam: 0, getNextPageParam: last => last.next_offset ?? undefined });
   const serverName = (id?: string) => servers.data?.pages.flatMap(p => p.items).find(x => x.id === id)?.name ?? '';
@@ -48,7 +51,7 @@ export function SourceBindings({ source, scope, actions }: { source: Source; sco
     <div className="source-section-heading"><div><h2>Trusted attributes</h2><p className="cp-admin-muted">Each operation reads trusted attributes from this API for one tool, before its rules are checked.</p></div><button className="cp-admin-button" onClick={() => setEditing('new')}>Add trusted attributes</button></div>
     {source.bindings.length ? <div className="cp-admin-table-scroll"><table className="cp-admin-table source-table">
       <thead><tr><th>Name</th><th>MCP server · tool</th><th>Attributes</th><th>Status</th><th className="source-actions-head">Actions</th></tr></thead>
-      <tbody>{source.bindings.map(item => {
+      <tbody>{source.bindings.slice((page - 1) * pageSize, page * pageSize).map(item => {
         const version = item.draft ?? item.approved, st = status(item, source);
         return <tr key={item.id}>
           <td><strong>{version?.name}</strong><small className="source-mono">GET {version?.path}</small></td>
@@ -63,7 +66,7 @@ export function SourceBindings({ source, scope, actions }: { source: Source; sco
           </div></td>
         </tr>;
       })}</tbody>
-    </table></div> : <p className="cp-admin-muted">No trusted attributes yet. Add them by hand, or import an operation from an OpenAPI description.</p>}
+    </table><TracePager page={Math.min(page, Math.max(1, Math.ceil(source.bindings.length / pageSize)))} size={pageSize} total={source.bindings.length} onPage={setPage} /></div> : <p className="cp-admin-muted">No trusted attributes yet. Add them by hand, or import an operation from an OpenAPI description.</p>}
     {turnOn && reviewed?.draft ? <Dialog title="Turn on these trusted attributes?" onClose={() => { if (!actions.busy) setReview(undefined); }}>
       <div className="admin-dialog-body">
         {reads(reviewed.draft)}

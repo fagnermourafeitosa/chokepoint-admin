@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CircleHelp, Database, Plus } from 'lucide-react';
 import { Tooltip } from '../../components/ui/tooltip/Tooltip';
+import { TracePager } from '../investigate/TraceUI';
 import { ConfirmDialog } from '../../components/ui/dialog/ConfirmDialog';
 import { sourceApi, type Source } from './api';
 import { useSources } from './useSources';
@@ -13,6 +14,9 @@ const auth: Record<Source['auth_type'], string> = { bearer: 'Bearer token', api_
 
 // What the old Keep facts authoritative box said, now behind the help icon of the title.
 const help = 'Credentials stay in Xokepoint; your client and your identity provider never fetch these attributes. Saving a source does not test its API. When the connection changes, turn its trusted attributes on again.';
+
+// Rows of one page, in the lists of sources and of trusted attributes (Investigate pager).
+export const pageSize = 10;
 
 const subtitle = 'Context sources are your authorized APIs. Their trusted attributes, about the subject or the object of a call, are read before the rules of a tool are checked.';
 
@@ -31,6 +35,7 @@ export function SourcesPage({ scope }: { scope: EnvironmentScope }) {
   const [selected, setSelected] = useState<string>();
   const [tab, setTab] = useState<'connection' | 'bindings'>('connection');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [deleting, setDeleting] = useState<Source>();
   const source = actions.sources.find(s => s.id === selected);
   // Edit opens the connection of the source; a new source starts there too.
@@ -69,10 +74,10 @@ export function SourcesPage({ scope }: { scope: EnvironmentScope }) {
 
       </>
       : <>
-        <label className="source-search">Find a source<input className="cp-admin-input" type="search" placeholder="Search sources…" value={search} onChange={e => setSearch(e.target.value)} /></label>
+        <label className="source-search">Find a source<input className="cp-admin-input" type="search" placeholder="Search sources…" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} /></label>
         {actions.sources.length ? <div className="cp-admin-table-scroll" role="region" aria-label="Context sources" tabIndex={0}><table className="cp-admin-table source-table">
           <thead><tr><th>Source</th><th>Authentication</th><th>Trusted attributes</th><th>Status</th><th className="source-actions-head">Actions</th></tr></thead>
-          <tbody>{shown.map(s => { const n = supplies(s); return <tr key={s.id}>
+          <tbody>{shown.slice((page - 1) * pageSize, page * pageSize).map(s => { const n = supplies(s); return <tr key={s.id}>
             <td><div className="source-name"><Database size={20} aria-hidden="true" /><span><strong>{s.name}</strong><small className="cp-admin-muted">{s.base_url}</small></span></div></td>
             <td>{auth[s.auth_type]}</td>
             <td>{n.attributes} {n.attributes === 1 ? 'attribute' : 'attributes'} · {n.tools} {n.tools === 1 ? 'tool' : 'tools'}{n.draft ? <> <span className="mcp-badge" data-tone="warning">Draft</span></> : null}</td>
@@ -82,7 +87,7 @@ export function SourcesPage({ scope }: { scope: EnvironmentScope }) {
               <button className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" disabled={actions.busy} onClick={() => setDeleting(s)}>Delete</button>
             </div></td>
           </tr>; })}</tbody>
-        </table></div> : <p>No context sources yet. Connect the API that knows your customers and orders.</p>}
+        </table><TracePager page={page} size={pageSize} total={shown.length} onPage={setPage} /></div> : <p>No context sources yet. Connect the API that knows your customers and orders.</p>}
       </>}
     {deleting ? <ConfirmDialog title="Delete source" confirmLabel="Delete source" busyLabel="Deleting…" busy={actions.busy}
       warning={deleting.bindings.length ? <>Its trusted attributes are turned off and removed: {deleting.bindings.map(b => (b.approved ?? b.draft)?.name).join(', ')}. Rules that read them deny their calls.</> : undefined}

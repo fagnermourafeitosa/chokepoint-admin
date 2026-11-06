@@ -23,3 +23,6 @@
 .source-tool{display:grid;gap:4px}.source-tool>span{display:inline-flex;align-items:center;gap:6px}
 .source-attribute-list>span{display:inline-flex;align-items:center;gap:6px}
 .source-describes-line{font-size:var(--cp-admin-type-label);font-weight:var(--cp-admin-weight-semibold)}
+/* The Investigate pager under the tables of Context sources. */
+.source-manager .trace-pager,.source-manager .trace-pager>div{display:flex;gap:12px;align-items:center;justify-content:space-between}
+.source-manager .trace-pager{padding:16px 24px;font-size:.75rem;color:var(--cp-admin-color-text-muted)}
