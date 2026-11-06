@@ -32,7 +32,7 @@ function Row({ decision, problem, state }: { decision?: Decision; problem?: Prob
   const permit = outcome === 'permit';
   const id = problem?.latest_decision_id || decision!.id;
   const at = problem?.last_at || decision!.decided_at;
-  const open = () => state.open(id, problem?.signal?.id);
+  const open = () => state.open(id);
   const resource = problem ? problem.resource : decision!.resource;
   return (
     <div className="trace-list-row trace-list-row--open trace-row-decision" role="row" title="Open the decision details" onClick={openRow(open)}>

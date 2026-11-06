@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router';
 import { exchangeApi, traceApi, traceKey, type ExchangeFilters } from './api';
@@ -45,29 +44,13 @@ export function useInvestigation(scope: EnvironmentScope) {
     retry: false,
   });
   const decisionId = requested || problem.data?.latest_decision_id;
-  // A token exchange signal opens the Token exchanges list, and a would-deny signal
-  // the would-deny decisions (Admin 041): neither names one decision.
-  const listTarget = view === 'exchanges' || params.get('result') === 'would_deny';
-  const unavailableTarget = !listTarget && params.has('signal_id') && !requested && !canonical;
-  const isDetail = !!requested || canonical || unavailableTarget || !!exchangeId;
+  const isDetail = !!requested || canonical || !!exchangeId;
   const detail = useQuery({
     queryKey: [...traceKey(scope), 'detail', decisionId],
     queryFn: ({ signal }) => traceApi.detail(scope, decisionId!, signal),
     enabled: !!decisionId,
     retry: false,
   });
-  const linkedSignal = detail.data?.problem?.signal?.id;
-  useEffect(() => {
-    if (linkedSignal && !params.has('signal_id'))
-      setParams(
-        (previous) => {
-          const next = new URLSearchParams(previous);
-          next.set('signal_id', linkedSignal);
-          return next;
-        },
-        { replace: true },
-      );
-  }, [linkedSignal, params, setParams]);
   const problems = useQuery({
     queryKey: [...traceKey(scope), 'problems', filters],
     queryFn: ({ signal }) => traceApi.problems(scope, filters, signal),
@@ -131,13 +114,11 @@ export function useInvestigation(scope: EnvironmentScope) {
       return next;
     });
   }
-  function open(id: string, signalId?: string) {
+  function open(id: string) {
     setParams((previous) => {
       const next = new URLSearchParams(previous);
       if (!isDetail) next.set('return_to', `/investigate?${previous}`);
       next.set('decision_id', id);
-      if (signalId) next.set('signal_id', signalId);
-      else if (!isDetail) next.delete('signal_id');
       return next;
     });
   }
@@ -158,7 +139,6 @@ export function useInvestigation(scope: EnvironmentScope) {
     agents,
     agentItems,
     isDetail,
-    unavailableTarget,
     decisionId,
     update,
     open,

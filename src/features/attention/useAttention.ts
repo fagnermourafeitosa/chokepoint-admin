@@ -11,7 +11,7 @@ export function useInbox(scope: EnvironmentScope) {
   const counts = useQuery({ queryKey: [...attentionKey(scope), 'counts'], queryFn: ({ signal }) => attentionApi.counts(scope, signal) });
   const lastPage = Math.max(1, Math.ceil((list.data?.total || 0) / (list.data?.page_size || 5)));
   useEffect(() => { if (list.data && page > lastPage) setPage(lastPage); }, [list.data, page, lastPage]);
-  return { list, counts, lastPage, page, setPage, type, status,
+  return { scope, list, counts, lastPage, page, setPage, type, status,
     setType: (value: SignalType | 'all') => { setType(value); setPage(1); },
     setStatus: (value: StatusFilter) => { setStatus(value); setPage(1); },
   };

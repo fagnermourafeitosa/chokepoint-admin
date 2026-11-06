@@ -190,9 +190,6 @@
 .trace-empty p {
   color: var(--cp-admin-color-text-muted);
 }
-.signal-detail-notice {
-  margin: 16px 24px;
-}
 @media (max-width: 990px) {
   .trace-list-row {
     gap: 12px;

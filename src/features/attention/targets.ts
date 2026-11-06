@@ -9,7 +9,7 @@ export function targetPath(signal: Signal): string | undefined {
   // All decisions, filtered on the agent, the tool and the closed hour.
   if (signal.type === 'report-only-would-deny') {
     const p = signal.target_params;
-    const query = new URLSearchParams({ view: 'decisions', result: 'would_deny', signal_id: signal.id, return_to: '/' });
+    const query = new URLSearchParams({ view: 'decisions', result: 'would_deny', return_to: '/' });
     if (p.agent) query.set('agent', p.agent);
     if (p.server_id && p.tool) { query.set('server_id', p.server_id); query.set('tool', p.tool); }
     if (p.window_start) {
@@ -21,25 +21,26 @@ export function targetPath(signal: Signal): string | undefined {
   }
   // The review date of the mode passed: open the agent (Backend 057).
   if (signal.type === 'report-only-review-due' && signal.target_params.agent_id) {
-    return `/access?${new URLSearchParams({ agent_id: signal.target_params.agent_id, signal_id: signal.id, return_to: '/' })}`;
+    return `/access?${new URLSearchParams({ agent_id: signal.target_params.agent_id, return_to: '/' })}`;
   }
   if (signal.target_route === 'decision-detail') {
     const p = signal.target_params;
-    if (!p.server_id || !p.tool || !p.agent || !p.reason || !p.window_start) return `/investigate?${new URLSearchParams({ signal_id: signal.id, return_to: '/' })}`;
-    return `/investigate?${new URLSearchParams({ server_id: p.server_id, tool: p.tool, agent: p.agent, reason: p.reason, window_start: p.window_start, signal_id: signal.id, return_to: '/' })}`;
+    // A historical item without a reason-qualified problem has no target (Backend 024 decision 7).
+    if (!p.server_id || !p.tool || !p.agent || !p.reason || !p.window_start) return undefined;
+    return `/investigate?${new URLSearchParams({ server_id: p.server_id, tool: p.tool, agent: p.agent, reason: p.reason, window_start: p.window_start, return_to: '/' })}`;
   }
   // A denied token exchange opens the Token exchanges view with its filters
   // (Backend 034 Admin contract item 3). The subject is searched as text: the
   // signal names the subject without its issuer.
   if (signal.target_route === 'token-exchanges') {
     const p = signal.target_params;
-    const query = new URLSearchParams({ view: 'exchanges', signal_id: signal.id, return_to: '/' });
+    const query = new URLSearchParams({ view: 'exchanges', return_to: '/' });
     for (const key of ['agent_id', 'reason', 'from', 'to'] as const) if (p[key]) query.set(key, p[key]);
     if (p.subject) query.set('q', p.subject);
     return `/investigate?${query}`;
   }
   if (signal.target_route === 'tool-catalog') {
-    const path = actionPath({ label: signal.target_label, route: signal.target_route, params: signal.target_params, available: true }, signal.id, '/');
+    const path = actionPath({ label: signal.target_label, route: signal.target_route, params: signal.target_params, available: true }, '/');
     return path;
   }
   return undefined;

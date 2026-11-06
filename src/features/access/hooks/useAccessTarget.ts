@@ -1,4 +1,3 @@
-import { attentionApi, attentionKey } from '../../attention/api';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router';
 import { traceApi, traceKey } from '../../investigate/api';
@@ -7,13 +6,6 @@ import type { AgentScope } from '../agent-api';
 export function useAccessTarget(scope: AgentScope) {
   const [params, setParams] = useSearchParams();
   const decisionId = params.get('decision_id');
-  const signalId = params.get('signal_id');
-  const item = useQuery({
-    queryKey: [...attentionKey(scope), 'detail', signalId],
-    queryFn: ({ signal }) => attentionApi.get(scope, signalId!, signal),
-    enabled: !!signalId,
-    retry: false,
-  });
   const detail = useQuery({
     queryKey: [...traceKey(scope), 'detail', decisionId],
     queryFn: ({ signal }) => traceApi.detail(scope, decisionId!, signal),
@@ -22,7 +14,7 @@ export function useAccessTarget(scope: AgentScope) {
   });
   const candidateIds = [
     ...new Set(
-      (detail.data?.actions || item.data?.actions || [])
+      (detail.data?.actions || [])
         .filter((a) => a.available && a.params.agent_id)
         .map((a) => a.params.agent_id),
     ),

@@ -64,14 +64,14 @@ function fixPath(x: Exchange, returnTo: string): string | undefined {
   if (!reason) return undefined;
   if (providerFix(x)) return '/access/integrations?type=identity';
   if (!x.agent) return undefined;
-  if (reason === 'no_delegation') return accessPath({ agent_id: x.agent.id, section: 'people', connection_id: x.subject?.identity_connection_id ?? undefined }, undefined, returnTo);
-  if (reason === 'invalid_authorization_details') return accessPath({ agent_id: x.agent.id, section: 'grants' }, undefined, returnTo);
-  if (reason === 'no_group' || reason === 'blocked') return accessPath({ agent_id: x.agent.id, section: 'people', connection_id: x.subject?.identity_connection_id ?? undefined }, undefined, returnTo);
-  if (reason === 'not_allowed_client') return accessPath({ agent_id: x.agent.id, view: 'identity' }, undefined, returnTo);
+  if (reason === 'no_delegation') return accessPath({ agent_id: x.agent.id, section: 'people', connection_id: x.subject?.identity_connection_id ?? undefined }, returnTo);
+  if (reason === 'invalid_authorization_details') return accessPath({ agent_id: x.agent.id, section: 'grants' }, returnTo);
+  if (reason === 'no_group' || reason === 'blocked') return accessPath({ agent_id: x.agent.id, section: 'people', connection_id: x.subject?.identity_connection_id ?? undefined }, returnTo);
+  if (reason === 'not_allowed_client') return accessPath({ agent_id: x.agent.id, view: 'identity' }, returnTo);
   // A login_error opens the agent identity only for a harness document problem.
-  if (reason === 'login_error') return x.cause && causes[x.cause]?.fix === 'identity' ? accessPath({ agent_id: x.agent.id, view: 'identity' }, undefined, returnTo) : undefined;
-  if (reason === 'code_reuse' || reason === 'refresh_reuse' || reason === 'dpop_invalid') return accessPath({ agent_id: x.agent.id, view: 'sessions' }, undefined, returnTo);
-  return accessPath({ agent_id: x.agent.id }, undefined, returnTo);
+  if (reason === 'login_error') return x.cause && causes[x.cause]?.fix === 'identity' ? accessPath({ agent_id: x.agent.id, view: 'identity' }, returnTo) : undefined;
+  if (reason === 'code_reuse' || reason === 'refresh_reuse' || reason === 'dpop_invalid') return accessPath({ agent_id: x.agent.id, view: 'sessions' }, returnTo);
+  return accessPath({ agent_id: x.agent.id }, returnTo);
 }
 
 // unverified explains a missing subject: the backend records it only after a

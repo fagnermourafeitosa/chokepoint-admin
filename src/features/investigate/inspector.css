@@ -267,3 +267,14 @@
 .trace-path [data-report-only] small { color: var(--cp-admin-color-warning); }
 .trace-outcome-large.cp-would-deny { gap: var(--cp-admin-space-2); }
 @media (max-width: 720px) { .trace-report-only-notice { margin-inline: var(--cp-admin-space-4); } }
+/* Admin 045: the Inbox item of the problem next to the decision ID. */
+.trace-inspector-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.trace-inspector-meta .inbox-item-status {
+  margin-top: 0;
+}

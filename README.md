@@ -155,6 +155,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 042 | [Microsoft Entra ID Connection Form](specs/042-2026-11-04-microsoft-entra-id-connection-form.md) | Implemented |
 | 043 | [Okta Connection Form](specs/043-2026-11-05-okta-connection-form.md) | Implemented |
 | 044 | [Sober Visual System](specs/044-2026-11-05-sober-visual-system.md) | Implemented |
+| 045 | [Inbox Item Status Without an Exit Guard](specs/045-2026-11-06-inbox-item-status-without-exit-guard.md) | Implemented |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 
@@ -236,7 +237,7 @@ The coordinated implementation consumes Backend 022–025. Investigate has paged
 
 Overview uses backend UTC aggregates for daily comparisons, allowed/denied hourly traffic, most-denied combinations, tool review coverage and distinct granted tools without recorded allowed calls in 30 days. View as table exposes chart values. The unused-tool indicator opens a paged review list. Both Custom and Enterprise tools are reachable through the review catalog.
 
-The Inbox defaults to Open and Reviewed. Opening an item's detail records Reviewed. Leaving the detail asks whether to keep Reviewed or mark Resolved; cancellation keeps the detail open and failed status writes can be retried. This shared navigation guard uses the React Router data router and applies to Investigate and signal-targeted Access/Integrations details. Individual calls have no workflow status. Missing signals do not trap navigation. Browser termination preserves the already saved review but cannot guarantee a custom exit modal.
+The Inbox defaults to Open and Reviewed. An item becomes Reviewed when its Inbox action is clicked, or when the inspector of its denial problem opens by any path. Mark resolved is one click, without a confirmation, in the Inbox row and in the inspector header; a failed write shows Retry. Navigation never opens a dialog, and no URL carries the Inbox item (Admin 045). Individual calls have no workflow status.
 
 Access routes select actual groups outside the first rail page, open the relevant permission section and highlight the affected server-qualified tool, policy or exact principal. Missing or ambiguous group evidence is explained rather than replaced with an invented application/group relationship. Navigation never changes or publishes permissions.
 

@@ -20,10 +20,11 @@ The static specimens include [scripts/preview.js](scripts/preview.js) for local 
 | Select | `admin-select` (`SelectMenu`) | Every choice from a list, in filters and forms. Never a native `select`: its platform chrome ignores the system. Same outlined trigger and option panel as the header environment selector, defined in `styles/controls.css` and shown in the specimen; the current option shows a check. `block` fills a form field, `required` keeps native form validation, and disabled options stay visible |
 | Range | `cp-admin-range` | Native keyboard/pointer input; specimen output updates locally |
 | Progress | `cp-admin-progress` | Native progress element with an accessible label |
-| Notice | `cp-admin-notice` | Neutral, success, and danger appearances; message remains explicit |
+| Notice | `cp-admin-notice` | Neutral, success, warning and danger appearances; message remains explicit |
 | Accordion | `cp-admin-accordion` | Native details/summary expansion |
 | Disclosure links | `cp-admin-disclosure` | Native details with ordinary links; intentionally not an ARIA menu |
 | Dialog | `cp-admin-dialog` | Native modal in the specimen; Escape and close actions supported |
+| Confirmation dialog | `ConfirmDialog` (`src/components/ui/dialog`) | Dialog that confirms a destructive action: one sentence on what the action does, with each value that comes from the data (names, identifiers) in bold and no product name, an optional warning notice (`cp-admin-notice--warning` with `TriangleAlert`) for a consequence, then Cancel and the danger button named after the action. Escape and Cancel keep everything |
 | Side panel | `cp-admin-side-panel` (`SidePanel`) | Native modal on the right edge, full height; slides in; Escape, the close button and a click on the backdrop close it. `data-width="wide"` for two columns |
 | Notification | `cp-admin-toast` | Polite local status message in the specimen |
 | Action variants | `cp-admin-button--ghost`, `--danger`, `--small` | Secondary emphasis, destructive appearance, compact actions |
@@ -62,7 +63,7 @@ Destructive actions that open a confirmation use `cp-admin-button--danger-soft` 
 
 ## Notices, fields and menu triggers
 
-`cp-admin-notice` without a tone is the neutral information notice; do not add one-off info colors. Success and danger tones use the `--success`/`--danger` modifiers or `data-tone="success|danger"`. Field labels are semibold; the value typed in `cp-admin-input` is always regular, even inside a label. A `small` inside `cp-admin-field` is helper text: label size, muted, regular weight. Menu triggers such as the identity row's More button use the ghost button treatment: dark border, offset shadow and lift.
+`cp-admin-notice` without a tone is the neutral information notice; do not add one-off info colors. Success, warning and danger tones use the `--success`/`--warning`/`--danger` modifiers or `data-tone="success|warning|danger"`. A warning notice starts with the `TriangleAlert` icon. Field labels are semibold; the value typed in `cp-admin-input` is always regular, even inside a label. A `small` inside `cp-admin-field` is helper text: label size, muted, regular weight. Menu triggers such as the identity row's More button use the ghost button treatment: dark border, offset shadow and lift.
 
 ## Report-only
 
