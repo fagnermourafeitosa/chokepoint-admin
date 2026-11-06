@@ -8,7 +8,7 @@ import { BindingEditor } from './BindingEditor';
 import type { EnvironmentScope } from '../access/environment-scope';
 import type { SourceActions } from './useSources';
 
-const about = (v?: BindingVersion) => (v?.entity === 'subject' ? 'Subject' : 'Object of the call');
+const about = (v?: BindingVersion) => (v?.entity === 'subject' ? 'The subject' : 'The object of the call');
 
 // The status of one binding (Admin 048, item 32): On, Draft or Needs review.
 function status(item: Binding, source: Source): { label: string; tone?: string } {
@@ -41,7 +41,7 @@ export function SourceBindings({ source, scope, actions }: { source: Source; sco
   return <section>
     <div className="source-section-heading"><div><h2>Trusted attributes</h2><p className="cp-admin-muted">Each operation reads trusted attributes from this API for one tool, before its rules are checked.</p></div><button className="cp-admin-button" onClick={() => setEditing('new')}>Add trusted attributes</button></div>
     {source.bindings.length ? <div className="cp-admin-table-scroll"><table className="cp-admin-table">
-      <thead><tr><th>Name</th><th>Tool</th><th>About</th><th>Status</th><th aria-label="Actions" /></tr></thead>
+      <thead><tr><th>Name</th><th>Tool</th><th>Describes</th><th>Status</th><th aria-label="Actions" /></tr></thead>
       <tbody>{source.bindings.map(item => {
         const version = item.draft ?? item.approved, st = status(item, source);
         return <tr key={item.id}>
