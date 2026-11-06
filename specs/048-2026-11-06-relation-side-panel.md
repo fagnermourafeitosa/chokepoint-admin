@@ -100,7 +100,7 @@ The tool editor shows Resource mapping, Resources and Rules side by side. Allowe
 
 26. The Access heading says "Choose who can delegate to each agent, the tools it can call and the rules of each call."
 27. Investigate keeps the deny reason `no_resource` (the backend can still return it for a tool mapped in Integrations) and says "The value of the call is not one of the allowed values of the agent." instead of "The agent can not act on this resource."
-28. Context sources says trusted attributes come from context sources; it never says "Trusted data for your policies" or "from your APIs".
+28. Context sources says trusted attributes come from context sources; it never says "Trusted data for your policies" or "from your APIs". The tab Attribute bindings, the button Add attribute binding and the editor title are **Trusted attributes**, **Add trusted attributes** and **Edit trusted attributes**, the same words as the link of the tool panel. The binding entity is **Object of the call** or **Subject**. Its texts say rule, never policy or decision.
 
 ---
 
