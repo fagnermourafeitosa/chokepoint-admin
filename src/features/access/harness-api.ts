@@ -18,10 +18,10 @@ export const harnessCatalogKey = ['harness-catalog'] as const;
 export const sessionsKey = (s: EnvironmentScope, agentId: string) => ['agent-harness-sessions', s.userId, s.tenantId, s.environmentId, agentId] as const;
 
 export const harnessApi = {
-  allowlist: (s: EnvironmentScope, agentId: string, signal: AbortSignal) => httpClient<ClientAllowlist>(`${agentPath(s, agentId)}/client/metadata-documents`, { signal }),
+  allowlist: (s: EnvironmentScope, agentId: string, signal: AbortSignal) => httpClient<ClientAllowlist>(`${agentPath(s, agentId)}/client/allowlist`, { signal }),
   // Replaces the allowlist when revision is current. The revision is shared with the agent key.
   saveAllowlist: (s: EnvironmentScope, agentId: string, clientIds: string[], revision: number) =>
-    httpClient<ClientAllowlist>(`${agentPath(s, agentId)}/client/metadata-documents`, { method: 'PUT', json: { client_ids: clientIds, revision } }),
+    httpClient<ClientAllowlist>(`${agentPath(s, agentId)}/client/allowlist`, { method: 'PUT', json: { client_ids: clientIds, revision } }),
   catalog: (signal: AbortSignal) => httpClient<Harness[]>('/v1/platform/harness-catalog', { signal }),
   consents: (s: EnvironmentScope, agentId: string, signal: AbortSignal) => httpClient<{ items: InteractiveConsent[] }>(`${agentPath(s, agentId)}/consents`, { signal }),
   grants: (s: EnvironmentScope, agentId: string, signal: AbortSignal) => httpClient<{ items: InteractiveGrant[] }>(`${agentPath(s, agentId)}/grants`, { signal }),
