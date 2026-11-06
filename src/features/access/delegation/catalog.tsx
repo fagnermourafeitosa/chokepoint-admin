@@ -58,8 +58,8 @@ async function loadDirectory(scope: EnvironmentScope, id: string, signal: AbortS
 
 const combineDirectories = (results: { data?: Directory; isError: boolean }[]) => results.map(r => ({ data: r.data, isError: r.isError }));
 
-type CatalogState = { scope: EnvironmentScope; catalog: Catalog; loading: boolean; error: boolean; retry: () => void; request: (issuer: string) => void; directoryFailed: (issuer: string) => boolean };
-const CatalogContext = createContext<CatalogState | null>(null);
+export type CatalogState = { scope: EnvironmentScope; catalog: Catalog; loading: boolean; error: boolean; retry: () => void; request: (issuer: string) => void; directoryFailed: (issuer: string) => boolean };
+export const CatalogContext = createContext<CatalogState | null>(null);
 
 export function CatalogProvider({ scope, issuers, children }: { scope: EnvironmentScope; issuers: string[]; children: ReactNode }) {
   const query = useQuery({ queryKey: ['delegation-catalog', scope.userId, scope.tenantId, scope.environmentId], queryFn: ({ signal }) => loadCatalog(scope, signal), retry: false });

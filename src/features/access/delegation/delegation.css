@@ -26,6 +26,7 @@
 .relation-field { display: grid; gap: var(--cp-admin-space-1); font-size: var(--cp-admin-type-small); }
 .relation-field > span { font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-bold); color: var(--cp-admin-color-text-muted); }
 .relation-field > div { display: grid; gap: var(--cp-admin-space-1); overflow-wrap: anywhere; }
+.relation-field > div.cp-admin-notice { display: flex; }
 .relation-note { font-size: var(--cp-admin-type-small); }
 .relation-conditions { display: grid; gap: var(--cp-admin-space-2); }
 .relation-condition { display: grid; gap: var(--cp-admin-space-1); padding: var(--cp-admin-space-3); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-canvas); }

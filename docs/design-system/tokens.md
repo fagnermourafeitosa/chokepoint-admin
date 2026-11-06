@@ -37,6 +37,8 @@
 | `--cp-admin-color-danger-bg-hover` | `#f6cfcb` | Hovered soft destructive button |
 | `--cp-admin-color-warning` | `#80510c` | Normalized review/pending text |
 | `--cp-admin-color-warning-bg` | `#fff1cc` | Warm pending surface |
+| `--cp-admin-color-info` | `#1d4f8f` | Info notice text and border |
+| `--cp-admin-color-info-bg` | `#deedff` | Info notice surface, same lightness as the warning and danger surfaces |
 | `--cp-admin-color-code-bg` | `#202122` | Dark CEL/JSON editor |
 | `--cp-admin-color-code-text` | `#f5f5ef` | Text in dark editor |
 | `--cp-admin-color-overlay` | `rgba(19, 24, 21, .42)` | Mock backdrop |
