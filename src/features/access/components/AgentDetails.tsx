@@ -12,7 +12,7 @@ import { CatalogProvider } from '../delegation/catalog';
 import { HttpError } from '../../../api/http-client';
 import { agentApi, type AgentRecord, type AgentScope } from '../agent-api';
 import { AgentVisual } from './AgentVisual';
-import { DelegationEditor, type BlockRequest } from '../delegation/DelegationEditor';
+import { DelegationEditor, type BlockRequest, EditorToggles, type EditorMode, type EditorVersion } from '../delegation/DelegationEditor';
 import { AgentIdentity } from '../delegation/AgentIdentity';
 import { HarnessSessions } from '../delegation/HarnessSessions';
 
@@ -68,15 +68,21 @@ export function AgentDetails({ agent, scope, target, onEdit, onDelete, onChanged
   const [panel, setPanel] = useState<ModePanel>();
   const navigate = useNavigate();
   const reportOnly = agent.enforcement === 'report_only';
+  const [mode, setMode] = useState<EditorMode>('graph');
+  const [version, setVersion] = useState<EditorVersion>('draft');
   return <section className="cp-admin-panel access-agent-details" aria-label="Selected agent">
     <div className="access-agent-heading"><AgentVisual agent={agent} scope={scope} /><div className="agent-detail-copy"><div className="access-agent-title"><h2>{agent.name}</h2><span className="mcp-badge" data-tone={disabled ? undefined : 'success'}>{disabled ? 'Disabled' : 'Active'}</span>{reportOnly ? <ReportOnlyChip /> : null}</div><p>{agent.description}</p><p className="cp-admin-muted">{disabled ? 'Disabled: it gets no token, and its next call is rejected.' : reportOnly ? 'Report-only: its calls run, and Xokepoint records the calls that its policy would deny.' : 'Acts for the subjects that delegate to it'}</p></div><div className="agent-detail-actions"><span className="agent-detail-actions-group"><span className="agent-mode-action"><button className={`cp-admin-button cp-admin-button--small ${reportOnly ? 'cp-admin-button--secondary' : 'cp-admin-button--ghost agent-report-only-button'}`} type="button" onClick={() => setPanel('mode')}>{reportOnly ? <><ShieldCheck size={15} aria-hidden="true" />Enforce access</> : <><Eye size={15} aria-hidden="true" />Report-only</>}</button><Tooltip content="Report-only lets the calls of this agent run and records each call that its policy would deny, so that you can check a policy before you enforce it. Delegation, a valid token, an enabled identity connection and the kill switch stay enforced."><CircleHelp size={14} aria-label="About Report-only" /></Tooltip></span><button className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" type="button" onClick={onEdit}><Pencil size={15} aria-hidden="true" />Edit</button></span><span className="agent-detail-actions-group"><AgentStatusAction key={agent.id} agent={agent} scope={scope} onChanged={onChanged} onReload={onReload} /><button className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" type="button" onClick={onDelete}><Trash2 size={15} aria-hidden="true" />Delete</button></span></div></div>
     {reportOnly ? <ReportOnlyNotice scope={scope} agent={agent} onChangeDate={() => setPanel('date')} onHistory={() => setPanel('history')}
       onViewCalls={() => navigate(`/investigate?${new URLSearchParams({ view: 'decisions', result: 'would_deny', agent: agent.id })}`)} /> : null}
-    <div className="cp-admin-inner-tabs agent-views" role="group" aria-label="Agent view">
-      {([['delegation', 'Delegation and access'], ['identity', 'Identity'], ['sessions', 'Harness sessions']] as const).map(([value, label]) =>
-        <button key={value} type="button" aria-pressed={view === value} onClick={() => choose(value)}>{label}</button>)}
+    {/* The views and, on Delegation and access, the Graph / List and Draft / Published toggles share one row (Admin 048). */}
+    <div className="agent-views-row">
+      <div className="cp-admin-inner-tabs agent-views" role="group" aria-label="Agent view">
+        {([['delegation', 'Delegation and access'], ['identity', 'Identity'], ['sessions', 'Harness sessions']] as const).map(([value, label]) =>
+          <button key={value} type="button" aria-pressed={view === value} onClick={() => choose(value)}>{label}</button>)}
+      </div>
+      {view === 'delegation' ? <EditorToggles mode={mode} version={version} onMode={setMode} onVersion={setVersion} /> : null}
     </div>
-    <div hidden={view !== 'delegation'}><DelegationEditor key={editorKey} scope={scope} agentId={agent.id} agentName={agent.name} target={target} block={block} /></div>
+    <div hidden={view !== 'delegation'}><DelegationEditor key={editorKey} scope={scope} agentId={agent.id} agentName={agent.name} reportOnly={reportOnly} mode={mode} version={version} onView={v => choose(v === 'access' ? 'delegation' : v)} target={target} block={block} /></div>
     <div hidden={view !== 'identity'}><AgentIdentity key={editorKey} scope={scope} agentId={agent.id} agentName={agent.name} disabled={disabled} /></div>
     {panel === 'mode' ? <ModeDialog scope={scope} agent={agent} onClose={() => setPanel(undefined)} onChanged={onChanged} onReload={onReload} /> : null}
     {panel === 'date' ? <ReviewDateDialog scope={scope} agent={agent} onClose={() => setPanel(undefined)} onChanged={onChanged} onReload={onReload} /> : null}

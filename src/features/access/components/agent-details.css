@@ -87,3 +87,7 @@
 
 /* The two views of an agent (Admin 029): Delegation and access, and Identity. */
 .agent-views { width: max-content; max-width: 100%; margin-block: var(--cp-admin-space-4); }
+
+/* Agent tabs and the graph view toggles on one row */
+.agent-views-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--cp-admin-space-3); margin-block: var(--cp-admin-space-4); }
+.agent-views-row .agent-views { margin-block: 0; }

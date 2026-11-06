@@ -1,10 +1,12 @@
+// Admin 048: the Expires select with help that says what happens.
 import { useEffect, useState } from 'react';
 import { CircleHelp, Search, ShieldCheck, Trash2 } from 'lucide-react';
 import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
 import { delegationId, formatTime, idpName, idpSubjects, type Doc, type IdpScope, type Subject, type SubjectKind } from './model';
 import { useCatalog } from './catalog';
 import type { Selection } from './layout';
-import { ExpiresField, IncludesField } from './Fields';
+import { IncludesField } from './Fields';
+import { ExpiresField } from './ExpiresField';
 import { HarnessAccess } from './HarnessAccess';
 
 const sectionPage = 10;
@@ -69,7 +71,7 @@ export function IdpPanel({ doc, issuer, agentName, onChange, onClose }: { doc: D
     <header><div><small>Identity provider</small><h4>{name}</h4><p className="cp-admin-muted">{name} → {agentName}</p></div></header>
     <IncludesField value={scope.kinds} onChange={kinds => onChange({ ...doc, scopes: doc.scopes.map(s => (s.issuer === issuer ? { ...s, kinds } : s)), delegations: doc.delegations.filter(d => d.issuer !== issuer || kinds.includes(d.kind)) })} />
     <SubjectList issuer={issuer} kinds={scope.kinds} chosen={chosen} onSet={setSubjects} />
-    <ExpiresField name="idp-expires" value={scope.expiresAt} onChange={v => set({ expiresAt: v })} dateText="Delegation from this identity provider ends at the end of this day (UTC)." />
+    <ExpiresField value={scope.expiresAt} onChange={v => set({ expiresAt: v })} never={`Subjects from ${name} can delegate to ${agentName} until you remove ${name}.`} ends={`After this day (UTC), nobody from ${name} can delegate to ${agentName}. Calls on their behalf are denied.`} />
     <ConsentRecord scope={scope} agentName={agentName} onConfirm={confirmed => set({ confirmed })} />
     <HarnessAccess doc={doc} scope={scope} agentName={agentName} onChange={onChange} />
     <footer><button type="button" className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" onClick={() => { onChange({ ...doc, scopes: doc.scopes.filter(s => s.issuer !== issuer), delegations: doc.delegations.filter(d => d.issuer !== issuer), blocked: doc.blocked.filter(b => b.issuer !== issuer) }); onClose(); }}><Trash2 size={14} aria-hidden="true" />Remove {name}</button></footer>

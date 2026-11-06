@@ -4,7 +4,7 @@ import type { AgentRef, ExchangeReasonLabel, ReasonLabel, SubjectRef } from './t
 export const denyText: Record<ReasonLabel, string> = {
   no_delegation: 'The subject did not delegate to this agent.',
   no_grant: 'The agent can not call this tool.',
-  no_resource: 'The agent can not act on this resource.',
+  no_resource: 'The value of the call is not one of the allowed values of the agent.',
   condition: 'A rule of this agent · server · tool was not met.',
   tool_not_reviewed: 'The tool has not been reviewed (blocked before the PDP).',
 };

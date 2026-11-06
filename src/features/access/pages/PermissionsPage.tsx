@@ -23,7 +23,7 @@ function AgentWorkbench({ scope }: { scope: AgentScope }) {
   const [railCollapsed, setRailCollapsed] = useState(false);
   return <section aria-label="Permissions">
     <div className="access-page-heading">
-      <div><span className="cp-admin-label">ACCESS WORKBENCH</span><h1 className="cp-admin-title">Agents</h1><p className="cp-admin-muted">Choose who can delegate to each agent, the tools it can call, the resources it can act on and the rules of each call.</p></div>
+      <div><h1 className="cp-admin-title">Agents</h1><p className="cp-admin-muted">Choose who can delegate to each agent, the tools it can call and the rules of each call.</p></div>
       <button className="cp-admin-button access-primary-action" onClick={() => workbench.setDialog('new-agent')}><Plus size={18} aria-hidden="true" />New agent</button>
     </div>
     {context.returnTo ? <Link className="cp-admin-button cp-admin-button--secondary trace-back" to={context.returnTo}>Back to {context.returnTo === '/' ? 'Overview' : 'Investigate'}</Link> : null}

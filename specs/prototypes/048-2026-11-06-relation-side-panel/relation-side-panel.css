@@ -1,0 +1,171 @@
+/* Admin 048 prototype: the relation editor as the body of the side panel.
+   The side panel header holds the eyebrow, the title and the close button, so the
+   editor's own header, close button and card frame are not used here.
+   Design system: 24px panel padding, 16px between related fields, labels above values. */
+.relation-side-panel .relation-panel > header,
+.relation-side-panel .relation-close { display: none; }
+.relation-side-panel .relation-panel {
+  gap: var(--cp-admin-space-5);
+  padding: var(--cp-admin-space-6);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.relation-side-panel .relation-field { gap: var(--cp-admin-space-2); font-size: var(--cp-admin-type-body); font-weight: var(--cp-admin-weight-regular); }
+.relation-side-panel .relation-field > span { font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); color: var(--cp-admin-color-text); }
+.relation-side-panel .relation-field small { font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-regular); color: var(--cp-admin-color-text-muted); }
+.relation-side-panel .relation-add-button { justify-self: start; }
+.relation-side-panel .relation-panel > footer { justify-items: start; padding-top: var(--cp-admin-space-5); }
+/* Context banner on Context sources when the page was opened from the side panel. */
+.proto-context-banner { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-4); margin-bottom: var(--cp-admin-space-6); }
+.proto-context-banner > div { display: grid; gap: var(--cp-admin-space-1); }
+.proto-context-banner span { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-small); }
+.proto-context-banner .cp-admin-button { flex: none; }
+@media (max-width: 740px) { .proto-context-banner { flex-direction: column; align-items: stretch; } }
+.proto-trusted-list { display: grid; gap: var(--cp-admin-space-2); margin: 0; padding: 0; list-style: none; }
+.proto-trusted-list li { display: flex; gap: var(--cp-admin-space-2); align-items: flex-start; }
+.proto-trusted-list span { display: grid; gap: 2px; }
+.relation-side-panel-relation { margin: 0; font-size: var(--cp-admin-type-small); }
+fieldset.relation-side-panel { min-width: 0; margin: 0; padding: 0; border: 0; }
+/* Allowed values of a mapped argument (Add resource redesign). */
+.allowed-values { display: grid; gap: var(--cp-admin-space-5); padding: var(--cp-admin-space-6); }
+.allowed-values-lead { margin: 0; font-size: var(--cp-admin-type-body); line-height: 1.5; }
+.allowed-values code, .allowed-values-list code { font-family: var(--cp-admin-font-mono); }
+.allowed-values .cp-admin-input-group { display: flex; gap: var(--cp-admin-space-2); }
+.allowed-values-input { flex: 1; font-family: var(--cp-admin-font-mono); font-weight: var(--cp-admin-weight-regular); }
+.allowed-values-list { border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); }
+.allowed-values-list > header { padding: var(--cp-admin-space-2) var(--cp-admin-space-4); border-bottom: 1px solid var(--cp-admin-color-border); font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-bold); letter-spacing: var(--cp-admin-tracking-label); text-transform: uppercase; color: var(--cp-admin-color-text-muted); }
+.allowed-values-list ul { margin: 0; padding: 0; list-style: none; }
+.allowed-values-list li { display: flex; align-items: center; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-2) var(--cp-admin-space-4); }
+.allowed-values-list li + li { border-top: var(--cp-admin-border-width) solid var(--cp-admin-color-border); }
+.allowed-values-list li > code { flex: 1; overflow-wrap: anywhere; }
+.allowed-values-list li:hover { background: var(--cp-admin-color-row-hover); }
+.allowed-values-empty { margin: var(--cp-admin-space-3); }
+.allowed-values-note { margin: 0; font-size: var(--cp-admin-type-small); }
+.allowed-values-args { margin: 0; padding: 0; border: 0; display: grid; gap: var(--cp-admin-space-2); }
+.allowed-values-args > legend { padding: 0; margin-bottom: var(--cp-admin-space-2); font-weight: var(--cp-admin-weight-semibold); }
+.allowed-values-arg { display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: var(--cp-admin-space-2); padding: var(--cp-admin-space-2) var(--cp-admin-space-3); border: 1px solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-control); font-weight: var(--cp-admin-weight-regular); cursor: pointer; }
+.allowed-values-arg:hover:not([data-disabled]) { background: var(--cp-admin-color-hover); }
+.allowed-values-arg:has(input:checked) { border-color: var(--cp-admin-color-text); }
+.allowed-values-arg[data-disabled] { color: var(--cp-admin-color-text-muted); cursor: not-allowed; }
+.allowed-values-type { font-size: var(--cp-admin-type-label); color: var(--cp-admin-color-text-muted); }
+.allowed-values-arg small { justify-self: end; }
+.allowed-values-equation { display: flex; align-items: center; gap: var(--cp-admin-space-2); }
+.allowed-values-equation b { font-family: var(--cp-admin-font-mono); }
+.allowed-values-row { flex: 1; font-family: var(--cp-admin-font-mono); }
+.allowed-values-note code { margin-inline: 2px; }
+.allowed-values[data-fixed] { padding: 0; gap: var(--cp-admin-space-4); }
+.capability-values > span { margin-bottom: var(--cp-admin-space-1); }
+.allowed-values[data-fixed] .cp-admin-field > span, .allowed-values[data-fixed] legend { font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-regular); color: var(--cp-admin-color-text-muted); }
+.allowed-values-arg .allowed-values-rule { justify-self: end; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+
+/* Agent node side panel */
+.agent-summary { display: grid; gap: var(--cp-admin-space-5); }
+.agent-summary > p { margin: 0; }
+.agent-summary-mode { display: flex; align-items: center; gap: var(--cp-admin-space-2); margin: 0; }
+.agent-summary-list { list-style: none; margin: 0; padding: 0; display: grid; border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); }
+.agent-summary-list li + li { border-top: var(--cp-admin-border-width) solid var(--cp-admin-color-border); }
+.agent-summary-list button { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-3); border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.agent-summary-list button:hover { background: var(--cp-admin-color-row-hover); }
+.agent-summary-list button > span { display: grid; gap: var(--cp-admin-space-1); min-width: 0; }
+.agent-summary-list strong { font-weight: var(--cp-admin-weight-semibold); }
+.agent-summary-views { display: flex; flex-wrap: wrap; gap: var(--cp-admin-space-2); }
+
+/* Agent tabs and the graph view toggles on one row */
+.proto-views-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--cp-admin-space-3); margin-block: var(--cp-admin-space-4); }
+.proto-views-row .agent-views { margin-block: 0; }
+
+/* Icon toggles and compact section counts */
+.delegation-toggle .proto-toggle-icon { display: inline-flex; align-items: center; justify-content: center; padding: 0 10px; }
+.proto-section-count { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); }
+.proto-section-count > strong { min-width: 1.5em; padding: 0 6px; border-radius: var(--cp-admin-radius-pill); background: var(--cp-admin-color-surface-muted); text-align: center; font-size: var(--cp-admin-type-label); }
+.delegation-toggle > .admin-tooltip-trigger { display: inline-flex; }
+.delegation-toggle > .admin-tooltip-trigger > button { min-height: 30px; }
+.delegation-toggle > .admin-tooltip-trigger + .admin-tooltip-trigger > button { border-inline-start: 1px solid var(--cp-admin-color-text); }
+.proto-button-count { min-width: 1.5em; padding: 0 6px; border-radius: var(--cp-admin-radius-pill); background: var(--cp-admin-color-surface-muted); text-align: center; font-size: var(--cp-admin-type-label); }
+
+/* Back link of a side panel opened from another one */
+.proto-panel-back { display: inline-flex; align-items: center; gap: var(--cp-admin-space-1); margin: var(--cp-admin-space-4) var(--cp-admin-space-6) 0; }
+
+/* How this works: the CEL example */
+.graph-help-cel { margin: 0; padding: var(--cp-admin-space-3); overflow-x: auto; border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface-muted); font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-small); }
+.graph-help .delegation-list-table code { overflow-wrap: anywhere; }
+
+/* Mapping warning: the other agents that call the tool */
+.allowed-values-impact { margin: 0; padding-inline-start: 18px; display: grid; gap: 2px; }
+.allowed-values-others { display: flex; align-items: center; gap: var(--cp-admin-space-2); margin-top: var(--cp-admin-space-1); }
+
+/* The labels of Allowed values match the other field labels of the panel. */
+.relation-side-panel .allowed-values .cp-admin-field > span:first-child { font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); color: var(--cp-admin-color-text); }
+
+/* Rules can read: call arguments, instance limits and trusted attributes, inside Rules. */
+.proto-rule-inputs { display: grid; gap: var(--cp-admin-space-2); padding: var(--cp-admin-space-3); border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); }
+.proto-rule-inputs > ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--cp-admin-space-3); }
+.proto-rule-inputs > ul > li { display: grid; gap: var(--cp-admin-space-1); }
+.proto-rule-inputs > ul > li > span { font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); }
+.proto-rule-inputs code { margin-inline-end: var(--cp-admin-space-1); }
+/* The title of the Rules block is the largest text of the block. */
+.relation-side-panel [data-field="rules"] > .relation-label { font-size: var(--cp-admin-type-body); font-weight: var(--cp-admin-weight-bold); }
+
+/* Tool panel in sections: each top-level field is a section with a divider and a bold title. */
+.relation-side-panel .proto-sectioned { gap: 0; }
+.relation-side-panel .proto-sectioned > .relation-side-panel-relation { padding-bottom: var(--cp-admin-space-4); }
+.relation-side-panel .proto-sectioned > .relation-field { padding-block: var(--cp-admin-space-5); border-top: var(--cp-admin-border-width) solid var(--cp-admin-color-border); }
+.relation-side-panel .proto-sectioned > .relation-field > span:first-child,
+.relation-side-panel .proto-sectioned > .relation-field > .relation-label { font-size: var(--cp-admin-type-body); font-weight: var(--cp-admin-weight-bold); color: var(--cp-admin-color-text); }
+.relation-side-panel .proto-sectioned > footer { padding-top: var(--cp-admin-space-5); border-top: var(--cp-admin-border-width) solid var(--cp-admin-color-border); }
+
+/* The header of the tool panel is the path agent → server → tool. */
+.proto-panel-path { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-1) var(--cp-admin-space-2); font-size: 1rem; line-height: 1.4; }
+.proto-panel-path > svg[aria-label] { color: var(--cp-admin-color-text-muted); }
+.proto-panel-path code { font-family: var(--cp-admin-font-mono); font-size: .9375rem; font-weight: var(--cp-admin-weight-semibold); }
+.proto-panel-path > span { display: inline-flex; align-items: center; gap: var(--cp-admin-space-1); white-space: nowrap; }
+.relation-side-panel .proto-sectioned > .relation-field:first-child { border-top: 0; padding-top: 0; }
+/* The tool always takes the second line of the title. */
+.proto-panel-path > .proto-panel-tool { flex-basis: 100%; }
+.proto-section-intro { margin: 0; font-size: var(--cp-admin-type-small); }
+.proto-section-chip { justify-self: start; }
+
+/* Rule editor: Add a condition on the right, the rule read as a sentence on a grey surface. */
+.relation-side-panel .condition-editor .rule-add { justify-self: end; }
+.proto-required { color: var(--cp-admin-color-danger); }
+.relation-side-panel .proto-rule-sentence { margin: 0; padding: var(--cp-admin-space-3); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface-muted); }
+.relation-side-panel .proto-rule-sentence { display: block; line-height: 1.5; }
+.relation-side-panel .proto-rule-sentence > svg { display: inline; vertical-align: -2px; margin-inline-end: var(--cp-admin-space-1); }
+.relation-side-panel .proto-rule-sentence > strong { margin-inline-start: var(--cp-admin-space-1); }
+
+/* is one of: the values look like an array */
+.proto-list-value { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-1); min-height: 36px; padding: var(--cp-admin-space-1) var(--cp-admin-space-2); border: var(--cp-admin-border-width) solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-small); }
+.proto-list-bracket { color: var(--cp-admin-color-text-muted); font-weight: var(--cp-admin-weight-bold); }
+.proto-list-item { display: inline-flex; align-items: center; gap: 2px; }
+.proto-list-item code { padding: 0 var(--cp-admin-space-1); border-radius: var(--cp-admin-radius-sm); background: var(--cp-admin-color-surface-muted); }
+.proto-list-item button { display: inline-flex; padding: 0; border: 0; background: none; color: var(--cp-admin-color-text-muted); cursor: pointer; }
+.proto-list-input { flex: 1; min-width: 60px; border: 0; outline: 0; background: transparent; font: inherit; color: var(--cp-admin-color-text); }
+/* Add rule: right side of the Rules section, with space before the footer. */
+.relation-side-panel .proto-sectioned > .relation-add-button { justify-self: end; margin-bottom: var(--cp-admin-space-5); }
+.relation-side-panel .proto-sectioned > footer { display: flex; justify-content: flex-end; }
+
+/* A link that leaves the panel for another screen: text and arrow, lighter than a button. */
+.proto-nav-link { display: inline-flex; align-items: center; gap: var(--cp-admin-space-1); justify-self: start; padding: 0; border: 0; background: none; color: var(--cp-admin-color-text); font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.proto-nav-link:hover svg { transform: translateX(2px); }
+.proto-nav-link svg { transition: transform .15s ease; }
+
+/* Trusted attributes list: room between sources and between a source and its attributes. */
+.proto-rule-inputs .proto-trusted-list { gap: var(--cp-admin-space-3); padding-block: var(--cp-admin-space-2); }
+.proto-rule-inputs .proto-trusted-list li { gap: var(--cp-admin-space-2); }
+.proto-rule-inputs .proto-trusted-list li > svg { margin-top: 2px; flex: none; }
+.proto-rule-inputs .proto-trusted-list span { gap: var(--cp-admin-space-1); }
+.proto-rule-inputs [data-field="trusted"] { gap: var(--cp-admin-space-2); }
+
+/* Rules: the helper stays with the list of rules; the Trusted attributes box is its own group below. */
+.relation-side-panel [data-field="rules"] .proto-rule-inputs { margin-top: var(--cp-admin-space-5); }
+
+/* Rule card: the name, then what the rule checks, in grey. */
+.relation-side-panel .proto-rule-expression { display: block; padding: 0; background: none; color: var(--cp-admin-color-text-muted); font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-label); overflow-wrap: anywhere; }
+.relation-condition header .proto-draft-badge { margin-inline-start: auto; }
+.relation-condition header .proto-draft-badge + .relation-icon-button { margin-inline-start: var(--cp-admin-space-2); }
+
+/* The collapse button of the agent list sits on the gap between the list and the content. */
+.proto-rail-wrap { position: relative; }
+.proto-rail-toggle { position: absolute; z-index: 2; top: var(--cp-admin-space-5); right: calc(var(--cp-admin-layout-gap) / -2 - 14px); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }

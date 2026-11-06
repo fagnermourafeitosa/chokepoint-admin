@@ -33,7 +33,12 @@
 .cp-admin-notice:is(.cp-admin-notice--success, [data-tone="success"]) { background: var(--cp-admin-color-success-bg); border-color: var(--cp-admin-color-success); color: var(--cp-admin-color-success); }
 .cp-admin-notice:is(.cp-admin-notice--danger, [data-tone="danger"]) { background: var(--cp-admin-color-danger-bg); border-color: var(--cp-admin-color-danger); color: var(--cp-admin-color-danger); }
 .cp-admin-notice:is(.cp-admin-notice--warning, [data-tone="warning"]) { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); color: var(--cp-admin-color-warning); }
-.cp-admin-notice > svg { flex: none; }
+.cp-admin-notice:is(.cp-admin-notice--info, [data-tone="info"]) { background: var(--cp-admin-color-info-bg); border-color: var(--cp-admin-color-info); color: var(--cp-admin-color-info); }
+.cp-admin-notice > svg { flex: none; margin-top: 2px; }
+.cp-admin-notice-body { display: grid; gap: var(--cp-admin-space-1); min-width: 0; }
+.cp-admin-notice-body > strong { margin-bottom: 0; font-weight: var(--cp-admin-weight-bold); }
+/* The body is regular wherever the notice sits, also inside a field whose spans are labels. */
+.cp-admin-notice-body, .cp-admin-notice-body > span { font-weight: var(--cp-admin-weight-regular); font-size: var(--cp-admin-type-small); }
 .cp-admin-accordion { border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); }
 .cp-admin-accordion summary { min-height: var(--cp-admin-control-height); padding: var(--cp-admin-space-4); font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); cursor: pointer; }
 .cp-admin-accordion > div { padding: 0 var(--cp-admin-space-4) var(--cp-admin-space-4); font-size: var(--cp-admin-type-small); }

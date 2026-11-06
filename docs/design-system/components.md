@@ -15,17 +15,18 @@ The static specimens include [scripts/preview.js](scripts/preview.js) for local 
 | Checkbox | `cp-admin-choice` | Native checked/unchecked/disabled states; whole label is clickable |
 | Radio group | `cp-admin-choice-group` | Native exclusive selection with fieldset/legend |
 | Switch | `cp-admin-switch` | Native checkbox with switch role and visible label |
-| Segmented selection | `cp-admin-segmented`, `cp-admin-segment` | Native radio choices; selected segment and visible keyboard focus |
+| Segmented selection | `cp-admin-segmented`, `cp-admin-segment` | Native radio choices; selected segment and visible keyboard focus. Not used on product screens: a choice from a list is a Select ([Layouts › Forms](layouts.md#forms)) |
 | Input/textarea | `cp-admin-input`, `cp-admin-field` | Existing default, readonly, disabled, invalid, and focus styling |
 | Select | `admin-select` (`SelectMenu`) | Every choice from a list, in filters and forms. Never a native `select`: its platform chrome ignores the system. Same outlined trigger and option panel as the header environment selector, defined in `styles/controls.css` and shown in the specimen; the current option shows a check. `block` fills a form field, `required` keeps native form validation, and disabled options stay visible |
 | Range | `cp-admin-range` | Native keyboard/pointer input; specimen output updates locally |
 | Progress | `cp-admin-progress` | Native progress element with an accessible label |
-| Notice | `cp-admin-notice` | Neutral, success, warning and danger appearances; message remains explicit |
+| Notice | `Notice` (`src/components/ui/notice`), `cp-admin-notice` | `tone` is `info` (`Info` icon, light blue), `warning` (`TriangleAlert`, light yellow) or `error` (`CircleAlert`, light red), with an optional bold title. The three backgrounds have the same lightness. Info is `role="status"`; warning and error are `role="alert"`. The class keeps a neutral and a success appearance for other uses; message remains explicit |
 | Accordion | `cp-admin-accordion` | Native details/summary expansion |
 | Disclosure links | `cp-admin-disclosure` | Native details with ordinary links; intentionally not an ARIA menu |
 | Dialog | `cp-admin-dialog` | Native modal in the specimen; Escape and close actions supported |
 | Confirmation dialog | `ConfirmDialog` (`src/components/ui/dialog`) | Dialog that confirms a destructive action: one sentence on what the action does, with each value that comes from the data (names, identifiers) in bold and no product name, an optional warning notice (`cp-admin-notice--warning` with `TriangleAlert`) for a consequence, then Cancel and the danger button named after the action. Escape and Cancel keep everything |
 | Side panel | `cp-admin-side-panel` (`SidePanel`) | Native modal on the right edge, full height; slides in; Escape, the close button and a click on the backdrop close it. `data-width="wide"` for two columns |
+| Pager | `TracePager` (`src/features/investigate/TraceUI.tsx`), `trace-pager` | Under every list table: record count, Previous, page / pages, Next; Previous and Next are disabled on the first and last page. See [Layouts › List tables](layouts.md#list-tables) |
 | Notification | `cp-admin-toast` | Polite local status message in the specimen |
 | Action variants | `cp-admin-button--ghost`, `--danger`, `--small` | Secondary emphasis, destructive appearance, compact actions |
 
@@ -63,7 +64,7 @@ Destructive actions that open a confirmation use `cp-admin-button--danger-soft` 
 
 ## Notices, fields and menu triggers
 
-`cp-admin-notice` without a tone is the neutral information notice; do not add one-off info colors. Success, warning and danger tones use the `--success`/`--warning`/`--danger` modifiers or `data-tone="success|warning|danger"`. A warning notice starts with the `TriangleAlert` icon. Field labels are semibold; the value typed in `cp-admin-input` is always regular, even inside a label. A `small` inside `cp-admin-field` is helper text: label size, muted, regular weight. Menu triggers such as the identity row's More button use the ghost button treatment: dark border, offset shadow and lift.
+Use the `Notice` component for a message about the screen: `info` says what happens after a choice and changes with it (for example, what Never or a date does; a fixed explanation of a field is helper text, a `small`, not a notice), `warning` names a consequence the person must check before publishing, `error` says what failed. One meaning per tone; do not add one-off colors. The class `cp-admin-notice` without a tone stays the neutral box for content that is not a message; the tones use the `--info`/`--success`/`--warning`/`--danger` modifiers or `data-tone`. Each tone starts with its icon (decided 2026-11-06, Admin 048). Field labels are semibold; the value typed in `cp-admin-input` is always regular, even inside a label. A `small` inside `cp-admin-field` is helper text: label size, muted, regular weight. Menu triggers such as the identity row's More button use the ghost button treatment: dark border, offset shadow and lift.
 
 ## Report-only
 
