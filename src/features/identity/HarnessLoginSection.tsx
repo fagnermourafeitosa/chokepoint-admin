@@ -21,7 +21,7 @@ export function HarnessLoginSection({ provider, value, stored, groupsCapable, on
   const redirect = stored?.redirect_uri ?? '';
   const keepsSecret = !!stored?.has_secret && stored.client_id === value.client_id && !changingSecret;
   return <div className="identity-form-section">
-    <div className="identity-section-heading"><h2>Harness login <Help text="People log in from a coding harness (Claude Code, VS Code and similar) through this identity provider. Xokepoint is an OIDC client here: it sends the person to the provider, reads who they are and their groups, then asks for their consent." /></h2>
+    <div className="identity-section-heading"><h2>Harness login <Help text="People log in from a coding harness (Claude Code, Codex and similar) through this identity provider. Xokepoint is an OIDC client here: it sends the person to the provider, reads who they are and their groups, then asks for their consent." /></h2>
       <p>Let people log in from a coding harness through this provider.</p></div>
     <div className="identity-form-fields">
       {!groupsCapable ? <p className="cp-admin-notice" role="status"><TriangleAlert size={16} aria-hidden="true" />This provider can not list groups yet, so harness login is not available for it.</p> : <>

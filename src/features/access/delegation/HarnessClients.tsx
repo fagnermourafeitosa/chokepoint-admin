@@ -47,7 +47,7 @@ export function HarnessClients({ scope, agentId, agentName, issuer }: { scope: E
   }
   const serverIds = [...new Set((permissions.data?.published?.capabilities ?? []).map(c => c.server_id))];
   const serverName = (id: string) => servers.data?.items.find(s => s.id === id)?.name ?? id;
-  const heading = <span className="identity-title">Harness login{tip('A coding harness (Claude Code, VS Code and similar) logs in a person through the browser. Only the harnesses listed here can log in to this agent.')}</span>;
+  const heading = <span className="identity-title">Harness login{tip('A coding harness (Claude Code, Codex and similar) logs in a person through the browser. Only the harnesses listed here can log in to this agent.')}</span>;
   if (allowlist.isPending) return <section className="identity-card harness-card" aria-label="Harness login">{heading}<p role="status">Loading the harnesses…</p></section>;
   if (allowlist.isError) return <section className="identity-card harness-card" aria-label="Harness login">{heading}<div role="alert" className="cp-admin-notice" data-tone="danger">Could not load the harnesses. <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => void allowlist.refetch()}>Retry</button></div></section>;
   const current = allowlist.data;
