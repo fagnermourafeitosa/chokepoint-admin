@@ -92,7 +92,8 @@ function rulesLayout(agentName: string, view: Doc, catalog: Catalog, positions: 
   const nodes = l.nodes.filter(n => n.column !== 'resources').map(n => (n.column === 'tools' && n.select.type === 'capability' ? { ...n, subtitle: (k => (k ? `${k} ${k === 1 ? 'rule' : 'rules'}` : 'No rules'))(rules(n.select.id)) } : n));
   const used = new Map<string, { id: string; attrs: string[] }[]>();
   for (const c of view.capabilities) for (const k of c.conditions) for (const b of k.bindings) {
-    const attrs = [...k.expression.matchAll(new RegExp(`chokepoint\\["${b}"\\]\\.values\\["([^"]+)"\\]`, 'g'))].map(m => m[1]);
+    const id = b.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const attrs = [...k.expression.matchAll(new RegExp(`chokepoint\\["${id}"\\]\\.values\\["([^"]+)"\\]`, 'g'))].map(m => m[1]);
     const caps = used.get(b) ?? [];
     const cap = caps.find(x => x.id === c.id) ?? (caps.push({ id: c.id, attrs: [] }), caps[caps.length - 1]);
     cap.attrs = [...new Set([...cap.attrs, ...attrs])];
@@ -131,7 +132,9 @@ function Editor({ scope, agentId, agentName, reportOnly, mode, version, onView, 
   const layout = useMemo(() => rulesLayout(agentName, view, catalog, positions), [agentName, view, catalog, positions]);
   const select = (s: Selection, parent?: Selection) => { setFrom(parent); setSelected(s); };
   const close = () => { setSelected(undefined); setFrom(undefined); };
-  useEffect(() => close(), [version]);
+  // A version switch closes the panel; the first run is skipped, so a panel opened by a URL target stays.
+  const firstVersion = useRef(true);
+  useEffect(() => { if (firstVersion.current) { firstVersion.current = false; return; } close(); }, [version]);
   useEffect(() => { const next = targetSelection(target, state.draft); if (next) setSelected(next); }, [target?.serverId, target?.tool, target?.section, target?.connectionId, !!state.config]);
   // Open the rule shows the rule: scroll once to the rules field (a condition) of the open panel (Admin 045).
   const panel = useRef<HTMLFieldSetElement>(null);
