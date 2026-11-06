@@ -1,35 +1,56 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { CircleHelp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bot, CircleHelp, List, Network, Server, Wrench, type LucideIcon } from 'lucide-react';
+import { SidePanel } from '../../../components/ui/side-panel/SidePanel';
+import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
 import type { AgentScope } from '../agent-api';
 import type { AccessTarget } from '../target-context';
 import { delegationKey, permissionApi } from './api';
 import { CatalogProvider, useCatalog } from './catalog';
+import { AddPanel } from './AddPanel';
+import { AgentPanel, type AgentView } from './AgentPanel';
 import { DelegationGraph } from './DelegationGraph';
 import { FilterBar, filterDoc, isFiltered, noFilters, type Filters } from './FilterBar';
 import { GraphHelp } from './GraphHelp';
-import { capabilityId, harnessWithoutGroups, type Doc } from './model';
-import { delegationLayout, type Positions, type Selection } from './layout';
+import { GroupPanel } from './GroupPanel';
+import { IdentityProvidersPanel } from './IdentityProvidersPanel';
+import { IdpPanel } from './IdpPanel';
+import { capabilityId, harnessWithoutGroups, idpName, serverName, type Catalog, type Doc } from './model';
+import { delegationLayout, type LayoutEdge, type LayoutNode, type Positions, type Selection } from './layout';
 import { ListView } from './ListView';
 import { PublishBar } from './PublishBar';
-import { RelationPanel } from './RelationPanel';
 import { RevisionHistory } from './RevisionHistory';
 import { SectionBar } from './SectionBar';
+import { ToolPanel } from './ToolPanel';
 import { useDelegation } from './useDelegation';
 import '../../mcp/mcp.css';
 import './delegation.css';
 
-function Toggle<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: [T, string][]; onChange: (v: T) => void }) {
-  return <div className="delegation-toggle" role="group" aria-label={label}>{options.map(([v, text]) => <button key={v} type="button" aria-pressed={value === v} onClick={() => onChange(v)}>{text}</button>)}</div>;
+export type EditorMode = 'graph' | 'list';
+export type EditorVersion = 'draft' | 'published';
+
+function Toggle<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: [T, string, LucideIcon?][]; onChange: (v: T) => void }) {
+  return <div className="delegation-toggle" role="group" aria-label={label}>{options.map(([v, text, Icon]) => Icon
+    ? <Tooltip key={v} content={text}><button type="button" className="toggle-icon" aria-label={text} aria-pressed={value === v} onClick={() => onChange(v)}><Icon size={16} aria-hidden="true" /></button></Tooltip>
+    : <button key={v} type="button" aria-pressed={value === v} onClick={() => onChange(v)}>{text}</button>)}</div>;
+}
+
+// The Graph / List and Draft / Published toggles, on the row of the agent views (Admin 048).
+export function EditorToggles({ mode, version, onMode, onVersion }: { mode: EditorMode; version: EditorVersion; onMode: (m: EditorMode) => void; onVersion: (v: EditorVersion) => void }) {
+  return <div className="delegation-toolbar-actions">
+    <Toggle label="View" value={mode} onChange={onMode} options={[['graph', 'Graph', Network], ['list', 'List', List]]} />
+    <Toggle label="Version" value={version} onChange={onVersion} options={[['draft', 'Draft'], ['published', 'Published']]} />
+  </div>;
 }
 
 // A block asked from the Harness sessions view (Admin 036 section 3, point 5). The editor adds it to
 // its local draft, so unsaved edits are kept; id changes for each request.
 export type BlockRequest = { id: number; issuer: string; subject: string };
-type Props = { scope: AgentScope; agentId: string; agentName: string; target?: AccessTarget; block?: BlockRequest };
+type Props = { scope: AgentScope; agentId: string; agentName: string; reportOnly: boolean; mode: EditorMode; version: EditorVersion; onView: (v: AgentView) => void; target?: AccessTarget; block?: BlockRequest };
 
-// Delegation and access (Admin 026): the agent graph as the editor. The catalog loads the
-// directories of the identity providers in the saved document.
+// Delegation and access (Admin 026, 048): the agent graph as the editor; the editor of the selected
+// node or edge opens in the side panel. The catalog loads the directories of the identity providers.
 export function DelegationEditor(props: Props) {
   const query = useQuery({ queryKey: delegationKey(props.scope, props.agentId), queryFn: ({ signal }) => permissionApi.get(props.scope, props.agentId, signal), retry: false, refetchInterval: q => (q.state.data?.reconciliation.state === 'pending' ? 5000 : false) });
   const saved = query.data?.draft ?? query.data?.published;
@@ -49,12 +70,54 @@ function targetSelection(target: AccessTarget | undefined, doc: Doc): Selection 
   return target.section === 'grants' ? { type: 'add', what: 'tool' } : undefined;
 }
 
-function Editor({ scope, agentId, agentName, target, block }: Props) {
+// title names the panel (Back links); heading, when set, is what the panel header shows.
+function panelHead(selected: Selection, doc: Doc, catalog: Catalog, agentName: string): { eyebrow?: string; title: string; heading?: ReactNode } {
+  if (selected.type === 'capability') {
+    const c = doc.capabilities.find(x => x.id === selected.id);
+    if (!c) return { title: 'Tool' };
+    return { title: c.tool, heading: <span className="panel-path"><span><Bot size={16} aria-hidden="true" />{agentName}</span><ArrowRight size={14} aria-label="calls on" /><span><Server size={16} aria-hidden="true" />{serverName(catalog, c.serverId)}</span><span className="panel-path-tool"><Wrench size={16} aria-hidden="true" /><code>{c.tool}</code></span></span> };
+  }
+  if (selected.type === 'add') return selected.what === 'delegator' ? { eyebrow: `Who can delegate to ${agentName}`, title: 'Identity providers' } : { eyebrow: agentName, title: 'Manage tools' };
+  if (selected.type === 'idp') return { eyebrow: `Who can delegate to ${agentName}`, title: idpName(catalog, selected.issuer) };
+  if (selected.type === 'group') return { eyebrow: agentName, title: selected.label };
+  return { eyebrow: 'Agent', title: agentName };
+}
+
+// The graph of Admin 048: no allowed values; a tool shows its rule count, and a rule that reads
+// trusted attributes draws an edge from its tool to the context source, labelled with what it reads.
+function rulesLayout(agentName: string, view: Doc, catalog: Catalog, positions: Positions) {
+  const plain = { ...view, resources: [], capabilities: view.capabilities.map(c => ({ ...c, mapping: undefined })) };
+  const l = delegationLayout(agentName, plain, catalog, positions);
+  const rules = (id: string) => view.capabilities.find(c => c.id === id)?.conditions.length ?? 0;
+  const nodes = l.nodes.filter(n => n.column !== 'resources').map(n => (n.column === 'tools' && n.select.type === 'capability' ? { ...n, subtitle: (k => (k ? `${k} ${k === 1 ? 'rule' : 'rules'}` : 'No rules'))(rules(n.select.id)) } : n));
+  const used = new Map<string, { id: string; attrs: string[] }[]>();
+  for (const c of view.capabilities) for (const k of c.conditions) for (const b of k.bindings) {
+    const attrs = [...k.expression.matchAll(new RegExp(`chokepoint\\["${b}"\\]\\.values\\["([^"]+)"\\]`, 'g'))].map(m => m[1]);
+    const caps = used.get(b) ?? [];
+    const cap = caps.find(x => x.id === c.id) ?? (caps.push({ id: c.id, attrs: [] }), caps[caps.length - 1]);
+    cap.attrs = [...new Set([...cap.attrs, ...attrs])];
+    used.set(b, caps);
+  }
+  const sources = [...used.entries()].map(([binding, caps], i) => {
+    const cap = view.capabilities.find(c => c.id === caps[0].id)!;
+    const found = catalog.bindings(cap.serverId, cap.tool).find(x => x.id === binding);
+    const key = `cs-${binding}`;
+    const node: LayoutNode = { key, select: { type: 'capability', id: cap.id }, column: 'resources', x: positions[key]?.x ?? l.colX.resources + 150, y: positions[key]?.y ?? 62 + i * 94, title: found?.source ?? binding, subtitle: `Context source · ${found?.entity === 'subject' ? 'subject' : 'object of the call'}` };
+    return { binding, caps, node };
+  });
+  const edges: LayoutEdge[] = sources.flatMap(({ binding, caps, node }) => caps.flatMap(x => {
+    const from = nodes.find(n => n.select.type === 'capability' && n.select.id === x.id);
+    return from ? [{ key: `ts-${x.id}-${binding}`, select: { type: 'capability' as const, id: x.id }, from, to: node, conditions: 0, mapping: x.attrs.join(', ') || 'trusted attributes' }] : [];
+  }));
+  return { ...l, width: l.width + (sources.length ? 150 : 0), nodes: [...nodes, ...sources.map(s => s.node)], kinds: [], edges: [...l.edges.filter(e => e.to.column !== 'resources' && e.from.column !== 'resources'), ...edges] };
+}
+
+function Editor({ scope, agentId, agentName, reportOnly, mode, version, onView, target, block }: Props) {
   const { catalog, loading, error, retry } = useCatalog();
   const state = useDelegation(scope, agentId, catalog);
-  const [back, setBack] = useState<Selection>();
-  const [mode, setMode] = useState<'graph' | 'list'>('graph');
-  const [version, setVersion] = useState<'draft' | 'published'>('draft');
+  const navigate = useNavigate();
+  // from: the panel that opened this one (the Identity providers list, the agent, a group), for Back.
+  const [from, setFrom] = useState<Selection>();
   const [positions, setPositions] = useState<Positions>({});
   const [maximized, setMaximized] = useState(false);
   const [help, setHelp] = useState(false);
@@ -64,19 +127,21 @@ function Editor({ scope, agentId, agentName, target, block }: Props) {
   const readOnly = version === 'published';
   const doc: Doc = readOnly ? state.published : state.draft;
   const view = useMemo(() => (isFiltered(filters) ? filterDoc(doc, filters, catalog) : doc), [doc, filters, catalog]);
-  const count = (d: Doc) => d.scopes.length + d.capabilities.length + d.resources.length;
-  const layout = useMemo(() => delegationLayout(agentName, view, catalog, positions), [agentName, view, catalog, positions]);
+  const count = (d: Doc) => d.scopes.length + d.capabilities.length;
+  const layout = useMemo(() => rulesLayout(agentName, view, catalog, positions), [agentName, view, catalog, positions]);
+  const select = (s: Selection, parent?: Selection) => { setFrom(parent); setSelected(s); };
+  const close = () => { setSelected(undefined); setFrom(undefined); };
+  useEffect(() => close(), [version]);
   useEffect(() => { const next = targetSelection(target, state.draft); if (next) setSelected(next); }, [target?.serverId, target?.tool, target?.section, target?.connectionId, !!state.config]);
-  // Open the rule shows the rule: scroll once to the rules field (a condition)
-  // or to the panel of the selected relation (Admin 045).
+  // Open the rule shows the rule: scroll once to the rules field (a condition) of the open panel (Admin 045).
   const panel = useRef<HTMLFieldSetElement>(null);
   const scrolled = useRef<string | undefined>(undefined);
   const targetKey = target ? JSON.stringify(target) : undefined;
   useEffect(() => {
     if (!targetKey || !selected || !state.config || scrolled.current === targetKey || !panel.current) return;
     scrolled.current = targetKey;
-    const node = (target?.section === 'policies' && panel.current.querySelector('[data-field="rules"]')) || panel.current;
-    node.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    const node = target?.section === 'policies' && panel.current.querySelector('[data-field="rules"]');
+    if (node) node.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }, [targetKey, selected, state.config]);
   const appliedBlock = useRef(0);
   useEffect(() => {
@@ -94,27 +159,47 @@ function Editor({ scope, agentId, agentName, target, block }: Props) {
   }, [maximized]);
   if (state.query.isError || error) return <div role="alert" className="cp-admin-notice" data-tone="danger">Could not load the delegation and access of this agent. <button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => { void state.reload(); retry(); }}>Retry</button></div>;
   if (!state.config || loading) return <p role="status" className="cp-admin-muted">Loading delegation and access…</p>;
+  const head = selected ? panelHead(selected, doc, catalog, agentName) : undefined;
+  // Add trusted attributes leaves for Context sources with the tool, so that its page can return here.
+  const toContextSources = (id: string) => {
+    const c = doc.capabilities.find(x => x.id === id);
+    if (!c) return;
+    navigate(`/access/context-sources?${new URLSearchParams({ agent_id: agentId, agent_name: agentName, server_id: c.serverId, tool: c.tool })}`);
+  };
   return <section className="delegation-editor" data-maximized={maximized} aria-label="Agent delegation editor">
     <header className="delegation-toolbar">
       <div className="agent-graph-title"><h3>Delegation and access</h3><button type="button" className="delegation-help" onClick={() => setHelp(true)}><CircleHelp size={16} aria-hidden="true" />How this works</button></div>
-      <div className="delegation-toolbar-actions">
-        <Toggle label="View" value={mode} onChange={setMode} options={[['graph', 'Graph'], ['list', 'List']]} />
-        <Toggle label="Version" value={version} onChange={v => { setVersion(v); setSelected(undefined); }} options={[['draft', 'Draft'], ['published', 'Published']]} />
-        {mode === 'graph' && Object.keys(positions).length ? <button type="button" className="rule-switch" onClick={() => setPositions({})}>Reset layout</button> : null}
-      </div>
+      {mode === 'graph' && Object.keys(positions).length ? <div className="delegation-toolbar-actions"><button type="button" className="rule-switch" onClick={() => setPositions({})}>Reset layout</button></div> : null}
     </header>
     <FilterBar filters={filters} onChange={setFilters} shown={count(view)} total={count(doc)} doc={doc} />
-    <SectionBar doc={doc} selected={selected} onSelect={setSelected} readOnly={readOnly} />
+    <SectionBar doc={doc} selected={selected} onSelect={s => select(s)} readOnly={readOnly} />
     {readOnly ? <p className="delegation-readonly">{state.config.published_revision ? `You see published revision ${state.config.published_revision}. Switch to Draft to edit.` : 'Nothing is published yet. Switch to Draft to edit.'}</p> : null}
     {state.error ? <div role="alert" className="cp-admin-notice" data-tone="danger">{state.error}{state.conflict ? <button type="button" className="cp-admin-button cp-admin-button--ghost" disabled={state.busy} onClick={() => void state.reload()}>Reload</button> : null}</div> : null}
-    <div className="delegation-body" data-panel={!!selected}>
+    <div className="delegation-body" data-panel={false}>
       {mode === 'graph'
-        ? <DelegationGraph layout={layout} selected={selected} onSelect={setSelected} onMove={(key, x, y) => setPositions(p => ({ ...p, [key]: { x, y } }))} readOnly={readOnly} maximized={maximized} onMaximize={() => setMaximized(v => !v)} />
-        : <ListView doc={view} source={doc} selected={selected} onSelect={setSelected} onChange={state.edit} readOnly={readOnly} />}
-      {selected ? <fieldset ref={panel} className="delegation-panel-frame" disabled={readOnly || state.busy}><RelationPanel key={JSON.stringify(selected) + version} selected={selected} agentName={agentName} doc={doc} onChange={state.edit} onClose={() => { setSelected(undefined); setBack(undefined); }} onSelect={s => { setBack(selected?.type === 'group' ? selected : undefined); setSelected(s); }} back={back} onBack={() => { setSelected(back); setBack(undefined); }} /></fieldset> : null}
+        ? <DelegationGraph layout={layout} selected={selected} onSelect={s => select(s)} onMove={(key, x, y) => setPositions(p => ({ ...p, [key]: { x, y } }))} readOnly={readOnly} maximized={maximized} onMaximize={() => setMaximized(v => !v)} />
+        : <ListView doc={view} source={doc} selected={selected} onSelect={s => select(s)} onChange={state.edit} readOnly={readOnly} />}
     </div>
     {help ? <GraphHelp onClose={() => setHelp(false)} /> : null}
-    <PublishBar config={state.config} changes={state.changes} busy={state.busy} blocker={harnessWithoutGroups(state.draft) ? 'Harness login is on without a group. Choose at least one group, or turn it off.' : undefined} onPublish={state.publish} onDiscard={() => { void state.discard(); setSelected(undefined); }} onHistory={() => setHistory(true)} />
+    <PublishBar config={state.config} changes={state.changes} busy={state.busy} blocker={harnessWithoutGroups(state.draft) ? 'Harness login is on without a group. Choose at least one group, or turn it off.' : undefined} onPublish={state.publish} onDiscard={() => { void state.discard(); close(); }} onHistory={() => setHistory(true)} />
     {history ? <RevisionHistory scope={scope} agentId={agentId} agentName={agentName} onClose={() => setHistory(false)} /> : null}
+    {selected && head ? <SidePanel eyebrow={head.eyebrow} title={head.heading ?? head.title} onClose={close}>
+      {from ? <button type="button" className="rule-switch panel-back" onClick={() => { setSelected(from); setFrom(undefined); }}><ArrowLeft size={14} aria-hidden="true" />Back to {panelHead(from, doc, catalog, agentName).title}</button> : null}
+      <fieldset ref={panel} key={JSON.stringify(selected) + version} className="relation-side-panel" disabled={readOnly || state.busy}>
+        {selected.type === 'capability'
+          ? <ToolPanel published={state.published} id={selected.id} start={!!selected.addCondition} agentName={agentName} doc={doc} onChange={state.edit} onClose={close} onContextSources={() => toContextSources(selected.id)} />
+          : selected.type === 'agent'
+          ? <AgentPanel agentName={agentName} reportOnly={reportOnly} doc={doc} onSelect={s => select(s, selected)} onView={v => { close(); onView(v); }} />
+          : selected.type === 'add' && selected.what === 'delegator'
+          ? <IdentityProvidersPanel agentName={agentName} doc={doc} onSelect={s => select(s, selected)} add={<AddPanel what="delegator" agentName={agentName} doc={doc} onChange={state.edit} onDone={close} />} />
+          : selected.type === 'add'
+          ? <aside className="relation-panel" aria-label="Selected relation"><AddPanel what={selected.what} agentName={agentName} doc={doc} onChange={state.edit} onDone={close} /></aside>
+          : selected.type === 'idp'
+          ? <aside className="relation-panel" aria-label="Selected relation"><IdpPanel doc={doc} issuer={selected.issuer} agentName={agentName} onChange={state.edit} onClose={close} onSelect={s => select(s, selected)} /></aside>
+          : selected.type === 'group'
+          ? <aside className="relation-panel" aria-label="Selected relation"><GroupPanel doc={doc} group={selected.group} groupKey={selected.key} label={selected.label} onSelect={s => select(s, selected)} /></aside>
+          : null}
+      </fieldset>
+    </SidePanel> : null}
   </section>;
 }

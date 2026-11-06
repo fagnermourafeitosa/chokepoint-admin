@@ -301,3 +301,122 @@ li[data-kind="changed"] .history-sign { color: var(--cp-admin-color-warning); }
 .history-timeline .history-entry-note { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .history-timeline .history-entry-meta { color: var(--cp-admin-color-text); }
 .history-entry-time { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); }
+
+
+/* Admin 048: the relation editors in the side panel. */
+/* Admin 048: the relation editor as the body of the side panel.
+   The side panel header holds the eyebrow, the title and the close button, so the
+   editor's own header, close button and card frame are not used here.
+   Design system: 24px panel padding, 16px between related fields, labels above values. */
+.relation-side-panel .relation-panel > header,
+.relation-side-panel .relation-close { display: none; }
+.relation-side-panel .relation-panel {
+  gap: var(--cp-admin-space-5);
+  padding: var(--cp-admin-space-6);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.relation-side-panel .relation-field { gap: var(--cp-admin-space-2); font-size: var(--cp-admin-type-body); font-weight: var(--cp-admin-weight-regular); }
+.relation-side-panel .relation-field > span { font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); color: var(--cp-admin-color-text); }
+.relation-side-panel .relation-field small { font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-regular); color: var(--cp-admin-color-text-muted); }
+.relation-side-panel .relation-add-button { justify-self: start; }
+.relation-side-panel .relation-panel > footer { justify-items: start; padding-top: var(--cp-admin-space-5); }
+.trusted-list { display: grid; gap: var(--cp-admin-space-2); margin: 0; padding: 0; list-style: none; }
+.trusted-list li { display: flex; gap: var(--cp-admin-space-2); align-items: flex-start; }
+.trusted-list span { display: grid; gap: 2px; }
+fieldset.relation-side-panel { min-width: 0; margin: 0; padding: 0; border: 0; }
+
+/* Agent node side panel */
+.agent-summary { display: grid; gap: var(--cp-admin-space-5); }
+.agent-summary > p { margin: 0; }
+.agent-summary-mode { display: flex; align-items: center; gap: var(--cp-admin-space-2); margin: 0; }
+.agent-summary-list { list-style: none; margin: 0; padding: 0; display: grid; border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); }
+.agent-summary-list li + li { border-top: var(--cp-admin-border-width) solid var(--cp-admin-color-border); }
+.agent-summary-list button { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-3); border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.agent-summary-list button:hover { background: var(--cp-admin-color-row-hover); }
+.agent-summary-list button > span { display: grid; gap: var(--cp-admin-space-1); min-width: 0; }
+.agent-summary-list strong { font-weight: var(--cp-admin-weight-semibold); }
+.agent-summary-views { display: flex; flex-wrap: wrap; gap: var(--cp-admin-space-2); }
+
+/* Icon toggles and compact section counts */
+.delegation-toggle .toggle-icon { display: inline-flex; align-items: center; justify-content: center; padding: 0 10px; }
+.section-count { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); }
+.section-count > strong { min-width: 1.5em; padding: 0 6px; border-radius: var(--cp-admin-radius-pill); background: var(--cp-admin-color-surface-muted); text-align: center; font-size: var(--cp-admin-type-label); }
+.delegation-toggle > .admin-tooltip-trigger { display: inline-flex; }
+.delegation-toggle > .admin-tooltip-trigger > button { min-height: 30px; }
+.delegation-toggle > .admin-tooltip-trigger + .admin-tooltip-trigger > button { border-inline-start: 1px solid var(--cp-admin-color-text); }
+.button-count { min-width: 1.5em; padding: 0 6px; border-radius: var(--cp-admin-radius-pill); background: var(--cp-admin-color-surface-muted); text-align: center; font-size: var(--cp-admin-type-label); }
+
+/* Back link of a side panel opened from another one */
+.panel-back { display: inline-flex; align-items: center; gap: var(--cp-admin-space-1); margin: var(--cp-admin-space-4) var(--cp-admin-space-6) 0; }
+
+/* How this works: the CEL example */
+.graph-help-cel { margin: 0; padding: var(--cp-admin-space-3); overflow-x: auto; border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface-muted); font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-small); }
+.graph-help .delegation-list-table code { overflow-wrap: anywhere; }
+
+/* Rules can read: call arguments, instance limits and trusted attributes, inside Rules. */
+.rule-trusted { display: grid; gap: var(--cp-admin-space-2); padding: var(--cp-admin-space-3); border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); }
+.rule-trusted > ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--cp-admin-space-3); }
+.rule-trusted > ul > li { display: grid; gap: var(--cp-admin-space-1); }
+.rule-trusted > ul > li > span { font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); }
+.rule-trusted code { margin-inline-end: var(--cp-admin-space-1); }
+/* The title of the Rules block is the largest text of the block. */
+.relation-side-panel [data-field="rules"] > .relation-label { font-size: var(--cp-admin-type-body); font-weight: var(--cp-admin-weight-bold); }
+
+/* Tool panel in sections: each top-level field is a section with a divider and a bold title. */
+.relation-side-panel .relation-sections { gap: 0; }
+.relation-side-panel .relation-sections > .relation-field { padding-block: var(--cp-admin-space-5); border-top: var(--cp-admin-border-width) solid var(--cp-admin-color-border); }
+.relation-side-panel .relation-sections > .relation-field > span:first-child,
+.relation-side-panel .relation-sections > .relation-field > .relation-label { font-size: var(--cp-admin-type-body); font-weight: var(--cp-admin-weight-bold); color: var(--cp-admin-color-text); }
+.relation-side-panel .relation-sections > footer { padding-top: var(--cp-admin-space-5); border-top: var(--cp-admin-border-width) solid var(--cp-admin-color-border); }
+
+/* The header of the tool panel is the path agent → server → tool. */
+.panel-path { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-1) var(--cp-admin-space-2); font-size: 1rem; line-height: 1.4; }
+.panel-path > svg[aria-label] { color: var(--cp-admin-color-text-muted); }
+.panel-path code { font-family: var(--cp-admin-font-mono); font-size: .9375rem; font-weight: var(--cp-admin-weight-semibold); }
+.panel-path > span { display: inline-flex; align-items: center; gap: var(--cp-admin-space-1); white-space: nowrap; }
+.relation-side-panel .relation-sections > .relation-field:first-child { border-top: 0; padding-top: 0; }
+/* The tool always takes the second line of the title. */
+.panel-path > .panel-path-tool { flex-basis: 100%; }
+
+/* Rule editor: Add a condition on the right, the rule read as a sentence on a grey surface. */
+.relation-side-panel .condition-editor .rule-add { justify-self: end; }
+.required-mark { color: var(--cp-admin-color-danger); }
+.relation-side-panel .rule-sentence--read { margin: 0; padding: var(--cp-admin-space-3); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface-muted); }
+.relation-side-panel .rule-sentence--read { display: block; line-height: 1.5; }
+.relation-side-panel .rule-sentence--read > svg { display: inline; vertical-align: -2px; margin-inline-end: var(--cp-admin-space-1); }
+.relation-side-panel .rule-sentence--read > strong { margin-inline-start: var(--cp-admin-space-1); }
+
+/* is one of: the values look like an array */
+.rule-list-value { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-1); min-height: 36px; padding: var(--cp-admin-space-1) var(--cp-admin-space-2); border: var(--cp-admin-border-width) solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-small); }
+.rule-list-bracket { color: var(--cp-admin-color-text-muted); font-weight: var(--cp-admin-weight-bold); }
+.rule-list-item { display: inline-flex; align-items: center; gap: 2px; }
+.rule-list-item code { padding: 0 var(--cp-admin-space-1); border-radius: var(--cp-admin-radius-sm); background: var(--cp-admin-color-surface-muted); }
+.rule-list-item button { display: inline-flex; padding: 0; border: 0; background: none; color: var(--cp-admin-color-text-muted); cursor: pointer; }
+.rule-list-input { flex: 1; min-width: 60px; border: 0; outline: 0; background: transparent; font: inherit; color: var(--cp-admin-color-text); }
+/* Add rule: right side of the Rules section, with space before the footer. */
+.relation-side-panel .relation-sections > .relation-add-button { justify-self: end; margin-bottom: var(--cp-admin-space-5); }
+.relation-side-panel .relation-sections > footer { display: flex; justify-content: flex-end; }
+
+/* A link that leaves the panel for another screen: text and arrow, lighter than a button. */
+.nav-link { display: inline-flex; align-items: center; gap: var(--cp-admin-space-1); justify-self: start; padding: 0; border: 0; background: none; color: var(--cp-admin-color-text); font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.nav-link:hover svg { transform: translateX(2px); }
+.nav-link svg { transition: transform .15s ease; }
+
+/* Trusted attributes list: room between sources and between a source and its attributes. */
+.rule-trusted .trusted-list { gap: var(--cp-admin-space-3); padding-block: var(--cp-admin-space-2); }
+.rule-trusted .trusted-list li { gap: var(--cp-admin-space-2); }
+.rule-trusted .trusted-list li > svg { margin-top: 2px; flex: none; }
+.rule-trusted .trusted-list span { gap: var(--cp-admin-space-1); }
+.rule-trusted [data-field="trusted"] { gap: var(--cp-admin-space-2); }
+
+/* Rules: the helper stays with the list of rules; the Trusted attributes box is its own group below. */
+.relation-side-panel [data-field="rules"] .rule-trusted { margin-top: var(--cp-admin-space-5); }
+
+/* Rule card: the name, then what the rule checks, in grey. */
+.relation-side-panel .rule-expression { display: block; padding: 0; background: none; color: var(--cp-admin-color-text-muted); font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-label); overflow-wrap: anywhere; }
+.relation-condition header .draft-badge { margin-inline-start: auto; }
+.relation-condition header .draft-badge + .relation-icon-button { margin-inline-start: var(--cp-admin-space-2); }
+.relation-sections > .tool-mapping-warning { margin-bottom: var(--cp-admin-space-5); }

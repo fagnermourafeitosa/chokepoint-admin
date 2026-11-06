@@ -9,7 +9,7 @@ const page = 50;
 const adds: Record<GroupKind, [Adding, string]> = { tools: ['tool', 'Add tools'], resources: ['resource', 'Add resource'] };
 
 function items(doc: Doc, group: GroupKind, key: string): Item[] {
-  if (group === 'tools') return doc.capabilities.filter(c => c.serverId === key).map(c => ({ select: { type: 'capability', id: c.id }, title: c.tool, detail: c.mapping ? `Resource: ${c.mapping.kind}` : 'No resource mapping', expires: c.expiresAt, conditions: c.conditions.length }));
+  if (group === 'tools') return doc.capabilities.filter(c => c.serverId === key).map(c => ({ select: { type: 'capability', id: c.id }, title: c.tool, detail: c.conditions.length ? `${c.conditions.length} ${c.conditions.length === 1 ? 'rule' : 'rules'}` : 'No rules', expires: c.expiresAt, conditions: c.conditions.length }));
   const [serverId, kind] = key.split('|');
   return doc.resources.filter(r => r.serverId === serverId && r.kind === kind).map(r => ({ select: { type: 'resource', id: r.id }, title: r.value, detail: kind, conditions: 0 }));
 }
@@ -25,7 +25,7 @@ export function GroupPanel({ doc, group, groupKey, label, onSelect }: { doc: Doc
   const [what, add] = adds[group];
   return <>
     <header><div><small>Group</small><h4>{label}</h4><p className="cp-admin-muted">{group === 'tools' ? 'Granted tools of this server' : `${groupKey.split('|')[1]} on ${serverName(catalog, groupKey.split('|')[0])}`}</p></div></header>
-    <div className="relation-field"><span>Summary</span><small>{all.length} total · {all.filter(i => i.expires).length} expire · {all.filter(i => i.conditions).length} with call conditions</small></div>
+    <div className="relation-field"><span>Summary</span><small>{all.length} total · {all.filter(i => i.expires).length} expire · {all.filter(i => i.conditions).length} with rules</small></div>
     <label className="group-search"><Search size={15} aria-hidden="true" /><input className="cp-admin-input" type="search" placeholder={`Filter ${all.length}…`} value={query} onChange={e => { setQuery(e.target.value); setShown(page); }} aria-label="Filter this group" /></label>
     <ul className="group-list">{found.slice(0, shown).map(i => <li key={JSON.stringify(i.select)}><button type="button" onClick={() => onSelect(i.select)}><span><strong>{i.title}</strong><small>{i.detail}</small></span>{i.expires ? <Clock size={13} aria-label="Has expiration" /> : null}{i.conditions ? <span className="group-cond"><Braces size={13} aria-hidden="true" />{i.conditions}</span> : null}</button></li>)}</ul>
     <p className="cp-admin-muted group-count">{found.length ? `Showing ${Math.min(shown, found.length)} of ${found.length}` : 'No match.'}</p>

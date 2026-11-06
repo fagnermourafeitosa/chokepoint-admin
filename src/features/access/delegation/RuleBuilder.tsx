@@ -1,4 +1,6 @@
-import { Plus, Trash2 } from 'lucide-react';
+// Admin 048: RuleBuilder: each line of a rule is a condition.
+import { useState } from 'react';
+import { Plus, Trash2, X } from 'lucide-react';
 import { findTool, type Catalog } from './model';
 import { SelectMenu } from '../../../components/ui/dropdown/SelectMenu';
 
@@ -44,13 +46,32 @@ export function ruleSentence(rule: Rule, fields: RuleField[]) {
   return rule.clauses.map(c => {
     const f = fields.find(x => x.key === c.field); if (!f) return '';
     const op = (ops[f.type] ?? ops.string).find(o => o.id === c.op)!;
-    return `${f.label} ${op.label}${op.noValue ? '' : ` ${c.valueField ? fields.find(x => x.key === c.valueField)?.label : c.value || '…'}`}`;
-  }).filter(Boolean).join(rule.join === 'all' ? ' and ' : ' or ');
+    const value = c.valueField ? fields.find(x => x.key === c.valueField)?.label : op.id === 'in' ? `[${listValues(c.value).join(', ') || '…'}]` : c.value || '…';
+    return `${f.label} ${op.label}${op.noValue ? '' : ` ${value}`}`;
+  }).filter(Boolean).join(rule.join === 'all' ? ' AND ' : ' OR ');
 }
 
 export const ruleBindings = (rule: Rule, fields: RuleField[]) => [...new Set(rule.clauses.flatMap(c => [c.field, c.valueField]).map(k => fields.find(f => f.key === k)?.binding).filter((b): b is string => !!b))];
 export const ruleLimits = (rule: Rule, fields: RuleField[]) => [...new Set(rule.clauses.flatMap(c => [c.field, c.valueField]).map(k => fields.find(f => f.key === k)?.limit).filter((l): l is string => !!l))];
 export const ruleComplete = (rule: Rule, fields: RuleField[]) => rule.clauses.length > 0 && rule.clauses.every(c => { const f = fields.find(x => x.key === c.field); const op = f && (ops[f.type] ?? ops.string).find(o => o.id === c.op); return !!op && (op.noValue || !!c.valueField || c.value.trim() !== ''); });
+
+// is one of: the values of the list, kept as one comma-separated string in the clause.
+const listValues = (v: string) => v.split(',').map(x => x.trim()).filter(Boolean);
+
+// Admin 048: the list of "is one of" looks like an array: [ 1001 × , 1002 × ] and an input to add more.
+function ListValue({ value, type, onChange }: { value: string; type: string; onChange: (v: string) => void }) {
+  const [text, setText] = useState('');
+  const items = listValues(value);
+  const add = (raw: string) => { const next = [...new Set([...items, ...listValues(raw.replace(/\n/g, ','))])]; onChange(next.join(', ')); setText(''); };
+  return <div className="rule-list-value" role="group" aria-label="List of values">
+    <span className="rule-list-bracket" aria-hidden="true">[</span>
+    {items.map((v, i) => <span key={v} className="rule-list-item"><code>{v}</code><button type="button" aria-label={`Remove ${v}`} onClick={() => onChange(items.filter(x => x !== v).join(', '))}><X size={12} /></button>{i < items.length - 1 ? <span aria-hidden="true">,</span> : null}</span>)}
+    <input className="rule-list-input" aria-label="Add a value" type={type === 'number' ? 'number' : 'text'} value={text} placeholder={items.length ? 'add' : 'value'}
+      onChange={e => setText(e.target.value)} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ',') && text.trim()) { e.preventDefault(); add(text); } if (e.key === 'Backspace' && !text && items.length) onChange(items.slice(0, -1).join(', ')); }}
+      onBlur={() => { if (text.trim()) add(text); }} onPaste={e => { const t = e.clipboardData.getData('text'); if (/[,\n]/.test(t)) { e.preventDefault(); add(t); } }} />
+    <span className="rule-list-bracket" aria-hidden="true">]</span>
+  </div>;
+}
 
 function FieldSelect({ fields, value, onChange, label, only }: { fields: RuleField[]; value: string; onChange: (v: string) => void; label: string; only?: string }) {
   const list = only ? fields.filter(f => f.type === only) : fields;
@@ -65,17 +86,20 @@ export function RuleBuilder({ fields, rule, onChange }: { fields: RuleField[]; r
     <div className="rule-join">Allow the call when <SelectMenu label="Match" value={rule.join} onChange={v => onChange({ ...rule, join: v as Rule['join'] })} options={[{ value: 'all', label: 'all' }, { value: 'any', label: 'any' }]} /> of these are true:</div>
     {rule.clauses.map(c => {
       const f = fields.find(x => x.key === c.field)!; const list = ops[f.type] ?? ops.string; const op = list.find(o => o.id === c.op) ?? list[0];
+      // Admin 048: compare only with a trusted attribute, never with another call argument (instance limits are not in the Admin for now).
+      const others = fields.filter(x => x.key !== c.field && x.binding);
       return <div key={c.id} className="rule-clause">
         <FieldSelect fields={fields} label="Field" value={c.field} onChange={v => { const nf = fields.find(x => x.key === v)!; set(c.id, { field: v, op: (ops[nf.type] ?? ops.string)[0].id, value: '', valueField: undefined }); }} />
         <SelectMenu block label="Operator" value={op.id} onChange={v => set(c.id, { op: v })} options={list.map(o => ({ value: o.id, label: o.label }))} />
         {op.noValue ? <span /> : <div className="rule-value">
-          {c.valueField !== undefined ? <FieldSelect fields={fields.filter(x => x.key !== c.field)} only={f.type} label="Compare with field" value={c.valueField} onChange={v => set(c.id, { valueField: v })} />
-            : <input className="cp-admin-input" aria-label="Value" type={f.type === 'number' ? 'number' : 'text'} value={c.value} placeholder={op.id === 'in' ? 'RJ, SP' : 'value'} onChange={e => set(c.id, { value: e.target.value })} />}
-          {op.id !== 'in' && fields.some(x => x.key !== c.field && x.type === f.type) ? <button type="button" className="rule-switch" onClick={() => set(c.id, { valueField: c.valueField !== undefined ? undefined : fields.find(x => x.key !== c.field && x.type === f.type)!.key })}>{c.valueField !== undefined ? 'Use a value' : 'Compare with a field'}</button> : null}
+          {c.valueField !== undefined ? <FieldSelect fields={others} only={f.type} label="Compare with a trusted attribute" value={c.valueField} onChange={v => set(c.id, { valueField: v })} />
+            : op.id === 'in' ? <ListValue value={c.value} type={f.type} onChange={v => set(c.id, { value: v })} />
+            : <input className="cp-admin-input" aria-label="Value" type={f.type === 'number' ? 'number' : 'text'} value={c.value} placeholder="value" onChange={e => set(c.id, { value: e.target.value })} />}
+          {op.id !== 'in' && others.some(x => x.type === f.type) ? <button type="button" className="rule-switch" onClick={() => set(c.id, { valueField: c.valueField !== undefined ? undefined : others.find(x => x.type === f.type)!.key })}>{c.valueField !== undefined ? 'Use a value' : 'Compare with a trusted attribute'}</button> : null}
         </div>}
-        <button type="button" className="relation-icon-button" aria-label="Remove this check" onClick={() => onChange({ ...rule, clauses: rule.clauses.filter(x => x.id !== c.id) })}><Trash2 size={14} /></button>
+        <button type="button" className="relation-icon-button" aria-label="Remove this condition" onClick={() => onChange({ ...rule, clauses: rule.clauses.filter(x => x.id !== c.id) })}><Trash2 size={14} /></button>
       </div>;
     })}
-    <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small rule-add" onClick={add} disabled={!fields.length}><Plus size={14} aria-hidden="true" />Add a check</button>
+    <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small rule-add" onClick={add} disabled={!fields.length}><Plus size={14} aria-hidden="true" />Add a condition</button>
   </div>;
 }

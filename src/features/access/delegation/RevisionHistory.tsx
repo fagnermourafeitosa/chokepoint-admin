@@ -13,7 +13,7 @@ import { revisionDiff, type Change, type Section } from './revisionDiff';
 const sections: { key: Section; label: string; Icon: typeof User }[] = [
   { key: 'delegator', label: 'Who can delegate', Icon: User },
   { key: 'tool', label: 'Servers and tools', Icon: Wrench },
-  { key: 'resource', label: 'Resources', Icon: Database },
+  { key: 'resource', label: 'Allowed values', Icon: Database },
   { key: 'rule', label: 'Rules', Icon: FileCode2 },
 ];
 const sign = { added: '+', removed: '−', changed: '~' };

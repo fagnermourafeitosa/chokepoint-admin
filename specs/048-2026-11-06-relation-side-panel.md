@@ -3,7 +3,7 @@
 - **Specification ID**: 048
 - **Date**: 2026-11-06
 - **Slug**: relation-side-panel
-- **Status**: In Progress
+- **Status**: Waiting Approve
 - **Owner**: Admin — Access, Delegation and access
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md)
 - **Related Specification**: [027 — Tool Resource Mapping Review](027-2026-10-31-tool-resource-mapping-review.md)
@@ -61,6 +61,7 @@ The tool editor shows Resource mapping, Resources and Rules side by side. Allowe
    - **No rules.** when the tool has none;
    - a **Trusted attributes** box (help icon: facts about the subject or the object of the call from context sources; only a rule uses them; they belong to the tool, so every agent with a rule on it reads the same) lists each binding of the tool (source, Subject or Object of the call, attribute names), or "None on this tool.", and always ends with the link **Add trusted attributes in Context sources →**;
    - **Add rule**, a secondary button on the right, opens the rule editor at once.
+   - the link leaves for Access › Context sources with the agent and the tool in the URL; that page shows a banner "Adding trusted attributes for <agent> · <tool>" with **Back to <agent> · <tool>**, which opens the panel of the tool again.
 8. Footer: **Remove access** on the right (danger). Its confirmation says "<agent> can no longer call <tool>, and its rules on this tool are removed. The tool stays on <server> for other agents. The change goes into the draft."
 9. The tool panel has no allowed values, no parameter choice and no Compare with a rule call to action.
 
@@ -145,15 +146,15 @@ Not chosen: keeping Integrations as it is, which leaves a mapping that blocks ev
 
 ## Acceptance Criteria
 
-- [ ] 1. Every node, edge and list row opens the `SidePanel`; the editor column is gone.
-- [ ] 2. The tool panel matches items 4 to 9; no allowed values or instance limits are shown or created.
-- [ ] 3. The rule editor matches items 10 to 15.
-- [ ] 4. The agent panel, section bar, filter, tabs row, list and collapse button match items 16 to 21.
-- [ ] 5. The graph shows rule counts and labelled context source edges (items 22 and 23).
-- [ ] 6. How this works matches item 24.
-- [ ] 7. The `Notice` component, tokens and docs exist (item 25).
-- [ ] 8. The copy of items 26 to 28 is in place; no screen of the Admin says "Resource mapping", "Resources", "call conditions" or "trusted attributes from your APIs".
-- [ ] 9. Resolved Decision 1 is applied: Integrations offers only no resource for a new or changed mapping, and a tool with a concrete resource shows the warning.
+- [x] 1. Every node, edge and list row opens the `SidePanel`; the editor column is gone.
+- [x] 2. The tool panel matches items 4 to 9; no allowed values or instance limits are shown or created.
+- [x] 3. The rule editor matches items 10 to 15.
+- [x] 4. The agent panel, section bar, filter, tabs row, list and collapse button match items 16 to 21. (The collapse button was measured in the prototype, not on the branch: functional test S8.)
+- [ ] 5. The graph shows rule counts and labelled context source edges (items 22 and 23). Rule counts seen on the demo; the labelled edge needs a rule that reads a binding, not published on the demo yet (functional test S7, not run).
+- [x] 6. How this works matches item 24.
+- [x] 7. The `Notice` component, tokens and docs exist (item 25).
+- [x] 8. The copy of items 26 to 28 is in place; no screen of the Admin says "Resource mapping", "Resources", "call conditions" or "trusted attributes from your APIs".
+- [x] 9. Resolved Decision 1 is applied: Integrations offers only no resource for a new or changed mapping, and a tool with a concrete resource shows the warning. (The warning was checked by code inspection; no Acme tool has a concrete resource.)
 
 ---
 

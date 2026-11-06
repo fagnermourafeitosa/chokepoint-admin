@@ -92,7 +92,7 @@ export function DelegationGraph({ layout, selected, onSelect, onMove, readOnly, 
         if (edge.mapping !== undefined) return <g key={edge.key} className="delegation-edge delegation-edge--mapping" aria-hidden="true"><path d={d} /><text x={tx - 8} y={ty - 6} textAnchor="end">reads {edge.mapping}</text></g>;
         return <g key={edge.key} className="delegation-edge" data-active={active}>
           <path d={d} />
-          {(readOnly && empty) || (toResource && !group) ? null : <foreignObject x={mx - 40} y={my - 12} width={80} height={24}><button type="button" className="delegation-edge-handle" aria-pressed={active} aria-label={empty ? `Add condition to ${edge.from.title} to ${edge.to.title}` : `Edit relation ${edge.from.title} to ${edge.to.title}`} title={empty ? 'Add a condition to this relation' : 'Edit this relation'} onClick={() => onSelect(empty && 'id' in edge.select ? { ...edge.select, addCondition: true } : edge.select)}>
+          {(readOnly && empty) || (toResource && !group) ? null : <foreignObject x={mx - 40} y={my - 12} width={80} height={24}><button type="button" className="delegation-edge-handle" aria-pressed={active} aria-label={empty ? `Add rule to ${edge.from.title} to ${edge.to.title}` : `Edit relation ${edge.from.title} to ${edge.to.title}`} title={empty ? 'Add a rule' : 'Open'} onClick={() => onSelect(empty && 'id' in edge.select ? { ...edge.select, addCondition: true } : edge.select)}>
             {group ? <strong>{edge.count}</strong> : null}
             {edge.expires ? <Clock size={12} aria-label="Has expiration" /> : null}
             {edge.conditions ? <><Braces size={12} aria-label="Call conditions" />{edge.conditions}</> : null}

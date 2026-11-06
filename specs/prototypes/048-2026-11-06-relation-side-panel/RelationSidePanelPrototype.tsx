@@ -27,7 +27,7 @@ import { GraphHelp } from './GraphHelp';
 import { delegationLayout, type LayoutEdge, type LayoutNode, type Positions, type Selection } from '../../../src/features/access/delegation/layout';
 import { idpName, serverName, type Doc } from '../../../src/features/access/delegation/model';
 import { PublishBar } from '../../../src/features/access/delegation/PublishBar';
-import { RelationPanel } from '../../../src/features/access/delegation/RelationPanel';
+import { GroupPanel } from '../../../src/features/access/delegation/GroupPanel';
 import { SectionBar } from './SectionBar';
 import { agentName, agents, catalogState, config, initialDoc } from './data';
 import '../../../src/features/access/access.css';
@@ -152,7 +152,7 @@ function Editor({ open, version, mode, block, onContextSources, onView }: { open
           ? <AgentPanel agentName={agentName} reportOnly={agents[0].reportOnly} doc={doc} onSelect={s => select(s, selected)} onView={v => { setSelected(undefined); onView(v); }} />
           : selected.type === 'capability'
           ? <CapabilityPanel key={JSON.stringify(selected)} published={initialDoc} id={selected.id} start={!!selected.addCondition} agentName={agentName} doc={doc} onChange={setDoc} onClose={() => setSelected(undefined)} onContextSources={() => onContextSources(selected.id)} />
-          : <RelationPanel key={JSON.stringify(selected)} selected={selected} agentName={agentName} doc={doc} onChange={setDoc} onClose={() => setSelected(undefined)} onSelect={setSelected} onBack={() => undefined} />}
+          : (selected.type === 'group' ? <aside className="relation-panel" aria-label="Selected relation"><GroupPanel doc={doc} group={selected.group} groupKey={selected.key} label={selected.label} onSelect={setSelected} /></aside> : null)}
       </fieldset>
     </SidePanel> : null}
   </section>;

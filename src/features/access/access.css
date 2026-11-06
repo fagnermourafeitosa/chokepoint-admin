@@ -28,3 +28,9 @@
 }
 .access-workbench[data-rail="collapsed"] { grid-template-columns: 4rem minmax(0, 1fr); }
 .access-target-context { display:flex; gap:12px; flex-wrap:wrap; padding:14px 18px; border:1px solid var(--cp-admin-color-border); border-radius:8px; margin:0 0 20px; font-size:.8125rem; }.access-target-context span { color:var(--cp-admin-color-text-muted); }
+/* Context banner on Context sources when the page was opened from the side panel. */
+.context-return-banner { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-4); margin-bottom: var(--cp-admin-space-6); }
+.context-return-banner > div { display: grid; gap: var(--cp-admin-space-1); }
+.context-return-banner span { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-small); }
+.context-return-banner .cp-admin-button { flex: none; }
+@media (max-width: 740px) { .context-return-banner { flex-direction: column; align-items: stretch; } }
