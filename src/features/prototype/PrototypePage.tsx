@@ -3,6 +3,7 @@ import { Link, Route, Routes } from 'react-router';
 import { loadPrototypeCatalog, type PrototypeEntry, type PrototypeState } from './catalog';
 import './prototype.css';
 import { InvestigatePrototype } from '../../../specs/prototypes/049-2026-11-07-investigate-layout/Investigate';
+import { RulesPanelPrototype } from '../../../specs/prototypes/049-2026-11-07-investigate-layout/RulesPanel';
 
 // Layout prototypes: fixed data, never connected to the backend (docs/design-system/visual-specification.md).
 // The prototypes are in specs/prototypes/<specification>/ (see specs/prototypes/README.md).
@@ -10,6 +11,8 @@ import { InvestigatePrototype } from '../../../specs/prototypes/049-2026-11-07-i
 // its page. When its real screen is implemented, remove the entry and mark the prototype Archived.
 const pages: Record<string, { path: string; element: ReactElement }> = {
   '049': { path: 'investigate', element: <InvestigatePrototype /> },
+  // Admin 049 item 15: the Rules list of the Access side panel.
+  '049-rules': { path: 'rules-panel', element: <RulesPanelPrototype /> },
 };
 
 // The index notes are Markdown: show `code` spans as code, the rest as text.

@@ -12,14 +12,15 @@ export function InvestigatePrototype() {
   const state = useInvestigation();
   return (
     <main className="admin-page cp-admin-container" aria-label="Investigate prototype">
-      <header className="trace-page-heading quick-incident-row">
-        <div>
-          <span className="attention-kicker">Investigate</span>
-          <h1>Find out why a call was denied</h1>
-          <p>Start from a problem, inspect the recorded reason and rule, then adjust access.</p>
-        </div>
-        <QuickIncident />
-      </header>
+      {state.isDetail ? null : (
+        <header className="trace-page-heading quick-incident-row">
+          <div>
+            <h1>Find out why a call was denied</h1>
+            <p>Start from a problem, inspect the recorded reason and rule, then adjust access.</p>
+          </div>
+          <QuickIncident />
+        </header>
+      )}
       {state.isDetail ? (
         <DecisionInspector state={state} />
       ) : (

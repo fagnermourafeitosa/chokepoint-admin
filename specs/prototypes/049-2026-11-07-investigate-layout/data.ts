@@ -30,10 +30,11 @@ const servers = {
 };
 
 const condition = { label: 'condition', description: 'A policy condition was not met.' } as const;
-// The rules of the Acme agents. The Admin has no allowed values: a rule checks the values.
-const amountRule = 'double(context.chokepoint.arguments.amount) <= 500.0';
-const queueRule = 'context.chokepoint.arguments.queue == "tier-1"';
-const datasetRule = 'context.chokepoint.arguments.dataset in ["sales_daily", "inventory"]';
+// The rules of the Acme agents, in the CEL that the rule builder writes. The Admin has no allowed
+// values: a rule checks the values.
+const amountRule = 'context.chokepoint.arguments["amount"] <= 500';
+const queueRule = 'context.chokepoint.arguments["queue"] == "tier-1"';
+const datasetRule = 'context.chokepoint.arguments["dataset"] in ["sales_daily", "inventory"]';
 
 // Each rule read as a sentence, in the words of the rule editor ("Reads as", ruleSentence).
 export const ruleSentence: Record<string, string> = {
@@ -108,7 +109,7 @@ export const agentItems = Object.values(agents).map(agent => ({ agent }));
 const ruleName: Record<string, string> = {
   [amountRule]: 'Refund up to 500',
   [queueRule]: 'Tier-1 queue only',
-  [datasetRule]: 'Approved datasets only',
+  [datasetRule]: 'Sales and inventory only',
 };
 
 type Step = Evidence['steps'][number];
@@ -125,7 +126,7 @@ function decisionOf(id: string): Decision | undefined {
   const listed = decisions.items.find(d => d.id === id);
   if (listed) return listed;
   const p = problems.items.find(x => x.latest_decision_id === id);
-  return p && decision({ id, server: { server_id: p.server_id, server_name: p.server_name ?? p.server_id }, tool: p.tool, agent: p.agent, subject: p.subject, resource: null, outcome: 'deny', reason: p.reason, enforcement: 'enforce', at: p.last_at, rule: p.condition ?? undefined, reference: `ref-${id}` });
+  return p && decision({ id, server: { server_id: p.server_id, server_name: p.server_name ?? p.server_id }, tool: p.tool, agent: p.agent, subject: p.subject, resource: null, outcome: 'deny', reason: p.reason, enforcement: 'enforce', at: p.last_at, rule: p.condition ?? undefined, reference: referenceOf(id) });
 }
 
 export function detailOf(id: string): DecisionDetail | undefined {
@@ -159,6 +160,15 @@ export function detailOf(id: string): DecisionDetail | undefined {
   };
 }
 
+// A reference code in the shape the caller receives (four letters or digits, a dash, four more).
+function referenceOf(id: string) {
+  const alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
+  let h = 2166136261;
+  for (const c of id) h = Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0;
+  const code = Array.from({ length: 8 }, (_, i) => alphabet[(h >>> (i * 3)) % alphabet.length]).join('');
+  return `${code.slice(0, 4)}-${code.slice(4)}`;
+}
+
 // The decisions grouped in a problem (Decisions in this problem): one per counted call, in its window.
 export function problemDecisions(p: Problem): Decision[] {
   const latest = decisionOf(p.latest_decision_id);
@@ -167,6 +177,7 @@ export function problemDecisions(p: Problem): Decision[] {
   return Array.from({ length: p.count }, (_, i) => i === 0 ? latest : {
     ...latest,
     id: `${p.latest_decision_id}-${i}`,
+    reference: referenceOf(`${p.latest_decision_id}-${i}`),
     decided_at: new Date(last - ((last - first) * i) / Math.max(1, p.count - 1)).toISOString().replace('.000', ''),
   });
 }

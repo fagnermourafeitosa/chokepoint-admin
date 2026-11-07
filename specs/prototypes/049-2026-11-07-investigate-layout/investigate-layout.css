@@ -13,3 +13,45 @@
 .proto-condition { display: block; overflow-wrap: anywhere; }
 /* The rule read as a sentence in the detail: neutral, since the rule failed (green means passed). */
 .proto-rule-read { color: var(--cp-admin-color-text-muted); }
+/* Decision facts: a plain label/value list, no box per fact. */
+.proto-facts { display: grid; grid-template-columns: 150px minmax(0, 1fr) 150px minmax(0, 1fr); row-gap: 0; column-gap: var(--cp-admin-space-5); margin: 0; padding-top: var(--cp-admin-space-4); border-top: 1px solid var(--cp-admin-color-border); }
+.proto-facts > div { display: contents; }
+.proto-facts > div > dt, .proto-facts > div > dd { margin: 0; padding: var(--cp-admin-space-2) 0; border: 0; background: none; border-bottom: 1px solid var(--cp-admin-color-border); }
+.proto-facts > div > dt { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-small); }
+.proto-facts > div > dd { overflow-wrap: anywhere; }
+.proto-facts > div:last-child > dt, .proto-facts > div:last-child > dd { border-bottom: 0; }
+@media (max-width: 900px) { .proto-facts { grid-template-columns: 150px minmax(0, 1fr); } }
+@media (max-width: 740px) { .proto-facts { grid-template-columns: 1fr; } .proto-facts > div > dt { border-bottom: 0; padding-bottom: 0; } }
+/* The facts sit between the rule columns and the decisions of the problem. */
+.trace-inspector .proto-facts { padding-bottom: var(--cp-admin-space-2); border-bottom: 1px solid var(--cp-admin-color-border); }
+/* No kicker in the detail header: the Inbox item status and the decision ID stay on the right. */
+.trace-inspector-header .trace-inspector-meta { margin-inline-start: auto; }
+/* Detail: Back and Quick incident share one bar; the Rules card takes the full width. */
+.proto-detail-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-4); margin-bottom: var(--cp-admin-space-4); }
+.proto-detail-bar .trace-back { margin: 0; }
+.trace-detail-columns.proto-one-column { grid-template-columns: minmax(0, 1fr); }
+.proto-rule-item > .mcp-badge { justify-self: start; }
+/* Same side margin as the title of the section (20px), close under it. */
+.trace-breakdown .proto-window { margin: -12px 20px 16px; }
+/* Lean detail: the facts the path and the title do not show, in one row, label over value. */
+.proto-facts.proto-facts--row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.proto-facts--row > div { display: grid; align-content: start; gap: 2px; }
+.proto-facts--row > div > dt, .proto-facts--row > div > dd { border-bottom: 0; padding: 0; }
+@media (max-width: 900px) { .proto-facts.proto-facts--row { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: var(--cp-admin-space-3); } }
+.trace-title .proto-title-action { justify-self: start; margin-top: var(--cp-admin-space-3); }
+/* Path first: space under the header and between the title and the facts. */
+.trace-inspector-header + .trace-path { margin-top: var(--cp-admin-space-4); }
+.trace-title + .proto-facts { margin-top: var(--cp-admin-space-5); }
+/* No rule under the detail header: the path box follows it directly. */
+.trace-inspector .trace-inspector-header { border-bottom: 0; padding-bottom: 0; }
+/* The running-text overview under the title: no rule above it. */
+.trace-title + .proto-who { margin: var(--cp-admin-space-4) 0 var(--cp-admin-space-5); line-height: 1.6; }
+.proto-who code { font-size: var(--cp-admin-type-small); }
+/* Facts under the title: no rule above them. */
+.trace-title + .proto-facts { border-top: 0; padding-top: 0; }
+/* Facts in two columns: who and where on the left, how it was decided on the right. */
+.proto-facts-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--cp-admin-space-6, 32px); align-items: start; margin-top: var(--cp-admin-space-5); }
+.proto-facts-columns .proto-facts { grid-template-columns: 150px minmax(0, 1fr); border-top: 0; padding-top: 0; }
+@media (max-width: 900px) { .proto-facts-columns { grid-template-columns: minmax(0, 1fr); } }
+/* Reference: a neutral chip in mono, the code as the caller reads it. */
+.proto-reference { font-family: var(--cp-admin-font-mono); }
