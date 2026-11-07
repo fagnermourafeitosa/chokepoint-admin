@@ -2,7 +2,7 @@ import './inspector.css';
 import { DecisionBreakdown } from './DecisionBreakdown';
 import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { ArrowLeft, ArrowRight, Check, CircleHelp, Eye, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, CircleHelp, Clock, Eye, X } from 'lucide-react';
 import { Tooltip } from '../../components/ui/tooltip/Tooltip';
 import { QuickIncident } from '../../components/quick-incident/QuickIncident';
 import { useRuleSentence } from './useRuleSentence';
@@ -137,12 +137,13 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
         <QuickIncident />
       </div>
       <article className="cp-admin-panel trace-inspector">
-        <header className="trace-inspector-header">
-          <span className="trace-inspector-meta">
-            {detail.problem?.signal ? <InboxItemStatus key={detail.problem.signal.id} scope={scope} id={detail.problem.signal.id} status={detail.problem.signal.status} reviewOnOpen label="Inbox item" /> : null}
-            <code>{utcTime(d.decided_at)}</code>
-          </span>
-        </header>
+        {detail.problem?.signal ? (
+          <header className="trace-inspector-header">
+            <span className="trace-inspector-meta">
+              <InboxItemStatus key={detail.problem.signal.id} scope={scope} id={detail.problem.signal.id} status={detail.problem.signal.status} reviewOnOpen />
+            </span>
+          </header>
+        ) : null}
         {steps.length ? (
           <ol className="trace-path trace-path-relations" aria-label="Recorded authorization path">
             {pathNodes(steps, d, rules.filter((r) => !r.permit).map((r) => r.name)).map((node, i) => (
@@ -168,6 +169,8 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
           )}
           <h2>{d.tool}</h2>
           <p>{cause}{wouldDeny ? ` The call ran because ${agent} was in Report-only.` : ''}</p>
+          {/* Admin 049 item 8: the decision time sits under the cause, above the action. */}
+          <time className="trace-title-time" dateTime={d.decided_at}><Clock size={14} aria-hidden="true" />{utcTime(d.decided_at)}</time>
           {action ? (
             action.to ? <Link className="cp-admin-button trace-title-action" to={action.to}>{action.label}<ArrowRight size={15} /></Link> : <p className="cp-admin-muted">{action.unavailable}</p>
           ) : null}

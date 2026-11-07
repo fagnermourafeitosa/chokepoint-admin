@@ -253,6 +253,7 @@
 .trace-inspector-header .trace-inspector-meta { margin-inline-start: auto; }
 .trace-inspector-header + .trace-path { margin-top: var(--cp-admin-space-4); }
 .trace-title .trace-title-action { justify-self: start; margin-top: var(--cp-admin-space-3); }
+.trace-title .trace-title-time { display: flex; align-items: center; gap: var(--cp-admin-space-1); margin-top: var(--cp-admin-space-2); font: var(--cp-admin-type-small) var(--cp-admin-font-mono); color: var(--cp-admin-color-text-muted); }
 /* Facts in two columns of label and value: who and where on the left, how it was decided on the right. */
 .trace-facts-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--cp-admin-space-6, 32px); align-items: start; margin-top: var(--cp-admin-space-5); }
 .trace-facts-list { display: grid; grid-template-columns: 150px minmax(0, 1fr); margin: 0; }
