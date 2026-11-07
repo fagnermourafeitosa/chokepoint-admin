@@ -156,20 +156,6 @@
   color: var(--cp-admin-color-text-muted);
   overflow-wrap: anywhere;
 }
-.trace-row-open {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 40px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  cursor: pointer;
-  color: var(--cp-admin-color-text-muted);
-}
-.trace-row-open:hover {
-  background: var(--cp-admin-color-surface-muted);
-}
 .trace-pager,
 .trace-pager > div {
   display: flex;
@@ -243,9 +229,15 @@
   }
 }
 
-/* Admin 030: the agent, the subject and the resource of each record. */
-.trace-row-decision { grid-template-columns: 1.2fr 0.9fr 1.1fr 1.2fr 1.1fr 36px; }
-.trace-row-exchange { grid-template-columns: 1.1fr 1fr 1.4fr 1.2fr 36px; }
+/* Admin 049: the agent, the subject, the server and tool, the failed rule and the Actions column. */
+.trace-row-decision { grid-template-columns: 1.2fr 0.9fr 1.1fr 1.2fr 1.4fr 90px; }
+.trace-row-exchange { grid-template-columns: 1.1fr 1fr 1.4fr 1.2fr 90px; }
+.trace-list-head > span:last-child { text-align: right; }
+.trace-actions-cell { display: flex; justify-content: flex-end; align-items: center; }
+/* Server then tool, each with its icon (pattern of Context sources › Trusted attributes). */
+.trace-tool { display: grid; gap: 4px; }
+.trace-tool > span { display: inline-flex; align-items: center; gap: 6px; }
+.trace-condition { display: block; overflow-wrap: anywhere; }
 .trace-list-row--open { cursor: pointer; }
 .trace-list-row--open:hover { background: var(--cp-admin-color-row-hover); }
 .trace-subject { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }

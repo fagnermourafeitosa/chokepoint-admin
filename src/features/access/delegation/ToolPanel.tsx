@@ -1,12 +1,13 @@
 import { useState, type ReactNode } from 'react';
-import { ArrowRight, Braces, CircleHelp, Database, Plus, Trash2 } from 'lucide-react';
+import { ArrowRight, Braces, CircleCheck, CircleHelp, Database, Plus, Trash2 } from 'lucide-react';
 import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
 import { ConfirmDialog } from '../../../components/ui/dialog/ConfirmDialog';
 import { Notice } from '../../../components/ui/notice/Notice';
 import { useCatalog } from './catalog';
 import { ConditionEditor } from './ConditionEditor';
 import { ExpiresField } from './ExpiresField';
-import { serverName, withoutCapability, type Condition, type Doc } from './model';
+import { serverName, withoutCapability, type CatalogBinding, type Condition, type Doc } from './model';
+import { celSentence } from './RuleBuilder';
 
 // The editor of one agent · server · tool edge (Admin 048): Expires, Rules with the trusted
 // attributes they can read, Add rule and Remove access.
@@ -25,8 +26,13 @@ const help = {
   rules: 'CEL conditions on this agent · server · tool, for example amount <= 200 or order_id in ["1001", "1002"]. A rule reads the call arguments and the trusted attributes. Every rule must pass.',
 };
 
-function Conditions({ items, published, onRemove }: { items: Condition[]; published: Condition[]; onRemove: (id: string) => void }) {
-  return <div className="relation-conditions">{items.length ? items.map(c => <article key={c.id} className="relation-condition"><header><Braces size={14} aria-hidden="true" /><strong>{c.name}</strong>{published.some(p => p.id === c.id) ? null : <span className="mcp-badge draft-badge">New in draft</span>}<button type="button" className="relation-icon-button" aria-label={`Remove ${c.name}`} onClick={() => onRemove(c.id)}><Trash2 size={14} /></button></header><code className="rule-expression">{c.expression}</code></article>) : <p className="cp-admin-muted">No rules.</p>}</div>;
+// Admin 049: a saved rule reads as the sentence of the rule editor; a rule that can not be read shows its CEL.
+function Conditions({ items, published, bindings, onRemove }: { items: Condition[]; published: Condition[]; bindings: CatalogBinding[]; onRemove: (id: string) => void }) {
+  return <div className="relation-conditions">{items.length ? items.map(c => {
+    const sentence = celSentence(c.expression, bindings);
+    return <article key={c.id} className="relation-condition"><header><Braces size={14} aria-hidden="true" /><strong>{c.name}</strong>{published.some(p => p.id === c.id) ? null : <span className="mcp-badge draft-badge">New in draft</span>}<button type="button" className="relation-icon-button" aria-label={`Remove ${c.name}`} onClick={() => onRemove(c.id)}><Trash2 size={14} /></button></header>
+      {sentence ? <p className="rule-sentence rule-sentence--read"><CircleCheck size={14} aria-hidden="true" />Reads as: <strong>{sentence}</strong></p> : <code className="rule-expression">{c.expression}</code>}</article>;
+  }) : <p className="cp-admin-muted">No rules.</p>}</div>;
 }
 
 // Add rule opens the rule editor at once. The expiration of the tool is its own section (Expires).
@@ -53,7 +59,7 @@ export function ToolPanel({ published, id, start, agentName, doc, onChange, onCl
     {/* Admin 048 Resolved Decision 1: a tool mapped in Integrations still checks allowed values, which the Admin no longer adds. */}
     {c.mapping ? <Notice tone="warning" className="tool-mapping-warning" title="This tool checks allowed values"><span>Every call of {agentName} to <code>{c.tool}</code> needs an allowed <code>{c.mapping.kind}</code> value, and the Admin can no longer add them. Set the tool to no resource in Integrations and use rules.</span></Notice> : null}
     <ExpiresField value={c.expiresAt} onChange={v => set({ expiresAt: v })} never={`${agentName} can call ${c.tool} until you remove it.`} ends={`After this day (UTC), ${agentName} can no longer call ${c.tool}. Its calls are denied.`} />
-    <Field label="Rules" help={help.rules} name="rules"><Conditions items={c.conditions} published={published.capabilities.find(x => x.id === c.id)?.conditions ?? []} onRemove={k => set({ conditions: c.conditions.filter(x => x.id !== k) })} />
+    <Field label="Rules" help={help.rules} name="rules"><Conditions items={c.conditions} bindings={bindings} published={published.capabilities.find(x => x.id === c.id)?.conditions ?? []} onRemove={k => set({ conditions: c.conditions.filter(x => x.id !== k) })} />
       <section className="rule-trusted" aria-label="Trusted attributes">
         <ul>
           <li data-field="trusted"><Label label="Trusted attributes" help={help.trusted} />

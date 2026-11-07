@@ -3,7 +3,7 @@
 - **Specification ID**: 049
 - **Date**: 2026-11-07
 - **Slug**: investigate-layout
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Investigate, Access
 - **Related Specification**: [020 — Investigate Problems and Decisions](020-2026-10-29-investigate-problems-and-decisions.md)
 - **Related Specification**: [030 — Investigate Agent, Subject and Token Exchanges](030-2026-10-31-investigate-agent-subject-and-token-exchanges.md)
@@ -69,7 +69,7 @@ Each row ends in an arrow icon button in a column without a header. The Admin li
     - No Resource line.
 11. **Decisions in this problem.** Title "Decisions in this problem · N denied" (the outcome word follows the decision). Under it, aligned with the title, "Same agent, server, tool, reason and result · window <start> – <end>". Each row shows the time, the subject and the reference code of the call (not the rule). A decision outside a problem shows "Repeated in this window · N" with the window line and no list.
 12. **Would deny notice.** "Not blocked — The policy of this call denies it, but <agent> was in Report-only, so the call reached <server>. …".
-13. **Copy.** Admin copy never names the product (user rule, 2026-11-07).
+13. **Copy.** Admin copy never names the product (user rule, 2026-11-07). This also covers the texts of the token exchange detail and their labels (`ExchangeInspector.tsx`, `labels.ts`), for example "The machine was revoked; the person must log in again." and "A token was issued for 5 minutes." (user decision in the code review, 2026-11-07).
 
 ### Rules read as sentences (Investigate and Access)
 
@@ -98,9 +98,9 @@ Each row ends in an arrow icon button in a column without a header. The Admin li
 
 ## User Stories
 
-- [ ] 1. As an administrator, I want to see which rule a call did not meet in the Investigate list, so that I can decide without opening each decision.
-- [ ] 2. As an administrator, I want saved rules read as sentences in Access and Investigate, so that I do not read CEL.
-- [ ] 3. As an administrator, I want the same row actions as in the other lists, so that the screens behave alike.
+- [x] 1. As an administrator, I want to see which rule a call did not meet in the Investigate list, so that I can decide without opening each decision.
+- [x] 2. As an administrator, I want saved rules read as sentences in Access and Investigate, so that I do not read CEL.
+- [x] 3. As an administrator, I want the same row actions as in the other lists, so that the screens behave alike.
 
 ---
 
@@ -109,12 +109,12 @@ Each row ends in an arrow icon button in a column without a header. The Admin li
 Agreed with the user on 2026-11-07.
 
 1. **Branch**: `feat/049-investigate-layout`, from `main`, after the approval of this specification.
-2. **Sentence helper (item 14)**: in `src/features/access/delegation/RuleBuilder.tsx`, next to `ruleCel` and `ruleSentence`. It is the inverse of `clauseCel`: it reads the CEL and returns the clauses, or nothing when it does not recognize the shape. `ruleSentence` reads the clauses with the fields of `ruleFields(catalog, serverId, tool)`; the catalog comes from `useCatalog()`. No backend change: the backend keeps sending the expression in `condition` and in the decision evidence.
+2. **Sentence helper (item 14)**: in `src/features/access/delegation/RuleBuilder.tsx`, next to `ruleCel` and `ruleSentence`. It is the inverse of `clauseCel`: it reads the CEL and returns the clauses, or nothing when it does not recognize the shape. `ruleSentence` reads the clauses. A call argument takes its name and type from the CEL; a trusted attribute takes them from the approved bindings of the context sources (`approvedBindings` in `catalog.tsx`). No backend change: the backend keeps sending the expression in `condition` and in the decision evidence.
 3. **Access side panel (item 15)**: `ToolPanel.tsx`, `Conditions`: the `<code className="rule-expression">` becomes the sentence in `rule-sentence--read`, and stays CEL when the helper does not convert.
 4. **Investigate list (items 1 to 5)**: `src/features/investigate/DecisionLists.tsx` (agent cell, Server and Wrench icons, Detail column instead of Resource, Actions column with View, also in the token exchange rows); `investigate.css` (grid columns and the Actions alignment); `Investigate.tsx` (no "Investigate" kicker; no page title in the detail).
-5. **Decision detail (items 6 to 13)**: `DecisionInspector.tsx` (bar with Back and Quick incident, header, five-step path, title with "Rule not met", two columns of facts, would deny notice); it already uses `CatalogProvider` for the revision history, and the same provider serves the helper. `DecisionBreakdown.tsx` (title "· N denied", window line, reference code per row). `inspector.css` (two columns of facts).
+5. **Decision detail (items 6 to 13)**: `DecisionInspector.tsx` (bar with Back and Quick incident, header, five-step path, title with "Rule not met", two columns of facts, would deny notice); its `CatalogProvider` wraps only the revision history panel and stays there. `DecisionBreakdown.tsx` (title "· N denied", window line, reference code per row). `inspector.css` (two columns of facts).
 6. **Prototype**: in the same change, remove the 049 routes from `PrototypePage.tsx` and mark the prototype Archived in `specs/prototypes/README.md`.
-7. **To check before coding**: whether `CatalogProvider` in `DecisionInspector` loads the context sources in time for the sentence on the first render; whether the Detail column of the list, which has no provider today, needs the catalog or only the argument names.
+7. **Checked before coding** (2026-11-07): the catalog loads asynchronously, so it is empty on the first render, and the detail body has no provider. The argument name and the operator come from the CEL itself; only a trusted attribute needs the bindings, to turn its binding ID into `subject.<name>`. In the code review the user chose to load only the context sources: `Investigate` is wrapped in `RuleBindingsProvider` (`useRuleSentence.tsx`, one `sourceApi.list` query), not in the full `CatalogProvider`. A rule that reads only arguments converts at once; a rule that reads a trusted attribute shows its CEL until the context sources load (item 14).
 
 ---
 
@@ -127,12 +127,12 @@ Agreed with the user on 2026-11-07.
 
 ## Acceptance Criteria
 
-- [ ] 1. The list matches items 1 to 4; Token exchanges matches item 5.
-- [ ] 2. The decision inspector matches items 6 to 12.
-- [ ] 3. A rule written by the builder reads as a sentence in the Detail column, the decision inspector and the side panel; a rule written as advanced CEL and a rule with one clause that can not be converted show their CEL (items 14 to 16).
-- [ ] 4. No Investigate screen says "Resource", "Verified agent", "No resource check" or the product name.
-- [ ] 5. Functional test: [049-2026-11-07-investigate-layout](functional-tests/049-2026-11-07-investigate-layout.md).
-- [ ] 6. `npm run check` and `npm run build` pass.
+- [x] 1. The list matches items 1 to 4; Token exchanges matches item 5. (Functional test S1.)
+- [x] 2. The decision inspector matches items 6 to 12. (Functional test S2.)
+- [x] 3. A rule written by the builder reads as a sentence in the Detail column, the decision inspector and the side panel; a rule written as advanced CEL and a rule with one clause that can not be converted show their CEL (items 14 to 16). (Functional tests S1 to S4 for builder rules, an older non-builder rule and advanced CEL; a rule with one clause that can not be converted by code inspection of `celRule`, which returns no clauses when one clause fails.)
+- [x] 4. No Investigate screen says "Resource", "Verified agent", "No resource check" or the product name. (Functional tests S1 and S2; after the review fix, an issued token exchange detail read on the demo shows "A token was issued for 5 minutes.", and the other exchange texts were checked by code inspection.)
+- [x] 5. Functional test: [049-2026-11-07-investigate-layout](functional-tests/049-2026-11-07-investigate-layout.md).
+- [x] 6. `npm run check` and `npm run build` pass.
 
 ---
 

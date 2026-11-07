@@ -119,38 +119,6 @@
   overflow-wrap: anywhere;
   font-size: 0.8125rem;
 }
-.trace-policy {
-  margin: 16px 0;
-}
-.trace-policy > strong,
-.trace-policy > span,
-.trace-policy > small,
-.trace-grant {
-  display: block;
-  font-size: 0.75rem;
-  overflow-wrap: anywhere;
-  margin: 5px 0;
-}
-/* Condition result chips, same family as the outcome chips. */
-.trace-policy > .trace-policy-pass,
-.trace-policy > .trace-policy-fail {
-  display: inline-block;
-  padding: var(--cp-admin-space-1) var(--cp-admin-space-2);
-  border: var(--cp-admin-border-width) solid var(--cp-admin-color-text);
-  border-radius: var(--cp-admin-radius-button);
-  color: var(--cp-admin-color-text);
-  font-family: var(--cp-admin-font-mono);
-  font-size: var(--cp-admin-type-label);
-  font-weight: var(--cp-admin-weight-bold);
-}
-.trace-policy > .trace-policy-pass {
-  background: var(--cp-admin-color-allow-bg);
-  color: var(--cp-admin-color-allow-text);
-}
-.trace-policy > .trace-policy-fail {
-  background: var(--cp-admin-color-deny-bg);
-  color: var(--cp-admin-color-deny);
-}
 .trace-actions {
   display: flex;
   gap: 8px;
@@ -254,7 +222,6 @@
 .trace-who { margin: 0 0 var(--cp-admin-space-4); font-size: var(--cp-admin-type-body); }
 .trace-path-relations li { flex-wrap: wrap; align-content: flex-start; row-gap: 4px; }
 .trace-path-relation { flex-basis: 100%; font: 11px var(--cp-admin-font-mono); color: var(--cp-admin-color-text-muted); overflow-wrap: anywhere; }
-.trace-rule-item { display: grid; gap: 4px; }
 
 /* Permission revision of a decision (layout prototype, Backend 038). */
 .trace-revision { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--cp-admin-space-2); }
@@ -278,3 +245,25 @@
 .trace-inspector-meta .inbox-item-status {
   margin-top: 0;
 }
+
+/* Admin 049: the decision detail. Back and Quick incident share one bar; no line under the header. */
+.trace-detail-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-4); margin-bottom: var(--cp-admin-space-4); }
+.trace-detail-bar .trace-back { margin: 0; }
+.trace-inspector .trace-inspector-header { border-bottom: 0; padding-bottom: 0; }
+.trace-inspector-header .trace-inspector-meta { margin-inline-start: auto; }
+.trace-inspector-header + .trace-path { margin-top: var(--cp-admin-space-4); }
+.trace-title .trace-title-action { justify-self: start; margin-top: var(--cp-admin-space-3); }
+/* Facts in two columns of label and value: who and where on the left, how it was decided on the right. */
+.trace-facts-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--cp-admin-space-6, 32px); align-items: start; margin-top: var(--cp-admin-space-5); }
+.trace-facts-list { display: grid; grid-template-columns: 150px minmax(0, 1fr); margin: 0; }
+.trace-facts-list > div { display: contents; }
+.trace-facts-list dt, .trace-facts-list dd { margin: 0; padding: var(--cp-admin-space-2) 0; border-bottom: 1px solid var(--cp-admin-color-border); }
+.trace-facts-list dt { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-small); }
+.trace-facts-list dd { overflow-wrap: anywhere; }
+.trace-facts-list > div:last-child > dt, .trace-facts-list > div:last-child > dd { border-bottom: 0; }
+@media (max-width: 900px) { .trace-facts-columns { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 740px) { .trace-facts-list { grid-template-columns: 1fr; } .trace-facts-list dt { border-bottom: 0; padding-bottom: 0; } }
+/* Reference: a neutral chip in mono, the code as the caller reads it. */
+.trace-reference { font-family: var(--cp-admin-font-mono); }
+/* The window line, close under the title of the decisions of the problem. */
+.trace-breakdown .trace-window { margin: -12px 20px 16px; }

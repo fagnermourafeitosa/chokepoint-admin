@@ -1,9 +1,10 @@
-import { ArrowRight, Eye } from 'lucide-react';
+import { Eye, Server, Wrench } from 'lucide-react';
 import { ReportOnlyChip } from '../../components/report-only/ReportOnlyChip';
 import type { Decision, Exchange, ExchangeProblem, Problem, SubjectRef } from './types';
 import type { useInvestigation } from './useInvestigation';
 import { QueryError, TracePager, utcTime } from './TraceUI';
 import { denyText, exchangeShort, exchangeText, kindText, subjectName, agentText } from './labels';
+import { useRuleSentence } from './useRuleSentence';
 type State = ReturnType<typeof useInvestigation>;
 
 // The subject with its Person or Service chip and its identity provider (Admin 030 section 2).
@@ -33,7 +34,7 @@ function Row({ decision, problem, state }: { decision?: Decision; problem?: Prob
   const id = problem?.latest_decision_id || decision!.id;
   const at = problem?.last_at || decision!.decided_at;
   const open = () => state.open(id);
-  const resource = problem ? problem.resource : decision!.resource;
+  const sentence = useRuleSentence(item.condition, item.server_id, item.tool);
   return (
     <div className="trace-list-row trace-list-row--open trace-row-decision" role="row" title="Open the decision details" onClick={openRow(open)}>
       <div role="cell">
@@ -49,7 +50,7 @@ function Row({ decision, problem, state }: { decision?: Decision; problem?: Prob
       </div>
       <div role="cell">
         <button className="trace-filter-link" onClick={() => state.update({ agent: item.agent.id })}>{agentText(item.agent)}</button>
-        <small>{item.agent.status === 'deleted' ? 'Deleted agent' : item.agent.name ? 'Verified agent' : 'Agent not found'}</small>
+        {item.agent.status === 'deleted' ? <small>Deleted agent</small> : !item.agent.name ? <small>Agent not found</small> : null}
         {decision?.enforcement === 'report_only' ? <ReportOnlyChip /> : null}
       </div>
       <div role="cell">
@@ -57,21 +58,17 @@ function Row({ decision, problem, state }: { decision?: Decision; problem?: Prob
         {problem && problem.principal_count > 1 ? <small>+{problem.principal_count - 1} more</small> : null}
       </div>
       <div role="cell">
-        <small>{item.server_name || item.server_id}</small>
-        <button className="trace-filter-link trace-mono" onClick={() => state.update({ server_id: item.server_id, tool: item.tool })}>{item.tool}</button>
+        <div className="trace-tool">
+          <span><Server size={14} aria-hidden="true" />{item.server_name || item.server_id}</span>
+          <span><Wrench size={14} aria-hidden="true" /><button className="trace-filter-link trace-mono" onClick={() => state.update({ server_id: item.server_id, tool: item.tool })}>{item.tool}</button></span>
+        </div>
         <small className="trace-repeat">{problem ? `×${problem.count} in window · last ` : ''}{utcTime(at)}</small>
       </div>
       <div role="cell">
-        {resource ? (
-          <><small>{resource.type}</small><strong className="trace-mono">{resource.id}</strong></>
-        ) : (
-          <small>No resource check</small>
-        )}
+        {item.condition ? <><small>Rule not met</small>{sentence ? <strong className="trace-condition">{sentence}</strong> : <code className="trace-condition trace-mono">{item.condition}</code>}</> : null}
       </div>
-      <div role="cell">
-        <button className="trace-row-open" aria-label={`Open the decision details of ${item.tool} at ${utcTime(at)}`} title="Open the decision details" onClick={open}>
-          <ArrowRight size={17} aria-hidden="true" />
-        </button>
+      <div role="cell" className="trace-actions-cell">
+        <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" aria-label={`View the decision of ${item.tool} at ${utcTime(at)}`} onClick={open}>View</button>
       </div>
     </div>
   );
@@ -106,10 +103,8 @@ function ExchangeRow({ exchange, problem, state }: { exchange?: Exchange; proble
         )}
       </div>
       <div role="cell"><small className={problem ? 'trace-repeat' : undefined}>{problem ? `×${problem.count} in window · last ` : ''}{utcTime(at)}</small></div>
-      <div role="cell">
-        <button className="trace-row-open" aria-label={`Open the token exchange details at ${utcTime(at)}`} title="Open the token exchange details" onClick={open}>
-          <ArrowRight size={17} aria-hidden="true" />
-        </button>
+      <div role="cell" className="trace-actions-cell">
+        <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" aria-label={`View the token exchange at ${utcTime(at)}`} onClick={open}>View</button>
       </div>
     </div>
   );
@@ -141,8 +136,8 @@ export function DecisionLists({ state }: { state: State }) {
         exchanges ? (
           <div className="trace-table" role="table" aria-label="Token exchanges">
             <div className="trace-list-row trace-list-head trace-row-exchange" role="row">
-              {['Result', 'Agent', 'Subject', 'When', ''].map((name, i) => (
-                <span role="columnheader" key={i}>{name || <span className="attention-sr-only">Open detail</span>}</span>
+              {['Result', 'Agent', 'Subject', 'When', 'Actions'].map((name, i) => (
+                <span role="columnheader" key={i}>{name}</span>
               ))}
             </div>
             {state.groupedExchanges
@@ -152,8 +147,8 @@ export function DecisionLists({ state }: { state: State }) {
         ) : (
           <div className="trace-table" role="table" aria-label={state.view === 'problems' ? 'Denied problems' : 'Recorded decisions'}>
             <div className="trace-list-row trace-list-head trace-row-decision" role="row">
-              {['Result', 'Agent', 'On behalf of', 'MCP server / tool', 'Resource', ''].map((name, i) => (
-                <span role="columnheader" key={i}>{name || <span className="attention-sr-only">Open detail</span>}</span>
+              {['Result', 'Agent', 'On behalf of', 'MCP server / tool', 'Detail', 'Actions'].map((name, i) => (
+                <span role="columnheader" key={i}>{name}</span>
               ))}
             </div>
             {state.view === 'problems'

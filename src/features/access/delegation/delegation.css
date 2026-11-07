@@ -86,8 +86,6 @@
 .rule-add { justify-self: start; }
 .rule-sentence { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; font-size: var(--cp-admin-type-small); color: var(--cp-admin-color-success); }
 .rule-sentence strong { color: var(--cp-admin-color-text); }
-.rule-cel summary { cursor: pointer; font-size: var(--cp-admin-type-label); color: var(--cp-admin-color-text-muted); }
-.rule-cel code { display: block; margin-top: 4px; font: 11px var(--cp-admin-font-mono); overflow-wrap: anywhere; }
 .rule-note { font-size: var(--cp-admin-type-label); }
 .delegation-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--cp-admin-space-3); margin-bottom: var(--cp-admin-space-4); }
 .delegation-toolbar h3 { font: var(--cp-admin-weight-bold) 1.125rem var(--cp-admin-font-heading); }

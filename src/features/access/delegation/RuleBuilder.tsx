@@ -1,7 +1,7 @@
 // Admin 048: RuleBuilder: each line of a rule is a condition.
 import { useState } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
-import { findTool, type Catalog } from './model';
+import { findTool, type Catalog, type CatalogBinding } from './model';
 import { SelectMenu } from '../../../components/ui/dropdown/SelectMenu';
 
 // A field the rule can read: a call argument or a trusted attribute. Only the CEL leaves the Admin.
@@ -49,6 +49,97 @@ export function ruleSentence(rule: Rule, fields: RuleField[]) {
     const value = c.valueField ? fields.find(x => x.key === c.valueField)?.label : op.id === 'in' ? `[${listValues(c.value).join(', ') || '…'}]` : c.value || '…';
     return `${f.label} ${op.label}${op.noValue ? '' : ` ${value}`}`;
   }).filter(Boolean).join(rule.join === 'all' ? ' AND ' : ' OR ');
+}
+
+// Admin 049: the inverse of ruleCel. It reads only the CEL that the builder writes (clauseCel, ruleCel)
+// and returns its clauses, or nothing for any other shape: the screen then shows the CEL. All or
+// nothing: one clause that can not be read leaves the whole rule as CEL.
+const argCel = /^context\.chokepoint\.arguments\["([^"\\]+)"\]$/;
+const attrCel = /^(subject|resource)\.properties\.chokepoint\["([^"\\]+)"\]\.values\["([^"\\]+)"\]$/;
+const stringLiteral = /^"(?:[^"\\]|\\.)*"$/;
+const numberLiteral = /^-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
+const compareOps: { cel: string; ids: Record<string, string> }[] = [
+  { cel: '<=', ids: { number: 'le' } }, { cel: '>=', ids: { number: 'ge' } }, { cel: '==', ids: { number: 'eq', string: 'eq' } },
+  { cel: '!=', ids: { string: 'ne' } }, { cel: '<', ids: { number: 'lt' } }, { cel: '>', ids: { number: 'gt' } },
+];
+
+// Splits text on a separator outside strings, parentheses and brackets.
+function splitTop(text: string, sep: string): string[] | undefined {
+  const parts: string[] = []; let depth = 0, quoted = false, start = 0;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (quoted) { if (ch === '\\') i++; else if (ch === '"') quoted = false; continue; }
+    if (ch === '"') quoted = true;
+    else if (ch === '(' || ch === '[') depth++;
+    else if (ch === ')' || ch === ']') { if (--depth < 0) return undefined; }
+    else if (depth === 0 && text.startsWith(sep, i)) { parts.push(text.slice(start, i)); start = i + sep.length; i += sep.length - 1; }
+  }
+  if (quoted || depth) return undefined;
+  parts.push(text.slice(start));
+  return parts;
+}
+
+// A call argument takes its type from the clause; a trusted attribute takes it from its binding.
+function celField(text: string, bindings: CatalogBinding[], key: string, type?: string): RuleField | undefined {
+  const arg = argCel.exec(text);
+  if (arg) return type ? { key, label: arg[1], group: 'Call arguments', type, cel: text } : undefined;
+  const attr = attrCel.exec(text);
+  const binding = attr && bindings.find(b => b.id === attr[2] && b.entity === attr[1]);
+  const a = binding?.attributes.find(x => x.name === attr![3]);
+  return binding && a && (!type || a.type === type) ? { key, label: `${binding.entity}.${a.name}`, group: binding.source, type: a.type, cel: text, binding: binding.id } : undefined;
+}
+
+const attributeType = (text: string, bindings: CatalogBinding[]) => celField(text, bindings, '')?.type;
+
+function celClause(text: string, i: number, bindings: CatalogBinding[]): { clause: Clause; fields: RuleField[] } | undefined {
+  const key = `c${i}`, id = `q-${i}`;
+  const bool = /^(!?)(.+)$/.exec(text)!;
+  const boolField = celField(bool[2], bindings, key, 'bool');
+  if (boolField) return { clause: { id, field: key, op: bool[1] ? 'false' : 'true', value: '' }, fields: [boolField] };
+  const list = /^(.+?) in \[(.*)\]$/.exec(text);
+  if (list) {
+    const values = splitTop(list[2], ', ');
+    if (!values?.length || !values.every(v => stringLiteral.test(v))) return undefined;
+    const decoded = values.map(v => JSON.parse(v) as string);
+    const f = celField(list[1], bindings, key, 'string');
+    return f && decoded.every(v => v && !v.includes(',')) ? { clause: { id, field: key, op: 'in', value: decoded.join(', ') }, fields: [f] } : undefined;
+  }
+  const starts = /^(.+)\.startsWith\((.+)\)$/.exec(text);
+  const [left, right, cel] = starts ? [starts[1], starts[2], 'startsWith'] : (() => {
+    for (const o of compareOps) { const parts = splitTop(text, ` ${o.cel} `); if (parts?.length === 2) return [parts[0], parts[1], o.cel]; }
+    return [];
+  })();
+  if (!left || !right || !cel) return undefined;
+  const literal = stringLiteral.test(right) ? 'string' : numberLiteral.test(right) ? 'number' : undefined;
+  const type = attributeType(left, bindings) ?? literal ?? attributeType(right, bindings) ?? (['<', '<=', '>', '>='].includes(cel) ? 'number' : undefined);
+  const opId = cel === 'startsWith' ? (type === 'string' ? 'starts' : undefined) : compareOps.find(o => o.cel === cel)?.ids[type ?? ''];
+  const f = type && celField(left, bindings, key, type);
+  if (!f || !opId) return undefined;
+  if (literal) return literal === type ? { clause: { id, field: key, op: opId, value: literal === 'string' ? JSON.parse(right) as string : right }, fields: [f] } : undefined;
+  const other = celField(right, bindings, `${key}v`, type);
+  return other ? { clause: { id, field: key, op: opId, value: '', valueField: other.key }, fields: [f, other] } : undefined;
+}
+
+export function celRule(expression: string, bindings: CatalogBinding[]): { rule: Rule; fields: RuleField[] } | undefined {
+  const text = expression.trim();
+  let join: Rule['join'] = 'all', parts = [text];
+  for (const [j, sep] of [['all', ' && '], ['any', ' || ']] as const) {
+    const split = splitTop(text, sep);
+    if (!split) return undefined;
+    if (split.length > 1) {
+      if (!split.every(p => p.startsWith('(') && p.endsWith(')'))) return undefined;
+      join = j; parts = split.map(p => p.slice(1, -1)); break;
+    }
+  }
+  const clauses = parts.map((p, i) => celClause(p, i, bindings));
+  if (!clauses.every(Boolean)) return undefined;
+  return { rule: { join, clauses: clauses.map(c => c!.clause) }, fields: clauses.flatMap(c => c!.fields) };
+}
+
+// The sentence of a saved rule, or undefined when its CEL can not be read (Admin 049 item 14).
+export function celSentence(expression: string, bindings: CatalogBinding[]) {
+  const parsed = celRule(expression, bindings);
+  return parsed ? ruleSentence(parsed.rule, parsed.fields) || undefined : undefined;
 }
 
 export const ruleBindings = (rule: Rule, fields: RuleField[]) => [...new Set(rule.clauses.flatMap(c => [c.field, c.valueField]).map(k => fields.find(f => f.key === k)?.binding).filter((b): b is string => !!b))];

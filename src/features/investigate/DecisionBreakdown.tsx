@@ -21,10 +21,24 @@ export function DecisionBreakdown({
     queryFn: ({ signal }) => traceApi.breakdown(scope, problemKey(problem!), page, signal),
     enabled: !!problem,
   });
-  if (!problem) return null;
+  // Admin 049 item 11: the outcome word follows the decision; the window line sits under the title.
+  const d = detail.decision;
+  const outcome = d.outcome === 'would_deny' ? 'would deny' : d.outcome === 'permit' ? 'allowed' : 'denied';
+  const window = (
+    <p className="cp-admin-muted trace-window">
+      Same agent, server, tool{d.reason ? ', reason' : ''} and result · window {utcTime(detail.repeat.window_start)} – {utcTime(detail.repeat.window_end)}
+    </p>
+  );
+  if (!problem) return (
+    <section className="trace-breakdown">
+      <h3>Repeated in this window · {detail.repeat.count} {outcome}</h3>
+      {window}
+    </section>
+  );
   return (
     <section className="trace-breakdown">
-      <h3>Decisions in this problem · {problem.count}</h3>
+      <h3>Decisions in this problem · {problem.count} {outcome}</h3>
+      {window}
       {query.isError ? (
         <QueryError
           text="The decisions in this problem could not be loaded."
@@ -42,7 +56,7 @@ export function DecisionBreakdown({
             >
               <time dateTime={d.decided_at}>{utcTime(d.decided_at)}</time>
               <span>{subjectName(d.subject)}</span>
-              <code>{d.resource ? `${d.resource.type} › ${d.resource.id}` : d.condition || d.reason?.label || 'allowed'}</code>
+              <code>{d.reference ?? '—'}</code>
             </button>
           ))}
         </div>

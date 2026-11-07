@@ -1,17 +1,20 @@
 import './inspector.css';
 import { DecisionBreakdown } from './DecisionBreakdown';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { ArrowLeft, ArrowRight, Check, Eye, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, CircleHelp, Eye, X } from 'lucide-react';
+import { Tooltip } from '../../components/ui/tooltip/Tooltip';
+import { QuickIncident } from '../../components/quick-incident/QuickIncident';
+import { useRuleSentence } from './useRuleSentence';
 import { ReportOnlyChip } from '../../components/report-only/ReportOnlyChip';
 import { HttpError } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 import { actionPath } from '../access/target-context';
 import { problemKey } from './types';
-import type { Decision, DecisionDetail } from './types';
+import type { Decision, DecisionDetail, StepState } from './types';
 import type { useInvestigation } from './useInvestigation';
 import { utcTime } from './TraceUI';
-import { agentText, denyText, kindText, stateText, stepLabel, subjectName } from './labels';
+import { agentText, denyText, stateText, stepLabel, subjectName } from './labels';
 import { ExchangeInspector } from './ExchangeInspector';
 import { InboxItemStatus } from '../attention/InboxItemStatus';
 
@@ -24,8 +27,6 @@ import { CatalogProvider } from '../access/delegation/catalog';
 const noIssuers: string[] = [];
 
 
-// The relation checked by each step of the path (Backend 034 evidence).
-const relationOfStep: Record<string, 'delegation' | 'capability' | 'resource'> = { delegation: 'delegation', capability: 'capability', resource: 'resource' };
 
 // Steps recorded by the PEP before the PDP decision (Backend 034).
 const preDecisionStep = new Set(['identity', 'tool_review']);
@@ -61,37 +62,101 @@ function reasonAction(d: Decision, detail: DecisionDetail, returnTo: string): { 
   return undefined;
 }
 
+// Admin 049 item 7: the path reads the recorded steps as Delegation, Agent, MCP server, Tool and Rules.
+// The PDP checks agent → tool once: the Agent dot passes (a failed identity check shows as its own
+// step), the MCP server dot passes when the tool step was evaluated, and the Tool dot carries the
+// capability state. The Rules dot names the failed rule.
+type PathNode = { key: string; label: string; state: StepState; value?: string };
+function pathNodes(steps: { key: string; state: StepState }[], d: Decision, failedRules: string[]): PathNode[] {
+  const agent = d.agent.name || d.agent.id;
+  return steps.flatMap((step): PathNode[] => {
+    if (step.key === 'delegation') return [
+      { key: 'delegation', label: 'Delegation', state: step.state, value: `${subjectName(d.subject)} → ${agent}` },
+      { key: 'agent', label: 'Agent', state: 'passed', value: agent },
+    ];
+    if (step.key === 'capability') return [
+      { key: 'server', label: 'MCP server', state: step.state === 'not_evaluated' ? 'not_evaluated' : 'passed', value: d.server_name || d.server_id },
+      { key: 'tool', label: 'Tool', state: step.state, value: d.tool },
+    ];
+    if (step.key === 'condition') return [{ key: 'condition', label: 'Rules', state: step.state, value: failedRules.join(', ') || undefined }];
+    if (step.key === 'resource') return [];
+    return [{ key: step.key, label: stepLabel[step.key] || step.key.replaceAll('_', ' '), state: step.state }];
+  });
+}
+
+function Help({ text, label }: { text: string; label: string }) {
+  return <Tooltip content={text}><CircleHelp size={14} aria-label={label} /></Tooltip>;
+}
+
 function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentScope; detail: DecisionDetail; state: State; onBack: () => void }) {
   const [history, setHistory] = useState(false);
   const d = detail.decision;
-  // The path shows the four steps of Admin 030. The checks before the PDP
-  // (identity, tool review) show only when they did not pass.
+  // The checks before the PDP (identity, tool review) show only when they did not pass.
   const steps = [...(d.evidence?.steps || [])]
     .filter((s) => !preDecisionStep.has(s.key) || s.state !== 'passed')
     .sort((a, b) => a.order - b.order);
-  const relations = new Map((d.evidence?.relations || []).map((r) => [r.key, r]));
   const rules = (d.evidence?.policies || []).filter((p) => p.server_id === d.server_id && (!p.tool || p.tool === d.tool));
   const agent = d.agent.name || d.agent.id;
   const server = d.server_name || d.server_id;
-  const kind = kindText(d.subject);
+  const sentence = useRuleSentence(d.condition, d.server_id, d.tool);
   // Backend 057: three outcomes; a would deny ran in Report-only.
   const permit = d.outcome === 'permit';
   const wouldDeny = d.outcome === 'would_deny';
   const action = reasonAction(d, detail, `/investigate?${state.params}`);
+  const cause = d.reason?.label === 'condition' && d.condition
+    ? <span className="relation-label">Rule not met: <strong>{sentence ?? <code className="trace-mono">{d.condition}</code>}</strong><Help label="About the recorded rule" text="The values of the call and of the attribute sources are never recorded. The rule shows what was checked, not the value that failed." /></span>
+    : d.reason ? denyText[d.reason.label] ?? d.reason.description : permit ? 'Every check passed.' : 'The deny reason was not recorded for this historical call.';
+  const facts: [string, ReactNode, string?][][] = [
+    [
+      ['Identity provider', d.subject.issuer],
+      ['On behalf of', d.subject.name ? `${d.subject.name} (${d.subject.subject})` : d.subject.subject],
+      ['Agent', d.agent.name ? `${agentText(d.agent)} (${d.agent.id})` : d.agent.id],
+      ['MCP server', server],
+      ['Tool', d.tool],
+    ],
+    [
+      // Backend 057: the mode of the agent at decision time.
+      ...(d.enforcement ? [['Mode', d.enforcement === 'report_only' ? <ReportOnlyChip key="mode" /> : 'Enforce', 'The mode of the agent when the call was decided. Enforce blocks a denied call. Report-only lets the call run and records it as would deny.'] as [string, ReactNode, string]] : []),
+      ['Reference', wouldDeny ? 'None: the caller was not refused' : d.reference ? <span className="mcp-badge trace-reference">{d.reference}</span> : '—', 'The code that the caller receives with a denied call. Paste it in Quick incident to open this decision.'],
+      ['Permission revision', d.effective_revision == null ? 'Not recorded' : (
+        <span className="trace-revision">
+          {d.agent.status ? <button type="button" className="trace-revision-link" onClick={() => setHistory(true)}>Revision {d.effective_revision}</button> : `Revision ${d.effective_revision}`}
+          {d.published_revision != null && d.published_revision !== d.effective_revision ? <small>Revision {d.published_revision} was applying</small> : null}
+        </span>
+      )],
+      ['Decided at (UTC)', utcTime(d.decided_at)],
+    ],
+  ];
   return (
     <>
-      <button className="cp-admin-button cp-admin-button--secondary trace-back" onClick={onBack}>
-        <ArrowLeft size={15} aria-hidden="true" />
-        Back to the list
-      </button>
+      <div className="quick-incident-row trace-detail-bar">
+        <button className="cp-admin-button cp-admin-button--secondary trace-back" onClick={onBack}>
+          <ArrowLeft size={15} aria-hidden="true" />
+          Back to the list
+        </button>
+        <QuickIncident />
+      </div>
       <article className="cp-admin-panel trace-inspector">
         <header className="trace-inspector-header">
-          <span className="attention-kicker">Decision inspector</span>
           <span className="trace-inspector-meta">
             {detail.problem?.signal ? <InboxItemStatus key={detail.problem.signal.id} scope={scope} id={detail.problem.signal.id} status={detail.problem.signal.status} reviewOnOpen label="Inbox item" /> : null}
-            <code>{d.id} · {utcTime(d.decided_at)}</code>
+            <code>{utcTime(d.decided_at)}</code>
           </span>
         </header>
+        {steps.length ? (
+          <ol className="trace-path trace-path-relations" aria-label="Recorded authorization path">
+            {pathNodes(steps, d, rules.filter((r) => !r.permit).map((r) => r.name)).map((node, i) => (
+              <li key={`${node.key}-${i}`} data-state={node.state} data-report-only={wouldDeny && node.state === 'failed' ? '' : undefined} tabIndex={0}>
+                <span className="trace-path-dot" />
+                <strong>{node.label}</strong>
+                <small>{wouldDeny && node.state === 'failed' ? 'Failed · not enforced' : stateText[node.state]}</small>
+                {node.value ? <span className="trace-path-relation">{node.value}</span> : null}
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="trace-missing">The authorization path was not recorded for this historical decision.</p>
+        )}
         <div className="trace-title">
           {wouldDeny ? (
             <span className="trace-outcome trace-outcome-large cp-would-deny"><Eye size={19} aria-hidden="true" />Would deny</span>
@@ -102,98 +167,30 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
             </span>
           )}
           <h2>{d.tool}</h2>
-          <p>{d.reason ? denyText[d.reason.label] ?? d.reason.description : permit ? 'Every check passed.' : 'The deny reason was not recorded for this historical call.'}{wouldDeny ? ` The call ran because ${agent} was in Report-only.` : ''}</p>
+          <p>{cause}{wouldDeny ? ` The call ran because ${agent} was in Report-only.` : ''}</p>
+          {action ? (
+            action.to ? <Link className="cp-admin-button trace-title-action" to={action.to}>{action.label}<ArrowRight size={15} /></Link> : <p className="cp-admin-muted">{action.unavailable}</p>
+          ) : null}
         </div>
         {wouldDeny ? (
           <div className="cp-admin-notice cp-report-only-notice trace-report-only-notice">
             <Eye size={18} aria-hidden="true" />
-            <div><strong>Not blocked</strong>Xokepoint evaluated this call and its policy denies it, but {agent} was in Report-only, so the call reached {server}. In Enforce, the same call is denied and the caller gets a reference code.</div>
+            <div><strong>Not blocked</strong>The policy of this call denies it, but {agent} was in Report-only, so the call reached {server}. In Enforce, the same call is denied and the caller gets a reference code.</div>
           </div>
         ) : null}
-        <p className="trace-who">
-          <strong>{agent}</strong> acted for <strong>{subjectName(d.subject)}</strong> ({[kind, d.subject.issuer].filter(Boolean).join(' · ')})
-        </p>
-        {steps.length ? (
-          <ol className="trace-path trace-path-relations" aria-label="Recorded authorization path">
-            {steps.map((step, i) => {
-              const relation = relationOfStep[step.key] ? relations.get(relationOfStep[step.key]) : undefined;
-              return (
-                <li key={`${step.key}-${i}`} data-state={step.state} data-report-only={wouldDeny && step.state === 'failed' ? '' : undefined} tabIndex={0}>
-                  <span className="trace-path-dot" />
-                  <strong>{stepLabel[step.key] || step.key.replaceAll('_', ' ')}</strong>
-                  <small>{wouldDeny && step.state === 'failed' ? 'Failed · not enforced' : stateText[step.state]}</small>
-                  {relation?.display ? <span className="trace-path-relation">{relation.display}</span> : null}
-                </li>
-              );
-            })}
-          </ol>
-        ) : (
-          <p className="trace-missing">The authorization path was not recorded for this historical decision.</p>
-        )}
-        <div className="trace-detail-columns">
-          <section className="trace-rule">
-            <h3>Rules of {agent} · {server} · {d.tool}</h3>
-            {rules.length ? (
-              rules.map((p, i) => (
-                <div key={`${p.policy_id}-${i}`} className="trace-policy trace-rule-item">
-                  <strong>{p.name}</strong>
-                  <span className={p.permit ? 'trace-policy-pass' : 'trace-policy-fail'}>{p.permit ? 'Passed' : 'Failed'}</span>
-                  <small>
-                    {p.required_bindings.length ? `Reads ${p.required_bindings.join(', ')}` : 'Reads call arguments only'}
-                    {p.required_limits?.length ? ` · instance limits ${p.required_limits.join(', ')}${p.limits_present ? '' : ' (missing in the token)'}` : ''}
-                  </small>
-                  <details className="rule-cel"><summary>CEL</summary><code>{p.expression}</code></details>
+        <div className="trace-facts-columns">
+          {facts.map((column, c) => (
+            <dl key={c} className="trace-facts trace-facts-list">
+              {column.map(([name, value, help]) => (
+                <div key={name}>
+                  <dt>{help ? <span className="relation-label">{name}<Help label={`About ${name.toLowerCase()}`} text={help} /></span> : name}</dt>
+                  <dd>{value}</dd>
                 </div>
-              ))
-            ) : (
-              <p className="cp-admin-muted">
-                {d.reason?.label === 'condition' ? 'The rule was not recorded.' : steps.some((s) => s.key === 'condition' && s.state === 'not_evaluated') ? 'Not evaluated: an earlier check failed.' : 'No rule on this tool.'}
-              </p>
-            )}
-            <p className="cp-admin-muted">Values of the call and of the attribute sources are never recorded.</p>
-            {action ? (
-              <div className="trace-actions">
-                {action.to ? (
-                  <Link className="cp-admin-button" to={action.to}>{action.label}<ArrowRight size={15} /></Link>
-                ) : (
-                  <p className="cp-admin-muted">{action.unavailable}</p>
-                )}
-              </div>
-            ) : null}
-          </section>
-          <section className="trace-repetition">
-            <h3>Repeated in this window</h3>
-            <p>Same agent, server, tool{d.reason ? ', reason' : ''} and result.</p>
-            <strong>{detail.repeat.count} {wouldDeny ? 'would deny' : permit ? 'allowed' : 'denied'}</strong>
-            <small>Window {utcTime(detail.repeat.window_start)} – {utcTime(detail.repeat.window_end)}</small>
-            <small>First {utcTime(detail.repeat.first_at)}</small>
-            <small>Last {utcTime(detail.repeat.last_at)}</small>
-          </section>
+              ))}
+            </dl>
+          ))}
         </div>
         <DecisionBreakdown key={JSON.stringify(detail.problem && problemKey(detail.problem))} scope={scope} detail={detail} select={state.open} />
-        <dl className="trace-facts">
-          {[
-            ['Agent', d.agent.name ? `${agentText(d.agent)} (${d.agent.id})` : d.agent.id],
-            ['On behalf of', d.subject.name ? `${d.subject.name} (${d.subject.subject})` : d.subject.subject],
-            ['Identity provider', d.subject.issuer],
-            ['Server', server],
-            ['Tool', d.tool],
-            ['Resource', d.resource ? `${d.resource.type} › ${d.resource.id}` : 'No resource check'],
-            ...(d.reference ? [['Reference', d.reference]] : []),
-            // Backend 057: the mode of the agent at decision time; a would deny has no code.
-            ...(d.enforcement ? [['Mode', d.enforcement === 'report_only' ? <ReportOnlyChip key="mode" /> : 'Enforce']] : []),
-            ...(wouldDeny ? [['Reference', 'None: the caller was not refused']] : []),
-            ['Decided at (UTC)', utcTime(d.decided_at)],
-            ['Permission revision', d.effective_revision == null ? 'Not recorded' : (
-              <span className="trace-revision">
-                {d.agent.status ? <button type="button" className="trace-revision-link" onClick={() => setHistory(true)}>Revision {d.effective_revision}</button> : `Revision ${d.effective_revision}`}
-                {d.published_revision != null && d.published_revision !== d.effective_revision ? <small>Revision {d.published_revision} was applying</small> : null}
-              </span>
-            )],
-          ].map(([name, value]) => (
-            <div key={name as string}><dt>{name}</dt><dd>{value}</dd></div>
-          ))}
-        </dl>
       </article>
       {history && d.effective_revision != null ? <CatalogProvider scope={scope} issuers={noIssuers}><RevisionHistory scope={scope} agentId={d.agent.id} agentName={agentText(d.agent)} initial={d.effective_revision} onClose={() => setHistory(false)} /></CatalogProvider> : null}
     </>

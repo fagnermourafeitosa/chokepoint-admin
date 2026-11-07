@@ -5,7 +5,7 @@ import type { EnvironmentScope } from '../environment-scope';
 import { mcpApi, type MCPServer } from '../../mcp/api';
 import { toolArguments } from '../../mcp/resource-api';
 import { identityApi, type DirectoryUser } from '../../identity/api';
-import { sourceApi } from '../../sources/api';
+import { sourceApi, type Source } from '../../sources/api';
 import { resourceTypesApi } from './api';
 import type { Catalog, CatalogBinding, CatalogTool, Directory, Subject } from './model';
 
@@ -18,6 +18,16 @@ async function pages<T>(load: (offset: number) => Promise<{ items: T[]; next_off
 // Rule builder types: only scalar arguments can be compared.
 const ruleType = (type: string) => (type === 'string' ? 'string' : type === 'integer' || type === 'number' ? 'number' : type === 'boolean' ? 'bool' : undefined);
 
+// The approved bindings of the context sources, by server and tool, with the attributes a rule can read.
+export function approvedBindings(sources: Source[]): Record<string, CatalogBinding[]> {
+  const bindings: Record<string, CatalogBinding[]> = {};
+  for (const source of sources) for (const binding of source.bindings) {
+    const v = binding.approved; if (!v) continue;
+    (bindings[`${v.server_id}/${v.tool_name}`] ??= []).push({ id: binding.id, source: `${source.name} / ${v.name}`, entity: v.entity, attributes: v.attributes.flatMap(a => { const type = ruleType(a.type); return type ? [{ name: a.name, type }] : []; }) });
+  }
+  return bindings;
+}
+
 async function loadCatalog(scope: EnvironmentScope, signal: AbortSignal) {
   const [servers, identities, sources, providers] = await Promise.all([pages(o => mcpApi.list(scope, o, signal)), pages(o => identityApi.list(scope, o, signal)), sourceApi.list(scope, signal), identityApi.providers(scope, signal)]);
   const managed = (s: MCPServer) => s.tools.filter(t => t.selected && t.reviewed && t.change !== 'removed');
@@ -29,11 +39,7 @@ async function loadCatalog(scope: EnvironmentScope, signal: AbortSignal) {
     const args = Object.fromEntries(toolArguments(t).flatMap(a => { const type = ruleType(a.type); return type ? [[a.name, type]] : []; }));
     return { serverId: s.id, tool: t.name, args, mapping: resource ? { pointer: resource.argument ? `/${resource.argument}` : '', kind: resource.type } : undefined };
   }));
-  const bindings: Record<string, CatalogBinding[]> = {};
-  for (const source of sources.items) for (const binding of source.bindings) {
-    const v = binding.approved; if (!v) continue;
-    (bindings[`${v.server_id}/${v.tool_name}`] ??= []).push({ id: binding.id, source: `${source.name} / ${v.name}`, entity: v.entity, attributes: v.attributes.flatMap(a => { const type = ruleType(a.type); return type ? [{ name: a.name, type }] : []; }) });
-  }
+  const bindings = approvedBindings(sources.items);
   return {
     servers: withTools.map(s => ({ id: s.id, name: s.name, type: s.connection_type === 'enterprise' ? 'enterprise' as const : 'custom' as const })),
     tools, bindings, idps: identities.map(i => ({ id: i.id, name: i.name, enabled: i.enabled, provider: i.provider, groups: !!providers.find(p => p.provider === i.provider)?.groups, harnessLogin: !!i.login?.enabled })),

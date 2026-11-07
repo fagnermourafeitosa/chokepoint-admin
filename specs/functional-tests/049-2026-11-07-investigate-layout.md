@@ -20,9 +20,9 @@ scenarios:
       - Each view ends in an Actions column with a View button, right aligned with its header.
       - No column or cell says "Resource" or "No resource check".
     last_run:
-      date: null
-      result: not_run
-      notes: null
+      date: 2026-11-07
+      result: passed
+      notes: "Production, after traffic.py --once on the rules recreated with the builder. Columns Result, Agent, On behalf of, MCP server / tool, Detail, Actions; no Verified agent line; Server and Wrench icons; Detail 'Rule not met · amount is at most 500', 'queue is tier-1', 'dataset is one of [sales_daily, inventory]'; an older decision of the earlier CEL rule shows its CEL; View right aligned with its header (both end at 1223 px); Token exchanges ends in Actions with View; no Resource or No resource check."
   - id: S2
     title: View opens the decision detail with the path, the failed rule and the facts
     criteria: [2, 3, 4]
@@ -37,9 +37,9 @@ scenarios:
       - The list title reads "Decisions in this problem · N denied", with the window line under it; each row shows a time, a subject and a reference code.
       - No text names the product.
     last_run:
-      date: null
-      result: not_run
-      notes: null
+      date: 2026-11-07
+      result: passed
+      notes: "refund_order decision of refunds-assistant: bar with Back to the list and Quick incident, no page title, no kickers, no decision ID; path Delegation, Agent, MCP server, Tool passed, Rules failed 'Refund up to 500'; 'Denied refund_order', 'Rule not met: amount is at most 500', Open the rule; help icons on the title, Mode and Reference; facts in two columns with Reference as a mono chip; 'Decisions in this problem · 1 denied' with the window line and the reference code; no CEL, no product name."
   - id: S3
     title: The side panel of Access reads a saved rule as a sentence
     criteria: [3]
@@ -48,9 +48,9 @@ scenarios:
     expected:
       - The Rules list shows "Refund up to 500" with "Reads as amount is at most 500" in the Reads as style; no CEL line.
     last_run:
-      date: null
-      result: not_run
-      notes: null
+      date: 2026-11-07
+      result: passed
+      notes: "Opened from Open the rule of the S2 decision: the panel shows 'Refund up to 500' with 'Reads as: amount is at most 500'; no CEL line."
   - id: S4
     title: A rule in advanced CEL shows its CEL
     criteria: [3]
@@ -62,9 +62,9 @@ scenarios:
       - Before the discard, the Rules list shows "Even amounts only" with its CEL, because it can not be read as a sentence.
       - After the discard, the rule is gone.
     last_run:
-      date: null
-      result: not_run
-      notes: null
+      date: 2026-11-07
+      result: passed
+      notes: "Added 'Even amounts only' as advanced CEL int(context.chokepoint.arguments[\"amount\"]) % 2 == 0: the Rules list showed it as CEL, next to the builder rule as a sentence. Discard draft brought the panel back to No unpublished changes."
 ---
 
 # Functional test: Investigate Layout and Rules Read as Sentences
