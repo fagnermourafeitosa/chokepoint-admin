@@ -1,0 +1,15 @@
+/* Admin 049 prototype: the Actions column, right aligned with its header (Admin list pattern). */
+.trace-row-decision { grid-template-columns: 1.2fr 0.9fr 1.1fr 1.2fr 1.4fr 90px; }
+.trace-row-exchange { grid-template-columns: 1.1fr 1fr 1.4fr 1.2fr 90px; }
+.trace-list-head > span:last-child { text-align: right; }
+.proto-actions-cell { display: flex; justify-content: flex-end; align-items: center; }
+@media (max-width: 740px) {
+  .trace-row-decision, .trace-row-exchange { grid-template-columns: 1fr 1fr; }
+}
+/* Server then tool, each with its icon (pattern of Context sources › Trusted attributes). */
+.proto-tool { display: grid; gap: 4px; }
+.proto-tool > span { display: inline-flex; align-items: center; gap: 6px; }
+/* Detail: the condition of the rule that the call did not meet. */
+.proto-condition { display: block; overflow-wrap: anywhere; }
+/* The rule read as a sentence in the detail: neutral, since the rule failed (green means passed). */
+.proto-rule-read { color: var(--cp-admin-color-text-muted); }
