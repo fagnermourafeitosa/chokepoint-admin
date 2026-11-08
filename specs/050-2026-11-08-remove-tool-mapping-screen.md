@@ -3,7 +3,7 @@
 - **Specification ID**: 050
 - **Date**: 2026-11-08
 - **Slug**: remove-tool-mapping-screen
-- **Status**: Not Implemented
+- **Status**: In Progress
 - **Owner**: Admin — Integrations, Context sources
 - **Related Specification**: [048 — Relation Side Panel and Rules Only](048-2026-11-06-relation-side-panel.md)
 - **Related Specification**: [027 — Tool Resource Mapping Review](027-2026-10-31-tool-resource-mapping-review.md)
