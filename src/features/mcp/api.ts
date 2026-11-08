@@ -2,7 +2,7 @@ import { httpClient, HttpError } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 import type { MCPToolAnnotations } from '../access/types';
 export type ToolContract = { name: string; title?: string; description?: string; annotations?: MCPToolAnnotations; inputSchema: unknown; outputSchema?: unknown; [key: string]: unknown };
-export type ManagedTool = { local_mapping?: import("./mapping-api").MappingVersion; mapping_draft?: import("./mapping-api").MappingVersion; reviewed: boolean; name: string; contract: ToolContract; previous?: ToolContract; change: 'new' | 'changed' | 'removed' | 'unchanged'; selected: boolean; enabled: boolean };
+export type ManagedTool = { reviewed: boolean; name: string; contract: ToolContract; previous?: ToolContract; change: 'new' | 'changed' | 'removed' | 'unchanged'; selected: boolean; enabled: boolean };
 export type MCPServer = { id: string; name: string; endpoint: string; transport: string; auth_type: 'chokepoint_token' | 'oauth'; connection_type?: 'custom' | 'enterprise'; provider_id?: string; account?: string; authentication_status?: string; enabled: boolean;
  // Backend 035: what a custom server must trust; read only, never sent back.
  audience?: string; issuer?: string; jwks_uri?: string; revision: number; server_info: unknown; tools: ManagedTool[] };

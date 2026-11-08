@@ -2,7 +2,6 @@ import { useState, type ReactNode } from 'react';
 import { ArrowRight, Braces, CircleCheck, CircleHelp, Database, Plus, Trash2 } from 'lucide-react';
 import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
 import { ConfirmDialog } from '../../../components/ui/dialog/ConfirmDialog';
-import { Notice } from '../../../components/ui/notice/Notice';
 import { useCatalog } from './catalog';
 import { ConditionEditor } from './ConditionEditor';
 import { ExpiresField } from './ExpiresField';
@@ -56,8 +55,6 @@ export function ToolPanel({ published, id, start, agentName, doc, onChange, onCl
   const bindings = catalog.bindings(c.serverId, c.tool);
   const removal = withoutCapability(doc, c.id);
   return <aside className="relation-panel relation-sections" aria-label="Selected relation">
-    {/* Admin 048 Resolved Decision 1: a tool mapped in Integrations still checks allowed values, which the Admin no longer adds. */}
-    {c.mapping ? <Notice tone="warning" className="tool-mapping-warning" title="This tool checks allowed values"><span>Every call of {agentName} to <code>{c.tool}</code> needs an allowed <code>{c.mapping.kind}</code> value, and the Admin can no longer add them. Set the tool to no resource in Integrations and use rules.</span></Notice> : null}
     <ExpiresField value={c.expiresAt} onChange={v => set({ expiresAt: v })} never={`${agentName} can call ${c.tool} until you remove it.`} ends={`After this day (UTC), ${agentName} can no longer call ${c.tool}. Its calls are denied.`} />
     <Field label="Rules" help={help.rules} name="rules"><Conditions items={c.conditions} bindings={bindings} published={published.capabilities.find(x => x.id === c.id)?.conditions ?? []} onRemove={k => set({ conditions: c.conditions.filter(x => x.id !== k) })} />
       <section className="rule-trusted" aria-label="Trusted attributes">

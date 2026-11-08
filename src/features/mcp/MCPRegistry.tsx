@@ -1,18 +1,15 @@
 import { ToolReviewCatalog } from './ToolReviewCatalog';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router';
 import { Plus, Server, Users, Building2 } from 'lucide-react';
-import { ToolMappingManager } from './ToolMappingManager';
 import { IdentityRegistry } from '../identity/IdentityRegistry';
 import { EmptyState } from '../../components/ui/empty-state/EmptyState';
 import { MCPDialog } from './MCPDialog';
 import { ToolRows } from './ToolRows';
-import { ResourceMapping } from './ResourceMapping';
 import { useMCPRegistry } from './useMCPRegistry';
 import { ConnectionTable } from './ConnectionTable';
 import { ChokepointTokenSetup } from './ChokepointTokenSetup';
-import { resourceApi, serverResourcesKey } from './resource-api';
 import { EnterpriseCatalog } from './enterprise/EnterpriseCatalog';
 import { EnterpriseReview } from './enterprise/EnterpriseReview';
 import { useEnterpriseConnection } from './enterprise/useEnterpriseConnection';
@@ -33,16 +30,10 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
   const kind = params.get('type') === 'identity' ? 'identity' : params.get('type') === 'custom' ? 'custom' : 'enterprise';
   const registry = useMCPRegistry(scope, kind === 'custom');
   const enterprise = useEnterpriseConnection(scope);
-  const [mapping, setMapping] = useState<{ serverId: string; serverName: string; toolName: string }>();
   const selectedId = params.get('server') ?? undefined;
   useEffect(() => { registry.setSelectedId(selectedId); }, [selectedId, registry.setSelectedId]);
   const details = useQuery({ queryKey: ['mcp-detail', scope.userId, scope.tenantId, scope.environmentId, selectedId], queryFn: ({ signal }) => mcpApi.get(scope, selectedId!, signal), enabled: !!selectedId });
   const server = details.data ?? registry.selected;
-  // One read draws the Resource line of every tool row (Admin 034, Backend 042). The server revision is in
-  // the key: a discovery or a mapping change gives a new revision, so the lines follow it. The previous lines
-  // of the same server stay while its new revision loads, so an open Resource block keeps its state.
-  const resources = useQuery({ queryKey: [...serverResourcesKey(scope, server?.id ?? ''), server?.revision], queryFn: ({ signal }) => resourceApi.server(scope, server!.id, signal), enabled: !!server, retry: false, placeholderData: (previous, query) => (query?.queryKey[4] === server?.id ? previous : undefined) });
-  const entries = new Map((resources.data?.tools ?? []).map(entry => [entry.tool, entry]));
   const choose = (id?: string) => setParams({ type: kind, ...(id ? { server: id } : {}) });
   const saved = (s: MCPServer) => { registry.setDialog(null); setParams({ type: s.connection_type === 'enterprise' ? 'enterprise' : 'custom', server: s.id }); void registry.refresh(); };
   const connect = (s: MCPServer) => s.connection_type === 'enterprise' ? void enterprise.connect(s.provider_id!, s) : registry.setDialog(s);
@@ -51,7 +42,6 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
   const correctScope = params.get('tenant') === scope.tenantId && params.get('environment') === scope.environmentId;
   if (params.get('review') === 'tools') return <ToolReviewCatalog scope={scope} />;
   if (kind === 'identity') return <IdentityRegistry scope={scope} onEnterprise={() => setParams({ type: 'enterprise' })} onCustom={() => setParams({ type: 'custom' })} />;
-  if (mapping) return <ToolMappingManager key={`${scope.userId}:${scope.tenantId}:${scope.environmentId}:${mapping.serverId}:${mapping.toolName}`} scope={scope} {...mapping} onClose={() => setMapping(undefined)} />;
   return <section aria-label="Integrations" className="mcp-registry">
     {returnTo ? <Link className="cp-admin-button cp-admin-button--secondary trace-back" to={returnTo}>Back to {returnTo === '/' ? 'Overview' : 'Investigate'}</Link> : null}
     <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect platforms and custom MCPs, then manage agent access.</p></div>{kind === 'custom' ? <button className="cp-admin-button" onClick={() => registry.setDialog('new')}><Plus size={16} />Connect custom MCP</button> : null}</header>
@@ -66,7 +56,7 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
       </> : null}
       {registry.error ? <p role="alert" className="cp-admin-notice" data-tone="danger">{registry.error}</p> : null}
       {selectedId && details.isError ? <p role="alert">Connection details are unavailable. <button className="cp-admin-button cp-admin-button--ghost" onClick={() => void details.refetch()}>Retry</button></p> : null}
-      {server ? <section id="mcp-server-details" className="mcp-details" aria-label={`${server.name} details`}><header className="mcp-details-heading"><div><h2>{server.name}</h2><p className="cp-admin-muted">{server.connection_type === 'enterprise' ? `Enterprise MCP · ${server.account || 'Account unavailable'}` : 'Custom MCP'} · {server.transport} · {server.enabled ? 'Enabled' : 'Disabled'}</p></div><button className="cp-admin-button cp-admin-button--secondary" disabled={enterprise.busy} onClick={() => connect(server)}>{server.connection_type === 'enterprise' ? 'Reconnect & review tools' : 'Discover tools'}</button></header>{server.connection_type !== 'enterprise' ? <ChokepointTokenSetup issuer={server.issuer} jwksUri={server.jwks_uri} audience={server.audience} unavailable={!server.issuer} /> : null}{resources.isError ? <p role="alert" className="cp-admin-notice" data-tone="danger">Could not load the resources of this server. <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => void resources.refetch()}>Retry</button></p> : null}<ToolRows tools={server.tools} focusTool={params.get('tool') || undefined} serverEnabled={server.enabled} onMapping={tool => setMapping({ serverId: server.id, serverName: server.name, toolName: tool.name })} resource={tool => { const entry = entries.get(tool.name); return resources.isPending ? <div className="resource-mapping"><p role="status" className="cp-admin-muted">Loading resource…</p></div> : entry ? <ResourceMapping key={`${scope.userId}:${scope.tenantId}:${scope.environmentId}:${server.id}:${tool.name}`} scope={scope} serverId={server.id} tool={tool} entry={entry} /> : null; }} /></section> : null}
+      {server ? <section id="mcp-server-details" className="mcp-details" aria-label={`${server.name} details`}><header className="mcp-details-heading"><div><h2>{server.name}</h2><p className="cp-admin-muted">{server.connection_type === 'enterprise' ? `Enterprise MCP · ${server.account || 'Account unavailable'}` : 'Custom MCP'} · {server.transport} · {server.enabled ? 'Enabled' : 'Disabled'}</p></div><button className="cp-admin-button cp-admin-button--secondary" disabled={enterprise.busy} onClick={() => connect(server)}>{server.connection_type === 'enterprise' ? 'Reconnect & review tools' : 'Discover tools'}</button></header>{server.connection_type !== 'enterprise' ? <ChokepointTokenSetup issuer={server.issuer} jwksUri={server.jwks_uri} audience={server.audience} unavailable={!server.issuer} /> : null}{/* Admin 050: no mapping screen and no Resource block on the tool rows. */}<ToolRows tools={server.tools} focusTool={params.get('tool') || undefined} serverEnabled={server.enabled} /></section> : null}
     </>}
     <p className="mcp-footnote cp-admin-muted">Connections belong to this workspace and environment. Agent permissions determine who can use their tools.</p>
     {registry.dialog ? <MCPDialog key={registry.dialog === 'new' ? 'new' : registry.dialog.id} scope={scope} server={registry.dialog === 'new' ? undefined : registry.dialog} onClose={() => registry.setDialog(null)} onRefresh={() => void registry.refresh()} onSaved={saved} /> : null}

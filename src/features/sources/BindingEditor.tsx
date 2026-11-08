@@ -3,7 +3,7 @@ import { SelectMenu } from '../../components/ui/dropdown/SelectMenu';
 import { useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { mcpApi, mcpKey } from '../mcp/api';
-import { sourceApi, type Source, type Binding, type BindingConfig, type Operation } from './api';
+import { sourceApi, type Source, type Binding, type BindingConfig, type Operation, type Parameter } from './api';
 import { OpenAPIImport } from './OpenAPIImport';
 import { BindingFields } from './BindingFields';
 import type { EnvironmentScope } from '../access/environment-scope';
@@ -13,10 +13,14 @@ import type { SourceActions } from './useSources';
 // blocked: "identity" for the subject and "tool" for the object of the call (backend pep/coaz/projection.go).
 const entityType = (entity: BindingConfig['entity']) => (entity === 'subject' ? 'identity' : 'tool');
 
+// Admin 050: Resource ID is no longer an identifier. A parameter saved with it opens as Tool
+// argument with no pointer, so saving asks for the argument.
+const fromResourceId = (p: Parameter): Parameter => ((p.from as string) === 'resource_id' ? { name: p.name, in: p.in, from: 'argument' } : p);
+
 function configFrom(binding: Binding | undefined): BindingConfig {
   const version = binding?.draft ?? binding?.approved;
   if (!version) return { name: '', server_id: '', tool_name: '', entity: 'resource', entity_type: 'tool', path: '', parameters: [], attributes: [{ name: '', pointer: '', type: 'string' }] };
-  return { name: version.name, server_id: version.server_id, tool_name: version.tool_name, entity: version.entity, entity_type: version.entity_type, path: version.path, parameters: version.parameters, attributes: version.attributes };
+  return { name: version.name, server_id: version.server_id, tool_name: version.tool_name, entity: version.entity, entity_type: version.entity_type, path: version.path, parameters: version.parameters.map(fromResourceId), attributes: version.attributes };
 }
 
 // The trusted attributes editor (Admin 048, item 34): a name, which tool, what the attributes
@@ -29,7 +33,7 @@ export function BindingEditor({ source, binding, scope, actions, onClose }: { so
   const items = servers.data?.pages.flatMap(p => p.items) ?? [];
   const selectedServer = items.find(s => s.id === config.server_id);
   function choose(operation: Operation) {
-    setConfig({ ...config, name: config.name || operation.operation_id || 'API attributes', path: operation.path, parameters: operation.parameters.map(p => ({ name: p.name, in: p.in, from: config.entity === 'subject' ? 'subject_id' : 'resource_id' })), attributes: operation.fields.slice(0, 32).map((field, i) => ({ name: (field.pointer.split('/').at(-1) || `attribute_${i + 1}`).replace(/[^A-Za-z0-9_]/g, '_').replace(/^[^A-Za-z]/, 'a_'), pointer: field.pointer, type: field.type })) });
+    setConfig({ ...config, name: config.name || operation.operation_id || 'API attributes', path: operation.path, parameters: operation.parameters.map(p => ({ name: p.name, in: p.in, ...(config.entity === 'subject' ? { from: 'subject_id' as const } : { from: 'argument' as const, pointer: `/${p.name}` }) })), attributes: operation.fields.slice(0, 32).map((field, i) => ({ name: (field.pointer.split('/').at(-1) || `attribute_${i + 1}`).replace(/[^A-Za-z0-9_]/g, '_').replace(/^[^A-Za-z]/, 'a_'), pointer: field.pointer, type: field.type })) });
   }
   const setAbout = (entity: BindingConfig['entity']) => setConfig({ ...config, entity });
   async function save() {

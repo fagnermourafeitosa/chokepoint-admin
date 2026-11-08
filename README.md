@@ -160,7 +160,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 047 | [Codex Harness Icon](specs/047-2026-11-06-codex-harness-icon.md) | Implemented |
 | 048 | [Relation Side Panel and Rules Only](specs/048-2026-11-06-relation-side-panel.md) | Implemented |
 | 049 | [Investigate Layout and Rules Read as Sentences](specs/049-2026-11-07-investigate-layout.md) | Implemented |
-| 050 | [Remove the Tool Mapping Screen, the Resource Block and the Resource ID Identifier](specs/050-2026-11-08-remove-tool-mapping-screen.md) | In Progress |
+| 050 | [Remove the Tool Mapping Screen, the Resource Block and the Resource ID Identifier](specs/050-2026-11-08-remove-tool-mapping-screen.md) | Implemented |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 
@@ -199,11 +199,9 @@ Incoming MCP tool calls use signed JWT access tokens and separate header-aware/l
 Stable decisions are maintained in [Backend Architecture](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress). Admin 008 and Backend 007 record the previously approved identity scope. Task-branch additions under Backend 008–011 now include COAZ projection, PIP enrichment, PAP permission management, fine-grained PDP decisions and authorized tool forwarding. They do not add a complete inbound MCP session proxy or public AuthZEN HTTP endpoint.
 
 
-## COAZ-MCP Mapping Management
+## COAZ-MCP Mapping
 
-MCP server tool details show default/server/local mapping origin and open a field or JSON/CEL editor. The backend compiles and projects example arguments/claims; the UI never evaluates a second CEL implementation. Save creates an inactive draft, review approves a version and removal explicitly compares the next effective mapping. Discarding a draft leaves active configuration unchanged. Revision conflicts require a reload; scope changes abort requests. The same authenticated HTTP client, CSRF and private query scope are retained.
-
-Mapping and source previews were accepted before implementation. The user subsequently waived policy previews and directed immediate implementation. Type checks, production builds and manual local-backend browser checks cover these slices; no automated Admin tests were added or run. Backend 008 owns mapping API and runtime limits; Backend 009–011 own sources, policies and execution.
+The Admin has no mapping screen and no Resource block on the tools of an MCP server (Admin 050). The backend keeps the COAZ-MCP mapping of each tool, its default and its routes; the Admin does not edit them. Trusted attributes about the object of a call read a tool argument, not `resource.id`.
 
 
 ## Trusted API Sources (Backend 009 / Admin 009)

@@ -417,4 +417,3 @@ fieldset.relation-side-panel { min-width: 0; margin: 0; padding: 0; border: 0; }
 .relation-side-panel .rule-expression { display: block; padding: 0; background: none; color: var(--cp-admin-color-text-muted); font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-label); overflow-wrap: anywhere; }
 .relation-condition header .draft-badge { margin-inline-start: auto; }
 .relation-condition header .draft-badge + .relation-icon-button { margin-inline-start: var(--cp-admin-space-2); }
-.relation-sections > .tool-mapping-warning { margin-bottom: var(--cp-admin-space-5); }

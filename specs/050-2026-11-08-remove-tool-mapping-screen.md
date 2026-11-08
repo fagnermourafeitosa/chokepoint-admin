@@ -3,7 +3,7 @@
 - **Specification ID**: 050
 - **Date**: 2026-11-08
 - **Slug**: remove-tool-mapping-screen
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Integrations, Context sources
 - **Related Specification**: [048 — Relation Side Panel and Rules Only](048-2026-11-06-relation-side-panel.md)
 - **Related Specification**: [027 — Tool Resource Mapping Review](027-2026-10-31-tool-resource-mapping-review.md)
@@ -97,11 +97,11 @@ Admin rule: no test files; verification is `npm run check`, `npm run build` and 
 
 ## Acceptance Criteria
 
-- [ ] 1. No tool row offers Configure mapping or a Resource block, and no screen says "Map the call to AuthZEN" or "Configure resource".
-- [ ] 2. Value from has no Resource ID option.
-- [ ] 3. A new binding about the object of the call starts with Tool argument and `/<URI parameter name>`.
-- [ ] 4. Functional test: `specs/functional-tests/050-2026-11-08-remove-tool-mapping-screen.md`.
-- [ ] 5. `npm run check` and `npm run build` pass.
+- [x] 1. No tool row offers Configure mapping or a Resource block, and no screen says "Map the call to AuthZEN" or "Configure resource". (S1; the screen and its modules are deleted)
+- [x] 2. Value from has no Resource ID option. (S2)
+- [x] 3. A new binding about the object of the call starts with Tool argument and `/<URI parameter name>`. (S2)
+- [x] 4. Functional test: `specs/functional-tests/050-2026-11-08-remove-tool-mapping-screen.md`.
+- [x] 5. `npm run check` and `npm run build` pass.
 
 ---
 

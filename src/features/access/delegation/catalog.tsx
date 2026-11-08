@@ -3,7 +3,7 @@ import { useQueries, useQuery } from '@tanstack/react-query';
 import { HttpError } from '../../../api/http-client';
 import type { EnvironmentScope } from '../environment-scope';
 import { mcpApi, type MCPServer } from '../../mcp/api';
-import { toolArguments } from '../../mcp/resource-api';
+import { toolArguments } from '../../mcp/tool-arguments';
 import { identityApi, type DirectoryUser } from '../../identity/api';
 import { sourceApi, type Source } from '../../sources/api';
 import { resourceTypesApi } from './api';

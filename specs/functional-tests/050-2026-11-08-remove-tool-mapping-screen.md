@@ -17,9 +17,9 @@ scenarios:
       - No row shows a Resource line or Configure resource.
       - No page of the Admin says "Map the call to AuthZEN" or "Authorization mapping".
     last_run:
-      date: null
-      result: not run
-      notes: ""
+      date: 2026-11-08
+      result: passed
+      notes: "Demo instance, Production, Admin from the feat/050 worktree on 5174. Acme Billing shows get_order, list_refunds and refund_order with no Configure mapping, no mapping badge, no Resource line and no Configure resource; the page has no Map the call to AuthZEN, Authorization mapping or COAZ default."
   - id: S2
     title: Trusted attributes about the object of the call read a tool argument
     criteria: [2, 3]
@@ -32,7 +32,7 @@ scenarios:
       - Each URI parameter starts as Tool argument, with the argument pointer /<URI parameter name>.
       - Value from offers Verified subject ID, Verified issuer and Tool argument, and no Resource ID.
     last_run:
-      date: null
-      result: not run
-      notes: ""
+      date: 2026-11-08
+      result: passed
+      notes: "Source of Acme, Add trusted attributes, The object of the call (default). Add parameter starts as Tool argument. A pasted OpenAPI with GET /orders/{order_id}, Inspect GET operations, Use this operation: order_id starts as Tool argument with the pointer /order_id. Value from offers Verified subject ID, Verified issuer and Tool argument, no Resource ID. Cancel; nothing saved."
 ---

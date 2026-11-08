@@ -1,7 +1,7 @@
 import { httpClient } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 export type SourceConfig = { name: string; base_url: string; auth_type: 'none'|'bearer'|'api_key'; api_key_header?: string; timeout_millis: number; cache_ttl_seconds: number; enabled: boolean };
-export type Parameter = { name: string; in: 'path'|'query'; from: 'subject_id'|'issuer'|'resource_id'|'argument'; pointer?: string };
+export type Parameter = { name: string; in: 'path'|'query'; from: 'subject_id'|'issuer'|'argument'; pointer?: string };
 export type Attribute = { name: string; pointer: string; type: string };
 export type BindingConfig = { name: string; server_id: string; tool_name: string; entity: 'subject'|'resource'; entity_type: string; path: string; parameters: Parameter[]; attributes: Attribute[] };
 export type BindingVersion = BindingConfig & { source_revision: number; schema_sha256: string };

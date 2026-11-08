@@ -48,24 +48,8 @@
 
 .mcp-tool-select { display: grid; place-items: center; min-width: var(--cp-admin-control-height); min-height: var(--cp-admin-control-height); }
 @media (pointer: coarse) { .mcp-tool-select { min-width: var(--cp-admin-touch-height); min-height: var(--cp-admin-touch-height); } }
-/* Resource block of a managed tool (Admin 027). */
-.resource-mapping { display: grid; gap: var(--cp-admin-space-2); padding: var(--cp-admin-space-2) var(--cp-admin-space-3); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-canvas); }
-.resource-mapping-line { display: flex; align-items: center; flex-wrap: wrap; gap: var(--cp-admin-space-2); font-size: var(--cp-admin-type-small); }
-.resource-mapping-line > span:first-of-type { font-weight: var(--cp-admin-weight-semibold); }
-.resource-mapping-line > .cp-admin-button { margin-inline-start: auto; }
-.resource-mapping-editor { display: grid; gap: var(--cp-admin-space-3); padding-top: var(--cp-admin-space-2); border-top: 1px solid var(--cp-admin-color-border); font-size: var(--cp-admin-type-small); }
-.resource-field { display: grid; gap: 4px; max-width: 32rem; }
-.resource-field > span { font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-bold); color: var(--cp-admin-color-text-muted); }
-.resource-field small { color: var(--cp-admin-color-text-muted); }
-.resource-preview { display: flex; align-items: center; flex-wrap: wrap; gap: var(--cp-admin-space-2); padding: var(--cp-admin-space-2) var(--cp-admin-space-3); border-inline-start: 3px solid var(--cp-admin-color-text); background: var(--cp-admin-color-surface); }
-.resource-preview > span:first-child { font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-bold); color: var(--cp-admin-color-text-muted); }
-.resource-preview small { flex-basis: 100%; color: var(--cp-admin-color-text-muted); }
+/* A warning line with an icon (Access: agent identity and harness access). */
 .resource-warning { display: flex; align-items: flex-start; gap: 6px; color: var(--cp-admin-color-warning); }
-.resource-actions { display: flex; flex-wrap: wrap; gap: var(--cp-admin-space-2); }
-.resource-note { font-size: var(--cp-admin-type-label); }
-.resource-label { display: inline-flex; align-items: center; gap: 4px; }
-.resource-label em { font-style: normal; font-weight: var(--cp-admin-weight-regular); }
-.resource-label .admin-tooltip-trigger { display: inline-flex; padding: 0; color: var(--cp-admin-color-text-muted); }
 /* Chokepoint token setup of a custom MCP server (Admin 029). */
 .chokepoint-token-setup { display: grid; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-3); border: 1px solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-canvas); }
 .chokepoint-token-setup > p { font-size: var(--cp-admin-type-small); }
