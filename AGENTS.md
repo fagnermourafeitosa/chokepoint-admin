@@ -60,7 +60,10 @@ flowchart TD
     VS --> LA{"User approves the layout?"}
     LA -- no --> VS
     LA -- yes --> S
-    S --> A{"User approves implementation?"}
+    S --> SA{"User approves the specification?"}
+    SA -- no --> S
+    SA -- yes --> NI["Status Not Implemented on main"]
+    NI --> A{"User approves implementation?"}
     A -- no --> W1["Wait"]
     A -- yes --> P["Status In Progress<br/>create the task branch from main"]
     P --> I["Implement on the task branch"]
@@ -106,15 +109,17 @@ The status changes only at the events in this table. At each event, change the s
 
 | Event | Status change | In the same step |
 | :--- | :--- | :--- |
-| The user approves the specification for implementation. | `Proposed` or `Not Implemented` → `In Progress` | Commit the status on `main`, then create the task branch from `main`. |
+| The user approves the specification. | `Proposed` → `Not Implemented` | Commit the status on `main`. |
+| The user approves the specification for implementation. | `Not Implemented` → `In Progress` | Commit the status on `main`, then create the task branch from `main`. |
 | The code is complete, all checks pass, and the Formal Code Review Gate is reported. | `In Progress` → `Waiting Approve` | Mark each met checkbox (`[x]`). Next to each unmet checkbox, write what is missing. |
 | The user approves the reviewed result. | `Waiting Approve` → `Implemented` | Change the status and the index in the commit on the task branch, before the merge. |
 
 Rules:
 
-* `Proposed` means written but on hold for an external decision. A notice below the header names that decision. Only the approval in the first row moves it on.
-* The approval in the third row **is** the approval for `Implemented`. Do not wait for a second approval.
-* Do not change a status at any other time, and do not mark `Implemented` before the third row.
+* `Proposed` means written and not approved by the user. Each new specification starts as `Proposed`, also when it records a choice that the user did not make. Only the user's explicit approval of the specification (first row) moves it to `Not Implemented`. Do not change it on your own judgment.
+* `Not Implemented` means approved by the user and not implemented. When the user approves the specification and its implementation at the same time, apply the first two rows in that order.
+* The approval in the fourth row **is** the approval for `Implemented`. Do not wait for a second approval.
+* Do not change a status at any other time, and do not mark `Implemented` before the fourth row.
 * Mark a checkbox only with evidence: a build or type check that you ran, a code inspection, or a manual browser check. Do not mark checkboxes only to end a turn.
 * Before each push to `main`, check that each specification whose code is in `main` is `Implemented`, in its header and in the `README.md` index.
 * Change the content of a specification (decisions, rules, contracts) on `main`. Status and checkbox changes go with the code, on the task branch.

@@ -3,7 +3,7 @@
 - **Specification ID**: <ID> (e.g., 012)
 - **Date**: YYYY-MM-DD
 - **Slug**: <slug-identifying-spec>
-- **Status**: Not Implemented
+- **Status**: Proposed
 - **Owner**: <Context, Module, or Squad Owner>
 - **Related Specification**: [0XX — <Related Spec Title>](0XX-YYYY-MM-DD-<slug>.md)
 - **Related Mock Contract**: [0XX — <Related Mock Title>](0XX-YYYY-MM-DD-<slug>.md)
