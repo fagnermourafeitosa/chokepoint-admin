@@ -89,7 +89,7 @@ Protected routes wait for session and authorized context. The real workspace lis
 
 Private query keys include user, workspace and environment. Switching context cancels/removes scoped data, and the pending-changes guard asks before it discards unsaved edits; logout/expiry clears private state. API 401 returns to login, while service failures show retry. Local logout revokes the backend session; a failed logout hides private UI and does not claim revocation succeeded. There is no login persistence in browser storage.
 
-Production requires a reviewed same-origin admin/API host with TLS, secure cookie deployment and restrictive SPA security headers. Vite's local proxy is not a production deployment. The future local Caddy/mTLS simulator comes from dev-infra/serverhttps and is not configured here.
+Production requires a reviewed same-origin admin/API host with TLS, secure cookie deployment and restrictive SPA security headers. Vite's local proxy is not a production deployment. In `dev`, the local Envoy (backend `infra/terraform`, started by `dev-infra/up.sh`) serves the Admin at `ADMIN_PUBLIC_ORIGIN`; the Admin container and its production headers are Backend 072.
 
 ## Access Workbench
 
