@@ -1,7 +1,8 @@
 #!/bin/sh
 # Start the Admin development server on ADMIN_DEV_HOST:ADMIN_DEV_PORT (.env.local).
-# An Admin already running on that port is stopped first.
-# The backend must run at ADMIN_API_TARGET (backend/dev.sh).
+# An Admin already running on that port is stopped first. Open it at ADMIN_PUBLIC_ORIGIN:
+# the local Envoy (dev-infra/up.sh) serves it there and routes /api/v1/ to the backend
+# (backend/dev.sh).
 set -eu
 cd "$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 
@@ -33,8 +34,8 @@ want=$(cat .nvmrc)
 # The process environment wins over .env.local, as in Vite.
 value() { eval "v=\${$1:-}"; [ -n "$v" ] || v=$(sed -n "s/^$1=//p" .env.local | tail -n 1); [ -n "$v" ] || fail "$1 is missing in .env.local (see .env.example)."; printf '%s' "$v"; }
 port=$(value ADMIN_DEV_PORT)
-target=$(value ADMIN_API_TARGET)
+origin=$(value ADMIN_PUBLIC_ORIGIN)
 stop_listeners "$port"
 [ -d node_modules ] || npm ci
-curl -s -o /dev/null --max-time 2 "$target" || printf 'Warning: the backend is not running at %s (run backend/dev.sh).\n' "$target" >&2
+curl -s -o /dev/null --max-time 2 "$origin/api/v1/public/feature-flags/healthcheck" || printf 'Warning: %s does not answer (run dev-infra/up.sh and backend/dev.sh).\n' "$origin" >&2
 exec npm run dev

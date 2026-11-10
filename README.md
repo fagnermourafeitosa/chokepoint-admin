@@ -12,7 +12,7 @@ Use React with Vite for the platform management application. The admin consumes 
 
 ## Quick start
 
-`dev.sh` installs the dependencies when needed and starts the development server at http://127.0.0.1:5173; open it at `ADMIN_PUBLIC_ORIGIN` (`https://app.xokepoint.localhost`), through the local Envoy (Backend 071). Start the backend first with `../backend/dev.sh`.
+`dev.sh` installs the dependencies when needed and starts the development server on `127.0.0.1:5173`. Open the Admin at `ADMIN_PUBLIC_ORIGIN` (`https://app.xokepoint.localhost`): the local Envoy serves it there and routes `/api/v1/` on the same origin to the backend (Backend 071, 072). There is no Vite proxy, so the Admin works only through Envoy. Start `../dev-infra/up.sh` and `../backend/dev.sh` first.
 
 ```sh
 ./dev.sh
@@ -30,27 +30,19 @@ npm ci
 
 A local `.env.local` is prepared for this checkout and ignored by Git. For a new checkout, copy `.env.example` to `.env.local`. Environment variables will be added when the relevant integrations are defined. Variables prefixed with `VITE_` are exposed to the browser. Never store secrets in public variables.
 
-## Container Images
+## Container Image
 
-`infra/` has two images. Build them from this module directory.
-
-| File | Use | Server |
-| :--- | :--- | :--- |
-| `infra/Dockerfile` | Production. The static build only. | static-web-server on port 8080. Unknown paths return `index.html`. It does not route `/api`: the deployment sends `/api` on the same origin to the backend. |
-| `infra/Dockerfile.development` | Local development, through `infra/dev-docker.sh`. | Nginx on `ADMIN_DEV_HOST:ADMIN_DEV_PORT`, `/api` sent to `ADMIN_API_TARGET` with the original `Host` header, as the Vite development server (Admin 038). |
-
-`infra/dev-docker.sh` is the container equivalent of `dev.sh`. It reads the three variables from the process environment or `.env.local` and stops when one is missing. It builds the development image and runs it on the host network. The image holds a build, so run the script again after a source change. The platform Keycloak accepts only the sign-in callbacks registered in its realm, so a new Admin origin needs its callback there.
-
-```sh
-./infra/dev-docker.sh
-ADMIN_DEV_PORT=15173 ADMIN_API_TARGET=http://127.0.0.1:18081 ./infra/dev-docker.sh
-```
+`infra/Dockerfile` is the production image: the static build only, served by static-web-server on port 8080, with `/health` for the container health check. Unknown paths return `index.html`, so the client routes load directly. It does not route `/api` and sets no security header: Envoy sends `/api/v1/` on the same origin to the backend and sets the Admin's headers and caching (Backend 072). There is no development image: the `local` VM runs this image behind Envoy.
 
 Production build:
 
 ```sh
 docker build -f infra/Dockerfile -t chokepoint-admin .
 ```
+
+## Deploy
+
+`infra/deploy.sh` deploys the Admin, first to `local`, then to `production` (or one of them as argument). It needs a clean checkout equal to `origin/main` and the sibling `backend` and `dev-infra` checkouts. The Admin has its own Terraform root and state (Backend 072, decision 5), so the plan holds only the Admin image and container: Envoy, Keycloak, PostgreSQL, OpenFGA, the backend and the site are never planned or changed. Each environment shows its plan and asks before it applies; the new container is healthy before the old one stops; then the script backs up the states, runs the header check and keeps the two newest Admin images on the host. A rollback is a revert commit on `main`, deployed the same way. See `backend/INFRA.md`, Application Deploys.
 
 ## Application
 
@@ -63,7 +55,7 @@ npm run build
 npm run preview
 ```
 
-The development server binds to `127.0.0.1:5173`. Production hosting must serve `index.html` for application routes such as `/access` and `/investigate`.
+The development server binds to `127.0.0.1:5173`; the browser reaches it only through the local Envoy. Production hosting serves `index.html` for application routes such as `/access` and `/investigate`.
 
 ## Design System
 
@@ -81,7 +73,7 @@ The application imports [the admin design system](docs/design-system/README.md),
 
 ## Login and Backend Session
 
-The admin has /login and /signup entry pages and a protected /onboarding/workspace page. Start local Keycloak/Mailpit from [dev-infra](../dev-infra/idps/keycloak/README.md), apply backend migrations and explicit seeds, start the Go API on 127.0.0.1:8081 and run npm run dev here. Open https://app.xokepoint.localhost/login. The public frontend links to these admin destinations; it does not handle credentials.
+The admin has /login and /signup entry pages and a protected /onboarding/workspace page. Start local Keycloak/Mailpit from [dev-infra](../dev-infra/idps/keycloak/README.md), apply backend migrations and explicit seeds, start the Go API (`../backend/dev.sh`) and run `./dev.sh` here. Open https://app.xokepoint.localhost/login. The public frontend links to these admin destinations; it does not handle credentials.
 
 The browser submits same-origin navigation forms to backend login/signup endpoints. The backend owns the OIDC exchange and HttpOnly cookie session. Keycloak's Chokepoint theme follows this module's fonts, tokens and logo; it processes credentials, verified email and MFA. The admin never sees passwords, provider tokens or session-cookie values. No static Bearer token remains in the client. Authenticated mutations use the in-memory session-bound CSRF token.
 
