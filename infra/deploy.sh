@@ -23,6 +23,13 @@ DEV_INFRA_DIR="${DEV_INFRA_DIR:-$root/dev-infra}"
 export BACKEND_DIR TF_VAR_admin_build_context="$admin"
 
 fail() { printf 'Error: %s\n' "$1" >&2; exit 1; }
+# running_tag: the tag of the image of the running admin container, empty when there is none.
+running_tag() {
+  name="$(docker ps --filter 'name=^chokepoint-admin-' --format '{{.Names}}' 2>/dev/null | head -n 1)"
+  [ -n "$name" ] || return 0
+  id="$(docker inspect -f '{{.Image}}' "$name")"
+  docker image ls chokepoint/admin --no-trunc --format '{{.ID}} {{.Tag}}' | awk -v id="$id" '$1 == id { print $2; exit }'
+}
 
 case "${1:-all}" in
   all) envs="local production" ;;
@@ -48,6 +55,11 @@ printf 'Deploying Admin %s\n' "$(git log -1 --format='%h %s')"
 for env in $envs; do
   printf '\n== %s ==\n' "$env"
   "$DEV_INFRA_DIR/terraform/tf.sh" "$env" admin init -input=false >/dev/null
+  # The tag of the image the running container uses: it stays on the host for a rollback.
+  DOCKER_HOST="$("$DEV_INFRA_DIR/terraform/tf.sh" "$env" admin output -raw docker_host 2>/dev/null || true)"
+  export DOCKER_HOST
+  previous="$(running_tag)"
+  unset DOCKER_HOST
   "$DEV_INFRA_DIR/terraform/tf.sh" "$env" admin plan -out=tfplan
   printf 'Apply this plan to %s? [y/N] ' "$env"
   read -r answer
@@ -56,11 +68,14 @@ for env in $envs; do
   "$DEV_INFRA_DIR/terraform/state-backup.sh" "$env" >/dev/null
   "$DEV_INFRA_DIR/envoy/check-headers.sh" "$env"
 
-  # Disk: the running image and the one before it stay; older ones and stale build cache go.
+  # Disk: the deployed image and the one it replaced stay, by tag. The build is reproducible, so
+  # every image has the same creation date and cannot be ordered by it. Older images and stale
+  # build cache go; a failed removal never stops the deploy.
   DOCKER_HOST="$("$DEV_INFRA_DIR/terraform/tf.sh" "$env" admin output -raw docker_host)"
   export DOCKER_HOST
-  docker image ls chokepoint/admin --format '{{.Repository}}:{{.Tag}}' | tail -n +3 | while read -r old; do
-    docker image rm "$old" >/dev/null && printf 'removed %s\n' "$old"
+  docker image ls chokepoint/admin --format '{{.Tag}}' | while read -r tag; do
+    if [ "$tag" = "$TF_VAR_admin_image_tag" ] || [ "$tag" = "$previous" ]; then continue; fi
+    docker image rm "chokepoint/admin:$tag" >/dev/null 2>&1 && printf 'removed %s\n' "$tag" || true
   done
   docker image prune -f >/dev/null
   docker builder prune -f --max-used-space 3GB >/dev/null
