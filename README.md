@@ -12,7 +12,7 @@ Use React with Vite for the platform management application. The admin consumes 
 
 ## Quick start
 
-`dev.sh` installs the dependencies when needed and starts the development server at http://127.0.0.1:5173. Start the backend first with `../backend/dev.sh`.
+`dev.sh` installs the dependencies when needed and starts the development server at http://127.0.0.1:5173; open it at `ADMIN_PUBLIC_ORIGIN` (`https://app.xokepoint.localhost`), through the local Envoy (Backend 071). Start the backend first with `../backend/dev.sh`.
 
 ```sh
 ./dev.sh
@@ -81,7 +81,7 @@ The application imports [the admin design system](docs/design-system/README.md),
 
 ## Login and Backend Session
 
-The admin has /login and /signup entry pages and a protected /onboarding/workspace page. Start local Keycloak/Mailpit from [dev-infra](../dev-infra/idps/keycloak/README.md), apply backend migrations and explicit seeds, start the Go API on 127.0.0.1:8081 and run npm run dev here. Open http://127.0.0.1:5173/login. The public frontend links to these admin destinations; it does not handle credentials.
+The admin has /login and /signup entry pages and a protected /onboarding/workspace page. Start local Keycloak/Mailpit from [dev-infra](../dev-infra/idps/keycloak/README.md), apply backend migrations and explicit seeds, start the Go API on 127.0.0.1:8081 and run npm run dev here. Open https://app.xokepoint.localhost/login. The public frontend links to these admin destinations; it does not handle credentials.
 
 The browser submits same-origin navigation forms to backend login/signup endpoints. The backend owns the OIDC exchange and HttpOnly cookie session. Keycloak's Chokepoint theme follows this module's fonts, tokens and logo; it processes credentials, verified email and MFA. The admin never sees passwords, provider tokens or session-cookie values. No static Bearer token remains in the client. Authenticated mutations use the in-memory session-bound CSRF token.
 
