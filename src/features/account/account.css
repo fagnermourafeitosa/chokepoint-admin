@@ -1,0 +1,27 @@
+/* Admin 051: the account area. Design-system tokens only. */
+.account-table { min-width: 56rem; }
+.account-table th { text-align: left; }
+.account-table td { vertical-align: middle; padding-block: var(--cp-admin-space-5); }
+.account-table th:last-child, .account-table td:last-child { text-align: right; }
+.account-name { display: flex; align-items: center; gap: var(--cp-admin-space-3); }
+.account-name > svg { flex-shrink: 0; }
+.account-name > span { display: grid; gap: var(--cp-admin-space-1); }
+.account-name small, .account-mono { font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-label); color: var(--cp-admin-color-text-muted); overflow-wrap: anywhere; }
+.account-badges, .account-row-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); }
+.account-row-actions { justify-content: flex-end; }
+.account-cell-chip { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); }
+.account-form { display: grid; gap: var(--cp-admin-space-6); }
+.account-section { display: grid; gap: var(--cp-admin-space-3); }
+.account-section h2 { margin: 0; font: 700 1.125rem var(--cp-admin-font-heading); }
+.account-section > p { margin: 0; }
+.account-section .cp-admin-table-scroll { border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-panel); }
+.account-name-field { width: 32rem; max-width: 100%; }
+.account-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--cp-admin-space-3); padding-top: var(--cp-admin-space-6); border-top: 1px solid var(--cp-admin-color-border); }
+.account-actions > span { display: flex; gap: var(--cp-admin-space-3); }
+.account-topbar-title { font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); }
+.account-tabs { margin-block-end: var(--cp-admin-space-6); }
+.account-danger { margin-top: var(--cp-admin-space-8); padding-top: var(--cp-admin-space-6); border-top: 1px solid var(--cp-admin-color-border); justify-items: start; }
+.account-danger h2 { color: var(--cp-admin-color-danger); }
+.account-delete-list { display: grid; gap: var(--cp-admin-space-2); margin: 0; padding: 0; list-style: none; }
+.account-delete-list li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); padding: var(--cp-admin-space-3); border: 1px solid var(--cp-admin-color-danger); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); }
+.account-delete-list li > svg { color: var(--cp-admin-color-danger); }

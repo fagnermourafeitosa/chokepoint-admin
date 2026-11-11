@@ -114,6 +114,19 @@ export function useAuthState(): AuthState {
     setEnvironmentId(undefined);
     setWorkspaceId(value.tenant_id);
   }
+  function openWorkspace(value: Workspace, id?: string) {
+    const switching = value.tenant_id !== workspace?.tenant_id || (!!id && id !== environment?.id);
+    if (!switching) return true;
+    if (!confirmSwitch(value.tenant_id !== workspace?.tenant_id ? "workspace" : "environment")) return false;
+    clearPrivate();
+    if (value.tenant_id !== workspace?.tenant_id) {
+      void client.cancelQueries({ queryKey: ["auth", "environments"] });
+      client.removeQueries({ queryKey: ["auth", "environments"] });
+    }
+    setWorkspaceId(value.tenant_id);
+    setEnvironmentId(id);
+    return true;
+  }
   function chooseEnvironment(id: string) {
     if (id === environment?.id) return;
     if (!confirmSwitch("environment")) return;
@@ -159,6 +172,7 @@ export function useAuthState(): AuthState {
     workspaces: workspaces.data?.items ?? [],
     workspace,
     chooseWorkspace,
+    openWorkspace,
     environments: environments.data?.items ?? [],
     environment,
     chooseEnvironment,

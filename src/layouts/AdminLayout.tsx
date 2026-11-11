@@ -25,7 +25,7 @@ export function AdminLayout() {
           environment={environment}
           onEnvironmentChange={setEnvironment}
           navigation={navigation}
-          accountEmail={auth.session?.user.display_name ?? ""}
+          accountEmail={auth.session?.user.email || auth.session?.user.display_name || ""}
         />
         {/* Admin 041: on every screen while the environment has an agent in Report-only. */}
         {auth.session && auth.workspace && auth.environment ? <ReportOnlyBanner key={`report-only:${auth.session.user.id}:${auth.workspace.tenant_id}:${auth.environment.id}`} scope={{ userId: auth.session.user.id, tenantId: auth.workspace.tenant_id, environmentId: auth.environment.id }} production={environment === 'Production'} /> : null}

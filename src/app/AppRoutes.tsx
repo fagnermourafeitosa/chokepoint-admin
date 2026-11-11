@@ -1,7 +1,11 @@
 import { createBrowserRouter, createRoutesFromElements, Navigate, Outlet, Route, RouterProvider } from 'react-router';
 import { AdminLayout } from '../layouts/AdminLayout';
-import { AuthProvider, RequireSession } from '../features/auth/AuthRoutes';
-import { LoginPage, WorkspacePage, WorkspaceOnboarding } from '../features/auth/AuthPages';
+import { AuthProvider, RequireAccount, RequireSession } from '../features/auth/AuthRoutes';
+import { LoginPage, WorkspaceOnboarding } from '../features/auth/AuthPages';
+import { AccountLayout } from '../features/account/AccountLayout';
+import { WorkspacesPage } from '../features/account/WorkspacesPage';
+import { WorkspaceDetailPage } from '../features/account/WorkspaceDetailPage';
+import { AccountInfoPage } from '../features/account/AccountInfoPage';
 import { lazy, Suspense } from 'react';
 import { navigation } from './navigation';
 
@@ -16,8 +20,15 @@ const router = createBrowserRouter(createRoutesFromElements(
   <Route element={<AuthProvider><Outlet /></AuthProvider>}>
     <Route path="/login" element={<LoginPage />} />
     <Route path="/signup" element={<LoginPage signup />} />
-    <Route path="/workspaces" element={<WorkspacePage />} />
+    {/* Admin 051: the account area replaces the workspace page. The first-workspace onboarding stays (Admin 005). */}
+    <Route path="/workspaces" element={<Navigate to="/account/workspaces" replace />} />
     <Route path="/onboarding/workspace" element={<WorkspaceOnboarding />} />
+    <Route element={<RequireAccount />}><Route path="/account" element={<AccountLayout />}>
+      <Route index element={<Navigate to="/account/workspaces" replace />} />
+      <Route path="workspaces" element={<WorkspacesPage />} />
+      <Route path="workspaces/:tenantId" element={<WorkspaceDetailPage />} />
+      <Route path="info" element={<AccountInfoPage />} />
+    </Route></Route>
     <Route element={<RequireSession />}><Route element={<AdminLayout />}>
       {navigation.map(({ path, Page, children }) => <Route key={path} path={path} element={<Page />}>
         {children?.map(({ path: childPath, Page: ChildPage }) => childPath ? <Route key={childPath} path={childPath} element={<ChildPage />} /> : <Route key="index" index element={<ChildPage />} />)}

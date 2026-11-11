@@ -1,4 +1,5 @@
 import { useAuth } from "../../features/auth/AuthContext";
+import { Link } from "react-router";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 
 type ProfileMenuProps = {
@@ -18,6 +19,10 @@ export function ProfileMenu({ email }: ProfileMenuProps) {
         <strong>Account</strong>
         <span>{email}</span>
       </div>
+      {/* Admin 051: the account area. */}
+      <Link className="admin-dropdown-option" to="/account/workspaces">
+        Account
+      </Link>
       <button
         type="button"
         className="admin-dropdown-option"

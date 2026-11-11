@@ -56,7 +56,7 @@ export function LoginPage({ signup = false }: { signup?: boolean }) {
   const { opening, start } = useLoginAction();
   if (a.loading || a.failed || a.signingOut || a.logoutFailed)
     return <AuthStatus />;
-  if (a.session) return <Navigate to="/workspaces" replace />;
+  if (a.session) return <Navigate to="/" replace />;
   return (
     <AuthFrame publicEntry>
       <h1>{signup ? "Create your account" : "Sign in"}</h1>
@@ -92,66 +92,6 @@ export function LoginPage({ signup = false }: { signup?: boolean }) {
     </AuthFrame>
   );
 }
-export function WorkspacePage() {
-  const a = useAuth();
-  if (
-    a.loading ||
-    a.failed ||
-    a.contextLoading ||
-    a.contextFailed ||
-    a.signingOut ||
-    a.logoutFailed
-  )
-    return <AuthStatus />;
-  if (!a.session) return <Navigate to="/login" replace />;
-  if (a.workspace && a.environment) return <Navigate to="/" replace />;
-  return (
-    <AuthFrame>
-      <h1>
-        {a.workspaces.length
-          ? "Choose your workspace"
-          : "You do not have access to a workspace."}
-      </h1>
-      {a.workspaces.map((w) => (
-        <button
-          className="cp-admin-button auth-choice"
-          key={w.tenant_id}
-          onClick={() => a.chooseWorkspace(w)}
-        >
-          {w.name}
-        </button>
-      ))}
-      {a.workspace && !a.environments.length ? (
-        <p role="status">No environments are available for this workspace.</p>
-      ) : null}
-      {a.workspace
-        ? a.environments.map((e) => (
-            <button
-              className="cp-admin-button auth-choice"
-              key={e.id}
-              onClick={() => a.chooseEnvironment(e.id)}
-            >
-              {e.name === "sandbox" ? "Sandbox" : "Production"}
-            </button>
-          ))
-        : null}
-      {!a.workspaces.length && a.session?.user.can_create_workspace ? (
-        <Link
-          className="cp-admin-button auth-choice"
-          to="/onboarding/workspace"
-        >
-          Create your first workspace
-        </Link>
-      ) : null}
-      <button
-        className="cp-admin-button cp-admin-button--ghost auth-choice"
-        onClick={() => void a.logout()}
-      >
-        Sign out
-      </button>
-    </AuthFrame>
-  );
-}
 export function WorkspaceOnboarding() {
   const a = useAuth();
   const { name, setName, error, pending, submit } = useWorkspaceOnboarding();
@@ -166,7 +106,7 @@ export function WorkspaceOnboarding() {
     return <AuthStatus />;
   if (!a.session) return <Navigate to="/login" replace />;
   if (a.workspaces.length || !a.session.user.can_create_workspace)
-    return <Navigate to="/workspaces" replace />;
+    return <Navigate to="/" replace />;
   return (
     <AuthFrame>
       <h1>Create your workspace</h1>
