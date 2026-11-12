@@ -70,6 +70,16 @@ Use the `Notice` component for a message about the screen: `info` says what happ
 
 Every mark of an agent in Report-only (Admin 041) uses the warning tokens and the `Eye` icon: `cp-report-only-chip` (the agent chip, and with `data-tone="danger"` the overdue review chip), `cp-report-only-notice` (the notice of the agent and of a would-deny decision, with a danger border when the review is overdue) and `cp-would-deny` (added to an outcome chip or an Inbox type tag: dashed, because the call ran). ALLOW keeps the brand yellow and DENY the action pink. Chips never wrap inside; a row of chips wraps between chips.
 
+## Direct link to the documentation
+
+The standard way to send the administrator from a screen element to the public docs page that explains it (decided 2026-11-12). The public site uses the same pattern.
+
+- **Mark:** the lucide `ArrowUpRight` icon, with no visible text, placed right after the label or title it explains and vertically centered on it. 14px next to a field label or a card title.
+- **Color and motion:** `color-text-muted` at rest; the text color on hover and focus, moving 2px up and right. Keyboard focus uses the standard focus outline. Reduced motion removes the movement. It is not a button: no border, no shadow, no lift.
+- **Destination:** the public docs page of that exact topic, in the locale of the Admin, never the docs home.
+- **Behavior:** opens in a new tab (`target="_blank" rel="noopener noreferrer"`), so the work on the screen stays open.
+- **Name:** `aria-label` and `title` name the destination page and say that it opens a new tab, for example "Agent identity, in the documentation (opens in a new tab)". Admin copy never names the product.
+
 ## Dropdown panels
 
 A dropdown panel opens under its trigger, aligned to the end of the trigger. When that would cut it at the left edge of the nearest container that clips its overflow, for example a filter at the start of a wrapped toolbar row, `Dropdown` sets `data-align="start"` and the panel aligns to the start of the trigger.
