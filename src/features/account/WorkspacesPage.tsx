@@ -58,7 +58,12 @@ export function WorkspacesPage() {
               </table>
             </div>}
       <TracePager page={page} size={pageSize} total={auth.workspaces.length} onPage={setPage} />
-      {creating ? <CreateWorkspaceDialog onClose={() => setCreating(false)} onCreated={() => { setCreating(false); void changed(); }} /> : null}
+      {/* Admin 052: the first workspace opens in the Admin, where the tour of its Sandbox starts. */}
+      {creating ? <CreateWorkspaceDialog first={auth.workspaces.length === 0} onClose={() => setCreating(false)} onCreated={workspace => {
+        const first = auth.workspaces.length === 0;
+        setCreating(false);
+        void changed().then(() => { if (first) open(workspace); });
+      }} /> : null}
       {deleting ? <DeleteWorkspaceDialog workspace={deleting} onClose={() => setDeleting(null)} onDeleted={() => { setDeleting(null); void changed(); }} /> : null}
     </main>
   );
