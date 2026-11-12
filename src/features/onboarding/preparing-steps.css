@@ -1,0 +1,6 @@
+/* Admin 052: the steps of the loading screen of the first workspace. */
+.preparing-steps { display: grid; gap: 12px; margin: 8px 0 0; padding: 0; list-style: none; }
+.preparing-step { display: flex; align-items: center; gap: 10px; color: var(--cp-admin-color-text-muted); }
+.preparing-step .cp-admin-status-dot { width: 8px; height: 8px; margin: 4px; opacity: .4; }
+.preparing-step--current, .preparing-step--done { color: var(--cp-admin-color-text); }
+.preparing-step--current .cp-admin-status-dot { opacity: 1; }

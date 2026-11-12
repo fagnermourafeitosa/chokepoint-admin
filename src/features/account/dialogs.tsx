@@ -4,6 +4,7 @@ import { Dialog } from '../../components/ui/dialog/Dialog';
 import { HttpError } from '../../api/http-client';
 import type { Workspace } from '../auth/AuthContext';
 import { accountApi, type DeletionPreview } from './api';
+import { PreparingSteps, preparingDelay } from '../onboarding/PreparingSteps';
 
 const failure = (error: unknown, conflict: string) =>
   error instanceof HttpError && error.status === 409 ? conflict
@@ -11,7 +12,8 @@ const failure = (error: unknown, conflict: string) =>
       : 'The request failed. Try again.';
 
 // Admin 051, item 8. The idempotency key stays while the name stays.
-export function CreateWorkspaceDialog({ onClose, onCreated }: { onClose: () => void; onCreated: (workspace: Workspace) => void }) {
+// Admin 052: the first workspace of the person shows the loading steps while it is created.
+export function CreateWorkspaceDialog({ first = false, onClose, onCreated }: { first?: boolean; onClose: () => void; onCreated: (workspace: Workspace) => void }) {
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -23,8 +25,11 @@ export function CreateWorkspaceDialog({ onClose, onCreated }: { onClose: () => v
     if (attempt.current.name !== normalized) attempt.current = { name: normalized, key: crypto.randomUUID() };
     setBusy(true);
     setError('');
+    const shown = first ? preparingDelay() : Promise.resolve();
     try {
-      onCreated(await accountApi.createWorkspace(normalized, attempt.current.key));
+      const workspace = await accountApi.createWorkspace(normalized, attempt.current.key);
+      await shown;
+      onCreated(workspace);
     } catch (e) {
       setError(failure(e, 'This request was already used for another name. Change the name and try again.'));
     } finally {
@@ -34,11 +39,11 @@ export function CreateWorkspaceDialog({ onClose, onCreated }: { onClose: () => v
   return (
     <Dialog title="Create workspace" onClose={() => { if (!busy) onClose(); }}>
       <form onSubmit={event => void submit(event)}>
-        <div className="admin-dialog-body">
+        {first && busy ? <div className="admin-dialog-body"><PreparingSteps /></div> : <div className="admin-dialog-body">
           <label className="cp-admin-field">Workspace name<input className="cp-admin-input" value={name} required maxLength={100} disabled={busy} onChange={event => setName(event.target.value)} /></label>
           <small className="cp-admin-muted">Up to 100 characters. The workspace starts with a Sandbox and a Production environment.</small>
           {error ? <p role="alert" className="cp-admin-notice cp-admin-notice--danger">{error}</p> : null}
-        </div>
+        </div>}
         <div className="admin-dialog-actions">
           <button type="button" className="cp-admin-button cp-admin-button--secondary" disabled={busy} onClick={onClose}>Cancel</button>
           <button type="submit" className="cp-admin-button" disabled={busy}>{busy ? 'Creating…' : 'Create workspace'}</button>

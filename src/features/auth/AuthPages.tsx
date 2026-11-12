@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { PreparingSteps } from "../onboarding/PreparingSteps";
 import { useLoginAction } from "./useLoginAction";
 import { useWorkspaceOnboarding } from "./useWorkspaceOnboarding";
 import { Link, Navigate } from "react-router";
@@ -92,6 +93,15 @@ export function LoginPage({ signup = false }: { signup?: boolean }) {
     </AuthFrame>
   );
 }
+function PreparingWorkspace() {
+  return (
+    <AuthFrame>
+      <h1>Preparing your workspace</h1>
+      <PreparingSteps />
+    </AuthFrame>
+  );
+}
+
 export function WorkspaceOnboarding() {
   const a = useAuth();
   const { name, setName, error, pending, submit } = useWorkspaceOnboarding();
@@ -107,6 +117,7 @@ export function WorkspaceOnboarding() {
   if (!a.session) return <Navigate to="/login" replace />;
   if (a.workspaces.length || !a.session.user.can_create_workspace)
     return <Navigate to="/" replace />;
+  if (pending) return <PreparingWorkspace />;
   return (
     <AuthFrame>
       <h1>Create your workspace</h1>
