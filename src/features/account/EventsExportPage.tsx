@@ -41,15 +41,15 @@ export function EventsExportPage() {
         : list.isError ? <div className="cp-admin-notice" role="alert">Could not load the destinations. <button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => void list.refetch()}>Retry</button></div>
           : items.length === 0 ? <p className="cp-admin-muted">No destination yet. Add one to send the calls of your workspaces to your SIEM.</p>
             : <div className="cp-admin-table-scroll" role="region" aria-label="Destinations" tabIndex={0}>
-              <table className="cp-admin-table events-export-table">
+              <table className="cp-admin-table account-table events-export-table">
                 <thead><tr><th scope="col">Destination</th><th scope="col">Type</th><th scope="col">Workspaces</th><th scope="col">Status</th><th scope="col">Actions</th></tr></thead>
                 <tbody>{items.map(destination => (
                   <tr key={destination.id}>
-                    <td><div className="events-export-name"><Send size={20} aria-hidden="true" /><span><strong>{destination.name}</strong><small>{destination.endpoint}</small></span></div></td>
+                    <td><div className="account-name"><Send size={20} aria-hidden="true" /><span><strong>{destination.name}</strong><small>{destination.endpoint}</small></span></div></td>
                     <td><span className="mcp-badge">{typeLabel[destination.type]}</span></td>
-                    <td><div className="events-export-badges">{destination.exports.map(item => <span key={`${item.tenant_id}-${item.environment}`} className="mcp-badge">{item.workspace_name || item.tenant_id} · {environmentLabel(item.environment)}</span>)}</div></td>
+                    <td><div className="account-badges">{destination.exports.map(item => <span key={`${item.tenant_id}-${item.environment}`} className="mcp-badge">{item.workspace_name || item.tenant_id} · {environmentLabel(item.environment)}</span>)}</div></td>
                     <td><div className="events-export-status"><span className="mcp-badge" data-tone={statusBadge[destination.status].tone}>{statusBadge[destination.status].label}</span><small>Last delivery {deliveredAt(destination.last_delivery_at)}</small></div></td>
-                    <td><div className="events-export-row-actions">
+                    <td><div className="account-row-actions">
                       <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => navigate(`/account/events-export/${destination.id}`)}>Edit</button>
                       <button type="button" className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" onClick={() => setDeleting(destination)}>Delete</button>
                     </div></td>

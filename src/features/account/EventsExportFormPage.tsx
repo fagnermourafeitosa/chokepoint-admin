@@ -1,11 +1,12 @@
 import { useState, type FormEvent } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
-import { Building2, Copy, Plus } from 'lucide-react';
+import { Building2, Plus } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { HttpError } from '../../api/http-client';
 import { SelectMenu } from '../../components/ui/dropdown/SelectMenu';
 import { ConfirmDialog } from '../../components/ui/dialog/ConfirmDialog';
 import { Notice } from '../../components/ui/notice/Notice';
+import { OneTimeSecret } from '../../components/ui/secret/OneTimeSecret';
 import { TracePager } from '../investigate/TraceUI';
 import '../investigate/investigate.css';
 import { useAuth } from '../auth/AuthContext';
@@ -71,7 +72,6 @@ function DestinationForm({ destination }: { destination?: Destination }) {
   const [deleting, setDeleting] = useState(false);
   const [rotating, setRotating] = useState(false);
   const [secret, setSecret] = useState<string>(() => (location.state as { secret?: string } | null)?.secret ?? '');
-  const [copied, setCopied] = useState(false);
   const workspaces = auth.workspaces.filter(w => (w.role ?? 'admin') === 'admin');
   const shown = workspaces.slice((workspacePage - 1) * workspacePageSize, workspacePage * workspacePageSize);
 
@@ -119,7 +119,6 @@ function DestinationForm({ destination }: { destination?: Destination }) {
     try {
       const result = await eventsExportApi.rotateSecret(destination.id);
       setSecret(result.secret);
-      setCopied(false);
       setRotating(false);
     } catch {
       setError('The secret could not be replaced. Try again.');
@@ -138,13 +137,7 @@ function DestinationForm({ destination }: { destination?: Destination }) {
         </div>
         <button type="button" className="cp-admin-button cp-admin-button--secondary access-primary-action" onClick={back}>Back to destinations</button>
       </header>
-      {secret ? (
-        <Notice tone="warning" title="Copy the signing secret now. You will not see it again." className="events-export-notice">
-          <span className="events-export-secret"><code>{secret}</code>
-            <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" onClick={() => { void navigator.clipboard.writeText(secret).then(() => setCopied(true)); }}><Copy size={14} aria-hidden="true" />{copied ? 'Copied' : 'Copy'}</button>
-          </span>
-        </Notice>
-      ) : null}
+      {secret ? <OneTimeSecret value={secret} title="Copy the signing secret now. You will not see it again." className="events-export-notice" /> : null}
       {destination?.status === 'failing' ? (
         <Notice tone="error" title="The last deliveries failed." className="events-export-notice">
           {destination.last_error}. Last delivery {deliveredAt(destination.last_delivery_at)}. Calls are kept and sent again for 72 hours.{destination.dropped > 0 ? ` ${destination.dropped} older ${destination.dropped === 1 ? 'call was' : 'calls were'} dropped.` : ''}
@@ -172,10 +165,11 @@ function DestinationForm({ destination }: { destination?: Destination }) {
           ) : (
             <>
               <label className="cp-admin-field events-export-field">Webhook URL<input className="cp-admin-input" type="url" required value={endpoint} disabled={busy} placeholder="https://hooks.example.com/agent-calls" onChange={event => setEndpoint(event.target.value)} /><small>HTTPS only. Each call is one POST with a JSON body.</small></label>
-              <div className="events-export-cell-chip">
-                <label className="cp-admin-field events-export-field">Signing secret<input className="cp-admin-input events-export-mono" readOnly value={destination?.type === 'webhook' ? 'whsec_••••••••••••••••' : 'Created when you save. You see it once.'} /><small>Each request has an HMAC-SHA256 signature of its body in a header. Check it to accept only calls sent by this destination.</small></label>
+              <div className="events-export-secret-row">
+                <label className="cp-admin-field events-export-field">Signing secret<input className="cp-admin-input account-mono" readOnly value={destination?.type === 'webhook' ? 'whsec_••••••••••••••••' : 'Created when you save. You see it once.'} /></label>
                 {destination?.type === 'webhook' ? <button type="button" className="cp-admin-button cp-admin-button--secondary" disabled={busy} onClick={() => setRotating(true)}>Rotate secret</button> : null}
               </div>
+              <small className="cp-admin-muted">Each request has an HMAC-SHA256 signature of its body in a header. Check it to accept only calls sent by this destination.</small>
             </>
           )}
           <h3>Headers</h3>
@@ -195,12 +189,12 @@ function DestinationForm({ destination }: { destination?: Destination }) {
         <section className="events-export-section" aria-labelledby="destination-scope-title">
           <h2 id="destination-scope-title">What is exported</h2>
           <p className="cp-admin-muted">Each allowed and denied call of these workspaces and environments, with the agent, the person, the tool, the result and the Reference code.</p>
-          <div className="cp-admin-table-scroll events-export-scope" role="region" aria-label="Workspaces and environments" tabIndex={0}>
+          <div className="cp-admin-table-scroll cp-admin-switch-table" role="region" aria-label="Workspaces and environments" tabIndex={0}>
             <table className="cp-admin-table">
               <thead><tr><th scope="col">Workspace</th><th scope="col">Production</th><th scope="col">Sandbox</th></tr></thead>
               <tbody>{shown.map(workspace => (
                 <tr key={workspace.tenant_id}>
-                  <td><div className="events-export-name"><Building2 size={20} aria-hidden="true" /><span><strong>{workspace.name}</strong><small>{workspace.tenant_id}</small></span></div></td>
+                  <td><div className="account-name"><Building2 size={20} aria-hidden="true" /><span><strong>{workspace.name}</strong><small>{workspace.tenant_id}</small></span></div></td>
                   {environments.map(environment => (
                     <td key={environment}><input className="cp-admin-switch" type="checkbox" role="switch" disabled={busy} aria-label={`Export ${workspace.name} ${environmentLabel(environment)}`} checked={(exports[workspace.tenant_id] ?? []).includes(environment)} onChange={event => switchEnvironment(workspace.tenant_id, environment, event.target.checked)} /></td>
                   ))}
@@ -222,7 +216,7 @@ function DestinationForm({ destination }: { destination?: Destination }) {
         </section>
 
         {error ? <Notice tone="error">{error}</Notice> : null}
-        <div className="events-export-actions">
+        <div className="account-actions">
           <button type="submit" className="cp-admin-button" disabled={busy}>{busy ? 'Saving…' : 'Save destination'}</button>
           <span>
             <button type="button" className="cp-admin-button cp-admin-button--secondary" disabled={busy} onClick={back}>Cancel</button>

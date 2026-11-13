@@ -1,16 +1,8 @@
-/* Admin 053: the Events export tab of the account area. Design-system tokens only. */
-.events-export-table { min-width: 52rem; }
-.events-export-table th { text-align: left; }
-.events-export-table td { vertical-align: middle; padding-block: var(--cp-admin-space-5); }
-.events-export-table th:last-child, .events-export-table td:last-child { text-align: right; }
-.events-export-name { display: flex; align-items: center; gap: var(--cp-admin-space-3); }
-.events-export-name > svg { flex-shrink: 0; }
-.events-export-name > span, .events-export-status { display: grid; gap: var(--cp-admin-space-1); justify-items: start; }
-.events-export-name small, .events-export-mono { font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-label); color: var(--cp-admin-color-text-muted); overflow-wrap: anywhere; }
+/* Admin 053: the Events export tab. It reuses the account area classes (account.css)
+   and the design system (Copy button, One-time secret, Switch table); only what
+   is unique to this screen is here. Design-system tokens only. */
+.events-export-status { display: grid; gap: var(--cp-admin-space-1); justify-items: start; }
 .events-export-status small { font-size: var(--cp-admin-type-label); color: var(--cp-admin-color-text-muted); }
-.events-export-badges, .events-export-row-actions, .events-export-cell-chip { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); }
-.events-export-row-actions { justify-content: flex-end; }
-.events-export-cell-chip > .cp-admin-field { flex: 1 1 auto; }
 .events-export-form { display: grid; gap: var(--cp-admin-space-8); }
 .events-export-section { display: grid; gap: var(--cp-admin-space-3); }
 .events-export-section h2 { margin: 0; font: 700 1.125rem var(--cp-admin-font-heading); }
@@ -24,17 +16,14 @@
 .events-export-header-row > button { width: 100%; min-height: var(--cp-admin-control-height); }
 .events-export-add { justify-self: start; }
 .events-export-notice { margin-block-end: var(--cp-admin-space-6); }
-.events-export-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--cp-admin-space-3); padding-top: var(--cp-admin-space-6); border-top: 1px solid var(--cp-admin-color-border); }
-.events-export-actions > span { display: flex; gap: var(--cp-admin-space-3); }
+.events-export-scope-pager { max-width: 48rem; }
 @media (max-width: 650px) {
   .events-export-pair, .events-export-header-row { grid-template-columns: 1fr; }
-  .events-export-scope table { min-width: 0; }
-  .events-export-scope th:not(:first-child), .events-export-scope td:not(:first-child) { width: 5.5rem; }
 }
-.events-export-scope { max-width: 48rem; border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-panel); }
-.events-export-scope th { text-align: left; }
-.events-export-scope td { vertical-align: middle; }
-.events-export-scope th:not(:first-child), .events-export-scope td:not(:first-child) { width: 8rem; text-align: center; }
-.events-export-scope-pager { max-width: 48rem; }
-.events-export-secret { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); }
-.events-export-secret code { font-family: var(--cp-admin-font-mono); overflow-wrap: anywhere; }
+/* The list has four data columns; it keeps the narrower width approved in its layout. */
+.account-table.events-export-table { min-width: 52rem; }
+/* The signing secret and Rotate secret share the line of the input, at the height of the field. */
+.events-export-secret-row { display: flex; flex-wrap: wrap; align-items: end; gap: var(--cp-admin-space-3); max-width: 48rem; }
+.events-export-secret-row > .cp-admin-field { flex: 1 1 24rem; max-width: 40rem; }
+.events-export-secret-row > .cp-admin-button { min-height: var(--cp-admin-control-height); }
+.events-export-secret-row + small { font-size: var(--cp-admin-type-label); }

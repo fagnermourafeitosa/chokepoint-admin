@@ -143,3 +143,20 @@
 .cp-report-only-notice { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); }
 .cp-report-only-notice > div { flex: 1; color: var(--cp-admin-color-text); }
 .cp-report-only-notice[data-overdue] { border-color: var(--cp-admin-color-danger); }
+
+/* One-time secret (Admin 053): the value in mono, wrapped, beside its Copy button. */
+.cp-admin-secret { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); }
+.cp-admin-secret code { font-family: var(--cp-admin-font-mono); overflow-wrap: anywhere; }
+
+/* Switch table (Admin 053): one row for each item, one column of switches for
+   each option, centered under its header. */
+.cp-admin-switch-table { max-width: 48rem; border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-panel); }
+.cp-admin-switch-table th { text-align: left; }
+.cp-admin-switch-table td { vertical-align: middle; }
+.cp-admin-switch-table th:not(:first-child),
+.cp-admin-switch-table td:not(:first-child) { width: 8rem; text-align: center; }
+@media (max-width: 650px) {
+  .cp-admin-switch-table table { min-width: 0; }
+  .cp-admin-switch-table th:not(:first-child),
+  .cp-admin-switch-table td:not(:first-child) { width: 5.5rem; }
+}
