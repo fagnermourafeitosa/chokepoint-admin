@@ -1,0 +1,29 @@
+/* Admin 053: the Events export tab. It reuses the account area classes (account.css)
+   and the design system (Copy button, One-time secret, Switch table); only what
+   is unique to this screen is here. Design-system tokens only. */
+.events-export-status { display: grid; gap: var(--cp-admin-space-1); justify-items: start; }
+.events-export-status small { font-size: var(--cp-admin-type-label); color: var(--cp-admin-color-text-muted); }
+.events-export-form { display: grid; gap: var(--cp-admin-space-8); }
+.events-export-section { display: grid; gap: var(--cp-admin-space-3); }
+.events-export-section h2 { margin: 0; font: 700 1.125rem var(--cp-admin-font-heading); }
+.events-export-section h3 { margin: var(--cp-admin-space-4) 0 0; font: 700 1rem var(--cp-admin-font-heading); }
+.events-export-section > p { margin: 0; }
+.events-export-field { max-width: 40rem; }
+.events-export-pair { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--cp-admin-space-4); max-width: 60rem; align-items: start; }
+.events-export-pair > .cp-admin-field { align-content: start; }
+.events-export-headers { display: grid; gap: var(--cp-admin-space-3); max-width: 60rem; }
+.events-export-header-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 7rem; gap: var(--cp-admin-space-3); align-items: end; }
+.events-export-header-row > button { width: 100%; min-height: var(--cp-admin-control-height); }
+.events-export-add { justify-self: start; }
+.events-export-notice { margin-block-end: var(--cp-admin-space-6); }
+.events-export-scope-pager { max-width: 48rem; }
+@media (max-width: 650px) {
+  .events-export-pair, .events-export-header-row { grid-template-columns: 1fr; }
+}
+/* The list has four data columns; it keeps the narrower width approved in its layout. */
+.account-table.events-export-table { min-width: 52rem; }
+/* The signing secret and Rotate secret share the line of the input, at the height of the field. */
+.events-export-secret-row { display: flex; flex-wrap: wrap; align-items: end; gap: var(--cp-admin-space-3); max-width: 48rem; }
+.events-export-secret-row > .cp-admin-field { flex: 1 1 24rem; max-width: 40rem; }
+.events-export-secret-row > .cp-admin-button { min-height: var(--cp-admin-control-height); }
+.events-export-secret-row + small { font-size: var(--cp-admin-type-label); }

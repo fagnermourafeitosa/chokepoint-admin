@@ -1,0 +1,40 @@
+/* Admin 053 prototype: Trace export tab of the account area. Design-system tokens only. */
+.trace-export-topbar-title { font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); }
+.trace-export-tabs { margin-block-end: var(--cp-admin-space-6); }
+.trace-export-table { min-width: 52rem; }
+.trace-export-table th { text-align: left; }
+.trace-export-table td { vertical-align: middle; padding-block: var(--cp-admin-space-5); }
+.trace-export-table th:last-child, .trace-export-table td:last-child { text-align: right; }
+.trace-export-name { display: flex; align-items: center; gap: var(--cp-admin-space-3); }
+.trace-export-name > svg { flex-shrink: 0; }
+.trace-export-name > span, .trace-export-status { display: grid; gap: var(--cp-admin-space-1); justify-items: start; }
+.trace-export-name small, .trace-export-mono { font-family: var(--cp-admin-font-mono); font-size: var(--cp-admin-type-label); color: var(--cp-admin-color-text-muted); overflow-wrap: anywhere; }
+.trace-export-status small { font-size: var(--cp-admin-type-label); color: var(--cp-admin-color-text-muted); }
+.trace-export-badges, .trace-export-row-actions, .trace-export-cell-chip { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); }
+.trace-export-row-actions { justify-content: flex-end; }
+.trace-export-cell-chip > .cp-admin-field { flex: 1 1 auto; }
+.trace-export-form { display: grid; gap: var(--cp-admin-space-8); }
+.trace-export-section { display: grid; gap: var(--cp-admin-space-3); }
+.trace-export-section h2 { margin: 0; font: 700 1.125rem var(--cp-admin-font-heading); }
+.trace-export-section h3 { margin: var(--cp-admin-space-4) 0 0; font: 700 1rem var(--cp-admin-font-heading); }
+.trace-export-section > p { margin: 0; }
+.trace-export-field { max-width: 40rem; }
+.trace-export-pair { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--cp-admin-space-4); max-width: 60rem; align-items: start; }
+.trace-export-pair > .cp-admin-field { align-content: start; }
+.trace-export-headers { display: grid; gap: var(--cp-admin-space-3); max-width: 60rem; }
+.trace-export-header-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 7rem; gap: var(--cp-admin-space-3); align-items: end; }
+.trace-export-header-row > button { width: 100%; min-height: var(--cp-admin-control-height); }
+.trace-export-add { justify-self: start; }
+.trace-export-notice { margin-block-end: var(--cp-admin-space-6); }
+.trace-export-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--cp-admin-space-3); padding-top: var(--cp-admin-space-6); border-top: 1px solid var(--cp-admin-color-border); }
+.trace-export-actions > span { display: flex; gap: var(--cp-admin-space-3); }
+@media (max-width: 650px) {
+  .trace-export-pair, .trace-export-header-row { grid-template-columns: 1fr; }
+  .trace-export-scope table { min-width: 0; }
+  .trace-export-scope th:not(:first-child), .trace-export-scope td:not(:first-child) { width: 5.5rem; }
+}
+.trace-export-scope { max-width: 48rem; border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-panel); }
+.trace-export-scope th { text-align: left; }
+.trace-export-scope td { vertical-align: middle; }
+.trace-export-scope th:not(:first-child), .trace-export-scope td:not(:first-child) { width: 8rem; text-align: center; }
+.trace-export-scope-pager { max-width: 48rem; }
