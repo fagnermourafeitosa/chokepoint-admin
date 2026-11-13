@@ -6,6 +6,8 @@ import { AccountLayout } from '../features/account/AccountLayout';
 import { WorkspacesPage } from '../features/account/WorkspacesPage';
 import { WorkspaceDetailPage } from '../features/account/WorkspaceDetailPage';
 import { AccountInfoPage } from '../features/account/AccountInfoPage';
+import { EventsExportPage } from '../features/account/EventsExportPage';
+import { EventsExportFormPage } from '../features/account/EventsExportFormPage';
 import { lazy, Suspense } from 'react';
 import { navigation } from './navigation';
 
@@ -27,6 +29,9 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route index element={<Navigate to="/account/workspaces" replace />} />
       <Route path="workspaces" element={<WorkspacesPage />} />
       <Route path="workspaces/:tenantId" element={<WorkspaceDetailPage />} />
+      <Route path="events-export" element={<EventsExportPage />} />
+      <Route path="events-export/new" element={<EventsExportFormPage />} />
+      <Route path="events-export/:id" element={<EventsExportFormPage />} />
       <Route path="info" element={<AccountInfoPage />} />
     </Route></Route>
     <Route element={<RequireSession />}><Route element={<AdminLayout />}>
