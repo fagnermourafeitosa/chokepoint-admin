@@ -6,6 +6,8 @@ export const denyText: Record<ReasonLabel, string> = {
   no_grant: 'The agent can not call this tool.',
   no_resource: 'The value of the call is not one of the allowed values of the agent.',
   condition: 'A rule of this agent · server · tool was not met.',
+  // Backend 087: a rule that reads earlier calls of the agent (a limit) was not met.
+  reach_limit: 'A limit of this agent · server · tool was reached.',
   tool_not_reviewed: 'The tool has not been reviewed (blocked before the PDP).',
 };
 

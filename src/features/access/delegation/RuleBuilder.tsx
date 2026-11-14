@@ -1,8 +1,10 @@
 // Admin 048: RuleBuilder: each line of a rule is a condition.
-import { useState } from 'react';
-import { Plus, Trash2, X } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { CircleHelp, Plus, Trash2, X } from 'lucide-react';
+import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
 import { findTool, type Catalog, type CatalogBinding } from './model';
 import { SelectMenu } from '../../../components/ui/dropdown/SelectMenu';
+import { celLimit, limitCel, limitComplete, limitHelp, limitSentence, type Usage } from './usage';
 
 // A field the rule can read: a call argument or a trusted attribute. Only the CEL leaves the Admin.
 export type RuleField = { key: string; label: string; group: string; type: string; cel: string; binding?: string; limit?: string };
@@ -37,18 +39,19 @@ function clauseCel(c: Clause, fields: RuleField[]) {
   return `${f.cel} ${op.cel} ${right || literal(f.type, c.value)}`;
 }
 
-export function ruleCel(rule: Rule, fields: RuleField[]) {
-  const parts = rule.clauses.map(c => clauseCel(c, fields)).filter(Boolean);
+// limits: the limit lines of the rule (Admin 054); they join the conditions with the same all/any.
+export function ruleCel(rule: Rule, fields: RuleField[], limits: Usage[] = []) {
+  const parts = [...rule.clauses.map(c => clauseCel(c, fields)), ...limits.map(limitCel)].filter(Boolean);
   return parts.length > 1 ? parts.map(p => `(${p})`).join(rule.join === 'all' ? ' && ' : ' || ') : parts[0] ?? '';
 }
 
-export function ruleSentence(rule: Rule, fields: RuleField[]) {
-  return rule.clauses.map(c => {
+export function ruleSentence(rule: Rule, fields: RuleField[], limits: Usage[] = [], tool = '') {
+  return [...rule.clauses.map(c => {
     const f = fields.find(x => x.key === c.field); if (!f) return '';
     const op = (ops[f.type] ?? ops.string).find(o => o.id === c.op)!;
     const value = c.valueField ? fields.find(x => x.key === c.valueField)?.label : op.id === 'in' ? `[${listValues(c.value).join(', ') || '…'}]` : c.value || '…';
     return `${f.label} ${op.label}${op.noValue ? '' : ` ${value}`}`;
-  }).filter(Boolean).join(rule.join === 'all' ? ' AND ' : ' OR ');
+  }), ...limits.map(u => limitSentence(u, tool))].filter(Boolean).join(rule.join === 'all' ? ' AND ' : ' OR ');
 }
 
 // Admin 049: the inverse of ruleCel. It reads only the CEL that the builder writes (clauseCel, ruleCel)
@@ -120,7 +123,8 @@ function celClause(text: string, i: number, bindings: CatalogBinding[]): { claus
   return other ? { clause: { id, field: key, op: opId, value: '', valueField: other.key }, fields: [f, other] } : undefined;
 }
 
-export function celRule(expression: string, bindings: CatalogBinding[]): { rule: Rule; fields: RuleField[] } | undefined {
+// usage: the usage definitions of the saved rule; a clause that reads one is a limit line (Admin 054).
+export function celRule(expression: string, bindings: CatalogBinding[], usage: Usage[] = []): { rule: Rule; fields: RuleField[]; limits: Usage[] } | undefined {
   const text = expression.trim();
   let join: Rule['join'] = 'all', parts = [text];
   for (const [j, sep] of [['all', ' && '], ['any', ' || ']] as const) {
@@ -131,20 +135,21 @@ export function celRule(expression: string, bindings: CatalogBinding[]): { rule:
       join = j; parts = split.map(p => p.slice(1, -1)); break;
     }
   }
-  const clauses = parts.map((p, i) => celClause(p, i, bindings));
+  const limits: Usage[] = [], clauses: ({ clause: Clause; fields: RuleField[] } | undefined)[] = [];
+  parts.forEach((p, i) => { const limit = celLimit(p, usage); if (limit) limits.push(limit); else clauses.push(celClause(p, i, bindings)); });
   if (!clauses.every(Boolean)) return undefined;
-  return { rule: { join, clauses: clauses.map(c => c!.clause) }, fields: clauses.flatMap(c => c!.fields) };
+  return { rule: { join, clauses: clauses.map(c => c!.clause) }, fields: clauses.flatMap(c => c!.fields), limits };
 }
 
 // The sentence of a saved rule, or undefined when its CEL can not be read (Admin 049 item 14).
-export function celSentence(expression: string, bindings: CatalogBinding[]) {
-  const parsed = celRule(expression, bindings);
-  return parsed ? ruleSentence(parsed.rule, parsed.fields) || undefined : undefined;
+export function celSentence(expression: string, bindings: CatalogBinding[], usage: Usage[] = [], tool = '') {
+  const parsed = celRule(expression, bindings, usage);
+  return parsed ? ruleSentence(parsed.rule, parsed.fields, parsed.limits, tool) || undefined : undefined;
 }
 
 export const ruleBindings = (rule: Rule, fields: RuleField[]) => [...new Set(rule.clauses.flatMap(c => [c.field, c.valueField]).map(k => fields.find(f => f.key === k)?.binding).filter((b): b is string => !!b))];
 export const ruleLimits = (rule: Rule, fields: RuleField[]) => [...new Set(rule.clauses.flatMap(c => [c.field, c.valueField]).map(k => fields.find(f => f.key === k)?.limit).filter((l): l is string => !!l))];
-export const ruleComplete = (rule: Rule, fields: RuleField[]) => rule.clauses.length > 0 && rule.clauses.every(c => { const f = fields.find(x => x.key === c.field); const op = f && (ops[f.type] ?? ops.string).find(o => o.id === c.op); return !!op && (op.noValue || !!c.valueField || c.value.trim() !== ''); });
+export const ruleComplete = (rule: Rule, fields: RuleField[], limits: Usage[] = []) => rule.clauses.length + limits.length > 0 && limits.every(limitComplete) && rule.clauses.every(c => { const f = fields.find(x => x.key === c.field); const op = f && (ops[f.type] ?? ops.string).find(o => o.id === c.op); return !!op && (op.noValue || !!c.valueField || c.value.trim() !== ''); });
 
 // is one of: the values of the list, kept as one comma-separated string in the clause.
 const listValues = (v: string) => v.split(',').map(x => x.trim()).filter(Boolean);
@@ -170,7 +175,9 @@ function FieldSelect({ fields, value, onChange, label, only }: { fields: RuleFie
   return <SelectMenu block label={label} value={value} onChange={onChange} options={groups.flatMap(g => list.filter(f => f.group === g).map(f => ({ value: f.key, label: `${f.label} · ${f.type} — ${g}` })))} />;
 }
 
-export function RuleBuilder({ fields, rule, onChange }: { fields: RuleField[]; rule: Rule; onChange: (r: Rule) => void }) {
+// limitLines and onAddLimit add the limit lines of Admin 054 after the conditions, with Add a limit
+// next to Add a condition and its help.
+export function RuleBuilder({ fields, rule, onChange, limitLines, onAddLimit }: { fields: RuleField[]; rule: Rule; onChange: (r: Rule) => void; limitLines?: ReactNode; onAddLimit?: () => void }) {
   const set = (id: string, patch: Partial<Clause>) => onChange({ ...rule, clauses: rule.clauses.map(c => (c.id === id ? { ...c, ...patch } : c)) });
   const add = () => { const f = fields[0]; onChange({ ...rule, clauses: [...rule.clauses, { id: `q-${Date.now()}`, field: f.key, op: (ops[f.type] ?? ops.string)[0].id, value: '' }] }); };
   return <div className="rule-builder">
@@ -191,6 +198,11 @@ export function RuleBuilder({ fields, rule, onChange }: { fields: RuleField[]; r
         <button type="button" className="relation-icon-button" aria-label="Remove this condition" onClick={() => onChange({ ...rule, clauses: rule.clauses.filter(x => x.id !== c.id) })}><Trash2 size={14} /></button>
       </div>;
     })}
-    <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small rule-add" onClick={add} disabled={!fields.length}><Plus size={14} aria-hidden="true" />Add a condition</button>
+    {limitLines}
+    <div className="limit-add">
+      <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small rule-add" onClick={add} disabled={!fields.length}><Plus size={14} aria-hidden="true" />Add a condition</button>
+      {onAddLimit ? <><button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={onAddLimit}><Plus size={14} aria-hidden="true" />Add a limit</button>
+        <Tooltip content={limitHelp}><CircleHelp size={14} aria-label="About limits" /></Tooltip></> : null}
+    </div>
   </div>;
 }

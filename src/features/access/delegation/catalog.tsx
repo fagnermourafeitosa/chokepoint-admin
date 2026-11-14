@@ -37,7 +37,9 @@ async function loadCatalog(scope: EnvironmentScope, signal: AbortSignal) {
   const tools: CatalogTool[] = withTools.flatMap((s, i) => managed(s).map(t => {
     const resource = types[i].items.find(r => r.tool === t.name);
     const args = Object.fromEntries(toolArguments(t).flatMap(a => { const type = ruleType(a.type); return type ? [[a.name, type]] : []; }));
-    return { serverId: s.id, tool: t.name, args, mapping: resource ? { pointer: resource.argument ? `/${resource.argument}` : '', kind: resource.type } : undefined };
+    // The schema type of each scalar argument: a sum limit reads only an integer (Backend 087).
+    const schema = Object.fromEntries(toolArguments(t).flatMap(a => (ruleType(a.type) ? [[a.name, a.type]] : [])));
+    return { serverId: s.id, tool: t.name, args, schema, mapping: resource ? { pointer: resource.argument ? `/${resource.argument}` : '', kind: resource.type } : undefined };
   }));
   const bindings = approvedBindings(sources.items);
   return {

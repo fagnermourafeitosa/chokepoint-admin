@@ -45,6 +45,11 @@ export function targetPath(signal: Signal): string | undefined {
   }
   return undefined;
 }
+const disconnectedText: Record<string, string> = {
+  unreachable: 'No answer from the server',
+  authentication: 'The server refused the credentials',
+  reauthorization_required: 'The OAuth grant needs a new authorization',
+};
 function discoveryCounts(c: Record<string, string>): string {
   return [Number(c.changed) > 0 ? `${c.changed} changed` : '', Number(c.removed) > 0 ? `${c.removed} removed` : ''].filter(Boolean).join(' · ');
 }
@@ -64,6 +69,8 @@ export function contextLines(signal: Signal): [string, string] {
     // Admin 041: the context of the Report-only signals.
     case 'report-only-would-deny': return [c.tool || '', [denyText[c.reason as ReasonLabel] || c.reason || '', c.people ? `${c.people} ${c.people === '1' ? 'person' : 'people'}` : ''].filter(Boolean).join(' · ')];
     case 'report-only-review-due': return [c.agent_name || c.agent || '', c.review_by ? `Review date ${reviewDay(c.review_by)}` : ''];
+    // Backend 088: the server and why the rediscovery failed.
+    case 'mcpserver_disconnected': return [c.server || '', c.reason ? disconnectedText[c.reason] ?? c.reason : ''];
     default: return ['', ''];
   }
 }

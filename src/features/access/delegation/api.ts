@@ -15,7 +15,11 @@ export type BlockedRecord = { identity_connection_id: string; subject: string; r
 export type DelegationRecord = { identity_connection_id: string; subject: string; kind: SubjectKind };
 export type CapabilityRecord = { server_id: string; tool: string; expires_at: string | null };
 export type ResourceRecord = { server_id: string; type: string; id: string };
-export type ConditionRecord = { id: string; name: string; server_id: string; tool: string; expression: string; required_bindings: string[]; required_limits: string[] };
+// A usage definition of a call condition (Backend 087 Implementation Decision 16): it reads the earlier
+// calls of the agent in a rolling window of at most 24 hours. The CEL reads context.chokepoint.usage["<id>"].value.
+export type UsageOperator = 'sum' | 'count_calls' | 'count_distinct' | 'formerly_within' | 'since_within';
+export type UsageRecord = { id: string; operator: UsageOperator; argument?: string; key?: string; window_seconds: number; tool?: string; anchor_tool?: string; match?: { argument: string; tool_argument: string } };
+export type ConditionRecord = { id: string; name: string; server_id: string; tool: string; expression: string; required_bindings: string[]; required_limits: string[]; usage?: UsageRecord[] };
 export type PermissionDocument = { scopes: ScopeRecord[]; delegations: DelegationRecord[]; capabilities: CapabilityRecord[]; resources: ResourceRecord[]; conditions: ConditionRecord[]; blocked?: BlockedRecord[] };
 export type Reconciliation = { state: 'effective' | 'pending'; last_attempt_at?: string | null; last_error?: string };
 // published_by, published_by_name, published_at and note describe the latest published or

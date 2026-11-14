@@ -3,7 +3,7 @@ import { httpClient } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 
 // SignalType mirrors the backend attention_signal_type enum.
-export type SignalType = 'tool-discovery' | 'requests-denied' | 'token_exchange_denied' | 'report-only-would-deny' | 'report-only-review-due';
+export type SignalType = 'tool-discovery' | 'requests-denied' | 'token_exchange_denied' | 'report-only-would-deny' | 'report-only-review-due' | 'mcpserver_disconnected';
 
 export const signalTypeLabels: Record<SignalType, string> = {
   'tool-discovery': 'Tool discovery',
@@ -12,7 +12,15 @@ export const signalTypeLabels: Record<SignalType, string> = {
   // Backend 057: Report-only signals; never denials.
   'report-only-would-deny': 'Would deny',
   'report-only-review-due': 'Review due',
+  // Backend 088: an automatic rediscovery could not reach the server.
+  mcpserver_disconnected: 'Server disconnected',
 };
+
+// Backend 088: the severity of a signal, 0 to 3, set by its type. 1 and 0 share the label Low
+// and differ only in the order (Admin 054 item 8).
+export type SeverityFilter = 'all' | 'high' | 'medium' | 'low';
+export const severityLevel = (severity: number): Exclude<SeverityFilter, 'all'> => (severity >= 3 ? 'high' : severity === 2 ? 'medium' : 'low');
+export const severityLabels: Record<Exclude<SeverityFilter, 'all'>, string> = { high: 'High', medium: 'Medium', low: 'Low' };
 
 // A Report-only signal type shows the eye of Report-only (Admin 041).
 export const reportOnlyTypes = new Set<string>(['report-only-would-deny', 'report-only-review-due']);
@@ -25,6 +33,7 @@ export type StatusFilter = 'active' | SignalStatus | 'all';
 export type Signal = {
   id: string;
   type: SignalType;
+  severity: number;
   subject: string;
   context: Record<string, string>;
   target_route: string;
@@ -52,9 +61,11 @@ const base = (s: EnvironmentScope): `/v1/${string}` =>
 export const attentionKey = (s: EnvironmentScope) => ['attention-signals', s.userId, s.tenantId, s.environmentId] as const;
 
 export const attentionApi = {
-  list: (s: EnvironmentScope, type: SignalType | 'all', page: number, status: StatusFilter, signal: AbortSignal) => {
+  // The backend orders by severity, then by time, and filters by severity (Backend 088).
+  list: (s: EnvironmentScope, type: SignalType | 'all', page: number, status: StatusFilter, severity: SeverityFilter, signal: AbortSignal) => {
     const query = new URLSearchParams({ page: String(page), page_size: String(pageSize), status });
     if (type !== 'all') query.set('type', type);
+    if (severity !== 'all') query.set('severity', severity);
     return httpClient<SignalPage>(`${base(s)}?${query}`, { signal });
   },
   counts: (s: EnvironmentScope, signal: AbortSignal) => httpClient<SignalCounts>(`${base(s)}/counts`, { signal }),

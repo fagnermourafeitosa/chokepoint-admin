@@ -78,7 +78,8 @@
 }
 .attention-row {
   display: grid;
-  grid-template-columns: 11rem minmax(0, 1.3fr) minmax(0, 1.1fr) 8rem 9rem;
+  /* Admin 054: Severity, Type, Subject, Context, When, Action. */
+  grid-template-columns: 5rem 11rem minmax(0, 1.3fr) minmax(0, 1.1fr) 8rem 9rem;
   gap: var(--cp-admin-space-4);
   align-items: center;
   padding: var(--cp-admin-space-4) var(--cp-admin-space-6);
@@ -195,7 +196,7 @@
   line-height: 1.5;
 }
 @media (max-width: 740px) {
-  .attention-row > :nth-child(3) {
+  .attention-row > :nth-child(4) {
     grid-column: 1/-1;
   }
   .attention-filters {
@@ -212,12 +213,14 @@
 .attention-tag { white-space: nowrap; }
 .attention-tag:has(svg) { display: inline-flex; align-items: center; gap: 4px; }
 .attention-tag--report-only-review-due { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); color: var(--cp-admin-color-warning); }
-/* Narrow screens: tag, subject and context stacked; the time and the action share the last row. */
+/* Narrow screens: severity and tag share the first row; subject and context stacked; the time and the action share the last row. */
 @media (max-width: 740px) {
   .attention-row { row-gap: var(--cp-admin-space-2); }
-  .attention-row > :nth-child(1), .attention-row > :nth-child(2), .attention-row > :nth-child(3) { grid-column: 1 / -1; }
-  .attention-row > :nth-child(4) { grid-column: 1; }
-  .attention-row > :nth-child(5) { grid-column: 2; }
+  .attention-row > :nth-child(1) { grid-column: 1; }
+  .attention-row > :nth-child(2) { grid-column: 2; justify-self: start; }
+  .attention-row > :nth-child(3), .attention-row > :nth-child(4) { grid-column: 1 / -1; }
+  .attention-row > :nth-child(5) { grid-column: 1; }
+  .attention-row > :nth-child(6) { grid-column: 2; }
   .attention-when time { white-space: nowrap; }
 }
 /* Admin 045: the status of an Inbox item and its Mark resolved action. */
@@ -243,3 +246,9 @@
   color: var(--cp-admin-color-danger);
   font-size: var(--cp-admin-type-small);
 }
+
+/* Admin 054: the severity chip of an Inbox item (Backend 088). High and Medium use the danger and warning palettes; Low is neutral. */
+.severity-chip { display: inline-flex; align-items: center; width: max-content; padding: 1px 8px; border: 1px solid var(--cp-admin-color-border); border-radius: 999px; font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-semibold); white-space: nowrap; }
+.severity-chip--high { border-color: var(--cp-admin-color-danger); background: var(--cp-admin-color-danger-bg); color: var(--cp-admin-color-danger); }
+.severity-chip--medium { border-color: var(--cp-admin-color-warning); background: var(--cp-admin-color-warning-bg); color: var(--cp-admin-color-warning); }
+.severity-chip--low { background: var(--cp-admin-color-surface-muted); color: var(--cp-admin-color-text-muted); }

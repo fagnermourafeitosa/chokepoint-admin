@@ -1,4 +1,5 @@
 import type { ConditionRecord, PermissionDocument, SubjectKind } from './api';
+import { usageFromRecord, usageToRecord, type Usage } from './usage';
 
 export type { SubjectKind };
 // The editor's view of the agent document. `issuer` is the identity connection ID; names come from the catalog.
@@ -10,7 +11,8 @@ export type PersonConsent = { groups: ConsentGroup[]; defaultDays: number; maxDa
 export type IdpScope = { issuer: string; kinds: SubjectKind[]; expiresAt?: string; consent?: Consent; confirmed?: boolean; personConsent?: PersonConsent };
 export type Blocked = { issuer: string; subject: string; reason?: string };
 export type Delegation = { id: string; issuer: string; subject: string; kind: SubjectKind };
-export type Condition = { id: string; name: string; expression: string; bindings: string[]; limits: string[] };
+// usage: the limits of the rule, which read earlier calls of the agent (Backend 087).
+export type Condition = { id: string; name: string; expression: string; bindings: string[]; limits: string[]; usage: Usage[] };
 export type Mapping = { pointer: string; kind: string };
 export type Capability = { id: string; serverId: string; tool: string; expiresAt?: string; mapping?: Mapping; conditions: Condition[] };
 // A resource belongs to a server and a resource type (Backend 029). It is an allow list: no rules.
@@ -19,7 +21,8 @@ export type Doc = { scopes: IdpScope[]; delegations: Delegation[]; capabilities:
 
 // What the editor reads besides the document: servers, reviewed tools, bindings, identity providers and directories.
 export type CatalogServer = { id: string; name: string; type: 'custom' | 'enterprise' };
-export type CatalogTool = { serverId: string; tool: string; args: Record<string, string>; mapping?: Mapping };
+// args: the rule builder type of each scalar argument; schema: its JSON Schema type (integer, number, string, boolean).
+export type CatalogTool = { serverId: string; tool: string; args: Record<string, string>; schema: Record<string, string>; mapping?: Mapping };
 export type CatalogBinding = { id: string; source: string; entity: 'subject' | 'resource'; attributes: { name: string; type: string }[] };
 // groups: the provider reads directory groups, which harness login needs (Backend 045).
 export type CatalogIdp = { id: string; name: string; enabled: boolean; provider: string; groups: boolean; harnessLogin: boolean };
@@ -56,7 +59,7 @@ export function fromDocument(d: PermissionDocument, catalog: Catalog): Doc {
     delegations: d.delegations.map(x => ({ id: delegationId(x.identity_connection_id, x.subject), issuer: x.identity_connection_id, subject: x.subject, kind: x.kind })),
     capabilities: d.capabilities.map(c => ({
       id: capabilityId(c.server_id, c.tool), serverId: c.server_id, tool: c.tool, expiresAt: toDate(c.expires_at), mapping: findTool(catalog, c.server_id, c.tool)?.mapping,
-      conditions: d.conditions.filter(k => k.server_id === c.server_id && k.tool === c.tool).map(k => ({ id: k.id, name: k.name, expression: k.expression, bindings: k.required_bindings, limits: k.required_limits })),
+      conditions: d.conditions.filter(k => k.server_id === c.server_id && k.tool === c.tool).map(k => ({ id: k.id, name: k.name, expression: k.expression, bindings: k.required_bindings, limits: k.required_limits, usage: (k.usage ?? []).map(usageFromRecord) })),
     })),
     resources: d.resources.map(r => ({ id: resourceId(r.server_id, r.type, r.id), serverId: r.server_id, kind: r.type, value: r.id })),
   };
@@ -71,7 +74,7 @@ export function toDocument(doc: Doc): PermissionDocument {
     delegations: doc.delegations.filter(x => doc.scopes.some(s => s.issuer === x.issuer && s.kinds.includes(x.kind)) && !isBlocked(doc, x.issuer, x.subject)).map(x => ({ identity_connection_id: x.issuer, subject: x.subject, kind: x.kind })),
     capabilities: doc.capabilities.map(c => ({ server_id: c.serverId, tool: c.tool, expires_at: toTime(c.expiresAt) })),
     resources: doc.resources.map(r => ({ server_id: r.serverId, type: r.kind, id: r.value })),
-    conditions: doc.capabilities.flatMap(c => c.conditions.map((k): ConditionRecord => ({ id: k.id, name: k.name, server_id: c.serverId, tool: c.tool, expression: k.expression, required_bindings: k.bindings, required_limits: k.limits }))),
+    conditions: doc.capabilities.flatMap(c => c.conditions.map((k): ConditionRecord => ({ id: k.id, name: k.name, server_id: c.serverId, tool: c.tool, expression: k.expression, required_bindings: k.bindings, required_limits: k.limits, ...(k.usage.length ? { usage: k.usage.map(usageToRecord) } : {}) }))),
     blocked: doc.blocked.map(b => ({ identity_connection_id: b.issuer, subject: b.subject, ...(b.reason ? { reason: b.reason } : {}) })),
   };
 }
@@ -83,7 +86,10 @@ export const harnessWithoutGroups = (doc: Doc) => doc.scopes.some(s => s.kinds.i
 // Unpublished changes: the items of each collection that differ from the published document.
 export function countChanges(next: PermissionDocument, published: PermissionDocument) {
   // An absent person_consent equals null: documents published before Backend 045 do not have it.
-  const key = (v: unknown) => JSON.stringify(v, (k, x) => (k === 'recorded_by_name' || (k === 'person_consent' && x == null) ? undefined : x));
+  // An empty or absent usage list is the same: rules without limits (Backend 087).
+  // Object keys are sorted: the backend can return the fields of a record in another order than the Admin builds them.
+  const sorted = (x: unknown) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([a], [b]) => a.localeCompare(b))) : x);
+  const key = (v: unknown) => JSON.stringify(v, (k, x) => (k === 'recorded_by_name' || (k === 'person_consent' && x == null) || (k === 'usage' && (x == null || (Array.isArray(x) && x.length === 0))) ? undefined : sorted(x)));
   const diff = <T,>(a: T[], b: T[]) => { const left = new Set(a.map(key)), right = new Set(b.map(key)); return [...left].filter(x => !right.has(x)).length + [...right].filter(x => !left.has(x)).length; };
   return diff(next.scopes, published.scopes) + diff(next.delegations, published.delegations) + diff(next.capabilities, published.capabilities) + diff(next.resources, published.resources) + diff(next.conditions, published.conditions) + diff(next.blocked ?? [], published.blocked ?? []);
 }

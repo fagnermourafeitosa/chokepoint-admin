@@ -110,13 +110,13 @@ A changed tool or a disconnected server is listed among denied calls, by time on
 
 ## Acceptance Criteria
 
-- [ ] 1. The rule editor adds, edits and removes limit lines for each operator, with the fields of item 3.
-- [ ] 2. **Per** offers **All calls** and the parameters, with the help of item 4.
-- [ ] 3. A `formerly_within` line shows the warning of item 6.
-- [ ] 4. A rule with limits reads as the sentence of item 7, in the editor and in the saved list.
-- [ ] 5. The Inbox shows the severity chip and the order of items 8 and 9, the type of item 10 and the filter of item 11.
-- [ ] 6. `npm run check` and `npm run build` pass.
-- [ ] 7. Functional test: [054-2026-11-13-cumulative-limits-and-signal-severity.md](functional-tests/054-2026-11-13-cumulative-limits-and-signal-severity.md)
+- [x] 1. The rule editor adds, edits and removes limit lines for each operator, with the fields of item 3. Evidence: code inspection of `LimitClause.tsx`, `ConditionEditor.tsx`.
+- [x] 2. **Per** offers **All calls** and the parameters, with the help of item 4.
+- [x] 3. A `formerly_within` line shows the warning of item 6.
+- [x] 4. A rule with limits reads as the sentence of item 7, in the editor and in the saved list.
+- [x] 5. The Inbox shows the severity chip and the order of items 8 and 9, the type of item 10 and the filter of item 11.
+- [x] 6. `npm run check` and `npm run build` pass (2026-11-14).
+- [ ] 7. Functional test: [054-2026-11-13-cumulative-limits-and-signal-severity.md](functional-tests/054-2026-11-13-cumulative-limits-and-signal-severity.md) — not met: the functional test runs after Backend 087 and 088 are merged.
 
 ---
 

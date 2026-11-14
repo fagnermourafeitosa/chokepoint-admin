@@ -7,7 +7,7 @@ export type Page<T> = {
   search_truncated?: boolean;
 };
 // Deny reasons of a decision (Backend 031, 034).
-export type ReasonLabel = 'no_delegation' | 'no_grant' | 'no_resource' | 'condition' | 'tool_not_reviewed';
+export type ReasonLabel = 'no_delegation' | 'no_grant' | 'no_resource' | 'condition' | 'reach_limit' | 'tool_not_reviewed';
 export type Reason = { label: ReasonLabel; description: string };
 // Reasons of a refused token exchange (Backend 034 Solution 6).
 export type ExchangeReasonLabel =

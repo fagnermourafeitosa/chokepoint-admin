@@ -5,9 +5,10 @@ title: Cumulative Limits in Rules and Signal Severity
 stack:
   - Demo instance (dev-infra/demo-instance - up.sh, after populate.py once; traffic.py for a recent history), workspace Acme, environment Production
   - Admin on https://acme.xokepoint.localhost (through Envoy; the Vite port 5174 alone has no API), signed in as beatriz@acme.test
+  - Backend int/087-088 and Admin feat/054 running in the demo instance (a copy of up.sh pointed at the worktrees)
 data: >-
   refunds-assistant on Acme Billing · refund_order. Prerequisite: the demo refund_order needs a
-  customer_id parameter and an integer amount (today it has a decimal amount and no customer_id).
+  customer_id parameter and an integer amount in whole dollars (dev-infra demo-instance servers.py, 2026-11-13).
   Remove the rules that the scenarios add, and start the stopped MCP server again after S6.
 scenarios:
   - id: S1
@@ -15,16 +16,16 @@ scenarios:
     criteria: [1]
     steps:
       - In Access, open refunds-assistant · Acme Billing · refund_order and click Add rule.
-      - Click Add a limit; choose sum, Of amount, Per customer_id, In the last 24 hours, Is at most 100000.
+      - Click Add a limit; choose sum, Of amount, Per customer_id, In the last 24 hours, Is at most 1000.
       - Click Add a limit again and choose count_calls, then count_distinct, then since_within on the same line.
     expected:
       - sum offers only integer parameters in Of.
       - count_calls has no Of; count_distinct has Of and no Per; since_within has Since, No call of and With the same.
       - The window accepts at most 24 hours.
     last_run:
-      date: null
-      result: not_run
-      notes: ''
+      date: 2026-11-14
+      result: passed
+      notes: '2026-11-14, real catalog: sum offers only amount · integer (schema type); count_calls has no Of; count_distinct has Of; since_within has Since, No call of and With the same; the window field keeps 24 hours at most. Found and fixed: With the same defaulted to refund_order.amount = get_order.order_id; it now prefers a parameter with the same name (order_id = order_id).'
   - id: S2
     title: Per is optional and explains both cases
     criteria: [2]
@@ -34,9 +35,9 @@ scenarios:
       - The first option is All calls.
       - The help has the per customer example and the all calls example.
     last_run:
-      date: null
-      result: not_run
-      notes: ''
+      date: 2026-11-14
+      result: passed
+      notes: '2026-11-14: Per starts with All calls; the help has the per customer and the all calls examples.'
   - id: S3
     title: formerly_within shows its warning
     criteria: [3]
@@ -45,20 +46,20 @@ scenarios:
     expected:
       - The warning "Checks the call, not its result" shows in the line.
     last_run:
-      date: null
-      result: not_run
-      notes: ''
+      date: 2026-11-14
+      result: passed
+      notes: '2026-11-14: the warning Checks the call, not its result shows on formerly_within.'
   - id: S4
     title: A rule with limits reads as a sentence
     criteria: [4]
     steps:
       - Name the rule of S1 and click Add to draft.
     expected:
-      - The editor and the saved list read "sum of amount per customer_id in the last 24 hours is at most 100000".
+      - The editor and the saved list read "sum of amount per customer_id in the last 24 hours is at most 1000".
     last_run:
-      date: null
-      result: not_run
-      notes: ''
+      date: 2026-11-14
+      result: passed
+      notes: '2026-11-14: published Daily refunds per customer; editor and saved list read the sentence. Found and fixed: after publishing, the draft bar showed 2 unpublished changes because the usage fields came back in another key order; countChanges now compares with sorted keys.'
   - id: S5
     title: The Inbox orders by severity, shows the chip and filters
     criteria: [5]
@@ -69,9 +70,9 @@ scenarios:
       - The first column shows High, Medium or Low; High items come first.
       - With Low, only Would deny, Review due and Requests denied items show, and the total follows the filter.
     last_run:
-      date: null
-      result: not_run
-      notes: ''
+      date: 2026-11-14
+      result: passed
+      notes: '2026-11-14: Severity column with High/Medium/Low, High first; Filter by severity sends severity=medium and the total follows (1 record); High showed the automatic Tool discovery item.'
   - id: S6
     title: A disconnected server shows in the Inbox
     criteria: [5]

@@ -26,9 +26,9 @@ const help = {
 };
 
 // Admin 049: a saved rule reads as the sentence of the rule editor; a rule that can not be read shows its CEL.
-function Conditions({ items, published, bindings, onRemove }: { items: Condition[]; published: Condition[]; bindings: CatalogBinding[]; onRemove: (id: string) => void }) {
+function Conditions({ items, published, bindings, tool, onRemove }: { items: Condition[]; published: Condition[]; bindings: CatalogBinding[]; tool: string; onRemove: (id: string) => void }) {
   return <div className="relation-conditions">{items.length ? items.map(c => {
-    const sentence = celSentence(c.expression, bindings);
+    const sentence = celSentence(c.expression, bindings, c.usage, tool);
     return <article key={c.id} className="relation-condition"><header><Braces size={14} aria-hidden="true" /><strong>{c.name}</strong>{published.some(p => p.id === c.id) ? null : <span className="mcp-badge draft-badge">New in draft</span>}<button type="button" className="relation-icon-button" aria-label={`Remove ${c.name}`} onClick={() => onRemove(c.id)}><Trash2 size={14} /></button></header>
       {sentence ? <p className="rule-sentence rule-sentence--read"><CircleCheck size={14} aria-hidden="true" />Reads as: <strong>{sentence}</strong></p> : <code className="rule-expression">{c.expression}</code>}</article>;
   }) : <p className="cp-admin-muted">No rules.</p>}</div>;
@@ -56,7 +56,7 @@ export function ToolPanel({ published, id, start, agentName, doc, onChange, onCl
   const removal = withoutCapability(doc, c.id);
   return <aside className="relation-panel relation-sections" aria-label="Selected relation">
     <ExpiresField value={c.expiresAt} onChange={v => set({ expiresAt: v })} never={`${agentName} can call ${c.tool} until you remove it.`} ends={`After this day (UTC), ${agentName} can no longer call ${c.tool}. Its calls are denied.`} />
-    <Field label="Rules" help={help.rules} name="rules"><Conditions items={c.conditions} bindings={bindings} published={published.capabilities.find(x => x.id === c.id)?.conditions ?? []} onRemove={k => set({ conditions: c.conditions.filter(x => x.id !== k) })} />
+    <Field label="Rules" help={help.rules} name="rules"><Conditions items={c.conditions} bindings={bindings} tool={c.tool} published={published.capabilities.find(x => x.id === c.id)?.conditions ?? []} onRemove={k => set({ conditions: c.conditions.filter(x => x.id !== k) })} />
       <section className="rule-trusted" aria-label="Trusted attributes">
         <ul>
           <li data-field="trusted"><Label label="Trusted attributes" help={help.trusted} />

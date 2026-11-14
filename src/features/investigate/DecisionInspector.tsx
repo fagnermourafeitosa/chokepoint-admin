@@ -51,7 +51,9 @@ function reasonAction(d: Decision, detail: DecisionDetail, returnTo: string): { 
       return { label: 'Open the rule', to: accessPath({ ...base, section: 'grants', server_id: d.server_id, tool: d.tool }, returnTo) };
     case 'no_resource':
       return { label: 'Open the rule', to: accessPath({ ...base, section: 'grants', server_id: d.server_id, tool: d.tool }, returnTo) };
+    // Backend 087: a reached limit opens its rule, as a failed rule does.
     case 'condition':
+    case 'reach_limit':
       return { label: 'Open the rule', to: accessPath({ ...base, section: 'policies', server_id: d.server_id, tool: d.tool, policy_id: d.policy_id ?? undefined }, returnTo) };
     case 'tool_not_reviewed': {
       const review = detail.actions.find((a) => a.route === 'tool-catalog');
@@ -103,8 +105,8 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
   const permit = d.outcome === 'permit';
   const wouldDeny = d.outcome === 'would_deny';
   const action = reasonAction(d, detail, `/investigate?${state.params}`);
-  const cause = d.reason?.label === 'condition' && d.condition
-    ? <span className="relation-label">Rule not met: <strong>{sentence ?? <code className="trace-mono">{d.condition}</code>}</strong><Help label="About the recorded rule" text="The values of the call and of the attribute sources are never recorded. The rule shows what was checked, not the value that failed." /></span>
+  const cause = (d.reason?.label === 'condition' || d.reason?.label === 'reach_limit') && d.condition
+    ? <span className="relation-label">{d.reason.label === 'reach_limit' ? 'Limit reached' : 'Rule not met'}: <strong>{sentence ?? <code className="trace-mono">{d.condition}</code>}</strong><Help label="About the recorded rule" text="The values of the call and of the attribute sources are never recorded. The rule shows what was checked, not the value that failed." /></span>
     : d.reason ? denyText[d.reason.label] ?? d.reason.description : permit ? 'Every check passed.' : 'The deny reason was not recorded for this historical call.';
   const facts: [string, ReactNode, string?][][] = [
     [
