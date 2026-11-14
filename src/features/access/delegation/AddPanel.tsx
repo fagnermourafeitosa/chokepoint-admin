@@ -43,8 +43,9 @@ function AddTool({ doc, onChange, onDone }: Omit<Props, 'what' | 'agentName'>) {
     onChange({ ...doc, capabilities: [...doc.capabilities, ...added] }); onDone();
   }
   if (!catalog.tools.length) return <p className="cp-admin-muted">No reviewed tools yet. Connect an MCP server and review its tools in Integrations.</p>;
-  return <>{catalog.servers.map(s => <div key={s.id} className="relation-field"><span>{s.name} · reviewed tools</span><ul className="relation-pick">{catalog.tools.filter(t => t.serverId === s.id).map(t => { const id = capabilityId(t.serverId, t.tool); return <li key={id}><label><input type="checkbox" disabled={granted.has(id)} checked={granted.has(id) || picked.includes(id)} onChange={e => setPicked(p => e.target.checked ? [...p, id] : p.filter(x => x !== id))} /><span>{t.tool}<small>{granted.has(id) ? 'Already granted' : t.mapping ? `Resource: ${t.mapping.kind}` : 'No resource mapping'}</small></span></label></li>; })}</ul></div>)}
-    <ExpiresField value={expires || undefined} onChange={v => setExpires(v ?? '')} never="The agent can call these tools until you remove them." ends="After this day (UTC), the agent can no longer call these tools. Its calls are denied." />
+  // Admin 054 item 16: Expires first, as in the panel of a tool, then the tools to add.
+  return <><ExpiresField value={expires || undefined} onChange={v => setExpires(v ?? '')} never="The agent can call these tools until you remove them." ends="After this day (UTC), the agent can no longer call these tools. Its calls are denied." />
+    {catalog.servers.map(s => <div key={s.id} className="relation-field"><span>{s.name} · reviewed tools</span><ul className="relation-pick">{catalog.tools.filter(t => t.serverId === s.id).map(t => { const id = capabilityId(t.serverId, t.tool); return <li key={id}><label><input type="checkbox" disabled={granted.has(id)} checked={granted.has(id) || picked.includes(id)} onChange={e => setPicked(p => e.target.checked ? [...p, id] : p.filter(x => x !== id))} /><span>{t.tool}<small>{granted.has(id) ? 'Already granted' : t.mapping ? `Resource: ${t.mapping.kind}` : 'No resource mapping'}</small></span></label></li>; })}</ul></div>)}
     <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!picked.length} onClick={add}>Add {picked.length || ''} to draft</button></>;
 }
 

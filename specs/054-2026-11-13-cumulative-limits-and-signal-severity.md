@@ -98,6 +98,7 @@ A changed tool or a disconnected server is listed among denied calls, by time on
 13. **An allowed call shows no rule** (user decision, 2026-11-14): the Detail column shows "Rule not met" or "Limit reached" only for a call whose `condition` is set, and Backend 087 Implementation Decision 23 sets it only for the condition that was not met. Before, an ALLOW row read "Rule not met" with the first rule of the tool.
 14. **The filter bar of Investigate has two lines** (user decision, 2026-11-14): the views (By problem, All decisions, Token exchanges) and the search on the first line; the selects (agent, reason, period, result), Latest first · UTC and Clear row filters on the line below.
 15. **The agent icon before the agent name over a side panel title** (user decision, 2026-11-14): Manage tools and the panel of a group of the graph show the robot icon of the graph and of the relation panel before the agent name.
+16. **Expires at the top of Manage tools** (user decision, 2026-11-14): the expiration of the tools to add comes first, as in the panel of a tool, then the reviewed tools of each server and Add to draft.
 
 ---
 
