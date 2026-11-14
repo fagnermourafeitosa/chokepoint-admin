@@ -95,6 +95,8 @@ A changed tool or a disconnected server is listed among denied calls, by time on
 10. **`mcpserver_disconnected`** has the type label **Server disconnected** and opens the server.
 11. **Filter by severity** (user decision, 2026-11-13): a third filter of the Inbox, between status and type, with **All severities**, **High**, **Medium** and **Low**. **Low** shows severity 1 and 0. The backend filters, so pagination and the total follow the filter.
 12. **Investigate reads a limit as its sentence** (user decision, 2026-11-14, story 4): a deny with `reach_limit` reads "Limit reached:" and the rule as the sentence of item 7, in the decision inspector and in the Detail column of the list. The record of a call keeps only the id of each limit, so the Admin reads the definitions from the permission revision that evaluated the call (`GET .../permissions/revisions/{revision}`); a row of the By problem view, which groups calls, reads them from the published document of the agent. While they load, or when the limit is no longer there, the rule shows its CEL.
+13. **An allowed call shows no rule** (user decision, 2026-11-14): the Detail column shows "Rule not met" or "Limit reached" only for a call whose `condition` is set, and Backend 087 Implementation Decision 23 sets it only for the condition that was not met. Before, an ALLOW row read "Rule not met" with the first rule of the tool.
+14. **The filter bar of Investigate has two lines** (user decision, 2026-11-14): the views (By problem, All decisions, Token exchanges) and the search on the first line; the selects (agent, reason, period, result), Latest first · UTC and Clear row filters on the line below.
 
 ---
 
@@ -117,6 +119,7 @@ A changed tool or a disconnected server is listed among denied calls, by time on
 - [x] 4. A rule with limits reads as the sentence of item 7, in the editor and in the saved list.
 - [x] 5. The Inbox shows the severity chip and the order of items 8 and 9, the type of item 10 and the filter of item 11.
 - [x] 8. A deny with `reach_limit` reads "Limit reached:" and the sentence of the rule in the decision inspector and in the list of decisions (item 12). Evidence: demo instance on 2026-11-14, decision shsw-jadx ("sum of amount per customer_id in the last 24 hours is at most 1000") and the list filtered by `reach_limit`, one row per operator, each read as a sentence.
+- [x] 9. ALLOW rows of the list show no rule, and the filter bar has the views and the search on one line and the selects on the line below (items 13 and 14). Evidence: demo instance on 2026-11-14, All decisions of Acme Production after Backend 087 Implementation Decision 23.
 - [x] 6. `npm run check` and `npm run build` pass (2026-11-14).
 - [x] 7. Functional test: [054-2026-11-13-cumulative-limits-and-signal-severity.md](functional-tests/054-2026-11-13-cumulative-limits-and-signal-severity.md) Evidence: S1–S6 passed on 2026-11-14 on the demo instance.
 

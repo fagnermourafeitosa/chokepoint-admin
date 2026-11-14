@@ -24,7 +24,9 @@ export function InvestigationToolbar({ state }: { state: State }) {
     }
   }
   return (
+    // Admin 054 item 14: the views and the search on the first line, the filters on the line below.
     <div className="trace-toolbar">
+      <div className="trace-toolbar-row">
       <div className="trace-segments" role="group" aria-label="Investigation view">
         <button
           aria-pressed={state.view === 'problems'}
@@ -72,6 +74,8 @@ export function InvestigationToolbar({ state }: { state: State }) {
           Search
         </button>
       </form>
+      </div>
+      <div className="trace-toolbar-row trace-toolbar-filters">
       <SelectMenu
         group="investigate-filters"
         label="Agent"
@@ -157,6 +161,7 @@ export function InvestigationToolbar({ state }: { state: State }) {
           Clear row filters
         </button>
       ) : null}
+      </div>
     </div>
   );
 }

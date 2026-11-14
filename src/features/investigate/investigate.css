@@ -15,11 +15,16 @@
 }
 .trace-toolbar {
   padding: 18px 24px;
+  display: grid;
+  gap: 12px;
+  border-bottom: 1px solid var(--cp-admin-color-border);
+}
+/* Admin 054 item 14: the views and the search on one line, the filters on the line below. */
+.trace-toolbar-row {
   display: flex;
   gap: 12px;
   align-items: center;
   flex-wrap: wrap;
-  border-bottom: 1px solid var(--cp-admin-color-border);
 }
 .trace-toolbar .cp-admin-input {
   min-height: 40px;
@@ -214,17 +219,17 @@
     min-width: 0;
     flex: 1;
   }
-  .trace-toolbar > label {
+  .trace-toolbar-filters > label {
     flex: 1 1 140px;
     min-width: 0;
   }
-  .trace-toolbar select {
+  .trace-toolbar-filters select {
     width: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .trace-toolbar > label {
+  .trace-toolbar-filters > label {
     flex-basis: 100%;
   }
 }
