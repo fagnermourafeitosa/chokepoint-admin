@@ -69,9 +69,10 @@ export function IdpPanel({ doc, issuer, agentName, onChange, onClose }: { doc: D
   };
   return <>
     <header><div><small>Identity provider</small><h4>{name}</h4><p className="cp-admin-muted">{name} → {agentName}</p></div></header>
+    {/* Admin 054 item 18: Expires first, as in the panel of a tool. */}
+    <ExpiresField value={scope.expiresAt} onChange={v => set({ expiresAt: v })} never={`Subjects from ${name} can delegate to ${agentName} until you remove ${name}.`} ends={`After this day (UTC), nobody from ${name} can delegate to ${agentName}. Calls on their behalf are denied.`} />
     <IncludesField value={scope.kinds} onChange={kinds => onChange({ ...doc, scopes: doc.scopes.map(s => (s.issuer === issuer ? { ...s, kinds } : s)), delegations: doc.delegations.filter(d => d.issuer !== issuer || kinds.includes(d.kind)) })} />
     <SubjectList issuer={issuer} kinds={scope.kinds} chosen={chosen} onSet={setSubjects} />
-    <ExpiresField value={scope.expiresAt} onChange={v => set({ expiresAt: v })} never={`Subjects from ${name} can delegate to ${agentName} until you remove ${name}.`} ends={`After this day (UTC), nobody from ${name} can delegate to ${agentName}. Calls on their behalf are denied.`} />
     <ConsentRecord scope={scope} agentName={agentName} onConfirm={confirmed => set({ confirmed })} />
     <HarnessAccess doc={doc} scope={scope} agentName={agentName} onChange={onChange} />
     <footer><button type="button" className="cp-admin-button cp-admin-button--danger-soft cp-admin-button--small" onClick={() => { onChange({ ...doc, scopes: doc.scopes.filter(s => s.issuer !== issuer), delegations: doc.delegations.filter(d => d.issuer !== issuer), blocked: doc.blocked.filter(b => b.issuer !== issuer) }); onClose(); }}><Trash2 size={14} aria-hidden="true" />Remove {name}</button></footer>

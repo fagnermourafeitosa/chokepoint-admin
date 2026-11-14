@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRight, Bot, CircleHelp, List, Network, Server, Wrench, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bot, CircleHelp, List, Network, Server, User, Wrench, type LucideIcon } from 'lucide-react';
 import { SidePanel } from '../../../components/ui/side-panel/SidePanel';
 import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
 import type { AgentScope } from '../agent-api';
@@ -81,7 +81,8 @@ function panelHead(selected: Selection, doc: Doc, catalog: Catalog, agentName: s
     return { title: c.tool, heading: <span className="panel-path"><span><Bot size={16} aria-hidden="true" />{agentName}</span><ArrowRight size={14} aria-label="calls on" /><span><Server size={16} aria-hidden="true" />{serverName(catalog, c.serverId)}</span><span className="panel-path-tool"><Wrench size={16} aria-hidden="true" /><code>{c.tool}</code></span></span> };
   }
   if (selected.type === 'add') return selected.what === 'delegator' ? { eyebrow: `Who can delegate to ${agentName}`, title: 'Identity providers' } : { eyebrow: agentEyebrow(agentName), title: 'Manage tools' };
-  if (selected.type === 'idp') return { eyebrow: `Who can delegate to ${agentName}`, title: idpName(catalog, selected.issuer) };
+  // The identity provider with the person icon of its node in the graph (Admin 054 item 17).
+  if (selected.type === 'idp') return { eyebrow: `Who can delegate to ${agentName}`, title: idpName(catalog, selected.issuer), heading: <span className="panel-title-icon"><User size={20} aria-hidden="true" />{idpName(catalog, selected.issuer)}</span> };
   if (selected.type === 'group') return { eyebrow: agentEyebrow(agentName), title: selected.label };
   return { eyebrow: 'Agent', title: agentName };
 }

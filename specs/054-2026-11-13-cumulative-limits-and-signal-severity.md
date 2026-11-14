@@ -99,6 +99,8 @@ A changed tool or a disconnected server is listed among denied calls, by time on
 14. **The filter bar of Investigate has two lines** (user decision, 2026-11-14): the views (By problem, All decisions, Token exchanges) and the search on the first line; the selects (agent, reason, period, result), Latest first · UTC and Clear row filters on the line below.
 15. **The agent icon before the agent name over a side panel title** (user decision, 2026-11-14): Manage tools and the panel of a group of the graph show the robot icon of the graph and of the relation panel before the agent name.
 16. **Expires at the top of Manage tools** (user decision, 2026-11-14): the expiration of the tools to add comes first, as in the panel of a tool, then the reviewed tools of each server and Add to draft.
+17. **The identity provider icon before its name in its side panel** (user decision, 2026-11-14): the panel of an identity provider shows the person icon of its node in the graph before the provider name.
+18. **Expires at the top of the identity provider panels** (user decision, 2026-11-14): in the panel of an identity provider, Expires comes before Includes and Who can delegate; in Add an identity provider, it comes right after the choice of the provider, whose name its notice reads.
 
 ---
 

@@ -25,9 +25,9 @@ function AddIdentityProvider({ agentName, doc, onChange, onDone }: Omit<Props, '
   }
   return <>
     <div className="relation-field"><span>Identity provider</span><SelectMenu block label="Identity provider" value={issuer} onChange={v => { setIssuer(v); setChosen(new Set()); }} options={free.map(i => ({ value: i.id, label: i.name }))} /></div>
+    <ExpiresField value={expires} onChange={setExpires} never={`Subjects from ${idpName(catalog, issuer)} can delegate to ${agentName} until you remove it.`} ends={`After this day (UTC), nobody from ${idpName(catalog, issuer)} can delegate to ${agentName}.`} />
     <IncludesField value={kinds} onChange={setKinds} />
     <SubjectList key={issuer} issuer={issuer} kinds={kinds} chosen={chosen} onSet={(subjects, on) => setChosen(c => { const n = new Set(c); subjects.forEach(x => (on ? n.add(x.subject) : n.delete(x.subject))); return n; })} />
-    <ExpiresField value={expires} onChange={setExpires} never={`Subjects from ${idpName(catalog, issuer)} can delegate to ${agentName} until you remove it.`} ends={`After this day (UTC), nobody from ${idpName(catalog, issuer)} can delegate to ${agentName}.`} />
     <label className="relation-consent"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /><span>I confirm that these subjects agreed to let <strong>{agentName}</strong> act for them.<small>{idpName(catalog, issuer)} can not record this consent itself, so Xokepoint records your name and the time when you publish.</small></span></label>
     <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!consent || !picked.length} onClick={add}>Add {picked.length || ''} to draft</button>
   </>;
