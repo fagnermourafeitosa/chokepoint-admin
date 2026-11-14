@@ -3,7 +3,7 @@
 - **Specification ID**: 054
 - **Date**: 2026-11-13
 - **Slug**: cumulative-limits-and-signal-severity
-- **Status**: Waiting Approve
+- **Status**: Implemented
 - **Owner**: admin / access (rule editor), attention (Inbox)
 - **Related Specification**: [048 — Relation Side Panel](048-2026-11-06-relation-side-panel.md), [049 — Investigate Layout and Rules Read as Sentences](049-2026-11-07-investigate-layout.md)
 - **Related Backend Specification**: [Backend 087 — Cumulative Limits Across Calls](../../backend/specs/087-2026-11-13-cumulative-limits-across-calls.md), [Backend 088 — Automatic Tool Rediscovery and Signal Severity](../../backend/specs/088-2026-11-13-automatic-tool-rediscovery.md)
