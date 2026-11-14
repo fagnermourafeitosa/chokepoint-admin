@@ -71,15 +71,18 @@ function targetSelection(target: AccessTarget | undefined, doc: Doc): Selection 
 }
 
 // title names the panel (Back links); heading, when set, is what the panel header shows.
-function panelHead(selected: Selection, doc: Doc, catalog: Catalog, agentName: string): { eyebrow?: string; title: string; heading?: ReactNode } {
+// The agent named over the title of a panel, with the agent icon of the graph and the relation panel.
+const agentEyebrow = (agentName: string) => <span className="panel-eyebrow-agent"><Bot size={14} aria-hidden="true" />{agentName}</span>;
+
+function panelHead(selected: Selection, doc: Doc, catalog: Catalog, agentName: string): { eyebrow?: ReactNode; title: string; heading?: ReactNode } {
   if (selected.type === 'capability') {
     const c = doc.capabilities.find(x => x.id === selected.id);
     if (!c) return { title: 'Tool' };
     return { title: c.tool, heading: <span className="panel-path"><span><Bot size={16} aria-hidden="true" />{agentName}</span><ArrowRight size={14} aria-label="calls on" /><span><Server size={16} aria-hidden="true" />{serverName(catalog, c.serverId)}</span><span className="panel-path-tool"><Wrench size={16} aria-hidden="true" /><code>{c.tool}</code></span></span> };
   }
-  if (selected.type === 'add') return selected.what === 'delegator' ? { eyebrow: `Who can delegate to ${agentName}`, title: 'Identity providers' } : { eyebrow: agentName, title: 'Manage tools' };
+  if (selected.type === 'add') return selected.what === 'delegator' ? { eyebrow: `Who can delegate to ${agentName}`, title: 'Identity providers' } : { eyebrow: agentEyebrow(agentName), title: 'Manage tools' };
   if (selected.type === 'idp') return { eyebrow: `Who can delegate to ${agentName}`, title: idpName(catalog, selected.issuer) };
-  if (selected.type === 'group') return { eyebrow: agentName, title: selected.label };
+  if (selected.type === 'group') return { eyebrow: agentEyebrow(agentName), title: selected.label };
   return { eyebrow: 'Agent', title: agentName };
 }
 

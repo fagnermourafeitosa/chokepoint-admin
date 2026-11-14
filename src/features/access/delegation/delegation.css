@@ -437,3 +437,7 @@ fieldset.relation-side-panel { min-width: 0; margin: 0; padding: 0; border: 0; }
 .limit-notes summary { display: inline-flex; align-items: center; gap: 6px; color: var(--cp-admin-color-text); font-weight: var(--cp-admin-weight-semibold); cursor: pointer; }
 .limit-notes:not([open]) { gap: 0; }
 .limit-notes ul { margin: 0; padding-inline-start: var(--cp-admin-space-4); display: grid; gap: 2px; }
+
+/* The agent named over the title of a side panel, with its icon. */
+.panel-eyebrow-agent { display: inline-flex; align-items: center; gap: 6px; }
+.panel-eyebrow-agent svg { flex: none; }

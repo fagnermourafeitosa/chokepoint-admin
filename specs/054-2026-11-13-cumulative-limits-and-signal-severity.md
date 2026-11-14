@@ -97,6 +97,7 @@ A changed tool or a disconnected server is listed among denied calls, by time on
 12. **Investigate reads a limit as its sentence** (user decision, 2026-11-14, story 4): a deny with `reach_limit` reads "Limit reached:" and the rule as the sentence of item 7, in the decision inspector and in the Detail column of the list. The record of a call keeps only the id of each limit, so the Admin reads the definitions from the permission revision that evaluated the call (`GET .../permissions/revisions/{revision}`); a row of the By problem view, which groups calls, reads them from the published document of the agent. While they load, or when the limit is no longer there, the rule shows its CEL.
 13. **An allowed call shows no rule** (user decision, 2026-11-14): the Detail column shows "Rule not met" or "Limit reached" only for a call whose `condition` is set, and Backend 087 Implementation Decision 23 sets it only for the condition that was not met. Before, an ALLOW row read "Rule not met" with the first rule of the tool.
 14. **The filter bar of Investigate has two lines** (user decision, 2026-11-14): the views (By problem, All decisions, Token exchanges) and the search on the first line; the selects (agent, reason, period, result), Latest first · UTC and Clear row filters on the line below.
+15. **The agent icon before the agent name over a side panel title** (user decision, 2026-11-14): Manage tools and the panel of a group of the graph show the robot icon of the graph and of the relation panel before the agent name.
 
 ---
 

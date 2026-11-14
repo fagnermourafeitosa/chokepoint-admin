@@ -2,7 +2,7 @@ import { X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useDialog } from '../dialog/useDialog';
 
-type SidePanelProps = { title: ReactNode; eyebrow?: string; actions?: ReactNode; width?: 'default' | 'wide'; onClose: () => void; children: ReactNode };
+type SidePanelProps = { title: ReactNode; eyebrow?: ReactNode; actions?: ReactNode; width?: 'default' | 'wide'; onClose: () => void; children: ReactNode };
 
 // A modal panel on the right edge of the window. Escape, the close button and a click on the backdrop close it.
 export function SidePanel({ title, eyebrow, actions, width = 'default', onClose, children }: SidePanelProps) {
