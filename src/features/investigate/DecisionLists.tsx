@@ -34,7 +34,10 @@ function Row({ decision, problem, state }: { decision?: Decision; problem?: Prob
   const id = problem?.latest_decision_id || decision!.id;
   const at = problem?.last_at || decision!.decided_at;
   const open = () => state.open(id);
-  const sentence = useRuleSentence(item.condition, item.server_id, item.tool);
+  // A call row reads the limits of its rule in the revision that evaluated it; a problem row, which
+  // groups calls, in the published document of the agent (Admin 054).
+  const ruleRevision = decision ? decision.evidence?.policies.find(p => p.policy_id === decision.policy_id)?.revision ?? decision.effective_revision : undefined;
+  const sentence = useRuleSentence(item.condition, item.server_id, item.tool, item.agent.id, ruleRevision);
   return (
     <div className="trace-list-row trace-list-row--open trace-row-decision" role="row" title="Open the decision details" onClick={openRow(open)}>
       <div role="cell">
@@ -65,7 +68,7 @@ function Row({ decision, problem, state }: { decision?: Decision; problem?: Prob
         <small className="trace-repeat">{problem ? `×${problem.count} in window · last ` : ''}{utcTime(at)}</small>
       </div>
       <div role="cell">
-        {item.condition ? <><small>Rule not met</small>{sentence ? <strong className="trace-condition">{sentence}</strong> : <code className="trace-condition trace-mono">{item.condition}</code>}</> : null}
+        {item.condition ? <><small>{item.reason?.label === 'reach_limit' ? 'Limit reached' : 'Rule not met'}</small>{sentence ? <strong className="trace-condition">{sentence}</strong> : <code className="trace-condition trace-mono">{item.condition}</code>}</> : null}
       </div>
       <div role="cell" className="trace-actions-cell">
         <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" aria-label={`View the decision of ${item.tool} at ${utcTime(at)}`} onClick={open}>View</button>

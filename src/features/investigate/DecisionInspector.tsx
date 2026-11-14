@@ -100,7 +100,9 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
   const rules = (d.evidence?.policies || []).filter((p) => p.server_id === d.server_id && (!p.tool || p.tool === d.tool));
   const agent = d.agent.name || d.agent.id;
   const server = d.server_name || d.server_id;
-  const sentence = useRuleSentence(d.condition, d.server_id, d.tool);
+  // The revision that evaluated the failed rule holds the definitions of its limits (Admin 054).
+  const ruleRevision = d.evidence?.policies.find(p => p.policy_id === d.policy_id)?.revision ?? d.effective_revision;
+  const sentence = useRuleSentence(d.condition, d.server_id, d.tool, d.agent.id, ruleRevision);
   // Backend 057: three outcomes; a would deny ran in Report-only.
   const permit = d.outcome === 'permit';
   const wouldDeny = d.outcome === 'would_deny';
