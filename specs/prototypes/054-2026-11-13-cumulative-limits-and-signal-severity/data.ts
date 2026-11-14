@@ -54,5 +54,16 @@ export const newRule: Usage[] = [
 ];
 
 export const keyHelp = 'Per separates one total from another. Per customer_id: each customer has their own total, for example at most 100000 per customer per day, so customer A and customer B each get 100000. All calls: one total for every call of this agent to this tool, for example at most 500000 in refunds per day, across all customers.';
-export const windowHelp = 'A rolling window of at most 24 hours: a call counts until it is older than the window. Nothing resets at midnight.';
+export const windowHelp = 'A rolling window: a call counts until it is older than the window. Nothing resets at midnight.';
+export const ofHelp = 'Only integer parameters, for example an amount in cents. A call without this argument, or with zero or a negative number, is denied as a rule that is not met, not as a reached limit.';
+
+// How limits count (Backend 087 Implementation Decisions 3, 4, 6, 10, 11 and 13), shown under the limit lines.
+export const howLimitsCount = [
+  'A call counts from the moment it is allowed, so calls at the same time see each other.',
+  'A call that fails does not count. A call without an answer keeps counting until it leaves the window.',
+  'A call over the limit is denied with the reason reach_limit. For an agent in Report-only, the call runs, counts and is recorded as would deny.',
+  'Each agent has its own totals: two agents together can go over the same limit.',
+  'Saving a change to this rule starts its totals from zero.',
+];
+
 export const formerlyRisk = 'formerly_within checks only that get_order was called with the same order_id and did not fail. It does not read what get_order returned.';

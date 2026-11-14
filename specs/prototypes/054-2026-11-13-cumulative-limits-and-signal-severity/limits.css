@@ -7,10 +7,16 @@
 .limit-field small { font-size: var(--cp-admin-type-label); }
 .limit-window, .limit-match { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; align-items: center; }
 .limit-match { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+/* The number inputs take the height of the select beside them (.rule-clause input sets 32px). */
+.limit-window .cp-admin-input { min-height: 40px; height: 40px; }
 .limit-risk { margin: 0; padding: var(--cp-admin-space-3); }
 .limit-risk strong { margin-bottom: 2px; }
 .limit-add { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); }
 .limit-add > svg { color: var(--cp-admin-color-text-muted); }
+.limit-notes { display: grid; gap: var(--cp-admin-space-1); padding: var(--cp-admin-space-3); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); font-size: var(--cp-admin-type-small); color: var(--cp-admin-color-text-muted); }
+.limit-notes summary { display: inline-flex; align-items: center; gap: 6px; color: var(--cp-admin-color-text); font-weight: var(--cp-admin-weight-semibold); cursor: pointer; }
+.limit-notes:not([open]) { gap: 0; }
+.limit-notes ul { margin: 0; padding-inline-start: var(--cp-admin-space-4); display: grid; gap: 2px; }
 
 .severity-chip { display: inline-flex; align-items: center; padding: 1px 8px; border: 1px solid var(--cp-admin-color-border); border-radius: 999px; font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-semibold); white-space: nowrap; }
 .severity-chip--high { border-color: var(--cp-admin-color-danger); background: var(--cp-admin-color-danger-bg); color: var(--cp-admin-color-danger); }

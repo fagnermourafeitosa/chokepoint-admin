@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowRight, Bot, Braces, CircleCheck, CircleHelp, Code, Database, Plus, Server, Trash2, Wrench } from 'lucide-react';
+import { ArrowRight, Bot, Braces, CircleCheck, CircleHelp, Code, Database, Info, Plus, Server, Trash2, Wrench } from 'lucide-react';
 import { SidePanel } from '../../../src/components/ui/side-panel/SidePanel';
 import { SelectMenu } from '../../../src/components/ui/dropdown/SelectMenu';
 import { Tooltip } from '../../../src/components/ui/tooltip/Tooltip';
@@ -8,15 +8,15 @@ import { ExpiresField } from '../../../src/features/access/delegation/ExpiresFie
 import { WaitingBackend } from '../../../src/features/access/delegation/WaitingBackend';
 import '../../../src/features/access/delegation/delegation.css';
 import './limits.css';
-import { newRule, saved, tool, type Usage } from './data';
-import { LimitClause, limitSentence } from './LimitClause';
+import { howLimitsCount, newRule, saved, tool, type Usage } from './data';
+import { LimitClause, limitSentence, windowValid } from './LimitClause';
 
 // Admin 054 prototype: the side panel of the refunds-assistant · Acme Billing · refund_order edge in
 // Access (a copy of src/features/access/delegation/ToolPanel.tsx and ConditionEditor.tsx on
 // 2026-11-13, fixed data). A rule can add limit lines that read earlier calls (Backend 087).
 
 const rulesHelp = 'Conditions on this agent · server · tool. A rule reads the call arguments, the trusted attributes and, with a limit, the earlier calls of this agent. Every rule must pass.';
-const limitHelp = 'A limit reads the earlier calls of this agent to this tool, in a rolling window of at most 24 hours. A call counts from the moment it is allowed; a failed call does not count. Each agent has its own totals: two agents together can go over the same limit.';
+const limitHelp = 'A limit reads the earlier calls of this agent to this tool in a rolling window, and allows the call only while the total stays within the value you set.';
 
 function Label({ label, help }: { label: string; help: string }) {
   return <span className="relation-label">{label}<Tooltip content={help}><CircleHelp size={14} aria-label={`About ${label.toLowerCase()}`} /></Tooltip></span>;
@@ -63,10 +63,11 @@ export function RuleLimitsPrototype() {
                   <WaitingBackend spec="087" tip="Reads the earlier calls of this agent: the usage definitions of the rule and the context.chokepoint.usage values." />
                 </div>
               </div>
+              {limits.length ? <details className="limit-notes"><summary><Info size={14} aria-hidden="true" />How limits count</summary><ul>{howLimitsCount.map(t => <li key={t}>{t}</li>)}</ul></details> : null}
               {sentence ? <p className="rule-sentence rule-sentence--read"><CircleCheck size={14} aria-hidden="true" />Reads as: <strong>{sentence}</strong></p> : null}
               <button type="button" className="rule-switch"><Code size={13} aria-hidden="true" />Edit as CEL (advanced)</button>
               <div className="condition-actions">
-                <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!name.trim()}>Add to draft</button>
+                <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!name.trim() || !limits.every(windowValid)}>Add to draft</button>
                 <button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small">Cancel</button>
               </div>
             </div>

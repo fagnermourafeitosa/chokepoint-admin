@@ -79,9 +79,14 @@ A changed tool or a disconnected server is listed among denied calls, by time on
    - `formerly_within`: **Tool** (another tool of the same server), **With the same** (a parameter of this tool = a parameter of that tool), **In the last**.
    - `since_within`: **Since** (the anchor tool), **No call of** (the watched tool), **With the same**, **In the last**.
 4. **Per** is optional. Its first option is **All calls**. Its help, with the two examples of Backend 087 Implementation Decision 16: per `customer_id`, each customer has their own total; **All calls**, one total for every call of the agent to the tool.
-5. **In the last**: a number and a unit (minutes, hours), at most 24 hours. Its help says that the window is rolling and nothing resets at midnight.
+5. **In the last**: a number and a unit (minutes, hours). The field itself keeps the value within 24 hours (1440 minutes): a larger number becomes the maximum, a unit change keeps the value within it, and **Add to draft** is disabled while a window is empty (user decision, 2026-11-13). Its help says only that the window is rolling and nothing resets at midnight; no help text repeats the 24 hours, because the field shows them.
 6. **`formerly_within` warning**: a warning notice in the line, "Checks the call, not its result": the line checks only that the tool was called with the same argument and did not fail; a call that returned a refusal still counts.
 7. **Reads as**: each limit line adds its part to the sentence, joined with the other lines. Examples: "count_calls of refund_order per customer_id in the last 1 hour is at most 10"; "sum of amount per customer_id in the last 24 hours is at most 100000"; "formerly_within get_order in the last 1 hour with the same order_id".
+
+12. **Help texts** (user request, 2026-11-13), in the words of the prototype data file:
+    - **Of** of `sum` (help icon): only integer parameters, for example an amount in cents; a call without this argument, or with zero or a negative number, is denied as a rule that is not met, not as a reached limit.
+    - **How limits count**, a muted collapsible box under the limit lines while the rule has at least one, closed by default (user decision, 2026-11-13): a call counts from the moment it is allowed, so calls at the same time see each other; a call that fails does not count, and a call without an answer keeps counting until it leaves the window; a call over the limit is denied with the reason `reach_limit`, and for an agent in Report-only it runs, counts and is recorded as would deny; each agent has its own totals, so two agents together can go over the same limit; saving a change to the rule starts its totals from zero.
+    - The help of **Per** (item 4), of **In the last** (item 5), the line under each operator (item 2) and the `formerly_within` warning (item 6).
 
 ### Inbox (Backend 088)
 

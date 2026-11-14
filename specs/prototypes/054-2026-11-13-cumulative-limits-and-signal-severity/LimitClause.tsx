@@ -1,10 +1,15 @@
 import { CircleHelp, Trash2, TriangleAlert } from 'lucide-react';
 import { SelectMenu } from '../../../src/components/ui/dropdown/SelectMenu';
 import { Tooltip } from '../../../src/components/ui/tooltip/Tooltip';
-import { formerlyRisk, keyHelp, operators, params, serverTools, tool, windowHelp, type Operator, type Usage } from './data';
+import { formerlyRisk, keyHelp, ofHelp, operators, params, serverTools, tool, windowHelp, type Operator, type Usage } from './data';
 
 // Admin 054 prototype: one limit line of the rule editor. It reads earlier calls of this agent
 // (Backend 087 usage definition). The operator names are the Dogwood names, written with _.
+
+// The window is at most 24 hours (Backend 087): the field keeps its value within it.
+export const windowMax = (unit: Usage['windowUnit']) => (unit === 'hours' ? 24 : 1440);
+const clampWindow = (value: number, unit: Usage['windowUnit']) => (Number.isFinite(value) && value > 0 ? Math.min(Math.round(value), windowMax(unit)) : 0);
+export const windowValid = (u: Usage) => u.windowValue >= 1 && u.windowValue <= windowMax(u.windowUnit);
 
 const numeric = (op: Operator) => op === 'sum' || op === 'count_calls' || op === 'count_distinct';
 const unit = (u: Usage) => (u.windowValue === 1 ? u.windowUnit.slice(0, -1) : u.windowUnit);
@@ -40,7 +45,7 @@ export function LimitClause({ usage, onChange, onRemove }: { usage: Usage; onCha
         <small className="cp-admin-muted">{operators.find(o => o.id === op)!.help}</small>
       </label>
 
-      {op === 'sum' || op === 'count_distinct' ? <label className="limit-field"><span>Of</span>
+      {op === 'sum' || op === 'count_distinct' ? <label className="limit-field"><span>Of{op === 'sum' ? <Help label="Of" text={ofHelp} /> : null}</span>
         <SelectMenu block label="Parameter" value={usage.argument ?? ''} onChange={v => set({ argument: v })} options={(op === 'sum' ? integers : params).map(p => ({ value: p.name, label: `${p.name} · ${p.type}` }))} />
       </label> : null}
 
@@ -63,8 +68,8 @@ export function LimitClause({ usage, onChange, onRemove }: { usage: Usage; onCha
       </> : null}
 
       <div className="limit-field"><span>In the last <Help label="the window" text={windowHelp} /></span><div className="limit-window">
-        <input className="cp-admin-input" aria-label="Window" type="number" min={1} max={usage.windowUnit === 'hours' ? 24 : 1440} value={usage.windowValue} onChange={e => set({ windowValue: Number(e.target.value) })} />
-        <SelectMenu block label="Unit" value={usage.windowUnit} onChange={v => set({ windowUnit: v as Usage['windowUnit'] })} options={[{ value: 'minutes', label: 'minutes' }, { value: 'hours', label: 'hours' }]} />
+        <input className="cp-admin-input" aria-label="Window" type="number" min={1} max={windowMax(usage.windowUnit)} value={usage.windowValue || ''} onChange={e => set({ windowValue: clampWindow(Number(e.target.value), usage.windowUnit) })} />
+        <SelectMenu block label="Unit" value={usage.windowUnit} onChange={v => { const u = v as Usage['windowUnit']; set({ windowUnit: u, windowValue: clampWindow(usage.windowValue, u) }); }} options={[{ value: 'minutes', label: 'minutes' }, { value: 'hours', label: 'hours' }]} />
       </div></div>
 
       {numeric(op) ? <div className="limit-field"><span>Is</span><div className="limit-window">
