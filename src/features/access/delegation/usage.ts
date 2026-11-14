@@ -84,10 +84,11 @@ export function usageFromRecord(r: UsageRecord): Usage {
 const usageCel = (id: string) => `context.chokepoint.usage[${JSON.stringify(id)}].value`;
 
 // The CEL of one limit line. A number compares with the limit; formerly_within must be true;
-// since_within must be false (no watched call since the anchor).
+// since_within must be false (no watched call since the anchor). The usage value is dynamic in CEL and
+// the backend accepts only a boolean expression, so formerly_within compares with true.
 export function limitCel(u: Usage) {
   if (numericOperator(u.operator)) return `${usageCel(u.id)} ${u.compare === 'lt' ? '<' : '<='} ${u.limit || '0'}`;
-  return u.operator === 'since_within' ? `!${usageCel(u.id)}` : usageCel(u.id);
+  return u.operator === 'since_within' ? `!${usageCel(u.id)}` : `${usageCel(u.id)} == true`;
 }
 
 const unitLabel = (u: Usage) => (u.windowValue === 1 ? u.windowUnit.slice(0, -1) : u.windowUnit);
@@ -107,7 +108,7 @@ export function limitSentence(u: Usage, tool: string) {
   }
 }
 
-const usageClause = /^(!?)context\.chokepoint\.usage\["([^"\\]+)"\]\.value(?: (<=|<) ([1-9]\d*))?$/;
+const usageClause = /^(!?)context\.chokepoint\.usage\["([^"\\]+)"\]\.value(?: (<=|<) ([1-9]\d*)| (== true))?$/;
 
 // The inverse of limitCel for a saved rule (Admin 049 item 14): the limit line of one CEL clause,
 // or undefined when the clause is not a limit that this rule declares.
@@ -115,8 +116,9 @@ export function celLimit(text: string, usage: Usage[]): Usage | undefined {
   const m = usageClause.exec(text);
   const u = m && usage.find(x => x.id === m[2]);
   if (!m || !u) return undefined;
-  const negated = m[1] === '!', compared = !!m[3];
+  const negated = m[1] === '!', compared = !!m[3], isTrue = !!m[5];
   if (numericOperator(u.operator)) return !negated && compared ? { ...u, compare: m[3] === '<' ? 'lt' : 'le', limit: m[4] } : undefined;
   if (compared) return undefined;
-  return negated === (u.operator === 'since_within') ? u : undefined;
+  if (u.operator === 'since_within') return negated && !isTrue ? u : undefined;
+  return !negated && isTrue ? u : undefined;
 }
