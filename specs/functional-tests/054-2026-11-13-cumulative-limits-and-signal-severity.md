@@ -83,9 +83,9 @@ scenarios:
       - A High item "Server disconnected" for Acme Billing shows, with the reason unreachable.
       - After the server answers again, the item is resolved.
     last_run:
-      date: null
-      result: not_run
-      notes: ''
+      date: 2026-11-14
+      result: passed
+      notes: '2026-11-14: the Acme Billing MCP server was stopped; the automatic rediscovery at 04:17:53 UTC raised mcpserver_disconnected (severity 3, reason unreachable) for Acme Billing; after the server started again, the next rediscovery resolved it. Tools did not change.'
 ---
 
 # Functional test: Cumulative Limits in Rules and Signal Severity

@@ -3,7 +3,7 @@
 - **Specification ID**: 054
 - **Date**: 2026-11-13
 - **Slug**: cumulative-limits-and-signal-severity
-- **Status**: In Progress
+- **Status**: Waiting Approve
 - **Owner**: admin / access (rule editor), attention (Inbox)
 - **Related Specification**: [048 — Relation Side Panel](048-2026-11-06-relation-side-panel.md), [049 — Investigate Layout and Rules Read as Sentences](049-2026-11-07-investigate-layout.md)
 - **Related Backend Specification**: [Backend 087 — Cumulative Limits Across Calls](../../backend/specs/087-2026-11-13-cumulative-limits-across-calls.md), [Backend 088 — Automatic Tool Rediscovery and Signal Severity](../../backend/specs/088-2026-11-13-automatic-tool-rediscovery.md)
@@ -57,12 +57,12 @@ A changed tool or a disconnected server is listed among denied calls, by time on
 
 ## User Stories
 
-- [ ] 1. As an administrator, I want to add a limit line to a rule, so that I can cap what an agent does across calls.
-- [ ] 2. As an administrator, I want help that explains **Per** with an example of each case, so that I know when a total is per customer and when it covers all calls.
-- [ ] 3. As an administrator, I want a warning on `formerly_within`, so that I know it does not read the result of the earlier call.
-- [ ] 4. As an administrator, I want a rule with limits to read as a sentence, so that I do not read CEL.
-- [ ] 5. As an administrator, I want the Inbox ordered by severity with a chip, so that I see the most important item first.
-- [ ] 6. As an administrator, I want to see when a server is disconnected, so that I fix it before agents fail.
+- [x] 1. As an administrator, I want to add a limit line to a rule, so that I can cap what an agent does across calls.
+- [x] 2. As an administrator, I want help that explains **Per** with an example of each case, so that I know when a total is per customer and when it covers all calls.
+- [x] 3. As an administrator, I want a warning on `formerly_within`, so that I know it does not read the result of the earlier call.
+- [x] 4. As an administrator, I want a rule with limits to read as a sentence, so that I do not read CEL.
+- [x] 5. As an administrator, I want the Inbox ordered by severity with a chip, so that I see the most important item first.
+- [x] 6. As an administrator, I want to see when a server is disconnected, so that I fix it before agents fail.
 
 ---
 
@@ -116,7 +116,7 @@ A changed tool or a disconnected server is listed among denied calls, by time on
 - [x] 4. A rule with limits reads as the sentence of item 7, in the editor and in the saved list.
 - [x] 5. The Inbox shows the severity chip and the order of items 8 and 9, the type of item 10 and the filter of item 11.
 - [x] 6. `npm run check` and `npm run build` pass (2026-11-14).
-- [ ] 7. Functional test: [054-2026-11-13-cumulative-limits-and-signal-severity.md](functional-tests/054-2026-11-13-cumulative-limits-and-signal-severity.md) — not met: the functional test runs after Backend 087 and 088 are merged.
+- [x] 7. Functional test: [054-2026-11-13-cumulative-limits-and-signal-severity.md](functional-tests/054-2026-11-13-cumulative-limits-and-signal-severity.md) Evidence: S1–S6 passed on 2026-11-14 on the demo instance.
 
 ---
 
