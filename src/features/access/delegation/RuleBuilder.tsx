@@ -18,7 +18,9 @@ export type Rule = { join: 'all' | 'any'; clauses: Clause[] };
 const ops: Record<string, { id: string; label: string; cel: string; noValue?: boolean }[]> = {
   string: [{ id: 'eq', label: 'is', cel: '==' }, { id: 'ne', label: 'is not', cel: '!=' }, { id: 'in', label: 'is one of', cel: 'in' }, { id: 'starts', label: 'starts with', cel: 'startsWith' }],
   number: [{ id: 'le', label: 'is at most', cel: '<=' }, { id: 'lt', label: 'is less than', cel: '<' }, { id: 'ge', label: 'is at least', cel: '>=' }, { id: 'gt', label: 'is more than', cel: '>' }, { id: 'eq', label: 'is', cel: '==' }],
-  bool: [{ id: 'true', label: 'is true', cel: '', noValue: true }, { id: 'false', label: 'is false', cel: '!', noValue: true }],
+  // An argument or attribute is dynamic in CEL and the backend accepts only a boolean expression,
+  // so "is true" compares with true; "is false" negates, which CEL types as a boolean.
+  bool: [{ id: 'true', label: 'is true', cel: ' == true', noValue: true }, { id: 'false', label: 'is false', cel: '!', noValue: true }],
 };
 
 export function ruleFields(catalog: Catalog, serverId: string, tool: string): RuleField[] {
@@ -32,7 +34,7 @@ const literal = (type: string, v: string) => (type === 'number' ? (v.trim() || '
 function clauseCel(c: Clause, fields: RuleField[]) {
   const f = fields.find(x => x.key === c.field); if (!f) return '';
   const op = (ops[f.type] ?? ops.string).find(o => o.id === c.op)!;
-  if (op.noValue) return `${op.cel}${f.cel}`;
+  if (op.noValue) return op.id === 'true' ? `${f.cel}${op.cel}` : `${op.cel}${f.cel}`;
   const right = c.valueField ? fields.find(x => x.key === c.valueField)?.cel ?? '' : '';
   if (op.id === 'in') return `${f.cel} in [${c.value.split(',').map(v => literal(f.type, v.trim())).join(', ')}]`;
   if (op.id === 'starts') return `${f.cel}.startsWith(${right || literal(f.type, c.value)})`;
@@ -96,6 +98,9 @@ const attributeType = (text: string, bindings: CatalogBinding[]) => celField(tex
 
 function celClause(text: string, i: number, bindings: CatalogBinding[]): { clause: Clause; fields: RuleField[] } | undefined {
   const key = `c${i}`, id = `q-${i}`;
+  const isTrue = /^(.+) == true$/.exec(text);
+  const trueField = isTrue && celField(isTrue[1], bindings, key, 'bool');
+  if (trueField) return { clause: { id, field: key, op: 'true', value: '' }, fields: [trueField] };
   const bool = /^(!?)(.+)$/.exec(text)!;
   const boolField = celField(bool[2], bindings, key, 'bool');
   if (boolField) return { clause: { id, field: key, op: bool[1] ? 'false' : 'true', value: '' }, fields: [boolField] };
