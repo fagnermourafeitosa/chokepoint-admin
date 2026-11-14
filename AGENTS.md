@@ -8,7 +8,6 @@ This module is the React application that manages the Chokepoint platform. Platf
 
 ## Language
 
-* Use ASD-STE100 Simplified Technical English when you explain anything to the user.
 * Write documentation, instructions, comments, specifications, identifiers and project artifacts in English.
 * Use the existing Chokepoint domain terms. Do not invent synonyms. Every name in the user experience comes from the canonical names in [backend/docs/authorization-domain-model.md](../backend/docs/authorization-domain-model.md). API and specification names, such as resource, stay out of the user experience.
 
@@ -83,7 +82,7 @@ flowchart TD
 * **Trivial choices.** Do not ask about choices that a one-line edit can change later, such as wording, order or labels. Apply the recommendation and say in one line what you chose. Ask only about architecture, contracts, scope, data and security.
 * **Zero guesswork.** Do not invent requirements, domain concepts, state transitions, APIs, validation rules or backend behavior. When the specification and the code do not define something, ask.
 * **Scope.** Do not expand a task because another change looks useful. Name it as a follow-up.
-* **No fallbacks.** The project is in initial development and is not in production. Do not write shims, legacy adapters, dual paths or fallbacks for earlier internal versions. Replace a changed contract cleanly. Ask the user before you add a compatibility layer.
+* **Production.** The system is in production. Do not write shims, legacy adapters, dual paths or fallbacks for earlier versions. Before a change breaks a published contract or changes stored data, you must stop and ask the user, and explain what breaks: the consumers or data that the change affects and how.
 
 ## Specifications
 
