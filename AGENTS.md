@@ -78,7 +78,7 @@ flowchart TD
 
 ## Decisions
 
-* **Grilling.** For each decision, give several real, different options, their consequences and a recommendation. The user can propose another option. If only one option is possible, explain why. Do not invent alternatives.
+* **Grilling.** Follow the [`grilling` skill](.agents/skills/grilling/SKILL.md).
 * **Trivial choices.** Do not ask about choices that a one-line edit can change later, such as wording, order or labels. Apply the recommendation and say in one line what you chose. Ask only about architecture, contracts, scope, data and security.
 * **Zero guesswork.** Do not invent requirements, domain concepts, state transitions, APIs, validation rules or backend behavior. When the specification and the code do not define something, ask.
 * **Scope.** Do not expand a task because another change looks useful. Name it as a follow-up.
