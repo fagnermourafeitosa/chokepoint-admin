@@ -37,7 +37,7 @@ export function IntegrationsPrototype() {
         <td>{s.tools} tools{s.reviewRequired ? <span className="mcp-badge" data-tone="warning">Review required</span> : null}</td>
         <td><span className="mcp-badge" data-tone={s.enabled ? 'success' : undefined}>{s.enabled ? 'Enabled' : 'Disabled'}</span></td>
         <td><div className="identity-row-actions il-row-actions">
-          <a className="cp-admin-button cp-admin-button--ghost" href="/prototype/tool-review-order">{s.enabled ? 'Discover' : 'Review & re-enable'}</a>
+          <a className="cp-admin-button cp-admin-button--ghost" href="/prototype/tool-review-order">{!s.enabled ? 'Review & re-enable' : s.reviewRequired ? 'Review' : 'Discover'}</a>
           <details className="identity-menu" name="mcp-row-menu"><summary aria-label={`More actions for ${s.name}`}><MoreHorizontal size={18} /></summary><div onClick={e => e.currentTarget.closest('details')?.removeAttribute('open')}>
             <button type="button" onClick={() => setEditing(s)}>Edit connection</button>
             <button type="button" onClick={() => setHistory(true)}>Review history</button>
