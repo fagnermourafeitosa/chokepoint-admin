@@ -43,6 +43,12 @@ Without Backend 095's routes, the Enterprise MCPs tab, the GitHub App dialog, th
 
 ---
 
+## Cleanup (2026-11-15)
+
+A review after the merge found two leftovers, removed on the user's request: the 422 message "Reconnect the account" of `mcpError` (Backend 095 no longer answers 422 for an MCP server) and the invalidation of the `mcp-provider-connection` query, which no longer exists. The spec table of the README lists 055 and 056 as Implemented.
+
+---
+
 ## Out of Scope
 
 - The new design for vendor-hosted MCP servers.

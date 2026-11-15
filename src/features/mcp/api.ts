@@ -25,7 +25,6 @@ export function mcpError(error: unknown) {
   if (error.status === 502) return 'Could not discover tools. Check the endpoint, authentication, and whether the backend can reach this server.';
   if (error.status === 400) return 'Check the connection fields and selected tools, then try again.';
   if (error.status === 404) return 'This server is not available in the current workspace and environment.';
-  if (error.status === 422) return 'Provider authentication is unavailable. Reconnect the account.';
   if (error.status === 429) return 'Discovery is busy. Try again shortly.';
  }
  return 'The request could not be completed. Check your connection and retry.';
