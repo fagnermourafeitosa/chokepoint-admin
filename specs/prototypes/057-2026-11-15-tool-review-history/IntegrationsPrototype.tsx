@@ -47,7 +47,6 @@ export function IntegrationsPrototype() {
       </tr>)}</tbody>
     </table></div>
     <TracePager page={page} size={size} total={servers.length} onPage={setPage} />
-    <p className="mcp-footnote cp-admin-muted">Connections belong to this workspace and environment. Agent permissions determine who can use their tools.</p>
     {history ? <ReviewHistory onClose={() => setHistory(false)} /> : null}
     {editing ? <EditDialog server={editing} onClose={() => setEditing(undefined)} /> : null}
   </section>;
