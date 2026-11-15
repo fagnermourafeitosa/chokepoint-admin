@@ -5,7 +5,8 @@ import '../../../src/features/mcp/mcp.css';
 import '../../../src/features/investigate/investigate.css';
 import '../../../src/features/identity/identity.css';
 import { ReviewHistory } from './HistoryPrototype';
-import { servers } from './data';
+import { EditDialog } from './EditDialog';
+import { servers as fixture, type ListedServer } from './data';
 import './prototype.css';
 
 // Admin 057 prototype: the Custom MCPs list of Integrations. A row no longer opens the server details
@@ -19,6 +20,11 @@ const size = 10;
 export function IntegrationsPrototype() {
   const [page, setPage] = useState(1);
   const [history, setHistory] = useState(false);
+  const [editing, setEditing] = useState<ListedServer>();
+  // Disable connection acts at once, as in the Admin today: the server stops serving its tools, and
+  // Review & re-enable turns it on again after a review.
+  const [servers, setServers] = useState(fixture);
+  const disable = (name: string) => setServers(list => list.map(s => (s.name === name ? { ...s, enabled: false } : s)));
   const rows = servers.slice((page - 1) * size, page * size);
   return <section aria-label="Integrations" className="mcp-registry">
     <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect custom MCPs and identity providers, then manage agent access.</p></div><button type="button" className="cp-admin-button"><Plus size={16} />Connect custom MCP</button></header>
@@ -32,10 +38,10 @@ export function IntegrationsPrototype() {
         <td><span className="mcp-badge" data-tone={s.enabled ? 'success' : undefined}>{s.enabled ? 'Enabled' : 'Disabled'}</span></td>
         <td><div className="identity-row-actions il-row-actions">
           <a className="cp-admin-button cp-admin-button--ghost" href="/prototype/tool-review-order">{s.enabled ? 'Discover' : 'Review & re-enable'}</a>
-          <details className="identity-menu"><summary aria-label={`More actions for ${s.name}`}><MoreHorizontal size={18} /></summary><div>
-            <button type="button">Edit connection</button>
+          <details className="identity-menu" name="mcp-row-menu"><summary aria-label={`More actions for ${s.name}`}><MoreHorizontal size={18} /></summary><div onClick={e => e.currentTarget.closest('details')?.removeAttribute('open')}>
+            <button type="button" onClick={() => setEditing(s)}>Edit connection</button>
             <button type="button" onClick={() => setHistory(true)}>Review history</button>
-            {s.enabled ? <button type="button">Disable connection</button> : null}
+            {s.enabled ? <button type="button" onClick={() => disable(s.name)}>Disable connection</button> : null}
           </div></details>
         </div></td>
       </tr>)}</tbody>
@@ -43,5 +49,6 @@ export function IntegrationsPrototype() {
     <TracePager page={page} size={size} total={servers.length} onPage={setPage} />
     <p className="mcp-footnote cp-admin-muted">Connections belong to this workspace and environment. Agent permissions determine who can use their tools.</p>
     {history ? <ReviewHistory onClose={() => setHistory(false)} /> : null}
+    {editing ? <EditDialog server={editing} onClose={() => setEditing(undefined)} /> : null}
   </section>;
 }

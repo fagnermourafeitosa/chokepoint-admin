@@ -47,7 +47,7 @@ export const tools: ReviewTool[] = [
     contract: c('export_orders', 'Export orders', 'Exports the orders of a month as CSV.', { readOnlyHint: true, openWorldHint: false }, obj({ month: { type: 'string', description: 'The month, as YYYY-MM.' } }, ['month'])) },
 ];
 
-export const server = { name: 'Acme Billing', transport: 'streamable-http', info: { instructions: 'Acme billing API for support agents.', serverInfo: { name: 'acme-billing', version: '2.4.0' } } };
+export const server = { name: 'Acme Billing', endpoint: 'https://acme-billing.acme.example/mcp', transport: 'streamable-http', info: { instructions: 'Acme billing API for support agents.', serverInfo: { name: 'acme-billing', version: '2.4.0' } } };
 
 // Review history of the server (Backend 096): one immutable event per confirmed review, and one per
 // automatic disable. The reviewer is a platform user; the system has none.
@@ -78,18 +78,18 @@ export const history: HistoryEvent[] = [
 ];
 
 // The Custom MCPs of the environment, for the Integrations list (Admin 057): 12 servers, 10 per page.
-export type ListedServer = { name: string; transport: string; tools: number; enabled: boolean; reviewRequired?: boolean };
+export type ListedServer = { name: string; endpoint: string; transport: string; tools: number; enabled: boolean; reviewRequired?: boolean };
 export const servers: ListedServer[] = [
-  { name: 'Acme Billing', transport: 'streamable-http', tools: 2, enabled: true, reviewRequired: true },
-  { name: 'Acme Issues', transport: 'streamable-http', tools: 5, enabled: true },
-  { name: 'Catalog', transport: 'streamable-http', tools: 6, enabled: true },
-  { name: 'Customer support RAG', transport: 'streamable-http', tools: 3, enabled: true },
-  { name: 'Data warehouse', transport: 'http-sse', tools: 4, enabled: true },
-  { name: 'HR records', transport: 'streamable-http', tools: 2, enabled: false },
-  { name: 'Inventory', transport: 'streamable-http', tools: 7, enabled: true },
-  { name: 'Ledger', transport: 'streamable-http', tools: 3, enabled: true, reviewRequired: true },
-  { name: 'Logistics', transport: 'http-sse', tools: 5, enabled: true },
-  { name: 'Marketing analytics', transport: 'streamable-http', tools: 2, enabled: true },
-  { name: 'Payroll', transport: 'streamable-http', tools: 4, enabled: false },
-  { name: 'Ticketing', transport: 'streamable-http', tools: 6, enabled: true },
+  { name: 'Acme Billing', endpoint: 'https://acme-billing.acme.example/mcp', transport: 'streamable-http', tools: 2, enabled: true, reviewRequired: true },
+  { name: 'Acme Issues', endpoint: 'https://acme-issues.acme.example/mcp', transport: 'streamable-http', tools: 5, enabled: true },
+  { name: 'Catalog', endpoint: 'https://catalog.acme.example/mcp', transport: 'streamable-http', tools: 6, enabled: true },
+  { name: 'Customer support RAG', endpoint: 'https://customer-support-rag.acme.example/mcp', transport: 'streamable-http', tools: 3, enabled: true },
+  { name: 'Data warehouse', endpoint: 'https://data-warehouse.acme.example/mcp', transport: 'http-sse', tools: 4, enabled: true },
+  { name: 'HR records', endpoint: 'https://hr-records.acme.example/mcp', transport: 'streamable-http', tools: 2, enabled: false },
+  { name: 'Inventory', endpoint: 'https://inventory.acme.example/mcp', transport: 'streamable-http', tools: 7, enabled: true },
+  { name: 'Ledger', endpoint: 'https://ledger.acme.example/mcp', transport: 'streamable-http', tools: 3, enabled: true, reviewRequired: true },
+  { name: 'Logistics', endpoint: 'https://logistics.acme.example/mcp', transport: 'http-sse', tools: 5, enabled: true },
+  { name: 'Marketing analytics', endpoint: 'https://marketing-analytics.acme.example/mcp', transport: 'streamable-http', tools: 2, enabled: true },
+  { name: 'Payroll', endpoint: 'https://payroll.acme.example/mcp', transport: 'streamable-http', tools: 4, enabled: false },
+  { name: 'Ticketing', endpoint: 'https://ticketing.acme.example/mcp', transport: 'streamable-http', tools: 6, enabled: true },
 ];
