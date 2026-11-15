@@ -34,7 +34,7 @@ export function IntegrationsPrototype() {
     <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect custom MCPs and identity providers, then manage agent access.</p></div><button type="button" className="cp-admin-button"><Plus size={16} />{tab === 'custom' ? 'Connect custom MCP' : 'Connect identity provider'}</button></header>
     <div className="mcp-types" role="group" aria-label="Integration type"><button aria-pressed={tab === 'custom'} onClick={() => setTab('custom')}><Server size={17} />Custom MCPs</button><button aria-pressed={tab === 'identity'} onClick={() => setTab('identity')}><Users size={17} />Identity providers</button></div>
     {tab === 'identity' ? <IdentityList /> : <>
-    <div className="mcp-toolbar"><label htmlFor="mcp-search">Find a connection</label><input id="mcp-search" type="search" className="cp-admin-input" placeholder="Search by name or endpoint" /></div>
+    <div className="mcp-toolbar"><label htmlFor="mcp-search">Find a connection <WaitingBackend spec="096" tip="A search by name or endpoint over every server of the environment, not only the loaded page." /></label><input id="mcp-search" type="search" className="cp-admin-input" placeholder="Search by name or endpoint" /></div>
     <div className="cp-admin-table-scroll identity-table-region" role="region" aria-label="MCP servers table" tabIndex={0}><table className="cp-admin-table mcp-servers">
       <thead><tr><th>Connection</th><th>Managed tools</th><th>Status</th><th className="il-actions-head">Actions</th></tr></thead>
       <tbody>{rows.map(s => <tr key={s.name}>
@@ -52,7 +52,7 @@ export function IntegrationsPrototype() {
         </div></td>
       </tr>)}</tbody>
     </table></div>
-    <TracePager page={page} size={size} total={servers.length} onPage={setPage} />
+    <div className="il-pager"><TracePager page={page} size={size} total={servers.length} onPage={setPage} /><WaitingBackend spec="096" tip="The total of servers of the environment, for the record count and the page count of the pager." /></div>
     </>}
     {history ? <ReviewHistory onClose={() => setHistory(false)} /> : null}
     {editing ? <EditDialog server={editing} onClose={() => setEditing(undefined)} /> : null}

@@ -20,3 +20,5 @@
 .il-impact { display: grid; gap: var(--cp-admin-space-2); margin: 0; padding-left: 1.25rem; }
 .il-impact li > span { display: block; }
 .cp-admin-table th.il-actions-head { text-align: right; }
+.il-pager { display: grid; gap: var(--cp-admin-space-1); justify-items: start; }
+.il-pager > nav { width: 100%; }

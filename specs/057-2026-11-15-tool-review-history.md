@@ -54,7 +54,7 @@ A click on a row of the Custom MCPs list opens the server details below the list
 
 ## Backend dependencies
 
-- [ ] [Backend 096](../../backend/specs/096-2026-11-15-tool-review-history.md): `review_order` and the granted agent count in previews and servers; denied tools kept and marked denied before; the review history API with the reviewer name; the system events of the automatic rediscovery; the impact of a disable (granting agents and the allowed calls of the last 24 hours, decision 13).
+- [ ] [Backend 096](../../backend/specs/096-2026-11-15-tool-review-history.md): `review_order` and the granted agent count in previews and servers; denied tools kept and marked denied before; the review history API with the reviewer name; the system events of the automatic rediscovery; the impact of a disable (granting agents and the allowed calls of the last 24 hours, decision 13); the total and the search `q` of the server list (decision 14).
 
 ---
 
