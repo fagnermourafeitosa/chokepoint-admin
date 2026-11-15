@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { ACTIONS, EVENTS, Joyride, STATUS, type EventData, type Step, type TooltipRenderProps } from 'react-joyride';
-import { Check, Copy, X } from 'lucide-react';
+import { Check, CircleHelp, Copy, X } from 'lucide-react';
+import { Tooltip } from '../../components/ui/tooltip/Tooltip';
 import { tourStops, type StopAction } from './tourStops';
 import './first-access.css';
 
@@ -148,6 +149,7 @@ export function FirstAccessTour({ sandbox }: { sandbox: boolean }) {
       tooltipComponent={TourTooltip}
       options={{ overlayColor: 'rgba(21, 22, 27, 0.55)', spotlightRadius: 4, zIndex: 120, targetWaitTimeout: 3000, scrollOffset: 100 /* the Admin header is fixed and 75px tall */ }}
     />
-    {run ? null : <button type="button" className="cp-admin-button cp-admin-button--secondary first-access-restart" onClick={() => void go(0, 1)}>Take the tour</button>}
+    {/* Admin 057: a small icon button, so it no longer covers Confirm review or the Next of a pager. */}
+    {run ? null : <span className="first-access-restart"><Tooltip content="Take the tour"><button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small first-access-restart-button" aria-label="Take the tour" onClick={() => void go(0, 1)}><CircleHelp size={18} aria-hidden="true" /></button></Tooltip></span>}
   </>;
 }

@@ -11,14 +11,15 @@ import { ToolReviewPage } from './ToolReviewPage';
 // one) and confirms the review. The dialog passes an edited connection in the navigation state.
 export type ReviewState = { connection?: Connection };
 
-export function CustomToolReview({ scope, serverId, initialTool, backTo, backLabel, onSaved }: { scope: EnvironmentScope; serverId?: string; initialTool?: string; backTo: string; backLabel: string; onSaved: (server: MCPServer) => void }) {
+export function CustomToolReview({ scope, serverId, initialTool, enable, backTo, backLabel, onSaved }: { scope: EnvironmentScope; serverId?: string; initialTool?: string; enable?: boolean; backTo: string; backLabel: string; onSaved: (server: MCPServer) => void }) {
   const state = (useLocation().state ?? {}) as ReviewState;
   const cache = useQueryClient();
   const server = useQuery({ queryKey: ['mcp-detail', scope.userId, scope.tenantId, scope.environmentId, serverId], queryFn: ({ signal }) => mcpApi.get(scope, serverId!, signal), enabled: !!serverId, staleTime: 0 });
   const connection: Connection | undefined = state.connection ?? (server.data ? { name: server.data.name, endpoint: server.data.endpoint, transport: server.data.transport, auth_type: 'chokepoint_token', revision: server.data.revision } : undefined);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const [enableAfter, setEnableAfter] = useState(false);
+  // The status switch of the list opens the review with Enable server after review checked (Admin 057).
+  const [enableAfter, setEnableAfter] = useState(!!enable);
   // One discovery per visit. A query shares the request across the double mount of StrictMode, and no
   // abort signal is passed, so a remount never cancels a discovery that the backend already stores.
   const discovery = useQuery({

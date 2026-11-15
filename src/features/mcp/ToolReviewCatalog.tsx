@@ -66,7 +66,7 @@ export function ToolReviewCatalog({ scope }: { scope: EnvironmentScope }) {
                 <th>Tool</th>
                 <th>Connection</th>
                 <th>Review</th>
-                <th>Action</th>
+                <th className="mcp-actions-head">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -76,19 +76,24 @@ export function ToolReviewCatalog({ scope }: { scope: EnvironmentScope }) {
                     <code>{tool.name}</code>
                   </td>
                   <td>{server.name}</td>
-                  <td>{tool.reviewed ? 'Reviewed' : 'Needs review'}</td>
                   <td>
+                    <span className="mcp-badge" data-tone={tool.reviewed ? 'success' : 'warning'}>{tool.reviewed ? 'Reviewed' : 'Needs review'}</span>
+                  </td>
+                  <td>
+                    <div className="identity-row-actions mcp-row-actions">
                     <button
-                      className="cp-admin-button cp-admin-button--ghost"
+                      className="cp-admin-button cp-admin-button--ghost cp-admin-button--small"
                       onClick={() =>
                         navigate(
                           // A tool that needs review opens the review page at that tool (Admin 055, decision 7).
-                          `/access/integrations?${new URLSearchParams({ type: 'custom', server: server.id, tool: tool.name, ...(tool.reviewed ? {} : { review: 'server' }) })}`,
+                          // Admin 057: the server details are gone, so a reviewed tool also opens the review page.
+                          `/access/integrations?${new URLSearchParams({ type: 'custom', server: server.id, tool: tool.name, review: 'server' })}`,
                         )
                       }
                     >
                       Open tool
                     </button>
+                    </div>
                   </td>
                 </tr>
               ))}

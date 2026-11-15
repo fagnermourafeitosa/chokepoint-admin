@@ -51,7 +51,11 @@ export function actionPath(
   }
   if (action.route === 'tool-catalog') {
     params.set('type', 'custom');
-    if (params.has('server_id')) params.set('server', params.get('server_id')!);
+    if (params.has('server_id')) {
+      params.set('server', params.get('server_id')!);
+      // Admin 057: a server opens its review page; the server details are gone.
+      params.set('review', 'server');
+    }
     return `/access/integrations?${params}`;
   }
   return undefined;

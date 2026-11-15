@@ -36,3 +36,8 @@
 .identity-key { resize: vertical; min-height: 96px; font-size: 12px; line-height: 1.45; }
 /* The footer draws the line above the actions, so the last section has none (Admin 043). */
 .identity-form-redesign fieldset>.identity-form-section:last-child{border-bottom:0}
+
+/* Admin 057: the More trigger matches the small row button (design system, layouts.md, Actions). */
+.identity-row-actions .identity-menu summary { min-width: var(--cp-admin-control-compact-height); min-height: var(--cp-admin-control-compact-height); }
+.cp-admin-table th.identity-actions-head { text-align: right; }
+.identity-row-actions { justify-content: flex-end; }
