@@ -25,11 +25,6 @@ function prototype(file: string, name: string): ReactElement {
 }
 
 const pages: Record<string, { path: string; element: ReactElement }> = {
-  '057': { path: 'tool-review-order', element: prototype('057-2026-11-15-tool-review-history/ReviewPrototype.tsx', 'ToolReviewHistoryPrototype') },
-  // The second page of 057, linked from the first: the Custom MCPs list, with the Review history panel.
-  '057-integrations': { path: 'integrations', element: prototype('057-2026-11-15-tool-review-history/IntegrationsPrototype.tsx', 'IntegrationsPrototype') },
-  // The third page of 057: Review coverage with small row actions.
-  '057-coverage': { path: 'review-coverage', element: prototype('057-2026-11-15-tool-review-history/CoveragePrototype.tsx', 'CoveragePrototype') },
 };
 
 // The index notes are Markdown: show `code` spans as code, the rest as text.

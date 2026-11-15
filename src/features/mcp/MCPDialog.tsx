@@ -28,7 +28,7 @@ export function MCPDialog({ scope, server, onClose, onReview }: { scope: Environ
     <label>MCP endpoint<input className="cp-admin-input" name="endpoint" type="url" required maxLength={2048} value={fields.endpoint} onChange={e => update('endpoint', e.target.value)} placeholder="https://mcp.example.com/mcp" /></label>
     <label>Transport<SelectMenu block label="Transport" value={fields.transport} onChange={v => update('transport', v)} options={[{ value: 'streamable-http', label: 'Streamable HTTP' }, { value: 'stdio', label: 'stdio — unsupported', disabled: true }]} /></label>
     <p className="cp-admin-muted">stdio is not supported. Xokepoint connects to an HTTP endpoint.</p>
-    <ChokepointTokenSetup compact issuer={trust.data?.issuer} jwksUri={trust.data?.jwks_uri} audience={typedAudience(fields.endpoint)} unavailable={trust.isError} />
+    <ChokepointTokenSetup issuer={trust.data?.issuer} jwksUri={trust.data?.jwks_uri} audience={typedAudience(fields.endpoint)} unavailable={trust.isError} />
    </div>
    <div className="admin-dialog-actions"><button type="button" className="cp-admin-button cp-admin-button--secondary" onClick={onClose}>Cancel</button><button className="cp-admin-button" type="submit">Discover tools</button></div>
   </form>

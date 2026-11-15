@@ -42,8 +42,8 @@ export function targetPath(signal: Signal): string | undefined {
   if (signal.target_route === 'tool-catalog') {
     const path = actionPath({ label: signal.target_label, route: signal.target_route, params: signal.target_params, available: true }, '/');
     // A tool discovery opens the review page of its server, at the first tool that needs a decision
-    // (Admin 055, decision 5).
-    return signal.type === 'tool-discovery' && path ? `${path}&review=server` : path;
+    // (Admin 055, decision 5); every server target opens its review page (Admin 057, decision 8).
+    return path;
   }
   return undefined;
 }

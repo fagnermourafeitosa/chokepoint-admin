@@ -34,6 +34,7 @@ function StateLabel({ tool, decision }: { tool: ManagedTool; decision?: Decision
   if (tool.change === 'removed') return <span className="tr-state cp-admin-muted">Disabled</span>;
   if (!needsDecision(tool)) return <span className="tr-state cp-admin-muted">No change</span>;
   if (!decision) return <span className="tr-state" data-state="pending">To review</span>;
+  if (tool.change === 'changed' && tool.denied_before) return <span className="tr-state" data-state={decision}>{decision === 'approved' ? 'Approved' : 'Kept denied'}</span>;
   if (tool.change === 'changed') return <span className="tr-state" data-state={decision}>{decision === 'approved' ? 'Change trusted' : 'Kept disabled'}</span>;
   return <span className="tr-state" data-state={decision}>{decision === 'approved' ? 'Approved' : 'Denied'}</span>;
 }
@@ -52,6 +53,7 @@ function Guide({ changed }: { changed: boolean }) {
 function ToolDetail({ tool, decision, busy, decide }: { tool: ManagedTool; decision?: Decision; busy: boolean; decide: (d: Decision) => void }) {
   const changed = tool.change === 'changed';
   const removed = tool.change === 'removed';
+  const wasDenied = !!tool.denied_before;
   const items = changed && tool.previous ? changesOf(tool.previous, tool.contract) : [];
   const touched = new Set(items.map(i => i.section));
   const label = (p: Param) => <><code>{p.name}</code><span className="cp-admin-muted">{p.type}{p.required ? ' · required' : ''}</span></>;
@@ -62,8 +64,10 @@ function ToolDetail({ tool, decision, busy, decide }: { tool: ManagedTool; decis
     </header>
     {removed ? <Notice tone="info">The server no longer returns this tool. It stays disabled, and agents cannot call it. There is nothing to decide. Below, the text that you last approved.</Notice> : null}
     {changed ? <>
-      <Notice tone="warning">The server changed this tool after you approved it. It stays disabled until you decide.</Notice>
-      <div className="history-summary"><span>Changes since you approved it</span><span className="history-count" data-kind="changed">~{items.length} changed</span></div>
+      {wasDenied ? <Notice tone="info">You denied this tool in an earlier review. The server changed it, so it comes back for a decision. It stays disabled, and agents cannot call it.</Notice>
+        : <Notice tone="warning">The server changed this tool after you approved it. It stays disabled until you decide.</Notice>}
+      {tool.granted_agents ? <p className="tr-granted">Granted to {tool.granted_agents} {tool.granted_agents === 1 ? 'agent' : 'agents'} in their published permissions</p> : null}
+      <div className="history-summary"><span>{wasDenied ? 'Changes since you denied it' : 'Changes since you approved it'}</span><span className="history-count" data-kind="changed">~{items.length} changed</span></div>
       {items.length ? <div className="history-diff">{items.map((item, i) => <section key={i}><h5>{item.section}</h5><ul>{item.rows.map((r, j) => <li key={j} data-kind={r.kind}><span className="history-sign" aria-label={r.kind}>{r.kind === 'added' ? '+' : r.kind === 'removed' ? '−' : '~'}</span><strong>{r.json ? <code>{r.text}</code> : r.text}</strong>{r.detail ? <code>{r.detail}</code> : null}</li>)}</ul></section>)}</div>
         : <Notice tone="info">The server went back to the text that you approved. Nothing changed since your approval, but the tool stays disabled until you decide.</Notice>}
     </> : null}
@@ -73,8 +77,8 @@ function ToolDetail({ tool, decision, busy, decide }: { tool: ManagedTool; decis
     {needsDecision(tool) ? <>
       <Guide changed={changed} />
       <div className="tr-decision">
-        <button type="button" className="cp-admin-button cp-admin-button--secondary" disabled={busy} aria-pressed={decision === 'denied'} onClick={() => decide('denied')}>{changed ? `Keep ${tool.name} disabled` : `Deny ${tool.name}`}</button>
-        <button type="button" className="cp-admin-button" disabled={busy} aria-pressed={decision === 'approved'} onClick={() => decide('approved')}>{changed ? 'Trust this change' : `Approve ${tool.name}`}</button>
+        <button type="button" className="cp-admin-button cp-admin-button--secondary" disabled={busy} aria-pressed={decision === 'denied'} onClick={() => decide('denied')}>{wasDenied ? `Keep ${tool.name} denied` : changed ? `Keep ${tool.name} disabled` : `Deny ${tool.name}`}</button>
+        <button type="button" className="cp-admin-button" disabled={busy} aria-pressed={decision === 'approved'} onClick={() => decide('approved')}>{wasDenied ? `Approve ${tool.name}` : changed ? 'Trust this change' : `Approve ${tool.name}`}</button>
       </div>
     </> : removed ? null : <p className="cp-admin-muted">No change since your last review. Its settings are retained.</p>}
   </>;
@@ -112,7 +116,9 @@ export type ToolReviewPageProps = {
 };
 
 export function ToolReviewPage({ heading, backTo, backLabel, registryName, tools, serverInfo, initialTool, busy, error, onConfirm, enableOption }: ToolReviewPageProps) {
-  const toReview = tools.filter(needsDecision);
+  // Backend 096: the backend orders the tools by criticality (review_order, lowest first): granted
+  // tools first, the tools denied before last.
+  const toReview = tools.filter(needsDecision).sort((a, b) => (a.review_order ?? 0) - (b.review_order ?? 0) || a.name.localeCompare(b.name));
   const unchanged = tools.filter(t => t.change === 'unchanged');
   const removed = tools.filter(t => t.change === 'removed');
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
@@ -122,19 +128,20 @@ export function ToolReviewPage({ heading, backTo, backLabel, registryName, tools
   const done = toReview.filter(t => decisions[t.name]).length;
   const tool = tools.find(t => t.name === shown);
   const readOnly = toReview.filter(t => t.change === 'new' && t.contract.annotations?.readOnlyHint && !decisions[t.name]);
+  const deniedBefore = toReview.filter(t => t.denied_before && !decisions[t.name]);
   const advance = (next: Record<string, Decision>) => {
     setDecisions(next);
     const pending = toReview.find(t => !next[t.name]);
     if (pending) setShown(pending.name);
   };
   const decide = (d: Decision) => advance({ ...decisions, [shown]: d });
-  const approveReadOnly = () => {
+  const bulk = (list: ManagedTool[], d: Decision) => {
     const next = { ...decisions };
-    readOnly.forEach(t => { next[t.name] = 'approved'; });
+    list.forEach(t => { next[t.name] = d; });
     advance(next);
   };
   const item = (t: ManagedTool) => <li key={t.name}><button type="button" className="tr-item" aria-current={shown === t.name} onClick={() => setShown(t.name)}>
-    <span className="tr-item-copy"><strong>{t.contract.title || t.name}</strong>{t.contract.title && t.contract.title !== t.name ? <code>{t.name}</code> : null}</span>
+    <span className="tr-item-copy"><strong>{t.contract.title || t.name}</strong>{t.contract.title && t.contract.title !== t.name ? <code>{t.name}</code> : null}{needsDecision(t) && t.granted_agents ? <small className="tr-item-use">Granted to {t.granted_agents} {t.granted_agents === 1 ? 'agent' : 'agents'}</small> : t.denied_before ? <small className="tr-item-use">Denied before</small> : null}</span>
     {t.change === 'new' || t.change === 'changed' ? <span className="mcp-badge" data-tone="warning">{t.change === 'new' ? 'New' : 'Changed'}</span> : t.change === 'removed' ? <span className="mcp-badge" data-tone="danger">Removed</span> : null}
     <StateLabel tool={t} decision={decisions[t.name]} />
   </button></li>;
@@ -146,7 +153,12 @@ export function ToolReviewPage({ heading, backTo, backLabel, registryName, tools
     </header>
     <div className="tr-layout">
       <nav className="tr-list" aria-label="Discovered tools">
-        {toReview.length ? <><div className="tr-group-head"><h3 className="cp-admin-label">To review</h3>{readOnly.length ? <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" disabled={busy} onClick={approveReadOnly}>Approve {readOnly.length} read-only</button> : null}</div><ul>{toReview.map(item)}</ul></> : null}
+        {toReview.length ? <><div className="tr-group-head"><h3 className="cp-admin-label">To review</h3></div>
+          {readOnly.length || deniedBefore.length ? <div className="tr-bulk">
+            {readOnly.length ? <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" disabled={busy} onClick={() => bulk(readOnly, 'approved')}>Approve {readOnly.length} read-only</button> : null}
+            {deniedBefore.length ? <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" disabled={busy} onClick={() => bulk(deniedBefore, 'denied')}>Keep {deniedBefore.length} denied</button> : null}
+          </div> : null}
+          <ul>{toReview.map(item)}</ul></> : null}
         {removed.length ? <><h3 className="cp-admin-label">Removed</h3><ul>{removed.map(item)}</ul></> : null}
         <h3 className="cp-admin-label">Server</h3>
         <ul><li><button type="button" className="tr-item" aria-current={shown === 'server'} onClick={() => setShown('server')}><span className="tr-item-copy"><strong>Instructions and identity</strong><code>initialize</code></span><span className="tr-state cp-admin-muted">Not sent to agents</span></button></li></ul>

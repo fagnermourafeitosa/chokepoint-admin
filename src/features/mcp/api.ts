@@ -2,19 +2,31 @@ import { httpClient, HttpError } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 import type { MCPToolAnnotations } from '../access/types';
 export type ToolContract = { name: string; title?: string; description?: string; annotations?: MCPToolAnnotations; inputSchema: unknown; outputSchema?: unknown; [key: string]: unknown };
-export type ManagedTool = { reviewed: boolean; name: string; contract: ToolContract; previous?: ToolContract; change: 'new' | 'changed' | 'removed' | 'unchanged'; selected: boolean; enabled: boolean };
+export type ManagedTool = { reviewed: boolean; name: string; contract: ToolContract; previous?: ToolContract; change: 'new' | 'changed' | 'removed' | 'unchanged'; selected: boolean; enabled: boolean;
+ // Backend 096, response only: the agents that grant the tool, its criticality order and whether a changed tool was denied before.
+ granted_agents?: number; review_order?: number; denied_before?: boolean };
 export type MCPServer = { id: string; name: string; endpoint: string; transport: string; auth_type: 'chokepoint_token'; enabled: boolean;
  // Backend 035: what a custom server must trust; read only, never sent back.
  audience?: string; issuer?: string; jwks_uri?: string; revision: number; server_info: unknown; tools: ManagedTool[] };
 // A custom server has only the Xokepoint token auth type (Backend 035 Resolved Decision 3).
 export type Connection = { name: string; endpoint: string; transport: string; auth_type: 'chokepoint_token'; revision?: number };
 export type Preview = { preview_id: string; expires_at: string; server_info: unknown; tools: ManagedTool[]; revision: number };
-export type ServerPage = { items: MCPServer[]; next_offset: number | null };
+export type ServerPage = { items: MCPServer[]; next_offset: number | null; total: number };
+// Backend 096: the review history of a server and the impact of a disable.
+export type ReviewDecision = { tool: string; decision: 'approved' | 'denied' | 'change_trusted' | 'kept_disabled' | 'disabled_changed' | 'disabled_removed'; contract: ToolContract; contract_sha256: string };
+export type ReviewEvent = { id: number; kind: 'review' | 'rediscovery'; server_revision: number; reviewer_id?: string; reviewer_name?: string; occurred_at: string; decisions: ReviewDecision[] };
+export type ReviewHistoryPage = { items: ReviewEvent[]; next_offset: number | null };
+export type Impact = { tools: number; agents: { id: string; name: string }[]; allowed_calls_24h: number };
+export const pageSize = 10;
 export const mcpKey = (s: EnvironmentScope) => ['mcp-servers', s.userId, s.tenantId, s.environmentId] as const;
 const path = (s: EnvironmentScope): `/v1/${string}` => `/v1/workspaces/${s.tenantId}/environments/${s.environmentId}/mcp-servers`;
 export const mcpApi = {
  get: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<MCPServer>(`${path(s)}/${id}`, { signal }),
  list: (s: EnvironmentScope, offset: number, signal: AbortSignal) => httpClient<ServerPage>(`${path(s)}?offset=${offset}`, { signal }),
+ // One page of the Integrations list, with the search that the backend runs (Admin 057, Backend 096).
+ page: (s: EnvironmentScope, offset: number, q: string, signal: AbortSignal) => httpClient<ServerPage>(`${path(s)}?${new URLSearchParams({ limit: String(pageSize), offset: String(offset), ...(q ? { q } : {}) })}`, { signal }),
+ reviewHistory: (s: EnvironmentScope, id: string, offset: number, signal: AbortSignal) => httpClient<ReviewHistoryPage>(`${path(s)}/${id}/review-history?offset=${offset}`, { signal }),
+ impact: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<Impact>(`${path(s)}/${id}/impact`, { signal }),
  discover: (s: EnvironmentScope, id: string | undefined, input: Connection, signal: AbortSignal) => httpClient<Preview>(`${path(s)}${id ? `/${id}` : ''}/discover`, { method: 'POST', json: input, signal }),
  confirm: (s: EnvironmentScope, id: string | undefined, preview: Preview, selected: string[], enable: boolean, signal: AbortSignal) => httpClient<MCPServer>(`${path(s)}${id ? `/${id}/confirm` : ''}`, { method: 'POST', json: { preview_id: preview.preview_id, selected_tools: selected, enable }, signal }),
  disable: (s: EnvironmentScope, server: MCPServer, signal: AbortSignal) => httpClient<MCPServer>(`${path(s)}/${server.id}/disable`, { method: 'POST', json: { revision: server.revision }, signal }),
