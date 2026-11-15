@@ -5,7 +5,7 @@ title: Tool Review Text
 stack:
   - Development stack (dev-infra/up.sh) with the local MCP fixtures (dev-infra/mcp run.py), workspace Development Workspace A, environment Sandbox
   - Admin on https://app.xokepoint.localhost (through Envoy), signed in as admin-a@chokepoint.test
-  - Backend feat/094-enterprise-discovery-stored-credential (which contains Backend 091) and Admin feat/055-tool-review-text, each started by its dev.sh from its worktree
+  - Backend main (1664a91, with Backend 091 and 094) and Admin main (250acd4, with Admin 055), each started by its dev.sh; the first runs used the feature branches
   - The dev-only WAF exception for the endpoint of a discovery (Envoy, dev_server), so a 127.0.0.1 endpoint can be discovered
 data: >-
   Catalog (127.0.0.1:8761) with the removed long_count and slow_count. To get a changed tool, the stored
@@ -26,7 +26,7 @@ scenarios:
     last_run:
       date: 2026-11-15
       result: passed
-      notes: 'First run showed ~2 changed with a false Other fields row, because the contracts were compared as text and jsonb reorders keys. Fixed: the diff compares canonical JSON with sorted keys. After a reload (a second discovery), the comparison still used the approved text: Backend 091 live.'
+      notes: 'First run showed ~2 changed with a false Other fields row, because the contracts were compared as text and jsonb reorders keys. Fixed: the diff compares canonical JSON with sorted keys. After a reload (a second discovery), the comparison still used the approved text: Backend 091 live. Rerun on main: ~1 changed, only Description, no Other fields row.'
   - id: S2
     title: Removed tools and the server item
     criteria: [1]
@@ -38,7 +38,7 @@ scenarios:
     last_run:
       date: 2026-11-15
       result: passed
-      notes: 'Instructions "Local development fixture; outputs are test data."; identity chokepoint-catalog 0.1.0.'
+      notes: 'Instructions "Local development fixture; outputs are test data."; identity chokepoint-catalog 0.1.0. Rerun on main: same instructions and identity; long_count shows no decision buttons.'
   - id: S3
     title: Trust a change and confirm
     criteria: [1]
@@ -50,7 +50,7 @@ scenarios:
     last_run:
       date: 2026-11-15
       result: passed
-      notes: 'Database after the confirmation: echo unchanged, reviewed, enabled, "Return a message unchanged. Available on both nonempty fixtures.", no previous; the server stays enabled.'
+      notes: 'Database after the confirmation: echo unchanged, reviewed, enabled, "Return a message unchanged. Available on both nonempty fixtures.", no previous; the server stays enabled. Rerun on main: database echo unchanged, reviewed, enabled, real fixture text, no previous.'
   - id: S4
     title: The Inbox and Review coverage open the review
     criteria: [1]
@@ -63,7 +63,7 @@ scenarios:
     last_run:
       date: 2026-11-15
       result: passed
-      notes: 'Inbox URL keeps return_to=/ and adds review=server. The first run read 0 of 0 decided when nothing needed a decision; fixed to Nothing to decide. Review coverage opened ?tool=echo&review=server at echo. echo was then trusted again to restore the data.'
+      notes: 'Inbox URL keeps return_to=/ and adds review=server. The first run read 0 of 0 decided when nothing needed a decision; fixed to Nothing to decide. Review coverage opened ?tool=echo&review=server at echo. echo was then trusted again to restore the data. Rerun on main: the Inbox opened Catalog at echo with the back link Overview; Review coverage opened ?tool=echo&review=server.'
   - id: S5
     title: A new Custom MCP, bulk approval and denial
     criteria: [1, 2]
@@ -77,7 +77,7 @@ scenarios:
     last_run:
       date: 2026-11-15
       result: passed
-      notes: 'Database: Utilities review test, enabled, tools [add selected and enabled]; echo was dropped.'
+      notes: 'Database: Utilities review test, enabled, tools [add selected and enabled]; echo was dropped. Rerun on main with Utilities main test: Approve 2 read-only, Deny echo; database: enabled, add only.'
   - id: S6
     title: A disabled server is enabled again by its review
     criteria: [1]
@@ -89,7 +89,7 @@ scenarios:
     last_run:
       date: 2026-11-15
       result: passed
-      notes: 'Database: enabled true, add selected. The server was then disabled again.'
+      notes: 'Database: enabled true, add selected. The server was then disabled again. Rerun on main with Utilities main test: Enable server after review shown only while disabled; database: enabled, add selected.'
   - id: S7
     title: Enterprise MCP review
     criteria: [2]
@@ -100,7 +100,7 @@ scenarios:
     last_run:
       date: 2026-11-15
       result: blocked
-      notes: 'No GitHub App and no Enterprise MCP in the local data: connecting needs a real GitHub App and OAuth. Backend 094 is covered by unit tests (stored credential discovery, refused connection fields, 422, kept credential on confirmation).'
+      notes: 'Rerun on main 2026-11-15: still blocked, Integrations > Enterprise MCPs reads Set up your GitHub App first. No GitHub App and no Enterprise MCP in the local data: connecting needs a real GitHub App and OAuth. Backend 094 is covered by unit tests (stored credential discovery, refused connection fields, 422, kept credential on confirmation).'
 ---
 
 # Tool Review Text — functional test
