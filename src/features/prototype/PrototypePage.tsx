@@ -2,16 +2,12 @@ import { useEffect, useState, type ReactElement } from 'react';
 import { Link, Route, Routes } from 'react-router';
 import { loadPrototypeCatalog, type PrototypeEntry, type PrototypeState } from './catalog';
 import './prototype.css';
-import { ToolReviewPrototype } from '../../../specs/prototypes/055-2026-11-14-tool-review-text/ToolReviewPrototype';
-import { EnterpriseReviewPrototype } from '../../../specs/prototypes/055-2026-11-14-tool-review-text/EnterpriseReviewPrototype';
 
 // Layout prototypes: fixed data, never connected to the backend (docs/design-system/visual-specification.md).
 // The prototypes are in specs/prototypes/<specification>/ (see specs/prototypes/README.md).
 // Register each Active prototype here: its specification ID, its path under /prototype/<page> and
 // its page. When its real screen is implemented, remove the entry and mark the prototype Archived.
 const pages: Record<string, { path: string; element: ReactElement }> = {
-  '055': { path: 'tool-review', element: <ToolReviewPrototype /> },
-  '055-enterprise': { path: 'enterprise-review', element: <EnterpriseReviewPrototype /> },
 };
 
 // The index notes are Markdown: show `code` spans as code, the rest as text.

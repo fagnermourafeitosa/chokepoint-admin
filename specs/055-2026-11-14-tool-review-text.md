@@ -7,7 +7,7 @@
 - **Owner**: Admin / MCP integrations
 - **Related Specification**: [Backend 047 — Protocol setup without bypass](../../backend/specs/047-2026-11-03-protocol-setup-without-bypass.md), [Backend 088 — Automatic tool rediscovery](../../backend/specs/088-2026-11-13-automatic-tool-rediscovery.md)
 - **Related Mock Contract**: none
-- **Visual Reference**: [prototype folder](prototypes/055-2026-11-14-tool-review-text/), pages `/prototype/tool-review` (Custom MCP) and `/prototype/enterprise-review` (Enterprise MCP) (Active)
+- **Visual Reference**: [prototype folder](prototypes/055-2026-11-14-tool-review-text/), pages `/prototype/tool-review` (Custom MCP) and `/prototype/enterprise-review` (Enterprise MCP) (Archived; the routes were removed at implementation)
 
 ---
 
