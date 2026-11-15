@@ -47,6 +47,7 @@ A click on a row of the Custom MCPs list opens the server details below the list
 6. **No server details below the list** (user, 2026-11-15). A row does not open details. The row actions are Edit (the dialog: name, endpoint and what the server must trust; saving runs the discovery and opens the review), Discover (the review page with the stored connection, no dialog; Review & re-enable for a disabled server), History and Disable, right-aligned under an Actions header.
 7. **Pager.** The Custom MCPs list has the pager of the Admin lists (records count, Previous and Next), 10 servers a page.
 8. **Links that opened the details.** Every target that opened the server details (Open tool of a reviewed tool in Review coverage, Open server of an Automatic rediscovery failed item, the tool-catalog targets of Investigate and the Inbox) opens the review page of that server, at that tool when the target names one.
+9. **A smaller tour button** (user, 2026-11-15). The fixed "Take the tour" button (Admin 052) covered Confirm review and the Next of the pagers. It becomes a small icon button (a help icon) with the tooltip "Take the tour", and the review footer keeps only its width free.
 
 ---
 
