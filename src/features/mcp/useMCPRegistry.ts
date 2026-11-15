@@ -17,7 +17,6 @@ export function useMCPRegistry(scope: EnvironmentScope, enabled = true) {
  const selected = servers.find(server => server.id === selectedId);
  const refresh = () => Promise.all([
   client.invalidateQueries({ queryKey: mcpKey(scope) }),
-  client.invalidateQueries({ queryKey: ['mcp-provider-connection', scope.userId, scope.tenantId, scope.environmentId] }),
   client.invalidateQueries({ queryKey: ['mcp-detail', scope.userId, scope.tenantId, scope.environmentId] }),
   client.invalidateQueries({ queryKey: ['mcp-summaries', scope.userId, scope.tenantId, scope.environmentId] }),
   client.invalidateQueries({ queryKey: ['permission-catalogs', scope.userId, scope.tenantId, scope.environmentId] }),
