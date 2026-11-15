@@ -1,21 +1,35 @@
-import { useEffect, useState, type ReactElement } from 'react';
+import { lazy, Suspense, useEffect, useState, type ComponentType, type ReactElement } from 'react';
 import { Link, Route, Routes } from 'react-router';
 import { loadPrototypeCatalog, type PrototypeEntry, type PrototypeState } from './catalog';
 import './prototype.css';
-import { ToolReviewHistoryPrototype } from '../../../specs/prototypes/057-2026-11-15-tool-review-history/ReviewPrototype';
-import { IntegrationsPrototype } from '../../../specs/prototypes/057-2026-11-15-tool-review-history/IntegrationsPrototype';
-import { CoveragePrototype } from '../../../specs/prototypes/057-2026-11-15-tool-review-history/CoveragePrototype';
 
 // Layout prototypes: fixed data, never connected to the backend (docs/design-system/visual-specification.md).
 // The prototypes are in specs/prototypes/<specification>/ (see specs/prototypes/README.md).
 // Register each Active prototype here: its specification ID, its path under /prototype/<page> and
 // its page. When its real screen is implemented, remove the entry and mark the prototype Archived.
+//
+// The pages load through import.meta.glob and only in the development server, as the catalog does:
+// the production image copies src/ without specs/, so a static import of a prototype breaks its
+// type check and build. A glob over a missing folder is empty.
+const modules = import.meta.env.DEV
+  ? import.meta.glob<Record<string, ComponentType>>('../../../specs/prototypes/*/*Prototype.tsx')
+  : {};
+
+function prototype(file: string, name: string): ReactElement {
+  const load = modules[`../../../specs/prototypes/${file}`];
+  const Page = lazy(async () => {
+    if (!load) throw new Error(`Prototype not found: ${file}`);
+    return { default: (await load())[name] };
+  });
+  return <Suspense fallback={null}><Page /></Suspense>;
+}
+
 const pages: Record<string, { path: string; element: ReactElement }> = {
-  '057': { path: 'tool-review-order', element: <ToolReviewHistoryPrototype /> },
+  '057': { path: 'tool-review-order', element: prototype('057-2026-11-15-tool-review-history/ReviewPrototype.tsx', 'ToolReviewHistoryPrototype') },
   // The second page of 057, linked from the first: the Custom MCPs list, with the Review history panel.
-  '057-integrations': { path: 'integrations', element: <IntegrationsPrototype /> },
+  '057-integrations': { path: 'integrations', element: prototype('057-2026-11-15-tool-review-history/IntegrationsPrototype.tsx', 'IntegrationsPrototype') },
   // The third page of 057: Review coverage with small row actions.
-  '057-coverage': { path: 'review-coverage', element: <CoveragePrototype /> },
+  '057-coverage': { path: 'review-coverage', element: prototype('057-2026-11-15-tool-review-history/CoveragePrototype.tsx', 'CoveragePrototype') },
 };
 
 // The index notes are Markdown: show `code` spans as code, the rest as text.
