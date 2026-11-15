@@ -60,6 +60,11 @@ Decided with the user on 2026-11-15, after reading how the backend detects a cha
 ## Acceptance Criteria
 
 - [x] 1. The user approves the layout on the prototype (2026-11-15).
+- [ ] 2. Before the merge to `main`, the public documentation in `frontend/content/docs`, in `en` and `pt-BR`, describes the implemented screen:
+  - `platform/mcp-servers/tool-review.mdx`: the review page (list and detail), the decisions (Approve and Deny, Trust this change and Keep disabled), "Changes since you approved it" (Backend 091), the reviewer guide with its OWASP entries, and that nobody edits the text of a tool;
+  - `platform/mcp-servers/server-details.mdx`: the review is a page, not a dialog;
+  - `platform/mcp-servers/custom-servers.mdx` and `platform/mcp-servers/enterprise-servers.mdx`: the review step after a discovery;
+  - `platform/operations/inbox.mdx`: the Review action of a tool discovery item opens the review page with the first pending tool open.
 
 ## Out of Scope
 
