@@ -14,3 +14,4 @@
 .cp-admin-table.mcp-servers th.il-actions-head { text-align: right; }
 .il-row-actions { justify-content: flex-end; }
 .il-row-actions .cp-admin-button { min-width: 10.5rem; justify-content: center; }
+.il-status { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); white-space: nowrap; }

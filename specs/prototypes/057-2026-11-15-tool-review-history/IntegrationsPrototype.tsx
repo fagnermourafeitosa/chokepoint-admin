@@ -35,13 +35,14 @@ export function IntegrationsPrototype() {
       <tbody>{rows.map(s => <tr key={s.name}>
         <td><span className="il-name"><Server size={24} aria-hidden="true" /><span><strong>{s.name}</strong><small>Custom MCP · {s.transport}</small></span></span></td>
         <td>{s.tools} tools{s.reviewRequired ? <span className="mcp-badge" data-tone="warning">Review required</span> : null}</td>
-        <td><span className="mcp-badge" data-tone={s.enabled ? 'success' : undefined}>{s.enabled ? 'Enabled' : 'Disabled'}</span></td>
+        {/* The status is the switch (user, 2026-11-15). Off disables at once; on opens the review with
+            Enable server after review checked, because only a confirmed review enables a server. */}
+        <td><label className="cp-admin-choice il-status"><input className="cp-admin-switch" type="checkbox" role="switch" checked={s.enabled} aria-label={`${s.name} enabled`} onChange={e => (e.target.checked ? window.location.assign('/prototype/tool-review-order') : disable(s.name))} />{s.enabled ? 'Enabled' : 'Disabled'}</label></td>
         <td><div className="identity-row-actions il-row-actions">
-          <a className="cp-admin-button cp-admin-button--ghost" href="/prototype/tool-review-order">{!s.enabled ? 'Review & re-enable' : s.reviewRequired ? 'Review' : 'Discover'}</a>
+          <a className="cp-admin-button cp-admin-button--ghost" href="/prototype/tool-review-order">{s.reviewRequired ? 'Review' : 'Discover'}</a>
           <details className="identity-menu" name="mcp-row-menu"><summary aria-label={`More actions for ${s.name}`}><MoreHorizontal size={18} /></summary><div onClick={e => e.currentTarget.closest('details')?.removeAttribute('open')}>
             <button type="button" onClick={() => setEditing(s)}>Edit connection</button>
             <button type="button" onClick={() => setHistory(true)}>Review history</button>
-            {s.enabled ? <button type="button" onClick={() => disable(s.name)}>Disable connection</button> : <button type="button" onClick={() => window.location.assign('/prototype/tool-review-order')}>Enable connection</button>}
           </div></details>
         </div></td>
       </tr>)}</tbody>
