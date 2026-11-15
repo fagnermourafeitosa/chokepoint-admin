@@ -95,3 +95,28 @@ export const servers: ListedServer[] = [
   { name: 'Payroll', endpoint: 'https://payroll.acme.example/mcp', transport: 'streamable-http', tools: 4, enabled: false, agents: [], calls: 0 },
   { name: 'Ticketing', endpoint: 'https://ticketing.acme.example/mcp', transport: 'streamable-http', tools: 6, enabled: true, agents: ['Support bot'], calls: 230 },
 ];
+
+// The identity providers of the environment, for the Identity providers tab (Admin 057, decision 10).
+export type ListedIdentity = { name: string; issuer: string; audiences: string[]; enabled: boolean; check: 'verified' | 'failed' | 'none'; checkedAt?: string };
+export const identities: ListedIdentity[] = [
+  { name: 'Keycloak customer', issuer: 'https://id.acme.example/realms/customer', audiences: ['xokepoint'], enabled: true, check: 'verified', checkedAt: 'Nov 15, 09:12 UTC' },
+  { name: 'Google Workspace', issuer: 'https://accounts.google.com', audiences: ['1234-acme.apps.googleusercontent.com'], enabled: true, check: 'verified', checkedAt: 'Nov 14, 18:40 UTC' },
+  { name: 'Okta workforce', issuer: 'https://acme.okta.com/oauth2/default', audiences: ['api://xokepoint'], enabled: false, check: 'failed', checkedAt: 'Nov 13, 11:05 UTC' },
+];
+
+// Review coverage rows (Admin 057, decision 10): each managed tool and its review state.
+export const coverage: { tool: string; server: string; reviewed: boolean }[] = [
+  { tool: 'refund_order', server: 'Acme Billing', reviewed: false },
+  { tool: 'get_receipt', server: 'Acme Billing', reviewed: false },
+  { tool: 'get_order', server: 'Acme Billing', reviewed: true },
+  { tool: 'list_orders', server: 'Acme Billing', reviewed: true },
+  { tool: 'post_journal', server: 'Ledger', reviewed: false },
+  { tool: 'list_issues', server: 'Acme Issues', reviewed: true },
+  { tool: 'get_issue', server: 'Acme Issues', reviewed: true },
+  { tool: 'create_issue', server: 'Acme Issues', reviewed: true },
+  { tool: 'search_docs', server: 'Customer support RAG', reviewed: true },
+  { tool: 'echo', server: 'Catalog', reviewed: true },
+  { tool: 'add', server: 'Catalog', reviewed: true },
+  { tool: 'current_time', server: 'Catalog', reviewed: true },
+  { tool: 'list_stock', server: 'Inventory', reviewed: true },
+];

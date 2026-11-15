@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MoreHorizontal, Plus, Server, Users } from 'lucide-react';
+import { Check, MoreHorizontal, Plus, Server, Shield, Users } from 'lucide-react';
 import { TracePager } from '../../../src/features/investigate/TraceUI';
 import '../../../src/features/mcp/mcp.css';
 import '../../../src/features/investigate/investigate.css';
@@ -8,7 +8,7 @@ import { ReviewHistory } from './HistoryPrototype';
 import { Dialog } from '../../../src/components/ui/dialog/Dialog';
 import { WaitingBackend } from '../../../src/features/access/delegation/WaitingBackend';
 import { EditDialog } from './EditDialog';
-import { servers as fixture, type ListedServer } from './data';
+import { identities, servers as fixture, type ListedServer } from './data';
 import './prototype.css';
 
 // Admin 057 prototype: the Custom MCPs list of Integrations. A row no longer opens the server details
@@ -20,6 +20,7 @@ import './prototype.css';
 const size = 10;
 
 export function IntegrationsPrototype() {
+  const [tab, setTab] = useState<'custom' | 'identity'>('custom');
   const [page, setPage] = useState(1);
   const [history, setHistory] = useState(false);
   const [editing, setEditing] = useState<ListedServer>();
@@ -30,8 +31,9 @@ export function IntegrationsPrototype() {
   const disable = (name: string) => { setServers(list => list.map(s => (s.name === name ? { ...s, enabled: false } : s))); setDisabling(undefined); };
   const rows = servers.slice((page - 1) * size, page * size);
   return <section aria-label="Integrations" className="mcp-registry">
-    <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect custom MCPs and identity providers, then manage agent access.</p></div><button type="button" className="cp-admin-button"><Plus size={16} />Connect custom MCP</button></header>
-    <div className="mcp-types" role="group" aria-label="Integration type"><button aria-pressed="true"><Server size={17} />Custom MCPs</button><button aria-pressed="false"><Users size={17} />Identity providers</button></div>
+    <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect custom MCPs and identity providers, then manage agent access.</p></div><button type="button" className="cp-admin-button"><Plus size={16} />{tab === 'custom' ? 'Connect custom MCP' : 'Connect identity provider'}</button></header>
+    <div className="mcp-types" role="group" aria-label="Integration type"><button aria-pressed={tab === 'custom'} onClick={() => setTab('custom')}><Server size={17} />Custom MCPs</button><button aria-pressed={tab === 'identity'} onClick={() => setTab('identity')}><Users size={17} />Identity providers</button></div>
+    {tab === 'identity' ? <IdentityList /> : <>
     <div className="mcp-toolbar"><label htmlFor="mcp-search">Find a connection</label><input id="mcp-search" type="search" className="cp-admin-input" placeholder="Search by name or endpoint" /></div>
     <div className="cp-admin-table-scroll identity-table-region" role="region" aria-label="MCP servers table" tabIndex={0}><table className="cp-admin-table mcp-servers">
       <thead><tr><th>Connection</th><th>Managed tools</th><th>Status</th><th className="il-actions-head">Actions</th></tr></thead>
@@ -51,6 +53,7 @@ export function IntegrationsPrototype() {
       </tr>)}</tbody>
     </table></div>
     <TracePager page={page} size={size} total={servers.length} onPage={setPage} />
+    </>}
     {history ? <ReviewHistory onClose={() => setHistory(false)} /> : null}
     {editing ? <EditDialog server={editing} onClose={() => setEditing(undefined)} /> : null}
     {/* Turning a server off cuts every agent off its tools at once, and only a review turns it on
@@ -67,4 +70,21 @@ export function IntegrationsPrototype() {
       <div className="admin-dialog-actions"><button type="button" className="cp-admin-button cp-admin-button--secondary" onClick={() => setDisabling(undefined)}>Cancel</button><button type="button" className="cp-admin-button cp-admin-button--danger" onClick={() => disable(disabling.name)}>Disable server</button></div>
     </Dialog> : null}
   </section>;
+}
+
+// The Identity providers tab with small row actions (decision 10): Edit as a small ghost button and
+// the More menu of the same height. Columns and menu as src/features/identity/IdentityRegistry.tsx.
+function IdentityList() {
+  return <>
+    <div className="cp-admin-table-scroll identity-table-region" role="region" aria-label="Identity connections" tabIndex={0}><table className="cp-admin-table identity-table">
+      <thead><tr><th>Connection</th><th>Accepted audiences</th><th>Status</th><th>Configuration check</th><th className="il-actions-head">Actions</th></tr></thead>
+      <tbody>{identities.map(c => <tr key={c.name}>
+        <td><div className="identity-name"><Shield size={22} /><span><strong>{c.name}</strong><small className="cp-admin-muted">{c.issuer}</small></span></div></td>
+        <td><div className="identity-audience-values">{c.audiences.map(a => <code key={a}>{a}</code>)}</div></td>
+        <td><span className="mcp-badge" data-tone={c.enabled ? 'success' : undefined}>{c.enabled ? 'Enabled' : 'Disabled'}</span></td>
+        <td><span className="identity-check-result">{c.check === 'verified' ? <Check size={16} aria-hidden="true" /> : null}{c.check === 'verified' ? 'Verified' : c.check === 'failed' ? 'Check failed' : 'Not checked'}</span>{c.checkedAt ? <small className="identity-check-date cp-admin-muted">{c.checkedAt}</small> : null}</td>
+        <td><div className="identity-row-actions il-row-actions"><button type="button" className="cp-admin-button cp-admin-button--ghost cp-admin-button--small">Edit</button><details className="identity-menu" name="identity-row-menu"><summary aria-label={`More actions for ${c.name}`}><MoreHorizontal size={18} /></summary><div onClick={e => e.currentTarget.closest('details')?.removeAttribute('open')}><button type="button">Check configuration</button><button type="button">{c.enabled ? 'Disable connection' : 'Enable connection'}</button><button type="button" className="identity-delete-action">Delete connection</button></div></details></div></td>
+      </tr>)}</tbody>
+    </table></div>
+  </>;
 }

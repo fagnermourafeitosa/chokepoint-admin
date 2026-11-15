@@ -19,3 +19,4 @@
 .il-status { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); white-space: nowrap; }
 .il-impact { display: grid; gap: var(--cp-admin-space-2); margin: 0; padding-left: 1.25rem; }
 .il-impact li > span { display: block; }
+.cp-admin-table th.il-actions-head { text-align: right; }

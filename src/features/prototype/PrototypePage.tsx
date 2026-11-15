@@ -4,6 +4,7 @@ import { loadPrototypeCatalog, type PrototypeEntry, type PrototypeState } from '
 import './prototype.css';
 import { ToolReviewHistoryPrototype } from '../../../specs/prototypes/057-2026-11-15-tool-review-history/ReviewPrototype';
 import { IntegrationsPrototype } from '../../../specs/prototypes/057-2026-11-15-tool-review-history/IntegrationsPrototype';
+import { CoveragePrototype } from '../../../specs/prototypes/057-2026-11-15-tool-review-history/CoveragePrototype';
 
 // Layout prototypes: fixed data, never connected to the backend (docs/design-system/visual-specification.md).
 // The prototypes are in specs/prototypes/<specification>/ (see specs/prototypes/README.md).
@@ -13,6 +14,8 @@ const pages: Record<string, { path: string; element: ReactElement }> = {
   '057': { path: 'tool-review-order', element: <ToolReviewHistoryPrototype /> },
   // The second page of 057, linked from the first: the Custom MCPs list, with the Review history panel.
   '057-integrations': { path: 'integrations', element: <IntegrationsPrototype /> },
+  // The third page of 057: Review coverage with small row actions.
+  '057-coverage': { path: 'review-coverage', element: <CoveragePrototype /> },
 };
 
 // The index notes are Markdown: show `code` spans as code, the rest as text.
