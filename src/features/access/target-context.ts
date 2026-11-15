@@ -38,7 +38,6 @@ export function actionPath(
     'policy_id',
     'decision_id',
     'section',
-    'connection_type',
   ]);
   const params = new URLSearchParams(
     Object.entries(action.params).filter(([key]) => permitted.has(key)),
@@ -51,7 +50,7 @@ export function actionPath(
     return `/access?${params}`;
   }
   if (action.route === 'tool-catalog') {
-    params.set('type', params.get('connection_type') === 'enterprise' ? 'enterprise' : 'custom');
+    params.set('type', 'custom');
     if (params.has('server_id')) params.set('server', params.get('server_id')!);
     return `/access/integrations?${params}`;
   }
