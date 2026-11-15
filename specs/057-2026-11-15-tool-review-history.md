@@ -3,7 +3,7 @@
 - **Specification ID**: 057
 - **Date**: 2026-11-15
 - **Slug**: tool-review-history
-- **Status**: Proposed
+- **Status**: Not Implemented
 - **Owner**: Admin / MCP integrations
 - **Related Specification**: [Backend 096 — Tool Review History and Remembered Denials](../../backend/specs/096-2026-11-15-tool-review-history.md), [055 — Tool Review Text](055-2026-11-14-tool-review-text.md)
 - **Related Mock Contract**: none
