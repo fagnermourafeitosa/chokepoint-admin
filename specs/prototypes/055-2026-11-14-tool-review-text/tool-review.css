@@ -1,34 +1,56 @@
-/* Admin 055 prototype: the Review discovered tools dialog with a right column. Tokens of the
-   Admin design system only. The dialog shows in the page, not as a modal, so it is laid out here. */
-.tool-review-dialog { position: static; display: flex; flex-direction: column; margin: var(--cp-admin-space-5) auto; width: min(1180px, calc(100vw - 2rem)); max-width: 1180px; max-height: none; }
-.tool-review-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--cp-admin-space-5); align-items: start; }
-.tool-review-list { display: grid; gap: var(--cp-admin-space-3); min-width: 0; }
-.tool-review-rows .mcp-tool-row { cursor: pointer; }
-.tool-review-rows .mcp-tool-row[data-context-target="true"] { box-shadow: inset 3px 0 0 var(--cp-admin-color-text); }
-.tool-review-server { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-3); text-align: left; padding: var(--cp-admin-space-4); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); color: inherit; font: inherit; cursor: pointer; }
-.tool-review-server > span:first-child { display: grid; gap: var(--cp-admin-space-1); }
-.tool-review-server[aria-pressed="true"] { box-shadow: inset 3px 0 0 var(--cp-admin-color-text); }
+/* Admin 055 prototype: the review of a discovery as a page. List and detail split by a clear divider.
+   Tokens of the Admin design system only. */
+/* align-content: start keeps the heading in place when the detail changes height. */
+.tr-page { display: grid; align-content: start; gap: var(--cp-admin-space-5); }
+.tr-back { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); color: inherit; font-weight: var(--cp-admin-weight-semibold); text-decoration: none; }
+.tr-page-head { align-items: end; }
+.tr-progress { display: grid; gap: var(--cp-admin-space-2); min-width: 220px; }
+.tr-progress-bar { appearance: none; width: 100%; height: .75rem; border: var(--cp-admin-border-width) solid var(--cp-admin-color-text); border-radius: var(--cp-admin-radius-button); background: var(--cp-admin-color-surface); }
+/* Same as the coverage meter of the Overview (src/features/overview/overview.css). */
+.tr-progress-bar::-webkit-progress-bar { background: var(--cp-admin-color-surface); }
+.tr-progress-bar::-webkit-progress-value { background: var(--cp-admin-color-text); }
+.tr-progress-bar::-moz-progress-bar { background: var(--cp-admin-color-text); }
 
-.tool-review-detail { position: sticky; top: 0; display: grid; gap: var(--cp-admin-space-5); padding: var(--cp-admin-space-5); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); min-width: 0; }
-.tool-review-detail header { display: grid; gap: var(--cp-admin-space-1); }
-.tool-review-detail h3 { margin: 0; }
-.tool-review-name { display: flex; align-items: center; gap: var(--cp-admin-space-3); }
-.tool-review-block { display: grid; gap: var(--cp-admin-space-2); }
-.tool-review-block h4 { margin: 0; }
-.tool-review-text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-.tool-review-compare { display: grid; gap: var(--cp-admin-space-3); }
-.tool-review-compare > div { display: grid; gap: var(--cp-admin-space-1); }
-.tool-review-mark { background: var(--cp-admin-color-danger-bg); color: var(--cp-admin-color-danger); padding: 0 2px; }
-.tool-review-mark[data-side="before"] { text-decoration: line-through; }
-.tool-review-params { display: grid; gap: var(--cp-admin-space-3); margin: 0; }
-.tool-review-params > div { display: grid; gap: var(--cp-admin-space-1); }
-.tool-review-params dt { display: flex; align-items: baseline; gap: var(--cp-admin-space-3); }
-.tool-review-params dd { margin: 0; }
+.tr-layout { display: grid; grid-template-columns: minmax(260px, 340px) minmax(0, 1fr); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); min-height: 520px; }
+.tr-list { display: grid; align-content: start; gap: var(--cp-admin-space-2); padding: var(--cp-admin-space-4); border-right: 1px solid var(--cp-admin-color-border); }
+.tr-list h3 { margin: var(--cp-admin-space-3) 0 0; }
+.tr-list ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--cp-admin-space-1); }
+.tr-item { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "copy badge" "copy state"; align-items: center; gap: 2px var(--cp-admin-space-3); padding: var(--cp-admin-space-3); border: 0; border-radius: var(--cp-admin-radius-control); background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.tr-item:hover { background: var(--cp-admin-color-row-hover); }
+.tr-item[aria-current="true"] { background: var(--cp-admin-color-row-selected); }
+.tr-item-copy { grid-area: copy; display: grid; gap: 2px; min-width: 0; }
+.tr-item .mcp-badge { grid-area: badge; justify-self: end; }
+.tr-item .tr-state { grid-area: state; justify-self: end; }
+.tr-group-toggle { display: flex; align-items: center; gap: var(--cp-admin-space-2); margin-top: var(--cp-admin-space-3); padding: var(--cp-admin-space-2) 0; border: 0; background: none; color: inherit; font: inherit; font-weight: var(--cp-admin-weight-semibold); cursor: pointer; }
+.tr-group-toggle[aria-expanded="true"] svg { transform: rotate(90deg); }
 
-.tool-review-guide { display: grid; gap: var(--cp-admin-space-2); padding: var(--cp-admin-space-4); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-warning-bg); }
-.tool-review-guide h4, .tool-review-guide p { margin: 0; }
-.tool-review-guide ul { margin: 0; padding-left: 1.2rem; display: grid; gap: var(--cp-admin-space-3); }
-.tool-review-guide li { display: grid; gap: var(--cp-admin-space-1); }
-.tool-review-guide a { font-size: var(--cp-admin-type-label); }
+.tr-state { font-size: var(--cp-admin-type-label); font-weight: var(--cp-admin-weight-semibold); }
+.tr-state[data-state="pending"] { color: var(--cp-admin-color-warning); }
+.tr-state[data-state="approved"] { color: var(--cp-admin-color-success); }
+.tr-state[data-state="denied"] { color: var(--cp-admin-color-danger); }
 
-@media (max-width: 900px) { .tool-review-body { grid-template-columns: 1fr; } .tool-review-detail { position: static; } }
+.tr-detail { display: grid; align-content: start; gap: var(--cp-admin-space-5); padding: var(--cp-admin-space-5) var(--cp-admin-space-6, 2rem); min-width: 0; }
+.tr-detail-head { display: flex; align-items: start; justify-content: space-between; gap: var(--cp-admin-space-4); }
+.tr-detail-head h2 { margin: 0 0 var(--cp-admin-space-1); }
+.tr-field { display: grid; gap: var(--cp-admin-space-2); }
+.tr-field-label { display: flex; align-items: baseline; gap: var(--cp-admin-space-3); font-weight: var(--cp-admin-weight-semibold); }
+.tr-text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+/* The guide is the design system accordion; only its icon and list spacing are set here. */
+.tr-guide summary { display: flex; align-items: center; gap: var(--cp-admin-space-2); }
+.tr-guide summary svg { color: var(--cp-admin-color-warning); flex: none; }
+.tr-guide p { margin: 0 0 var(--cp-admin-space-2); }
+.tr-guide ul { margin: 0 0 var(--cp-admin-space-2); padding-left: 1.2rem; display: grid; gap: var(--cp-admin-space-2); }
+.tr-guide a { white-space: nowrap; }
+
+.tr-decision { display: flex; justify-content: flex-end; gap: var(--cp-admin-space-3); padding-top: var(--cp-admin-space-4); border-top: 1px solid var(--cp-admin-color-border); }
+.tr-decision .cp-admin-button--secondary[aria-pressed="true"] { background: var(--cp-admin-color-selected); }
+.tr-footer { position: sticky; bottom: 0; display: flex; align-items: center; justify-content: flex-end; gap: var(--cp-admin-space-4); padding: var(--cp-admin-space-4) 0; background: var(--cp-admin-color-surface); border-top: 1px solid var(--cp-admin-color-border); }
+.tr-footer > div { display: flex; gap: var(--cp-admin-space-3); }
+
+@media (max-width: 900px) {
+  .tr-layout { grid-template-columns: 1fr; }
+  .tr-list { border-right: 0; border-bottom: 1px solid var(--cp-admin-color-border); }
+}
+/* A long text stays on the line of its sign in the revision history diff. */
+.tr-detail .history-diff li { flex-wrap: nowrap; }
+.tr-detail .history-diff li strong { flex: 1; min-width: 0; overflow-wrap: anywhere; }
