@@ -99,8 +99,8 @@ scenarios:
       - The page shows the provider, the account and the same review; it opens without a new OAuth authorization (Backend 094).
     last_run:
       date: 2026-11-15
-      result: blocked
-      notes: 'Rerun on main 2026-11-15: still blocked, Integrations > Enterprise MCPs reads Set up your GitHub App first. No GitHub App and no Enterprise MCP in the local data: connecting needs a real GitHub App and OAuth. Backend 094 is covered by unit tests (stored credential discovery, refused connection fields, 422, kept credential on confirmation).'
+      result: passed
+      notes: 'Run on main with the GitHub App of the user in Sandbox and the account fagnermourafeitosa (OAuth done by the user). New connection: 46 tools, Approve 28 read-only, 18 write tools denied, confirmed; the server stores 28 tools and the credential. Then the approved description of get_me was shortened in the database: the review opened from Integrations and from the Inbox (back link Overview) with no new authorization (Backend 094), get_me Changed with ~1 changed in Description; Trust this change and Confirm review kept the credential (same secret hash, account, connected) and left get_me unchanged with no previous. The run found two layout defects, fixed in the same pass: long tool names ran under the badges, and the Take the tour button covered Confirm review.'
 ---
 
 # Tool Review Text — functional test
