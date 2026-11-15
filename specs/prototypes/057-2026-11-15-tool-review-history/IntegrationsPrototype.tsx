@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { History, Pause, Pencil, Plus, RefreshCw, Server, Users } from 'lucide-react';
+import { MoreHorizontal, Plus, Server, Users } from 'lucide-react';
 import { TracePager } from '../../../src/features/investigate/TraceUI';
 import '../../../src/features/mcp/mcp.css';
 import '../../../src/features/investigate/investigate.css';
+import '../../../src/features/identity/identity.css';
 import { ReviewHistory } from './HistoryPrototype';
 import { servers } from './data';
 import './prototype.css';
 
 // Admin 057 prototype: the Custom MCPs list of Integrations. A row no longer opens the server details
 // below the list: the Edit dialog shows the connection and what the server must trust, the review page
-// shows the tools, and Review history opens the history. Edit and Discover are two actions, and the
-// list has a pager. Fixed data.
+// shows the tools, and History opens the review history. Each row has one visible action, Discover,
+// and a menu for the others, as the rows of Identity providers (src/features/identity/IdentityRegistry.tsx).
+// The list has a pager. Fixed data.
 
 const size = 10;
 
@@ -22,18 +24,20 @@ export function IntegrationsPrototype() {
     <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect custom MCPs and identity providers, then manage agent access.</p></div><button type="button" className="cp-admin-button"><Plus size={16} />Connect custom MCP</button></header>
     <div className="mcp-types" role="group" aria-label="Integration type"><button aria-pressed="true"><Server size={17} />Custom MCPs</button><button aria-pressed="false"><Users size={17} />Identity providers</button></div>
     <div className="mcp-toolbar"><label htmlFor="mcp-search">Find a connection</label><input id="mcp-search" type="search" className="cp-admin-input" placeholder="Search by name or endpoint" /></div>
-    <div className="cp-admin-table-scroll" role="region" aria-label="MCP servers table" tabIndex={0}><table className="cp-admin-table mcp-servers">
+    <div className="cp-admin-table-scroll identity-table-region" role="region" aria-label="MCP servers table" tabIndex={0}><table className="cp-admin-table mcp-servers">
       <thead><tr><th>Connection</th><th>Managed tools</th><th>Status</th><th className="il-actions-head">Actions</th></tr></thead>
       <tbody>{rows.map(s => <tr key={s.name}>
         <td><span className="il-name"><Server size={24} aria-hidden="true" /><span><strong>{s.name}</strong><small>Custom MCP · {s.transport}</small></span></span></td>
         <td>{s.tools} tools{s.reviewRequired ? <span className="mcp-badge" data-tone="warning">Review required</span> : null}</td>
         <td><span className="mcp-badge" data-tone={s.enabled ? 'success' : undefined}>{s.enabled ? 'Enabled' : 'Disabled'}</span></td>
-        <td className="mcp-row-actions">
-          <button type="button" className="cp-admin-button cp-admin-button--ghost"><Pencil size={14} />Edit</button>
-          <a className="cp-admin-button cp-admin-button--ghost" href="/prototype/tool-review-order"><RefreshCw size={14} />{s.enabled ? 'Discover' : 'Review & re-enable'}</a>
-          <button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => setHistory(true)}><History size={14} />History</button>
-          {s.enabled ? <button type="button" className="cp-admin-button cp-admin-button--ghost" aria-label={`Disable ${s.name}`}><Pause size={14} />Disable</button> : null}
-        </td>
+        <td><div className="identity-row-actions il-row-actions">
+          <a className="cp-admin-button cp-admin-button--ghost" href="/prototype/tool-review-order">{s.enabled ? 'Discover' : 'Review & re-enable'}</a>
+          <details className="identity-menu"><summary aria-label={`More actions for ${s.name}`}><MoreHorizontal size={18} /></summary><div>
+            <button type="button">Edit connection</button>
+            <button type="button" onClick={() => setHistory(true)}>Review history</button>
+            {s.enabled ? <button type="button">Disable connection</button> : null}
+          </div></details>
+        </div></td>
       </tr>)}</tbody>
     </table></div>
     <TracePager page={page} size={size} total={servers.length} onPage={setPage} />
