@@ -54,3 +54,13 @@
 /* A long text stays on the line of its sign in the revision history diff. */
 .tr-detail .history-diff li { flex-wrap: nowrap; }
 .tr-detail .history-diff li strong { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.tr-detail .history-diff li:has(> code) strong { flex: none; }
+.tr-detail .history-diff li > code { flex: 1; min-width: 0; }
+.tr-detail .history-diff li strong code { color: inherit; }
+
+/* Enterprise page: the provider and account in the heading, the bulk approval next to To review, and the
+   prototype-only scenario switch. */
+.tr-enterprise-head { display: flex; align-items: center; gap: var(--cp-admin-space-4); }
+.tr-group-head { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-2); margin-top: var(--cp-admin-space-3); }
+.tr-group-head h3 { margin: 0; }
+.tr-scenario { justify-self: start; }

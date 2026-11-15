@@ -27,6 +27,7 @@ function Field({ label, now }: { label: ReactNode; now?: string; changed?: boole
 }
 
 function stateLabel(t: ManagedTool, decision?: Decision) {
+  if (t.change === 'removed') return <span className="tr-state cp-admin-muted">Disabled</span>;
   if (!needsDecision(t)) return <span className="tr-state cp-admin-muted">No change</span>;
   if (!decision) return <span className="tr-state" data-state="pending">To review</span>;
   if (t.change === 'changed') return <span className="tr-state" data-state={decision}>{decision === 'approved' ? 'Change trusted' : 'Kept disabled'}</span>;
@@ -44,43 +45,51 @@ function Guide({ changed }: { changed: boolean }) {
   </details>;
 }
 
-// A changed field as two rows of the revision history diff (design system): the approved text removed,
-// the discovered text added.
-function DiffRows({ was, now }: { was?: string; now?: string }) {
-  return <ul>
-    <li data-kind="removed"><span className="history-sign" aria-label="approved">−</span><strong>{was || 'No description.'}</strong></li>
-    <li data-kind="added"><span className="history-sign" aria-label="discovered">+</span><strong>{now || 'No description.'}</strong></li>
-  </ul>;
+// The changes of a tool since its approval, by JSON path (Admin 055, decision 2): the text that the
+// model reads as removed and added rows; a parameter added or removed and a type or required change as
+// one row; every other difference grouped in one Other fields row. Each item counts once.
+type Row = { kind: 'added' | 'removed' | 'changed'; text: ReactNode; code?: string };
+type Item = { section: string; rows: Row[] };
+const textRows = (was?: string, now?: string): Row[] => [{ kind: 'removed', text: was || 'No description.' }, { kind: 'added', text: now || 'No description.' }];
+function changesOf(was: ToolContract, now: ToolContract): Item[] {
+  const items: Item[] = [];
+  if (was.title !== now.title) items.push({ section: 'Title', rows: textRows(was.title, now.title) });
+  if (was.description !== now.description) items.push({ section: 'Description', rows: textRows(was.description, now.description) });
+  const before = new Map(params(was).map(p => [p.name, p])), after = new Map(params(now).map(p => [p.name, p]));
+  for (const p of after.values()) {
+    const old = before.get(p.name);
+    if (!old) { items.push({ section: `Parameter ${p.name}`, rows: [{ kind: 'added', text: `Parameter added · ${p.type}${p.required ? ' · required' : ''}`, code: p.description }] }); continue; }
+    if (old.type !== p.type) items.push({ section: `Parameter ${p.name}`, rows: [{ kind: 'changed', text: `Type ${old.type} → ${p.type}` }] });
+    if (old.required !== p.required) items.push({ section: `Parameter ${p.name}`, rows: [{ kind: 'changed', text: p.required ? 'Now required' : 'No longer required' }] });
+    if (old.description !== p.description) items.push({ section: `Parameter ${p.name}`, rows: textRows(old.description, p.description) });
+  }
+  for (const p of before.values()) if (!after.has(p.name)) items.push({ section: `Parameter ${p.name}`, rows: [{ kind: 'removed', text: 'Parameter removed' }] });
+  const rest = (c: ToolContract) => JSON.stringify({ ...c, name: undefined, title: undefined, description: undefined, inputSchema: undefined });
+  if (rest(was) !== rest(now)) items.push({ section: 'Other fields', rows: [{ kind: 'removed', text: <code>{rest(was)}</code> }, { kind: 'added', text: <code>{rest(now)}</code> }] });
+  return items;
 }
 
 function ToolDetail({ tool, decision, decide }: { tool: ManagedTool; decision?: Decision; decide: (d: Decision) => void }) {
   const changed = tool.change === 'changed';
-  const was = changed ? tool.previous : undefined;
-  const before = new Map(params(was).map(p => [p.name, p.description]));
+  const removed = tool.change === 'removed';
+  const items = changed && tool.previous ? changesOf(tool.previous, tool.contract) : [];
+  const touched = new Set(items.map(i => i.section));
   const now = params(tool.contract);
-  const descriptionChanged = changed && was?.description !== tool.contract.description;
-  const changedParams = changed ? now.filter(p => before.get(p.name) !== p.description) : [];
-  const keptParams = now.filter(p => !changedParams.includes(p));
-  const count = (descriptionChanged ? 1 : 0) + changedParams.length;
   const paramLabel = (p: Param) => <><code>{p.name}</code><span className="cp-admin-muted">{p.type}{p.required ? ' · required' : ''}</span></>;
   return <>
     <header className="tr-detail-head">
       <div><h2>{tool.contract.title || tool.name}</h2><code>{tool.name}</code></div>
       {stateLabel(tool, decision)}
     </header>
+    {removed ? <Notice tone="info">The server no longer returns this tool. It stays disabled, and agents cannot call it. There is nothing to decide. Below, the text that you last approved.</Notice> : null}
     {changed ? <>
       <Notice tone="warning">The server changed this tool after you approved it. It stays disabled until you decide.</Notice>
-      <div className="history-summary"><span>Changes since you approved it</span><span className="history-count" data-kind="changed">~{count} changed</span></div>
-      <div className="history-diff">
-        {descriptionChanged ? <section><h5>Description</h5><DiffRows was={was?.description} now={tool.contract.description} /></section> : null}
-        {changedParams.map(p => <section key={p.name}><h5>Parameter {p.name}</h5><DiffRows was={before.get(p.name)} now={p.description} /></section>)}
-      </div>
-      {!descriptionChanged ? <Field label="Description" now={tool.contract.description} changed={false} /> : null}
-      {keptParams.map(p => <Field key={p.name} label={paramLabel(p)} now={p.description} changed={false} />)}
-    </> : <>
-      <Field label="Description" now={tool.contract.description} changed={false} />
-      {now.map(p => <Field key={p.name} label={paramLabel(p)} now={p.description} changed={false} />)}
-    </>}
+      <div className="history-summary"><span>Changes since you approved it</span><span className="history-count" data-kind="changed">~{items.length} changed</span></div>
+      {items.length ? <div className="history-diff">{items.map((item, i) => <section key={i}><h5>{item.section}</h5><ul>{item.rows.map((r, j) => <li key={j} data-kind={r.kind}><span className="history-sign" aria-label={r.kind}>{r.kind === 'added' ? '+' : r.kind === 'removed' ? '−' : '~'}</span><strong>{r.text}</strong>{r.code ? <code>{r.code}</code> : null}</li>)}</ul></section>)}</div>
+        : <Notice tone="info">The server went back to the text that you approved. Nothing changed since your approval, but the tool stays disabled until you decide.</Notice>}
+    </> : null}
+    {!touched.has('Description') ? <Field label="Description" now={tool.contract.description} /> : null}
+    {now.filter(p => !touched.has(`Parameter ${p.name}`)).map(p => <Field key={p.name} label={paramLabel(p)} now={p.description} />)}
     <ToolAnnotations annotations={tool.contract.annotations} />
     {needsDecision(tool) ? <>
       <Guide changed={changed} />
@@ -93,7 +102,7 @@ function ToolDetail({ tool, decision, decide }: { tool: ManagedTool; decision?: 
           <button type="button" className="cp-admin-button" aria-pressed={decision === 'approved'} onClick={() => decide('approved')}>Approve {tool.name}</button>
         </>}
       </div>
-    </> : <p className="cp-admin-muted">No change since your last review. Its settings are retained.</p>}
+    </> : removed ? null : <p className="cp-admin-muted">No change since your last review. Its settings are retained.</p>}
   </>;
 }
 
@@ -109,6 +118,7 @@ function ServerDetail() {
 export function ToolReviewPrototype() {
   const toReview = tools.filter(needsDecision);
   const unchanged = tools.filter(t => !needsDecision(t) && t.change !== 'removed');
+  const removedTools = tools.filter(t => t.change === 'removed');
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
   const [shown, setShown] = useState(toReview[0]?.name ?? 'server');
   const [showUnchanged, setShowUnchanged] = useState(false);
@@ -122,7 +132,7 @@ export function ToolReviewPrototype() {
   };
   const item = (t: ManagedTool) => <li key={t.name}><button type="button" className="tr-item" aria-current={shown === t.name} onClick={() => setShown(t.name)}>
     <span className="tr-item-copy"><strong>{t.contract.title || t.name}</strong><code>{t.name}</code></span>
-    {t.change === 'new' || t.change === 'changed' ? <span className="mcp-badge" data-tone="warning">{t.change === 'new' ? 'New' : 'Changed'}</span> : null}
+    {t.change === 'new' || t.change === 'changed' ? <span className="mcp-badge" data-tone="warning">{t.change === 'new' ? 'New' : 'Changed'}</span> : t.change === 'removed' ? <span className="mcp-badge" data-tone="danger">Removed</span> : null}
     {stateLabel(t, decisions[t.name])}
   </button></li>;
   return <main className="admin-page cp-admin-container tr-page" aria-label="Tool review prototype">
@@ -135,6 +145,7 @@ export function ToolReviewPrototype() {
       <nav className="tr-list" aria-label="Discovered tools">
         <h3 className="cp-admin-label">To review</h3>
         <ul>{toReview.map(item)}</ul>
+        {removedTools.length ? <><h3 className="cp-admin-label">Removed</h3><ul>{removedTools.map(item)}</ul></> : null}
         <h3 className="cp-admin-label">Server</h3>
         <ul><li><button type="button" className="tr-item" aria-current={shown === 'server'} onClick={() => setShown('server')}><span className="tr-item-copy"><strong>Instructions and identity</strong><code>initialize</code></span><span className="tr-state cp-admin-muted">Not sent to agents</span></button></li></ul>
         <button type="button" className="tr-group-toggle" aria-expanded={showUnchanged} onClick={() => setShowUnchanged(v => !v)}><ChevronRight size={16} aria-hidden="true" />{unchanged.length} unchanged tools</button>
