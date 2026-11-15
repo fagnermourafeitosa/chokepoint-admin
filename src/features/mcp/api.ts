@@ -16,12 +16,14 @@ export const mcpApi = {
  get: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<MCPServer>(`${path(s)}/${id}`, { signal }),
  list: (s: EnvironmentScope, offset: number, signal: AbortSignal) => httpClient<ServerPage>(`${path(s)}?offset=${offset}`, { signal }),
  discover: (s: EnvironmentScope, id: string | undefined, input: Connection, signal: AbortSignal) => httpClient<Preview>(`${path(s)}${id ? `/${id}` : ''}/discover`, { method: 'POST', json: input, signal }),
+ // Backend 094: an Enterprise MCP is discovered with its stored credential; the request carries only the revision.
+ discoverEnterprise: (s: EnvironmentScope, id: string, revision: number, signal: AbortSignal) => httpClient<Preview>(`${path(s)}/${id}/discover`, { method: 'POST', json: { revision }, signal }),
  confirm: (s: EnvironmentScope, id: string | undefined, preview: Preview, selected: string[], enable: boolean, signal: AbortSignal) => httpClient<MCPServer>(`${path(s)}${id ? `/${id}/confirm` : ''}`, { method: 'POST', json: { preview_id: preview.preview_id, selected_tools: selected, enable }, signal }),
  disable: (s: EnvironmentScope, server: MCPServer, signal: AbortSignal) => httpClient<MCPServer>(`${path(s)}/${server.id}/disable`, { method: 'POST', json: { revision: server.revision }, signal }),
 };
 export function mcpError(error: unknown) {
  if (error instanceof HttpError) {
-  if (error.status === 409) return 'This preview expired or the server changed. Close this dialog and discover again.';
+  if (error.status === 409) return 'This review expired or the server changed. Open the review again.';
   if (error.status === 502) return 'Could not discover tools. Check the endpoint, authentication, and whether the backend can reach this server.';
   if (error.status === 400) return 'Check the connection fields and selected tools, then try again.';
   if (error.status === 404) return 'This server is not available in the current workspace and environment.';

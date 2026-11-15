@@ -3,7 +3,7 @@
 - **Specification ID**: 055
 - **Date**: 2026-11-14
 - **Slug**: tool-review-text
-- **Status**: In Progress
+- **Status**: Waiting Approve
 - **Owner**: Admin / MCP integrations
 - **Related Specification**: [Backend 047 — Protocol setup without bypass](../../backend/specs/047-2026-11-03-protocol-setup-without-bypass.md), [Backend 088 — Automatic tool rediscovery](../../backend/specs/088-2026-11-13-automatic-tool-rediscovery.md)
 - **Related Mock Contract**: none
@@ -61,6 +61,10 @@ Decided with the user on 2026-11-15, after reading how the backend detects a cha
 
 7. **Review coverage opens the review at the exact tool** (user decision, 2026-11-15). In the Review coverage table (`src/features/mcp/ToolReviewCatalog.tsx`, reached from the Tools reviewed metric of the Overview), the Open tool action of a tool marked Needs review opens the review page of its server with that tool open, for both kinds. A reviewed tool keeps opening the server details in Integrations. No backend change: the row already has the server and the tool name.
 
+8. **Found by the functional test and fixed**: the diff compares canonical JSON with sorted keys, because the stored contract (PostgreSQL jsonb) lists its keys in another order than the discovered one; and the progress reads Nothing to decide when no tool needs a decision.
+9. **Enable server after review** stays on the page for an existing server that is disabled (the old dialog had it; the review is where a disabled server is enabled again). It is the only control that the prototype did not show.
+10. **Discovery once per visit.** Each entry runs its discovery as a query without an abort signal, so the double mount of React StrictMode shares one request and never cancels a discovery that the backend already stores.
+
 ## Backend dependencies
 
 - [ ] [Backend 094 — Manual Discovery of an Enterprise MCP with the Stored Credential](../../backend/specs/094-2026-11-15-enterprise-discovery-stored-credential.md): the review page of an Enterprise MCP gets its preview from a discovery with the stored credential, as the automatic rediscovery does, so it opens from the Inbox and from Review coverage without an OAuth authorization (user decision, 2026-11-15). Today the backend refuses a manual discovery of an Enterprise MCP, and a preview only comes from a new OAuth authorization.
@@ -70,11 +74,16 @@ Decided with the user on 2026-11-15, after reading how the backend detects a cha
 
 - [x] 1. The user approves the layout on the prototype (2026-11-15), including the removed tool, the tool whose server went back to the approved contract and the full field diff (Custom MCP page).
 - [x] 2. The user approves the Enterprise heading and the bulk approval of read-only tools on the prototype (2026-11-15).
-- [ ] 3. Before the merge to `main`, the public documentation in `frontend/content/docs`, in `en` and `pt-BR`, describes the implemented screen:
+- [x] 3. Before the merge to `main`, the public documentation in `frontend/content/docs`, in `en` and `pt-BR`, describes the implemented screen:
   - `platform/mcp-servers/tool-review.mdx`: the review page (list and detail), the decisions (Approve and Deny, Trust this change and Keep disabled), "Changes since you approved it" (Backend 091), the reviewer guide with its OWASP entries, and that nobody edits the text of a tool;
   - `platform/mcp-servers/server-details.mdx`: the review is a page, not a dialog;
   - `platform/mcp-servers/custom-servers.mdx` and `platform/mcp-servers/enterprise-servers.mdx`: the review step after a discovery;
   - `platform/operations/inbox.mdx`: the Review action of a tool discovery item opens the review page with the first pending tool open.
+
+- [ ] 4. Functional test: [055-2026-11-14-tool-review-text](functional-tests/055-2026-11-14-tool-review-text.md). S1 to S6 passed on 2026-11-15 (Custom MCP: changed, removed, server, trust and confirm, Inbox, Review coverage, new server with bulk approval and denial, disabled server enabled again). **S7 (Enterprise MCP) is blocked**: there is no GitHub App and no Enterprise MCP locally, and connecting one needs a real GitHub App and OAuth. Backend 094 is covered by unit tests.
+- [x] 5. `npm run check` and `npm run build` pass.
+
+Evidence of criterion 3: the five pages, in `en` and `pt-BR`, are on the frontend branch `docs/055-tool-review-page` (commit `ce5c638`), checked on the frontend development server (each page answers 200 with the new text). They are published with the merge of this specification.
 
 ## Out of Scope
 

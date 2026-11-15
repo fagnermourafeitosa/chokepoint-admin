@@ -82,7 +82,8 @@ export function ToolReviewCatalog({ scope }: { scope: EnvironmentScope }) {
                       className="cp-admin-button cp-admin-button--ghost"
                       onClick={() =>
                         navigate(
-                          `/access/integrations?${new URLSearchParams({ type: server.connection_type === 'enterprise' ? 'enterprise' : 'custom', server: server.id, tool: tool.name })}`,
+                          // A tool that needs review opens the review page at that tool (Admin 055, decision 7).
+                          `/access/integrations?${new URLSearchParams({ type: server.connection_type === 'enterprise' ? 'enterprise' : 'custom', server: server.id, tool: tool.name, ...(tool.reviewed ? {} : { review: 'server' }) })}`,
                         )
                       }
                     >

@@ -1,7 +1,7 @@
 import { ToolReviewCatalog } from './ToolReviewCatalog';
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useSearchParams } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { Plus, Server, Users, Building2 } from 'lucide-react';
 import { IdentityRegistry } from '../identity/IdentityRegistry';
 import { EmptyState } from '../../components/ui/empty-state/EmptyState';
@@ -11,9 +11,10 @@ import { useMCPRegistry } from './useMCPRegistry';
 import { ConnectionTable } from './ConnectionTable';
 import { ChokepointTokenSetup } from './ChokepointTokenSetup';
 import { EnterpriseCatalog } from './enterprise/EnterpriseCatalog';
-import { EnterpriseReview } from './enterprise/EnterpriseReview';
+import { CustomToolReview } from './review/CustomToolReview';
+import { EnterpriseToolReview } from './review/EnterpriseToolReview';
 import { useEnterpriseConnection } from './enterprise/useEnterpriseConnection';
-import { mcpApi, type MCPServer } from './api';
+import { mcpApi, type Connection, type MCPServer } from './api';
 import type { EnvironmentScope } from '../access/environment-scope';
 import './mcp.css';
 
@@ -36,17 +37,34 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
   const server = details.data ?? registry.selected;
   const choose = (id?: string) => setParams({ type: kind, ...(id ? { server: id } : {}) });
   const saved = (s: MCPServer) => { registry.setDialog(null); setParams({ type: s.connection_type === 'enterprise' ? 'enterprise' : 'custom', server: s.id }); void registry.refresh(); };
+  const navigate = useNavigate();
+  // Discover tools in the Connect or Edit dialog opens the review page with the typed connection.
+  const startReview = (connection: Connection) => {
+    const dialog = registry.dialog;
+    registry.setDialog(null);
+    navigate(`/access/integrations?${new URLSearchParams(dialog && dialog !== 'new' ? { type: 'custom', server: dialog.id, review: 'server' } : { type: 'custom', review: 'new' })}`, { state: { connection } });
+  };
   const connect = (s: MCPServer) => s.connection_type === 'enterprise' ? void enterprise.connect(s.provider_id!, s) : registry.setDialog(s);
   const servers = registry.servers.filter(s => kind === 'enterprise' ? s.connection_type === 'enterprise' : s.connection_type !== 'enterprise');
   const preview = params.get('preview');
   const correctScope = params.get('tenant') === scope.tenantId && params.get('environment') === scope.environmentId;
   if (params.get('review') === 'tools') return <ToolReviewCatalog scope={scope} />;
+  // Admin 055: the review of a discovery is a page. review=server opens the review of a stored server
+  // (tool opens that tool), review=new the review of a Custom MCP that the Connect dialog started, and
+  // preview the review of a new Enterprise OAuth authorization.
+  const review = params.get('review');
+  const reviewTool = params.get('tool') ?? undefined;
+  const reviewLabel = returnTo === '/' ? 'Overview' : returnTo ? 'Investigate' : 'Integrations';
+  const reviewBack = returnTo ?? `/access/integrations?${new URLSearchParams({ type: kind, ...(selectedId ? { server: selectedId } : {}) })}`;
+  if (preview && correctScope) return <EnterpriseToolReview key={preview} scope={scope} previewId={preview} backTo="/access/integrations?type=enterprise" backLabel="Integrations" onSaved={saved} onReconnect={connect} />;
+  if (review === 'server' && selectedId && kind === 'enterprise') return <EnterpriseToolReview key={selectedId} scope={scope} serverId={selectedId} initialTool={reviewTool} backTo={reviewBack} backLabel={reviewLabel} onSaved={saved} onReconnect={connect} />;
+  if ((review === 'server' && selectedId && kind === 'custom') || review === 'new') return <CustomToolReview key={selectedId ?? 'new'} scope={scope} serverId={review === 'server' ? selectedId : undefined} initialTool={reviewTool} backTo={reviewBack} backLabel={reviewLabel} onSaved={saved} />;
   if (kind === 'identity') return <IdentityRegistry scope={scope} onEnterprise={() => setParams({ type: 'enterprise' })} onCustom={() => setParams({ type: 'custom' })} />;
   return <section aria-label="Integrations" className="mcp-registry">
     {returnTo ? <Link className="cp-admin-button cp-admin-button--secondary trace-back" to={returnTo}>Back to {returnTo === '/' ? 'Overview' : 'Investigate'}</Link> : null}
     <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect platforms and custom MCPs, then manage agent access.</p></div>{kind === 'custom' ? <button className="cp-admin-button" onClick={() => registry.setDialog('new')}><Plus size={16} />Connect custom MCP</button> : null}</header>
     <div className="mcp-types" role="group" aria-label="Integration type"><button aria-pressed={kind === 'enterprise'} onClick={() => setParams({ type: 'enterprise' })}><Building2 size={17} />Enterprise MCPs</button><button aria-pressed={kind === 'custom'} onClick={() => setParams({ type: 'custom' })}><Server size={17} />Custom MCPs</button><button aria-pressed={false} onClick={() => setParams({ type: 'identity' })}><Users size={17} />Identity providers</button></div>
-    {preview && !correctScope ? <p role="alert" className="cp-admin-notice">This authorization belongs to another workspace or environment. Select its original context to review it.</p> : preview ? <EnterpriseReview key={preview} scope={scope} id={preview} onClose={() => setParams({ type: 'enterprise' })} onSaved={saved} /> : <>
+    {preview ? <p role="alert" className="cp-admin-notice">This authorization belongs to another workspace or environment. Select its original context to review it.</p> : <>
       {kind === 'enterprise' ? <EnterpriseCatalog state={enterprise} pending={registry.pending} onSelect={choose} onDisable={s => void registry.disable(s)} /> : null}
       {params.has('oauth_error') ? <p role="alert" className="cp-admin-notice" data-tone="danger">{oauthErrors[params.get('oauth_error') ?? ''] ?? oauthErrors.authentication_failed}</p> : null}
       {kind === 'custom' ? <><div className="mcp-toolbar"><label htmlFor="mcp-search">Find a connection</label><input id="mcp-search" type="search" className="cp-admin-input" placeholder="Search by name or endpoint" value={registry.search} onChange={e => registry.setSearch(e.target.value)} /></div>
@@ -59,6 +77,6 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
       {server ? <section id="mcp-server-details" className="mcp-details" aria-label={`${server.name} details`}><header className="mcp-details-heading"><div><h2>{server.name}</h2><p className="cp-admin-muted">{server.connection_type === 'enterprise' ? `Enterprise MCP · ${server.account || 'Account unavailable'}` : 'Custom MCP'} · {server.transport} · {server.enabled ? 'Enabled' : 'Disabled'}</p></div><button className="cp-admin-button cp-admin-button--secondary" disabled={enterprise.busy} onClick={() => connect(server)}>{server.connection_type === 'enterprise' ? 'Reconnect & review tools' : 'Discover tools'}</button></header>{server.connection_type !== 'enterprise' ? <ChokepointTokenSetup issuer={server.issuer} jwksUri={server.jwks_uri} audience={server.audience} unavailable={!server.issuer} /> : null}{/* Admin 050: no mapping screen and no Resource block on the tool rows. */}<ToolRows tools={server.tools} focusTool={params.get('tool') || undefined} serverEnabled={server.enabled} /></section> : null}
     </>}
     <p className="mcp-footnote cp-admin-muted">Connections belong to this workspace and environment. Agent permissions determine who can use their tools.</p>
-    {registry.dialog ? <MCPDialog key={registry.dialog === 'new' ? 'new' : registry.dialog.id} scope={scope} server={registry.dialog === 'new' ? undefined : registry.dialog} onClose={() => registry.setDialog(null)} onRefresh={() => void registry.refresh()} onSaved={saved} /> : null}
+    {registry.dialog ? <MCPDialog key={registry.dialog === 'new' ? 'new' : registry.dialog.id} scope={scope} server={registry.dialog === 'new' ? undefined : registry.dialog} onClose={() => registry.setDialog(null)} onReview={startReview} /> : null}
   </section>;
 }
