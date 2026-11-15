@@ -64,6 +64,8 @@ Decided with the user on 2026-11-15, after reading how the backend detects a cha
 8. **Found by the functional test and fixed**: the diff compares canonical JSON with sorted keys, because the stored contract (PostgreSQL jsonb) lists its keys in another order than the discovered one; and the progress reads Nothing to decide when no tool needs a decision.
 9. **Enable server after review** stays on the page for an existing server that is disabled (the old dialog had it; the review is where a disabled server is enabled again). It is the only control that the prototype did not show.
 10. **Discovery once per visit.** Each entry runs its discovery as a query without an abort signal, so the double mount of React StrictMode shares one request and never cancels a discovery that the backend already stores.
+11. **Long tool names in the list.** A tool name wraps inside its column and never runs under the New or Changed badge and the state; the name shows once when the tool has no title (the GitHub MCP tools have none). Found by the GitHub functional test (S7), 2026-11-15.
+12. **The footer clears the tour button.** The fixed Take the tour button sits over the bottom right corner, so the sticky footer keeps its right side free and Confirm review stays clickable. Found by the GitHub functional test (S7), 2026-11-15.
 
 ## Backend dependencies
 
@@ -80,7 +82,7 @@ Decided with the user on 2026-11-15, after reading how the backend detects a cha
   - `platform/mcp-servers/custom-servers.mdx` and `platform/mcp-servers/enterprise-servers.mdx`: the review step after a discovery;
   - `platform/operations/inbox.mdx`: the Review action of a tool discovery item opens the review page with the first pending tool open.
 
-- [x] 4. Functional test: [055-2026-11-14-tool-review-text](functional-tests/055-2026-11-14-tool-review-text.md). S1 to S6 passed on 2026-11-15 (Custom MCP: changed, removed, server, trust and confirm, Inbox, Review coverage, new server with bulk approval and denial, disabled server enabled again). **S7 (Enterprise MCP) is blocked**: there is no GitHub App and no Enterprise MCP locally, and connecting one needs a real GitHub App and OAuth. Backend 094 is covered by unit tests. The user approved the publication with S7 blocked (2026-11-15); Backend 094 is Implemented.
+- [x] 4. Functional test: [055-2026-11-14-tool-review-text](functional-tests/055-2026-11-14-tool-review-text.md). S1 to S6 passed on 2026-11-15 (Custom MCP: changed, removed, server, trust and confirm, Inbox, Review coverage, new server with bulk approval and denial, disabled server enabled again). S7 (Enterprise MCP, GitHub) passed on 2026-11-15 with the user's GitHub App and account.
 - [x] 5. `npm run check` and `npm run build` pass.
 
 Evidence of criterion 3: the five pages, in `en` and `pt-BR`, are on the frontend branch `docs/055-tool-review-page` (commit `ce5c638`), checked on the frontend development server (each page answers 200 with the new text). They are published with the merge of this specification.

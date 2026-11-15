@@ -135,7 +135,7 @@ export function ToolReviewPage({ heading, backTo, backLabel, registryName, tools
     advance(next);
   };
   const item = (t: ManagedTool) => <li key={t.name}><button type="button" className="tr-item" aria-current={shown === t.name} onClick={() => setShown(t.name)}>
-    <span className="tr-item-copy"><strong>{t.contract.title || t.name}</strong><code>{t.name}</code></span>
+    <span className="tr-item-copy"><strong>{t.contract.title || t.name}</strong>{t.contract.title && t.contract.title !== t.name ? <code>{t.name}</code> : null}</span>
     {t.change === 'new' || t.change === 'changed' ? <span className="mcp-badge" data-tone="warning">{t.change === 'new' ? 'New' : 'Changed'}</span> : t.change === 'removed' ? <span className="mcp-badge" data-tone="danger">Removed</span> : null}
     <StateLabel tool={t} decision={decisions[t.name]} />
   </button></li>;
