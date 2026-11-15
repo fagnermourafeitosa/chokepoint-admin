@@ -3,7 +3,7 @@
 - **Specification ID**: 055
 - **Date**: 2026-11-14
 - **Slug**: tool-review-text
-- **Status**: Waiting Approve
+- **Status**: Implemented
 - **Owner**: Admin / MCP integrations
 - **Related Specification**: [Backend 047 — Protocol setup without bypass](../../backend/specs/047-2026-11-03-protocol-setup-without-bypass.md), [Backend 088 — Automatic tool rediscovery](../../backend/specs/088-2026-11-13-automatic-tool-rediscovery.md)
 - **Related Mock Contract**: none
@@ -67,7 +67,7 @@ Decided with the user on 2026-11-15, after reading how the backend detects a cha
 
 ## Backend dependencies
 
-- [ ] [Backend 094 — Manual Discovery of an Enterprise MCP with the Stored Credential](../../backend/specs/094-2026-11-15-enterprise-discovery-stored-credential.md): the review page of an Enterprise MCP gets its preview from a discovery with the stored credential, as the automatic rediscovery does, so it opens from the Inbox and from Review coverage without an OAuth authorization (user decision, 2026-11-15). Today the backend refuses a manual discovery of an Enterprise MCP, and a preview only comes from a new OAuth authorization.
+- [x] [Backend 094 — Manual Discovery of an Enterprise MCP with the Stored Credential](../../backend/specs/094-2026-11-15-enterprise-discovery-stored-credential.md): the review page of an Enterprise MCP gets its preview from a discovery with the stored credential, as the automatic rediscovery does, so it opens from the Inbox and from Review coverage without an OAuth authorization (user decision, 2026-11-15). Today the backend refuses a manual discovery of an Enterprise MCP, and a preview only comes from a new OAuth authorization.
 - [x] [Backend 091 — Keep the Approved Tool Contract Across Repeated Changes](../../backend/specs/091-2026-11-15-keep-approved-tool-contract.md): `previous` keeps the last approved contract while a tool stays `changed`, so the review compares with what was approved. Resolved: Backend 091 is Implemented (2026-11-15); the `Waiting backend · 091` chip was removed from the prototype.
 
 ## Acceptance Criteria
@@ -80,7 +80,7 @@ Decided with the user on 2026-11-15, after reading how the backend detects a cha
   - `platform/mcp-servers/custom-servers.mdx` and `platform/mcp-servers/enterprise-servers.mdx`: the review step after a discovery;
   - `platform/operations/inbox.mdx`: the Review action of a tool discovery item opens the review page with the first pending tool open.
 
-- [ ] 4. Functional test: [055-2026-11-14-tool-review-text](functional-tests/055-2026-11-14-tool-review-text.md). S1 to S6 passed on 2026-11-15 (Custom MCP: changed, removed, server, trust and confirm, Inbox, Review coverage, new server with bulk approval and denial, disabled server enabled again). **S7 (Enterprise MCP) is blocked**: there is no GitHub App and no Enterprise MCP locally, and connecting one needs a real GitHub App and OAuth. Backend 094 is covered by unit tests.
+- [x] 4. Functional test: [055-2026-11-14-tool-review-text](functional-tests/055-2026-11-14-tool-review-text.md). S1 to S6 passed on 2026-11-15 (Custom MCP: changed, removed, server, trust and confirm, Inbox, Review coverage, new server with bulk approval and denial, disabled server enabled again). **S7 (Enterprise MCP) is blocked**: there is no GitHub App and no Enterprise MCP locally, and connecting one needs a real GitHub App and OAuth. Backend 094 is covered by unit tests. The user approved the publication with S7 blocked (2026-11-15); Backend 094 is Implemented.
 - [x] 5. `npm run check` and `npm run build` pass.
 
 Evidence of criterion 3: the five pages, in `en` and `pt-BR`, are on the frontend branch `docs/055-tool-review-page` (commit `ce5c638`), checked on the frontend development server (each page answers 200 with the new text). They are published with the merge of this specification.
