@@ -13,7 +13,9 @@
 .il-name small { color: var(--cp-admin-color-text-muted); }
 .cp-admin-table.mcp-servers th.il-actions-head { text-align: right; }
 .il-row-actions { justify-content: flex-end; }
-.il-row-actions .cp-admin-button { min-width: 10.5rem; justify-content: center; }
+.il-row-actions .cp-admin-button { min-width: 5.5rem; justify-content: center; }
+/* The More trigger matches the small row button (layouts.md, Actions). */
+.il-row-actions .identity-menu summary { min-width: var(--cp-admin-control-compact-height); min-height: var(--cp-admin-control-compact-height); }
 .il-status { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); white-space: nowrap; }
 .il-impact { display: grid; gap: var(--cp-admin-space-2); margin: 0; padding-left: 1.25rem; }
 .il-impact li > span { display: block; }

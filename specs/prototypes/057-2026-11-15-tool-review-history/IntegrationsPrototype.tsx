@@ -42,7 +42,7 @@ export function IntegrationsPrototype() {
             Enable server after review checked, because only a confirmed review enables a server. */}
         <td><label className="cp-admin-choice il-status"><input className="cp-admin-switch" type="checkbox" role="switch" checked={s.enabled} aria-label={`${s.name} enabled`} onChange={e => (e.target.checked ? window.location.assign('/prototype/tool-review-order')   : setDisabling(s))} />{s.enabled ? 'Enabled' : 'Disabled'}</label></td>
         <td><div className="identity-row-actions il-row-actions">
-          <a className="cp-admin-button cp-admin-button--ghost" href="/prototype/tool-review-order">{s.reviewRequired ? 'Review' : 'Discover'}</a>
+          <a className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" href="/prototype/tool-review-order">{s.reviewRequired ? 'Review' : 'Discover'}</a>
           <details className="identity-menu" name="mcp-row-menu"><summary aria-label={`More actions for ${s.name}`}><MoreHorizontal size={18} /></summary><div onClick={e => e.currentTarget.closest('details')?.removeAttribute('open')}>
             <button type="button" onClick={() => setEditing(s)}>Edit connection</button>
             <button type="button" onClick={() => setHistory(true)}>Review history</button>
