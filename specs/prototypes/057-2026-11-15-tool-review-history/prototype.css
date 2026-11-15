@@ -1,0 +1,10 @@
+/* Admin 057 prototype: what the review page adds to Admin 055. */
+.tr-item-use { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); }
+.tr-bulk { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); }
+.tr-granted { display: flex; align-items: center; gap: var(--cp-admin-space-2); margin: 0; font-weight: var(--cp-admin-weight-semibold); }
+.rh-actions { display: flex; gap: var(--cp-admin-space-2); }
+.rh-decisions { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--cp-admin-space-1); }
+.rh-decisions details { border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); }
+.rh-decisions summary { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-3); cursor: pointer; }
+.rh-contract { display: grid; gap: var(--cp-admin-space-1); padding: 0 var(--cp-admin-space-3) var(--cp-admin-space-3); }
+.rh-contract p { margin: 0; }
