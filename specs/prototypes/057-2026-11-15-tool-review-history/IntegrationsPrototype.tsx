@@ -41,7 +41,7 @@ export function IntegrationsPrototype() {
           <details className="identity-menu" name="mcp-row-menu"><summary aria-label={`More actions for ${s.name}`}><MoreHorizontal size={18} /></summary><div onClick={e => e.currentTarget.closest('details')?.removeAttribute('open')}>
             <button type="button" onClick={() => setEditing(s)}>Edit connection</button>
             <button type="button" onClick={() => setHistory(true)}>Review history</button>
-            {s.enabled ? <button type="button" onClick={() => disable(s.name)}>Disable connection</button> : null}
+            {s.enabled ? <button type="button" onClick={() => disable(s.name)}>Disable connection</button> : <button type="button" onClick={() => window.location.assign('/prototype/tool-review-order')}>Enable connection</button>}
           </div></details>
         </div></td>
       </tr>)}</tbody>
