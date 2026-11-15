@@ -63,6 +63,7 @@ Decided with the user on 2026-11-15, after reading how the backend detects a cha
 
 ## Backend dependencies
 
+- [ ] [Backend 094 — Manual Discovery of an Enterprise MCP with the Stored Credential](../../backend/specs/094-2026-11-15-enterprise-discovery-stored-credential.md): the review page of an Enterprise MCP gets its preview from a discovery with the stored credential, as the automatic rediscovery does, so it opens from the Inbox and from Review coverage without an OAuth authorization (user decision, 2026-11-15). Today the backend refuses a manual discovery of an Enterprise MCP, and a preview only comes from a new OAuth authorization.
 - [x] [Backend 091 — Keep the Approved Tool Contract Across Repeated Changes](../../backend/specs/091-2026-11-15-keep-approved-tool-contract.md): `previous` keeps the last approved contract while a tool stays `changed`, so the review compares with what was approved. Resolved: Backend 091 is Implemented (2026-11-15); the `Waiting backend · 091` chip was removed from the prototype.
 
 ## Acceptance Criteria

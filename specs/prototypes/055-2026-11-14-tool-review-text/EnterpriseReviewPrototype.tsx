@@ -6,6 +6,7 @@ import type { ManagedTool, ToolContract } from '../../../src/features/mcp/api';
 import '../../../src/features/mcp/mcp.css';
 import '../../../src/features/access/delegation/delegation.css';
 import { ProviderMark } from '../../../src/features/mcp/ProviderMark';
+import { WaitingBackend } from '../../../src/features/access/delegation/WaitingBackend';
 import { firstConnection, guide, owaspUrl, rediscovery, server } from './enterprise-data';
 import './tool-review.css';
 
@@ -155,7 +156,7 @@ function EnterpriseReview({ scenario, setScenario }: { scenario: 'first' | 'redi
     <div className="cp-admin-segmented tr-scenario" role="radiogroup" aria-label="Prototype scenario">{([['first', 'First connection'], ['rediscovery', 'Rediscovery']] as const).map(([v, l]) => <label key={v} className="cp-admin-segment"><input type="radio" name="scenario" checked={scenario === v} onChange={() => setScenario(v)} /><span>{l}</span></label>)}</div>
     <a className="tr-back" href="#"><ArrowLeft size={16} aria-hidden="true" />Integrations</a>
     <header className="access-page-heading tr-page-head">
-      <div className="tr-enterprise-head"><ProviderMark provider={server.provider} size={40} /><div><span className="cp-admin-label">{server.name} · Enterprise MCP</span><h1 className="cp-admin-title">Review discovered tools</h1><p className="cp-admin-muted">Connected as <strong>{server.account}</strong>. Calls through this connection use this account. Agents still need published tool permissions.</p></div></div>
+      <div className="tr-enterprise-head"><ProviderMark provider={server.provider} size={40} /><div><span className="cp-admin-label">{server.name} · Enterprise MCP</span><h1 className="cp-admin-title">Review discovered tools <WaitingBackend spec="094" tip="Opens the review of an Enterprise MCP from the Inbox and from Review coverage with the stored credential, without a new OAuth authorization." /></h1><p className="cp-admin-muted">Connected as <strong>{server.account}</strong>. Calls through this connection use this account. Agents still need published tool permissions.</p></div></div>
       <div className="tr-progress"><strong>{done} of {toReview.length} decided</strong><progress className="tr-progress-bar" value={done} max={toReview.length} aria-label="Tools decided" /></div>
     </header>
     <div className="tr-layout">
