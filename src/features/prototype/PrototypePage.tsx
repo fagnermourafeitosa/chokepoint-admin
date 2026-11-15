@@ -3,7 +3,7 @@ import { Link, Route, Routes } from 'react-router';
 import { loadPrototypeCatalog, type PrototypeEntry, type PrototypeState } from './catalog';
 import './prototype.css';
 import { ToolReviewHistoryPrototype } from '../../../specs/prototypes/057-2026-11-15-tool-review-history/ReviewPrototype';
-import { ServerHistoryPrototype } from '../../../specs/prototypes/057-2026-11-15-tool-review-history/HistoryPrototype';
+import { IntegrationsPrototype } from '../../../specs/prototypes/057-2026-11-15-tool-review-history/IntegrationsPrototype';
 
 // Layout prototypes: fixed data, never connected to the backend (docs/design-system/visual-specification.md).
 // The prototypes are in specs/prototypes/<specification>/ (see specs/prototypes/README.md).
@@ -11,8 +11,8 @@ import { ServerHistoryPrototype } from '../../../specs/prototypes/057-2026-11-15
 // its page. When its real screen is implemented, remove the entry and mark the prototype Archived.
 const pages: Record<string, { path: string; element: ReactElement }> = {
   '057': { path: 'tool-review-order', element: <ToolReviewHistoryPrototype /> },
-  // The second page of 057, linked from the first: the Review history of a server.
-  '057-history': { path: 'review-history', element: <ServerHistoryPrototype /> },
+  // The second page of 057, linked from the first: the Custom MCPs list, with the Review history panel.
+  '057-integrations': { path: 'integrations', element: <IntegrationsPrototype /> },
 };
 
 // The index notes are Markdown: show `code` spans as code, the rest as text.

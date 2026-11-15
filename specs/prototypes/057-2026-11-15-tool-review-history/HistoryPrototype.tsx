@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Bot, History, ShieldCheck } from 'lucide-react';
+import { Bot } from 'lucide-react';
 import { SidePanel } from '../../../src/components/ui/side-panel/SidePanel';
 import { WaitingBackend } from '../../../src/features/access/delegation/WaitingBackend';
-import { ToolRows } from '../../../src/features/mcp/ToolRows';
 import '../../../src/features/mcp/mcp.css';
 import '../../../src/features/access/delegation/delegation.css';
-import { history, server, tools, type HistoryDecision, type HistoryEvent } from './data';
+import { history, server, type HistoryDecision, type HistoryEvent } from './data';
 import './prototype.css';
 
-// Admin 057 prototype: the Review history of a server (Backend 096), in the pattern of the revision
+// Admin 057 prototype: the Review history of a server (Backend 096), opened from its row in
+// Integrations (IntegrationsPrototype.tsx), in the pattern of the revision
 // history of an agent (src/features/access/delegation/RevisionHistory.tsx): a timeline of the reviews
 // and of the automatic disables, and the decisions of the selected one with the text decided on.
 
@@ -24,7 +24,7 @@ const labels: Record<HistoryDecision, { text: string; tone?: 'success' | 'danger
 };
 const title = (e: HistoryEvent) => (e.kind === 'review' ? 'Review' : 'Automatic rediscovery');
 
-function ReviewHistory({ onClose }: { onClose: () => void }) {
+export function ReviewHistory({ onClose }: { onClose: () => void }) {
   const [selected, setSelected] = useState(history[0].id);
   const current = history.find(e => e.id === selected)!;
   const count = (kind: 'yes' | 'no' | 'auto') => current.decisions.filter(d => (kind === 'yes' ? ['approved', 'change_trusted'] : kind === 'no' ? ['denied', 'kept_disabled'] : ['disabled_changed', 'disabled_removed']).includes(d.decision)).length;
@@ -67,20 +67,3 @@ function ReviewHistory({ onClose }: { onClose: () => void }) {
   </section></SidePanel>;
 }
 
-export function ServerHistoryPrototype() {
-  const [open, setOpen] = useState(true);
-  return <section aria-label="Integrations" className="mcp-registry">
-    <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect custom MCPs and identity providers, then manage agent access.</p></div></header>
-    <section id="mcp-server-details" className="mcp-details" aria-label={`${server.name} details`}>
-      <header className="mcp-details-heading">
-        <div><h2>{server.name}</h2><p className="cp-admin-muted">Custom MCP · {server.transport} · Enabled</p></div>
-        <div className="rh-actions">
-          <button type="button" className="cp-admin-button cp-admin-button--secondary" onClick={() => setOpen(true)}><History size={16} aria-hidden="true" />Review history</button>
-          <button type="button" className="cp-admin-button cp-admin-button--secondary"><ShieldCheck size={16} aria-hidden="true" />Discover tools</button>
-        </div>
-      </header>
-      <ToolRows tools={tools.filter(t => t.change === 'unchanged')} serverEnabled />
-    </section>
-    {open ? <ReviewHistory onClose={() => setOpen(false)} /> : null}
-  </section>;
-}

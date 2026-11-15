@@ -76,3 +76,20 @@ export const history: HistoryEvent[] = [
     { tool: 'export_orders', decision: 'approved', description: 'Exports the orders of a month as CSV.' },
   ] },
 ];
+
+// The Custom MCPs of the environment, for the Integrations list (Admin 057): 12 servers, 10 per page.
+export type ListedServer = { name: string; transport: string; tools: number; enabled: boolean; reviewRequired?: boolean };
+export const servers: ListedServer[] = [
+  { name: 'Acme Billing', transport: 'streamable-http', tools: 2, enabled: true, reviewRequired: true },
+  { name: 'Acme Issues', transport: 'streamable-http', tools: 5, enabled: true },
+  { name: 'Catalog', transport: 'streamable-http', tools: 6, enabled: true },
+  { name: 'Customer support RAG', transport: 'streamable-http', tools: 3, enabled: true },
+  { name: 'Data warehouse', transport: 'http-sse', tools: 4, enabled: true },
+  { name: 'HR records', transport: 'streamable-http', tools: 2, enabled: false },
+  { name: 'Inventory', transport: 'streamable-http', tools: 7, enabled: true },
+  { name: 'Ledger', transport: 'streamable-http', tools: 3, enabled: true, reviewRequired: true },
+  { name: 'Logistics', transport: 'http-sse', tools: 5, enabled: true },
+  { name: 'Marketing analytics', transport: 'streamable-http', tools: 2, enabled: true },
+  { name: 'Payroll', transport: 'streamable-http', tools: 4, enabled: false },
+  { name: 'Ticketing', transport: 'streamable-http', tools: 6, enabled: true },
+];

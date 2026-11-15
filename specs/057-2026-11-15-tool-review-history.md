@@ -7,7 +7,7 @@
 - **Owner**: Admin / MCP integrations
 - **Related Specification**: [Backend 096 — Tool Review History and Remembered Denials](../../backend/specs/096-2026-11-15-tool-review-history.md), [055 — Tool Review Text](055-2026-11-14-tool-review-text.md)
 - **Related Mock Contract**: none
-- **Visual Reference**: [prototype folder](prototypes/057-2026-11-15-tool-review-history/), pages `/prototype/tool-review-order` (review page) and `/prototype/review-history` (Review history of a server)
+- **Visual Reference**: [prototype folder](prototypes/057-2026-11-15-tool-review-history/), pages `/prototype/tool-review-order` (review page) and `/prototype/integrations` (Custom MCPs list with the Review history panel)
 
 ---
 
@@ -31,6 +31,10 @@ Each one needs its own decision before Confirm.
 
 Nobody can see who approved or denied a tool, when, or which text it had.
 
+### 4. The server details repeat other screens
+
+A click on a row of the Custom MCPs list opens the server details below the list: what the server must trust and its tools. The Edit dialog already shows what to trust, and the review page shows every tool with more detail. The list has no pager, and "Edit & discover" is one action for two jobs (user, 2026-11-15).
+
 ---
 
 ## Solution (from the prototype)
@@ -39,7 +43,10 @@ Nobody can see who approved or denied a tool, when, or which text it had.
 2. **Use and history in the list.** A tool granted to agents shows "Granted to N agents" under its name; a tool denied before shows "Denied before".
 3. **Keep N denied.** Next to "Approve N read-only", "Keep N denied" keeps every changed tool that was denied before denied at once (Backend 096, decision 8). The decision of each one is still visible and can be changed before Confirm.
 4. **Detail of a tool denied before.** An info notice says that it was denied in an earlier review and came back because the server changed it; the diff reads "Changes since you denied it"; the buttons are "Keep <tool> denied" and "Approve <tool>". A changed granted tool says how many agents grant it.
-5. **Review history.** The server details have a "Review history" action that opens a side panel in the pattern of the agent revision history: a timeline of reviews (reviewer and time) and automatic rediscoveries (Xokepoint), and for the selected event the count of approved, denied and disabled tools and each tool with its decision and, on demand, the text decided on.
+5. **Review history.** Each row of the Custom MCPs list has a "History" action that opens a side panel in the pattern of the agent revision history: a timeline of reviews (reviewer and time) and automatic rediscoveries (Xokepoint), and for the selected event the count of approved, denied and disabled tools and each tool with its decision and, on demand, the text decided on.
+6. **No server details below the list** (user, 2026-11-15). A row does not open details. The row actions are Edit (the dialog: name, endpoint and what the server must trust; saving runs the discovery and opens the review), Discover (the review page with the stored connection, no dialog; Review & re-enable for a disabled server), History and Disable, right-aligned under an Actions header.
+7. **Pager.** The Custom MCPs list has the pager of the Admin lists (records count, Previous and Next), 10 servers a page.
+8. **Links that opened the details.** Every target that opened the server details (Open tool of a reviewed tool in Review coverage, Open server of an Automatic rediscovery failed item, the tool-catalog targets of Investigate and the Inbox) opens the review page of that server, at that tool when the target names one.
 
 ---
 

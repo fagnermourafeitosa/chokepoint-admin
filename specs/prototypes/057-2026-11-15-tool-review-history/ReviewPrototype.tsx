@@ -127,9 +127,9 @@ export function ToolReviewHistoryPrototype() {
     <StateLabel tool={t} decision={decisions[t.name]} />
   </button></li>;
   return <section className="tr-page" aria-label="Review discovered tools">
-    <a className="tr-back" href="/prototype"><ArrowLeft size={16} aria-hidden="true" />Integrations</a>
+    <a className="tr-back" href="/prototype/integrations"><ArrowLeft size={16} aria-hidden="true" />Integrations</a>
     <header className="access-page-heading tr-page-head">
-      <div><span className="cp-admin-label">{server.name} · Custom MCP</span><h1 className="cp-admin-title">Review discovered tools</h1><p className="cp-admin-muted">Decide each new or changed tool. Unchanged tools keep their settings. <a href="/prototype/review-history">Review history</a></p></div>
+      <div><span className="cp-admin-label">{server.name} · Custom MCP</span><h1 className="cp-admin-title">Review discovered tools</h1><p className="cp-admin-muted">Decide each new or changed tool. Unchanged tools keep their settings. <a href="/prototype/integrations">Integrations list</a></p></div>
       <div className="tr-progress"><strong>{done} of {toReview.length} decided</strong><progress className="tr-progress-bar" value={done} max={toReview.length} aria-label="Tools decided" /></div>
     </header>
     <div className="tr-layout">
@@ -151,6 +151,6 @@ export function ToolReviewHistoryPrototype() {
         {shown === 'server' ? <ServerDetail serverInfo={server.info} registryName={server.name} /> : tool ? <ToolDetail tool={tool} decision={decisions[tool.name]} busy={busy} decide={decide} /> : null}
       </section>
     </div>
-    <footer className="tr-footer"><div><a className="cp-admin-button cp-admin-button--secondary" href="/prototype">Cancel</a><button type="button" className="cp-admin-button" disabled={done < toReview.length}>Confirm review</button></div></footer>
+    <footer className="tr-footer"><div><a className="cp-admin-button cp-admin-button--secondary" href="/prototype/integrations">Cancel</a><button type="button" className="cp-admin-button" disabled={done < toReview.length}>Confirm review</button></div></footer>
   </section>;
 }

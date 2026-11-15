@@ -8,3 +8,9 @@
 .rh-decisions summary { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-3); cursor: pointer; }
 .rh-contract { display: grid; gap: var(--cp-admin-space-1); padding: 0 var(--cp-admin-space-3) var(--cp-admin-space-3); }
 .rh-contract p { margin: 0; }
+.il-name { display: flex; align-items: center; gap: var(--cp-admin-space-3); }
+.il-name > span { display: grid; gap: 2px; }
+.il-name small { color: var(--cp-admin-color-text-muted); }
+.cp-admin-table.mcp-servers th.il-actions-head { text-align: right; }
+.cp-admin-table.mcp-servers td.mcp-row-actions { text-align: right; }
+.cp-admin-table.mcp-servers td.mcp-row-actions > * { margin-left: var(--cp-admin-space-2); }
