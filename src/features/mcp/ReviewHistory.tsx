@@ -19,7 +19,9 @@ const labels: Record<ReviewDecision['decision'], { text: string; tone: 'success'
   disabled_changed: { text: 'Disabled: changed', tone: 'warning' },
   disabled_removed: { text: 'Disabled: removed', tone: 'warning' },
 };
-const title = (e: ReviewEvent) => (e.kind === 'review' ? 'Review' : 'Automatic rediscovery');
+// A rediscovery event comes from a manual Discover or from the automatic rediscovery (Backend 096):
+// the backend records both the same way, so the title names what happened, not who started it.
+const title = (e: ReviewEvent) => (e.kind === 'review' ? 'Review' : 'Tools disabled');
 const reviewer = (e: ReviewEvent) => e.reviewer_name || e.reviewer_id?.slice(0, 8) || '';
 const group = (d: ReviewDecision) => (['approved', 'change_trusted'].includes(d.decision) ? 'yes' : ['denied', 'kept_disabled'].includes(d.decision) ? 'no' : 'auto');
 
@@ -55,9 +57,9 @@ export function ReviewHistory({ scope, server, onClose }: { scope: EnvironmentSc
     </nav>
     {current ? <article className="history-detail" aria-label={title(current)}>
       <header className="history-detail-head">
-        <div><span className="cp-admin-label">{current.kind === 'review' ? 'Review' : 'Automatic'}</span><h4>{title(current)} · revision {current.server_revision}</h4></div>
+        <div><span className="cp-admin-label">{current.kind === 'review' ? 'Review' : 'Discovery'}</span><h4>{title(current)} · revision {current.server_revision}</h4></div>
         <dl className="history-facts">
-          <div><dt>{current.kind === 'review' ? 'Reviewed by' : 'Done by'}</dt><dd>{current.kind === 'review' ? <><span className="history-avatar" aria-hidden="true">{initials(reviewer(current))}</span>{reviewer(current)}</> : 'Xokepoint, automatic rediscovery'}</dd></div>
+          <div><dt>{current.kind === 'review' ? 'Reviewed by' : 'Done by'}</dt><dd>{current.kind === 'review' ? <><span className="history-avatar" aria-hidden="true">{initials(reviewer(current))}</span>{reviewer(current)}</> : 'Xokepoint, after a discovery'}</dd></div>
           <div><dt>When</dt><dd>{utc(current.occurred_at)}</dd></div>
         </dl>
       </header>

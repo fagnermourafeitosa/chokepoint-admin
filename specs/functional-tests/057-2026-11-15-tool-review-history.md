@@ -56,7 +56,7 @@ scenarios:
     steps:
       - Open the More menu of Catalog and choose Review history.
     expected:
-      - The panel lists the review (Development Admin A) and the automatic rediscovery (Xokepoint), and the review shows 1 approved, 2 denied with each tool and its decision.
+      - The panel lists the review (Development Admin A) and the Tools disabled event of the discovery (Xokepoint, after a discovery), and the review shows 1 approved, 2 denied with each tool and its decision.
     last_run:
       date: 2026-11-15
       result: passed
