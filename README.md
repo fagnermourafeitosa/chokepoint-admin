@@ -221,21 +221,17 @@ Nested changes use a revisioned draft under the selected Agent's permissions res
 
 No automated Admin tests were added or run. Use type checking, production build and manual browser checks for this slice. Its formal review and result approval are still pending.
 
-## Enterprise MCP Connections and Agent Graph (Admin 010)
+## Agent Graph (Admin 010)
 
-Integrations separates Enterprise MCPs from Custom MCPs. The GitHub button uses the official local brand asset and the backend's availability metadata. The endpoint is fixed by the provider; each customer saves its application credentials through Admin. OAuth returns to an account/tool review before registration.
+Agent details include a connection graph based on published associations and grants, with MCP node details, tool counts, contextual help, zoom/fit and a vertical narrow-screen layout. Existing permission controls remain available, and changing graph/permission tabs preserves mounted editor state. The graph shows configuration, not live traffic or guaranteed runtime permits. See specification 010 and its review evidence for the resolved review findings and verification limits. The Agent graph omits the implicit Chokepoint enforcement node, duplicate relationship list and repeated permission actions; runtime authorization context is available through the heading help tooltip.
 
-Agent details include a connection graph based on published associations and grants, with MCP node details, tool counts, contextual help, zoom/fit and a vertical narrow-screen layout. Existing permission controls remain available, and changing graph/permission tabs preserves mounted editor state. The graph shows configuration, not live traffic or guaranteed runtime permits. See specification 010 and its review evidence for the resolved review findings and verification limits.
-
-The GitHub provider offers a numbered setup guide with official documentation links before the customer’s Client ID and secret form. Configure GitHub stores the application within the selected workspace/environment. Connect GitHub is disabled with a setup helper until the scoped application configuration is saved, then uses that customer’s application for OAuth. No global GitHub credentials or API restart is required. The Agent graph omits the implicit Chokepoint enforcement node, duplicate relationship list and repeated permission actions; runtime authorization context is available through the heading help tooltip.
-
-Enterprise MCPs show one connection per provider in the provider block, with account, status, tools and actions. Search, connection tables and pagination apply only to Custom MCPs.
+Enterprise MCP (the GitHub connection of Admin 010) was removed by Admin 056 with Backend 095. Integrations has Custom MCPs and Identity providers.
 
 ## Investigation and Overview (Admin 019–021)
 
 The coordinated implementation consumes Backend 022–025. Investigate has paged By problem and All decisions views with exact filters, retained UTC periods and historical evidence. The inspector displays recorded path states and configured condition expressions, never actual arguments or source values. Contextual actions use real permission-group, server, tool and policy references; an OAuth application identifier is not an Agent UUID. Since Admin 030 the lists and the inspector show the verified agent, the subject on whose behalf it acted (Person or Service and identity provider) and the resource; the path is Delegation, Tool, Resource and Rules with the relation checked; each deny reason has one action that opens the agent editor at the place of the fix. A third view, Token exchanges, lists the exchanges at the authorization server with their reasons and a detail in the same layout, and the Inbox shows the Token exchange denied signal.
 
-Overview uses backend UTC aggregates for daily comparisons, allowed/denied hourly traffic, most-denied combinations, tool review coverage and distinct granted tools without recorded allowed calls in 30 days. View as table exposes chart values. The unused-tool indicator opens a paged review list. Both Custom and Enterprise tools are reachable through the review catalog.
+Overview uses backend UTC aggregates for daily comparisons, allowed/denied hourly traffic, most-denied combinations, tool review coverage and distinct granted tools without recorded allowed calls in 30 days. View as table exposes chart values. The unused-tool indicator opens a paged review list. Every tool is reachable through the review catalog.
 
 The Inbox defaults to Open and Reviewed. An item becomes Reviewed when its Inbox action is clicked, or when the inspector of its denial problem opens by any path. Mark resolved is one click, without a confirmation, in the Inbox row and in the inspector header; a failed write shows Retry. Navigation never opens a dialog, and no URL carries the Inbox item (Admin 045). Individual calls have no workflow status.
 

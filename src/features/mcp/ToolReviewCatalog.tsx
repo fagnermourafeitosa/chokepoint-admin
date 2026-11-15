@@ -16,7 +16,7 @@ async function catalog(scope: EnvironmentScope, signal: AbortSignal) {
   }
   return servers;
 }
-// Review coverage includes both Enterprise and Custom connections.
+// Review coverage lists the tools of every MCP server.
 export function ToolReviewCatalog({ scope }: { scope: EnvironmentScope }) {
   const query = useQuery({
     queryKey: [...mcpKey(scope), 'review-catalog'],
@@ -83,7 +83,7 @@ export function ToolReviewCatalog({ scope }: { scope: EnvironmentScope }) {
                       onClick={() =>
                         navigate(
                           // A tool that needs review opens the review page at that tool (Admin 055, decision 7).
-                          `/access/integrations?${new URLSearchParams({ type: server.connection_type === 'enterprise' ? 'enterprise' : 'custom', server: server.id, tool: tool.name, ...(tool.reviewed ? {} : { review: 'server' }) })}`,
+                          `/access/integrations?${new URLSearchParams({ type: 'custom', server: server.id, tool: tool.name, ...(tool.reviewed ? {} : { review: 'server' }) })}`,
                         )
                       }
                     >

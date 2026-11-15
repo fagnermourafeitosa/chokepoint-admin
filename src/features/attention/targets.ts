@@ -50,7 +50,6 @@ export function targetPath(signal: Signal): string | undefined {
 const disconnectedText: Record<string, string> = {
   unreachable: 'No answer from the server',
   authentication: 'The server refused the credentials',
-  reauthorization_required: 'The OAuth grant needs a new authorization',
 };
 function discoveryCounts(c: Record<string, string>): string {
   return [Number(c.changed) > 0 ? `${c.changed} changed` : '', Number(c.removed) > 0 ? `${c.removed} removed` : ''].filter(Boolean).join(' · ');

@@ -11,7 +11,7 @@ function HierarchyDiagram() {
     <text x={10} y={18} className="help-col">WHO CAN DELEGATE</text><text x={196} y={18} className="help-col">AGENT</text><text x={372} y={18} className="help-col">SERVER · TOOLS · RULES</text>
     {box(10, 120, 150, 50, 'Keycloak customer', '80 of 81 delegate')}
     {box(196, 120, 140, 50, 'Deploy bot', 'acts, is verified', 'agent')}
-    <g className="help-group"><rect x={372} y={40} width={216} height={190} rx={6} /><text x={382} y={58}>GitHub · Enterprise MCP</text></g>
+    <g className="help-group"><rect x={372} y={40} width={216} height={190} rx={6} /><text x={382} y={58}>GitHub · Custom MCP</text></g>
     {box(382, 70, 196, 64, 'merge_pull_request', '2 rules: approvals, repository')}
     {box(382, 150, 196, 50, 'list_issues', 'no rules')}
     {edge('M 160 145 L 194 145', 'delegates', 150, 112)}

@@ -43,7 +43,7 @@ async function loadCatalog(scope: EnvironmentScope, signal: AbortSignal) {
   }));
   const bindings = approvedBindings(sources.items);
   return {
-    servers: withTools.map(s => ({ id: s.id, name: s.name, type: s.connection_type === 'enterprise' ? 'enterprise' as const : 'custom' as const })),
+    servers: withTools.map(s => ({ id: s.id, name: s.name })),
     tools, bindings, idps: identities.map(i => ({ id: i.id, name: i.name, enabled: i.enabled, provider: i.provider, groups: !!providers.find(p => p.provider === i.provider)?.groups, harnessLogin: !!i.login?.enabled })),
   };
 }

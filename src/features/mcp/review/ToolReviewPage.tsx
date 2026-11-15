@@ -9,9 +9,8 @@ import '../mcp.css';
 import '../../access/delegation/delegation.css';
 import './tool-review.css';
 
-// Admin 055: the review of a discovery as a page, for a Custom and an Enterprise MCP. It knows nothing
-// of the server kind: an entry (CustomToolReview, EnterpriseToolReview) loads the preview, builds the
-// heading and passes the confirmation. The list shows each tool and the state of its decision; the
+// Admin 055: the review of a discovery as a page. Its entry (CustomToolReview) loads the preview,
+// builds the heading and passes the confirmation. The list shows each tool and the state of its decision; the
 // detail shows the text that the model reads, the change since approval and the decision. Nobody edits
 // the text of a tool: the reviewer approves or denies it.
 

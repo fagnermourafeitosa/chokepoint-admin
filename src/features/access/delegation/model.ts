@@ -20,7 +20,7 @@ export type Resource = { id: string; serverId: string; kind: string; value: stri
 export type Doc = { scopes: IdpScope[]; delegations: Delegation[]; capabilities: Capability[]; resources: Resource[]; blocked: Blocked[] };
 
 // What the editor reads besides the document: servers, reviewed tools, bindings, identity providers and directories.
-export type CatalogServer = { id: string; name: string; type: 'custom' | 'enterprise' };
+export type CatalogServer = { id: string; name: string };
 // args: the rule builder type of each scalar argument; schema: its JSON Schema type (integer, number, string, boolean).
 export type CatalogTool = { serverId: string; tool: string; args: Record<string, string>; schema: Record<string, string>; mapping?: Mapping };
 export type CatalogBinding = { id: string; source: string; entity: 'subject' | 'resource'; attributes: { name: string; type: string }[] };

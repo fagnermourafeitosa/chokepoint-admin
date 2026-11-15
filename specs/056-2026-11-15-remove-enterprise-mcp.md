@@ -3,7 +3,7 @@
 - **Specification ID**: 056
 - **Date**: 2026-11-15
 - **Slug**: remove-enterprise-mcp
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin / MCP integrations
 - **Related Specification**: [Backend 095 — Remove Enterprise MCP](../../backend/specs/095-2026-11-15-remove-enterprise-mcp.md), [055 — Tool Review Text](055-2026-11-14-tool-review-text.md)
 - **Related Mock Contract**: none
@@ -35,14 +35,16 @@ Without Backend 095's routes, the Enterprise MCPs tab, the GitHub App dialog, th
 
 ## Acceptance Criteria
 
-- [ ] 1. No Enterprise MCP screen, route, API call or field remains in the Admin.
-- [ ] 2. Custom MCP connection, review, Inbox and Review coverage work as before.
-- [ ] 3. `npm run check` and `npm run build` pass.
-- [ ] 4. Functional test in the browser on the development stack.
-- [ ] 5. Public docs no longer describe Enterprise MCP.
+- [x] 1. No Enterprise MCP screen, route, API call or field remains in the Admin.
+- [x] 2. Custom MCP connection, review, Inbox and Review coverage work as before.
+- [x] 3. `npm run check` and `npm run build` pass.
+- [x] 4. Functional test in the browser on the development stack.
+- [x] 5. Public docs no longer describe Enterprise MCP.
 
 ---
 
 ## Out of Scope
 
 - The new design for vendor-hosted MCP servers.
+
+**Verification (2026-11-15).** `npm run check` and `npm run build` pass. Functional test in the browser on the development stack with Backend 095: Integrations opens on Custom MCPs with two tabs (Custom MCPs, Identity providers), `type=enterprise` falls back to Custom MCPs, the Inbox opens a Custom MCP review without `connection_type` and its confirmation stores the tool, Review coverage lists the tools, the delegation graph labels each server Custom MCP, and the removed backend routes are not called. Public docs dropped the Enterprise MCP pages and the vendor server passages (frontend `c6856d9`).
