@@ -78,18 +78,20 @@ export const history: HistoryEvent[] = [
 ];
 
 // The Custom MCPs of the environment, for the Integrations list (Admin 057): 12 servers, 10 per page.
-export type ListedServer = { name: string; endpoint: string; transport: string; tools: number; enabled: boolean; reviewRequired?: boolean };
+// agents and calls are the impact of a disable (Backend 096): the agents whose published permission
+// grants a tool of the server, and the allowed calls to its tools in the last 24 hours.
+export type ListedServer = { name: string; endpoint: string; transport: string; tools: number; enabled: boolean; reviewRequired?: boolean; agents: string[]; calls: number };
 export const servers: ListedServer[] = [
-  { name: 'Acme Billing', endpoint: 'https://acme-billing.acme.example/mcp', transport: 'streamable-http', tools: 2, enabled: true, reviewRequired: true },
-  { name: 'Acme Issues', endpoint: 'https://acme-issues.acme.example/mcp', transport: 'streamable-http', tools: 5, enabled: true },
-  { name: 'Catalog', endpoint: 'https://catalog.acme.example/mcp', transport: 'streamable-http', tools: 6, enabled: true },
-  { name: 'Customer support RAG', endpoint: 'https://customer-support-rag.acme.example/mcp', transport: 'streamable-http', tools: 3, enabled: true },
-  { name: 'Data warehouse', endpoint: 'https://data-warehouse.acme.example/mcp', transport: 'http-sse', tools: 4, enabled: true },
-  { name: 'HR records', endpoint: 'https://hr-records.acme.example/mcp', transport: 'streamable-http', tools: 2, enabled: false },
-  { name: 'Inventory', endpoint: 'https://inventory.acme.example/mcp', transport: 'streamable-http', tools: 7, enabled: true },
-  { name: 'Ledger', endpoint: 'https://ledger.acme.example/mcp', transport: 'streamable-http', tools: 3, enabled: true, reviewRequired: true },
-  { name: 'Logistics', endpoint: 'https://logistics.acme.example/mcp', transport: 'http-sse', tools: 5, enabled: true },
-  { name: 'Marketing analytics', endpoint: 'https://marketing-analytics.acme.example/mcp', transport: 'streamable-http', tools: 2, enabled: true },
-  { name: 'Payroll', endpoint: 'https://payroll.acme.example/mcp', transport: 'streamable-http', tools: 4, enabled: false },
-  { name: 'Ticketing', endpoint: 'https://ticketing.acme.example/mcp', transport: 'streamable-http', tools: 6, enabled: true },
+  { name: 'Acme Billing', endpoint: 'https://acme-billing.acme.example/mcp', transport: 'streamable-http', tools: 2, enabled: true, reviewRequired: true, agents: ['Support bot', 'Refund assistant', 'Finance copilot'], calls: 148 },
+  { name: 'Acme Issues', endpoint: 'https://acme-issues.acme.example/mcp', transport: 'streamable-http', tools: 5, enabled: true, agents: ['Support bot'], calls: 37 },
+  { name: 'Catalog', endpoint: 'https://catalog.acme.example/mcp', transport: 'streamable-http', tools: 6, enabled: true, agents: ['Example agent'], calls: 12 },
+  { name: 'Customer support RAG', endpoint: 'https://customer-support-rag.acme.example/mcp', transport: 'streamable-http', tools: 3, enabled: true, agents: ['Support bot', 'Onboarding helper'], calls: 412 },
+  { name: 'Data warehouse', endpoint: 'https://data-warehouse.acme.example/mcp', transport: 'http-sse', tools: 4, enabled: true, agents: ['Finance copilot'], calls: 9 },
+  { name: 'HR records', endpoint: 'https://hr-records.acme.example/mcp', transport: 'streamable-http', tools: 2, enabled: false, agents: [], calls: 0 },
+  { name: 'Inventory', endpoint: 'https://inventory.acme.example/mcp', transport: 'streamable-http', tools: 7, enabled: true, agents: ['Ops agent', 'Procurement bot'], calls: 88 },
+  { name: 'Ledger', endpoint: 'https://ledger.acme.example/mcp', transport: 'streamable-http', tools: 3, enabled: true, reviewRequired: true, agents: ['Finance copilot'], calls: 54 },
+  { name: 'Logistics', endpoint: 'https://logistics.acme.example/mcp', transport: 'http-sse', tools: 5, enabled: true, agents: ['Ops agent'], calls: 21 },
+  { name: 'Marketing analytics', endpoint: 'https://marketing-analytics.acme.example/mcp', transport: 'streamable-http', tools: 2, enabled: true, agents: [], calls: 0 },
+  { name: 'Payroll', endpoint: 'https://payroll.acme.example/mcp', transport: 'streamable-http', tools: 4, enabled: false, agents: [], calls: 0 },
+  { name: 'Ticketing', endpoint: 'https://ticketing.acme.example/mcp', transport: 'streamable-http', tools: 6, enabled: true, agents: ['Support bot'], calls: 230 },
 ];

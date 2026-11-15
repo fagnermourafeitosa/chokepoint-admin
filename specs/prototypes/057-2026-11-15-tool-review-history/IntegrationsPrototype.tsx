@@ -5,6 +5,8 @@ import '../../../src/features/mcp/mcp.css';
 import '../../../src/features/investigate/investigate.css';
 import '../../../src/features/identity/identity.css';
 import { ReviewHistory } from './HistoryPrototype';
+import { Dialog } from '../../../src/components/ui/dialog/Dialog';
+import { WaitingBackend } from '../../../src/features/access/delegation/WaitingBackend';
 import { EditDialog } from './EditDialog';
 import { servers as fixture, type ListedServer } from './data';
 import './prototype.css';
@@ -24,7 +26,8 @@ export function IntegrationsPrototype() {
   // Disable connection acts at once, as in the Admin today: the server stops serving its tools, and
   // Review & re-enable turns it on again after a review.
   const [servers, setServers] = useState(fixture);
-  const disable = (name: string) => setServers(list => list.map(s => (s.name === name ? { ...s, enabled: false } : s)));
+  const [disabling, setDisabling] = useState<ListedServer>();
+  const disable = (name: string) => { setServers(list => list.map(s => (s.name === name ? { ...s, enabled: false } : s))); setDisabling(undefined); };
   const rows = servers.slice((page - 1) * size, page * size);
   return <section aria-label="Integrations" className="mcp-registry">
     <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect custom MCPs and identity providers, then manage agent access.</p></div><button type="button" className="cp-admin-button"><Plus size={16} />Connect custom MCP</button></header>
@@ -37,7 +40,7 @@ export function IntegrationsPrototype() {
         <td>{s.tools} tools{s.reviewRequired ? <span className="mcp-badge" data-tone="warning">Review required</span> : null}</td>
         {/* The status is the switch (user, 2026-11-15). Off disables at once; on opens the review with
             Enable server after review checked, because only a confirmed review enables a server. */}
-        <td><label className="cp-admin-choice il-status"><input className="cp-admin-switch" type="checkbox" role="switch" checked={s.enabled} aria-label={`${s.name} enabled`} onChange={e => (e.target.checked ? window.location.assign('/prototype/tool-review-order') : disable(s.name))} />{s.enabled ? 'Enabled' : 'Disabled'}</label></td>
+        <td><label className="cp-admin-choice il-status"><input className="cp-admin-switch" type="checkbox" role="switch" checked={s.enabled} aria-label={`${s.name} enabled`} onChange={e => (e.target.checked ? window.location.assign('/prototype/tool-review-order')   : setDisabling(s))} />{s.enabled ? 'Enabled' : 'Disabled'}</label></td>
         <td><div className="identity-row-actions il-row-actions">
           <a className="cp-admin-button cp-admin-button--ghost" href="/prototype/tool-review-order">{s.reviewRequired ? 'Review' : 'Discover'}</a>
           <details className="identity-menu" name="mcp-row-menu"><summary aria-label={`More actions for ${s.name}`}><MoreHorizontal size={18} /></summary><div onClick={e => e.currentTarget.closest('details')?.removeAttribute('open')}>
@@ -50,5 +53,18 @@ export function IntegrationsPrototype() {
     <TracePager page={page} size={size} total={servers.length} onPage={setPage} />
     {history ? <ReviewHistory onClose={() => setHistory(false)} /> : null}
     {editing ? <EditDialog server={editing} onClose={() => setEditing(undefined)} /> : null}
+    {/* Turning a server off cuts every agent off its tools at once, and only a review turns it on
+        again, so the switch asks first and shows the impact (user, 2026-11-15). */}
+    {disabling ? <Dialog title={`Disable ${disabling.name}`} onClose={() => setDisabling(undefined)}>
+      <div className="admin-dialog-body">
+        <p>Agents lose access to its tools at once: every call to them is denied. To enable it again, you review its tools.</p>
+        <ul className="il-impact">
+          <li><strong>{disabling.tools} managed tools</strong> stop answering.</li>
+          <li><strong>{disabling.agents.length ? `${disabling.agents.length} ${disabling.agents.length === 1 ? 'agent has' : 'agents have'} grants on them` : 'No agent has grants on them'}</strong>{disabling.agents.length ? <span className="cp-admin-muted">{disabling.agents.join(', ')}</span> : null} <WaitingBackend spec="096" tip="The agents whose published permission grants a tool of this server, so the administrator knows who loses access." /></li>
+          <li><strong>{disabling.calls} allowed calls</strong> in the last 24 hours <WaitingBackend spec="096" tip="The allowed calls to the tools of this server in the last 24 hours, so the administrator knows how much traffic stops." /></li>
+        </ul>
+      </div>
+      <div className="admin-dialog-actions"><button type="button" className="cp-admin-button cp-admin-button--secondary" onClick={() => setDisabling(undefined)}>Cancel</button><button type="button" className="cp-admin-button cp-admin-button--danger" onClick={() => disable(disabling.name)}>Disable server</button></div>
+    </Dialog> : null}
   </section>;
 }

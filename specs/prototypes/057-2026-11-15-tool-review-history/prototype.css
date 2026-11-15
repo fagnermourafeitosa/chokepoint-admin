@@ -15,3 +15,5 @@
 .il-row-actions { justify-content: flex-end; }
 .il-row-actions .cp-admin-button { min-width: 10.5rem; justify-content: center; }
 .il-status { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); white-space: nowrap; }
+.il-impact { display: grid; gap: var(--cp-admin-space-2); margin: 0; padding-left: 1.25rem; }
+.il-impact li > span { display: block; }
