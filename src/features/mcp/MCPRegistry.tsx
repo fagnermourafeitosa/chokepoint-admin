@@ -1,7 +1,11 @@
 import { ToolReviewCatalog } from './ToolReviewCatalog';
 import { useState } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router';
-import { Plus, Server, Users } from 'lucide-react';
+import { Plus, Server } from 'lucide-react';
+import { useAuth } from '../auth/AuthContext';
+import { ExternalApps } from '../externalapps/ExternalApps';
+import { IntegrationTabs } from '../externalapps/IntegrationTabs';
+import { SlackConfigPage } from '../externalapps/SlackConfigPage';
 import { IdentityRegistry } from '../identity/IdentityRegistry';
 import { EmptyState } from '../../components/ui/empty-state/EmptyState';
 import { TracePager } from '../investigate/TraceUI';
@@ -21,7 +25,9 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
   const [params, setParams] = useSearchParams();
   const back = params.get('return_to');
   const returnTo = back && (back === '/' || back.startsWith('/investigate?')) ? back : undefined;
-  const kind = params.get('type') === 'identity' ? 'identity' : 'custom';
+  const type = params.get('type');
+  const kind = type === 'identity' || type === 'external' ? type : 'custom';
+  const auth = useAuth();
   const registry = useMCPRegistry(scope, kind === 'custom');
   const selectedId = params.get('server') ?? undefined;
   const [history, setHistory] = useState<MCPServer>();
@@ -51,12 +57,15 @@ export function MCPRegistry({ scope }: { scope: EnvironmentScope }) {
   const reviewLabel = returnTo === '/' ? 'Overview' : returnTo ? 'Investigate' : 'Integrations';
   const reviewBack = returnTo ?? '/access/integrations?type=custom';
   if ((review === 'server' && selectedId && kind === 'custom') || review === 'new') return <CustomToolReview key={selectedId ?? 'new'} scope={scope} serverId={review === 'server' ? selectedId : undefined} initialTool={reviewTool} enable={params.get('enable') === '1'} backTo={reviewBack} backLabel={reviewLabel} onSaved={saved} />;
-  if (kind === 'identity') return <IdentityRegistry scope={scope} onCustom={() => setParams({ type: 'custom' })} />;
+  // Admin 059: the External apps tab, and the configuration page of an app.
+  if (kind === 'external' && params.get('app') === 'slack') return <SlackConfigPage scope={scope} workspace={auth.workspace?.name ?? ''} environment={auth.environment?.name === 'production' ? 'Production' : 'Sandbox'} onDone={() => setParams({ type: 'external' })} />;
+  if (kind === 'external') return <ExternalApps scope={scope} onTab={t => setParams({ type: t })} />;
+  if (kind === 'identity') return <IdentityRegistry scope={scope} onTab={t => setParams({ type: t })} />;
   const servers = registry.servers;
   return <section aria-label="Integrations" className="mcp-registry">
     {returnTo ? <Link className="cp-admin-button cp-admin-button--secondary trace-back" to={returnTo}>Back to {returnTo === '/' ? 'Overview' : 'Investigate'}</Link> : null}
-    <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect custom MCPs and identity providers, then manage agent access.</p></div><button className="cp-admin-button" onClick={() => registry.setDialog('new')}><Plus size={16} />Connect custom MCP</button></header>
-    <div className="mcp-types" role="group" aria-label="Integration type"><button aria-pressed={kind === 'custom'} onClick={() => setParams({ type: 'custom' })}><Server size={17} />Custom MCPs</button><button aria-pressed={false} onClick={() => setParams({ type: 'identity' })}><Users size={17} />Identity providers</button></div>
+    <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect custom MCPs, identity providers and external apps, then manage agent access.</p></div><button className="cp-admin-button" onClick={() => registry.setDialog('new')}><Plus size={16} />Connect custom MCP</button></header>
+    <IntegrationTabs current="custom" onTab={t => setParams({ type: t })} />
     <div className="mcp-toolbar"><label htmlFor="mcp-search">Find a connection</label><input id="mcp-search" type="search" className="cp-admin-input" placeholder="Search by name or endpoint" value={registry.search} onChange={e => registry.setSearch(e.target.value)} /></div>
     {registry.isPending ? <p role="status">Loading MCP servers…</p>
       : registry.isError ? <div role="alert">Could not load MCP servers. <button className="cp-admin-button cp-admin-button--ghost cp-admin-button--small" onClick={() => void registry.refetch()}>Retry</button></div>

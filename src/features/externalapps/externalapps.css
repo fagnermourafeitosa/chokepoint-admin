@@ -1,0 +1,39 @@
+/* Admin 059: the External apps tab and the Slack configuration. */
+.ea-category { display: grid; gap: var(--cp-admin-space-3); }
+.ea-category-head { display: grid; gap: var(--cp-admin-space-1); }
+.ea-category-head h2, .ea-category-head p { margin: 0; }
+.ea-back { width: fit-content; }
+.ea-app-head { display: flex; align-items: center; gap: var(--cp-admin-space-4); }
+.ea-app-head p { margin: var(--cp-admin-space-1) 0 0; }
+/* Numbered square steps (sober design: numbers, not illustrations). */
+.ea-steps { list-style: none; counter-reset: ea-step; margin: 0; padding: 0; display: grid; gap: var(--cp-admin-space-5); min-width: 0; }
+.ea-steps > li { counter-increment: ea-step; position: relative; padding-left: 2.75rem; display: grid; gap: var(--cp-admin-space-2); min-width: 0; }
+.ea-steps > li::before { content: counter(ea-step); position: absolute; left: 0; top: 0; width: 1.75rem; height: 1.75rem; display: grid; place-items: center; border: 2px solid var(--cp-admin-color-text); font-weight: var(--cp-admin-weight-semibold); font-size: var(--cp-admin-type-label); }
+.ea-steps p { margin: 0; }
+.ea-tip { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); }
+.ea-manifest { max-height: 16rem; overflow: auto; margin: 0; }
+.ea-row { display: flex; align-items: center; gap: var(--cp-admin-space-3); flex-wrap: wrap; }
+.ea-footer { gap: var(--cp-admin-space-3); }
+.ea-scopes code { font-family: var(--cp-admin-font-mono); white-space: nowrap; }
+.ea-not-requested { margin: 0; font-size: var(--cp-admin-type-small); }
+.ea-guide { margin-bottom: var(--cp-admin-space-6); }
+.ea-guide > summary { color: var(--cp-admin-color-info); }
+.ea-guide > div { display: grid; gap: var(--cp-admin-space-4); }
+.ea-guide-intro { margin: 0; color: var(--cp-admin-color-text-muted); }
+/* No separators around the guide: none under App credentials, none at the buttons (user, 2026-11-15). */
+.identity-form-section.ea-credentials { border-bottom: 0; padding-bottom: 0; }
+.identity-form-actions.ea-footer { border-top: 0; }
+.ea-signals { gap: var(--cp-admin-space-3); }
+/* External apps: square cards, the whole card opens the app (user, 2026-11-15). Hover: the hard ink shadow. */
+.ea-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, 13rem); gap: var(--cp-admin-space-4); }
+.ea-card { box-sizing: border-box; width: 13rem; height: 13rem; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: var(--cp-admin-space-2); padding: var(--cp-admin-space-5); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); text-decoration: none; transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease; }
+.ea-card:hover, .ea-card:focus-visible { border-color: var(--cp-admin-color-text); box-shadow: 4px 4px 0 var(--cp-admin-color-text); transform: translate(-2px, -2px); }
+.ea-card:focus-visible { outline: 2px solid var(--cp-admin-color-focus); outline-offset: 2px; }
+.ea-card-logo { display: grid; place-items: center; width: 3rem; height: 3rem; }
+.ea-card strong { font-size: 1.05rem; }
+.ea-card small { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); display: -webkit-box; -webkit-line-clamp: 2; flex: none; -webkit-box-orient: vertical; overflow: hidden; }
+.ea-card .mcp-badge { margin-top: var(--cp-admin-space-1); }
+@media (prefers-reduced-motion: reduce) { .ea-card { transition: none; } .ea-card:hover { transform: none; } }
+/* Under construction: no hover, no click, muted (user, 2026-11-15). */
+.ea-card--soon { cursor: default; color: var(--cp-admin-color-text-muted); }
+.ea-card--soon:hover { border-color: var(--cp-admin-color-border); box-shadow: none; transform: none; }

@@ -10,6 +10,7 @@ import { EventsExportPage } from '../features/account/EventsExportPage';
 import { EventsExportFormPage } from '../features/account/EventsExportFormPage';
 import { lazy, Suspense } from 'react';
 import { navigation } from './navigation';
+import { SignalLinkPage } from '../features/attention/SignalLinkPage';
 
 // Layout prototypes exist only in the development server: a production build has no
 // /prototype route and no prototype code (the dead branch and its chunk are removed).
@@ -25,6 +26,9 @@ const router = createBrowserRouter(createRoutesFromElements(
     {/* Admin 051: the account area replaces the workspace page. The first-workspace onboarding stays (Admin 005). */}
     <Route path="/workspaces" element={<Navigate to="/account/workspaces" replace />} />
     <Route path="/onboarding/workspace" element={<WorkspaceOnboarding />} />
+    {/* Admin 059: the link of a Slack message. It needs a session, not a chosen workspace:
+        it opens the workspace and the environment of the signal itself. */}
+    <Route element={<RequireAccount />}><Route path="/inbox/:signalId" element={<SignalLinkPage />} /></Route>
     <Route element={<RequireAccount />}><Route path="/account" element={<AccountLayout />}>
       <Route index element={<Navigate to="/account/workspaces" replace />} />
       <Route path="workspaces" element={<WorkspacesPage />} />
