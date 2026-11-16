@@ -1,0 +1,9 @@
+/* Admin 062 prototype: the Barricade page. Fields keep one grid; each number input has its unit. */
+.barricade-page { display: grid; gap: 20px; }
+.barricade-workspace { max-width: 420px; }
+.barricade-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px 24px; }
+.barricade-input { display: flex; align-items: center; gap: 8px; }
+.barricade-input input { width: 96px; }
+.barricade-detail { display: block; margin-top: 2px; }
+.barricade-table td { vertical-align: middle; }
+.barricade-table td:last-child { width: 46%; }

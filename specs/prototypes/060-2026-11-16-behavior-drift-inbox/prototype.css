@@ -1,0 +1,9 @@
+/* Admin 060 prototype: the Behavior drift tag uses the warning palette, as the Review due tag;
+   the Slack section stacks its switches as in the real form. */
+.attention-tag--behavior-drift { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); color: var(--cp-admin-color-warning); }
+.drift-prototype { display: grid; gap: var(--cp-admin-space-6, 24px); }
+.drift-slack { display: grid; gap: 16px; }
+.drift-slack h2 { margin: 2px 0 4px; }
+.drift-slack-choices { display: grid; gap: 12px; max-width: 720px; }
+/* Admin 061: the category tabs above the Inbox table. */
+.cat-tabs { display: flex; align-items: center; gap: 12px; padding: 0 0 12px; }
