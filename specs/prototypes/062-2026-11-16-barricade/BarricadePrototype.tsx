@@ -1,17 +1,19 @@
 import { useState } from 'react';
-import { Building2, Send, UserRound } from 'lucide-react';
+import { Activity, Building2, History, Send, UserRound } from 'lucide-react';
 import { SelectMenu } from '../../../src/components/ui/dropdown/SelectMenu';
 import { Notice } from '../../../src/components/ui/notice/Notice';
+import { SidePanel } from '../../../src/components/ui/side-panel/SidePanel';
 import { WaitingBackend } from '../../../src/features/access/delegation/WaitingBackend';
 import '../../../src/features/account/account.css';
 import { BarricadeIcon } from './BarricadeIcon';
-import { departures, heuristics, responses, workspaces } from './data';
+import { actions, anomalies, environments, heuristics, history, modules, settings, workspaces, type Key } from './data';
 import './prototype.css';
 
-// Admin 062 prototype: Barricade as a tab of the account area (Admin 051), after Events export, because
-// its settings belong to a workspace and apply to Sandbox and Production. Rendered inside the real
-// account layout under /account/prototype/barricade. The drift heuristics of Backend 099 with their
-// defaults, and the response to each departure (Backend 099 Implementation Decision 16a). Saving writes nothing.
+// Admin 062 prototype: Barricade as a tab of the account area (Admin 051), after Events export. Each
+// environment of a workspace has its own setting (Backend 101). The page grows by security module:
+// a rail on the left lists the modules (Behavior drift first), and each module has Detection and
+// Automated response. The change history of the environment opens in a side panel. Rendered inside
+// the real account layout under /account/prototype/barricade. Saving writes nothing.
 
 function SectionHeading({ title, description }: { title: string; description: string }) {
   return <div className="identity-section-heading"><h2>{title}</h2><p>{description}</p></div>;
@@ -29,41 +31,62 @@ function Tabs() {
 
 export function BarricadePrototype() {
   const [workspace, setWorkspace] = useState(workspaces[0].value);
-  const [values, setValues] = useState<Record<string, number>>(Object.fromEntries(heuristics.map(h => [h.key, h.value])));
-  const [chosen, setChosen] = useState<Record<string, string>>(Object.fromEntries(departures.map(d => [d.key, 'alert'])));
+  const [environment, setEnvironment] = useState(environments[0].value);
+  const [module, setModule] = useState(modules[0].key);
+  const [showHistory, setShowHistory] = useState(false);
+  const [edits, setEdits] = useState<Record<string, Record<Key, number>>>(Object.fromEntries(Object.entries(settings).map(([env, s]) => [env, { ...s.values }])));
+  const [chosen, setChosen] = useState<Record<string, string>>(Object.fromEntries(anomalies.map(a => [a.key, 'alert'])));
+  const values = edits[environment];
   const enforcing = Object.values(chosen).some(v => v !== 'alert');
+  const envLabel = environments.find(e => e.value === environment)?.label;
   return <main id="main-content" className="admin-page cp-admin-container barricade-page" aria-label="Barricade" tabIndex={-1}>
     <Tabs />
-    <header className="access-page-heading">
+    <header className="access-page-heading barricade-heading">
       <div>
-        <h1 className="cp-admin-title">Barricade<WaitingBackend spec="101" tip="Stores the security settings of each workspace: the drift heuristics and the response to each departure." /></h1>
-        <p className="cp-admin-muted">Security settings of a workspace, for Sandbox and Production: how an agent that leaves its pattern is detected, and what happens then.</p>
+        <h1 className="cp-admin-title">Barricade<WaitingBackend spec="101" tip="Stores the security settings of each workspace environment, created with the market defaults, with the history of every change." /></h1>
+        <p className="cp-admin-muted">Security settings of each environment of a workspace. Sandbox and Production are set apart.</p>
+      </div>
+      <div className="barricade-scope">
+        <label className="cp-admin-field">Workspace<SelectMenu block label="Workspace" value={workspace} onChange={setWorkspace} options={workspaces} /></label>
+        <label className="cp-admin-field">Environment<SelectMenu block label="Environment" value={environment} onChange={setEnvironment} options={environments} /></label>
+        <button type="button" className="cp-admin-button cp-admin-button--ghost barricade-history-button" onClick={() => setShowHistory(true)}><History size={16} aria-hidden="true" />Change history</button>
       </div>
     </header>
-    <form className="cp-admin-panel identity-form identity-form-redesign" onSubmit={e => e.preventDefault()}>
-      <div className="identity-form-section">
-        <SectionHeading title="Workspace" description="The settings below apply to both environments of this workspace." />
-        <div className="identity-form-fields barricade-workspace"><label className="cp-admin-field">Workspace<SelectMenu block label="Workspace" value={workspace} onChange={setWorkspace} options={workspaces} /></label></div>
-      </div>
-      <div className="identity-form-section">
-        <SectionHeading title="Behavior drift detection" description="How each agent's pattern is learned and when a departure becomes a signal. The defaults follow market practice." />
-        <div className="identity-form-fields barricade-fields">
-          {heuristics.map(h => <label key={h.key} className="cp-admin-field">{h.label}
-            <span className="barricade-input"><input className="cp-admin-input" type="number" min={1} value={values[h.key]} onChange={e => setValues(v => ({ ...v, [h.key]: Number(e.target.value) }))} /><span className="cp-admin-muted">{h.unit}</span></span>
-            <small>{h.help}</small></label>)}
+    <div className="barricade-layout">
+      <nav className="cp-admin-panel barricade-rail" aria-label="Security modules">
+        {modules.map(m => <button key={m.key} type="button" aria-current={module === m.key ? 'page' : undefined} onClick={() => setModule(m.key)}><Activity size={16} aria-hidden="true" /><span><strong>{m.label}</strong><small>{m.detail}</small></span></button>)}
+      </nav>
+      <form className="cp-admin-panel identity-form identity-form-redesign" onSubmit={e => e.preventDefault()}>
+        <div className="barricade-module-head"><h2>Behavior drift</h2><small className="cp-admin-muted">{envLabel} · {settings[environment].updated}</small></div>
+        <div className="identity-form-section">
+          <SectionHeading title="Detection" description="How each agent's baseline is learned and when an anomaly is raised." />
+          <div className="identity-form-fields barricade-fields">
+            {heuristics.map(h => <label key={h.key} className="cp-admin-field">{h.label}
+              <span className="barricade-input"><input className="cp-admin-input" type="number" min={1} value={values[h.key]} onChange={e => setEdits(all => ({ ...all, [environment]: { ...all[environment], [h.key]: Number(e.target.value) } }))} /><span className="cp-admin-muted">{h.unit}</span></span>
+              <small>{h.help}</small></label>)}
+          </div>
         </div>
-      </div>
-      <div className="identity-form-section">
-        <SectionHeading title="Response to a departure" description="What happens when an agent leaves its pattern. Alert is the default: a signal in the Inbox, also sent to Slack when chosen there." />
-        <div className="identity-form-fields">
-          <div className="cp-admin-table-scroll"><table className="cp-admin-table barricade-table">
-            <thead><tr><th>Departure</th><th>Response</th></tr></thead>
-            <tbody>{departures.map(d => <tr key={d.key}><td><strong>{d.label}</strong><small className="cp-admin-muted barricade-detail">{d.detail}</small></td><td><SelectMenu block label={`Response to ${d.label}`} value={chosen[d.key]} onChange={v => setChosen(c => ({ ...c, [d.key]: v }))} options={responses} /></td></tr>)}</tbody>
-          </table></div>
-          {enforcing ? <Notice tone="warning" title="Calls will be blocked automatically">A suspended tool denies every call of that agent until an administrator restores it; a disabled agent gets no token and its next call is refused. For an agent in Report-only, the calls run and are recorded as would deny.</Notice> : null}
+        <div className="identity-form-section">
+          <SectionHeading title="Automated response" description="The action taken when an anomaly is raised. Alert is the default; the other actions block calls without waiting for a person." />
+          <div className="identity-form-fields">
+            <table className="cp-admin-table barricade-table">
+              <thead><tr><th>Anomaly</th><th>Action</th></tr></thead>
+              <tbody>{anomalies.map(a => <tr key={a.key}><td><strong>{a.label}</strong><small className="cp-admin-muted barricade-detail">{a.detail}</small></td><td><SelectMenu block label={`Action for ${a.label}`} value={chosen[a.key]} onChange={v => setChosen(c => ({ ...c, [a.key]: v }))} options={actions} /></td></tr>)}</tbody>
+            </table>
+            {enforcing ? <Notice tone="warning" title="Calls will be blocked automatically">A suspended tool denies every call of that agent until an administrator restores it; a disabled agent gets no token and its next call is refused. For an agent in Report-only, the calls run and are recorded as would deny.</Notice> : null}
+          </div>
         </div>
+        <footer className="identity-form-actions ea-footer"><span /><button type="button" className="cp-admin-button cp-admin-button--ghost">Cancel</button><button className="cp-admin-button" type="submit">Save</button></footer>
+      </form>
+    </div>
+    {showHistory ? <SidePanel eyebrow={`${workspaces.find(w => w.value === workspace)?.label} · ${envLabel}`} title="Change history" width="wide" onClose={() => setShowHistory(false)}>
+      <div className="barricade-history-body">
+        <p className="cp-admin-muted">Every change of this environment's Barricade setting, newest first. The history cannot be edited.</p>
+        <table className="cp-admin-table barricade-history">
+          <thead><tr><th>When</th><th>Who</th><th>Change</th></tr></thead>
+          <tbody>{history[environment].map(h => <tr key={h.when + h.change}><td>{h.when}</td><td>{h.who}</td><td>{h.change}</td></tr>)}</tbody>
+        </table>
       </div>
-      <footer className="identity-form-actions ea-footer"><span /><button type="button" className="cp-admin-button cp-admin-button--ghost">Cancel</button><button className="cp-admin-button" type="submit">Save</button></footer>
-    </form>
+    </SidePanel> : null}
   </main>;
 }

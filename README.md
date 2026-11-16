@@ -164,7 +164,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 059 | [Slack Integration](specs/059-2026-11-15-slack-integration.md) | Implemented |
 | 060 | [Behavior Drift in the Inbox](specs/060-2026-11-16-behavior-drift-inbox.md) | Proposed |
 | 061 | [Inbox Categories](specs/061-2026-11-16-inbox-categories.md) | Implemented |
-| 062 | [Barricade](specs/062-2026-11-16-barricade.md) | Proposed |
+| 062 | [Barricade](specs/062-2026-11-16-barricade.md) | In Progress |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 
