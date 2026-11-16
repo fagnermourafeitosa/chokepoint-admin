@@ -2,7 +2,14 @@ import { httpClient, HttpError } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 import type { MCPToolAnnotations } from '../access/types';
 export type ToolContract = { name: string; title?: string; description?: string; annotations?: MCPToolAnnotations; inputSchema: unknown; outputSchema?: unknown; [key: string]: unknown };
+// Backend 097: the lethal trifecta label of a tool contract. The model gives one level per leg; an
+// administrator's correction (operator) wins. A failed label has no model levels.
+export type TrifectaLevel = 'none' | 'low' | 'high';
+export type TrifectaLeg = 'private_data' | 'untrusted_content' | 'external_communication';
+export type TrifectaLabel = { state: 'labeled' | 'failed'; model?: Record<TrifectaLeg, TrifectaLevel>; operator?: Partial<Record<TrifectaLeg, TrifectaLevel>> };
+export type LevelCorrection = { tool: string; leg: TrifectaLeg; level: TrifectaLevel | null };
 export type ManagedTool = { reviewed: boolean; name: string; contract: ToolContract; previous?: ToolContract; change: 'new' | 'changed' | 'removed' | 'unchanged'; selected: boolean; enabled: boolean;
+ trifecta?: TrifectaLabel;
  // Backend 096, response only: the agents that grant the tool, its criticality order and whether a changed tool was denied before.
  granted_agents?: number; review_order?: number; denied_before?: boolean };
 export type MCPServer = { id: string; name: string; endpoint: string; transport: string; auth_type: 'chokepoint_token'; enabled: boolean;
@@ -13,7 +20,9 @@ export type Connection = { name: string; endpoint: string; transport: string; au
 export type Preview = { preview_id: string; expires_at: string; server_info: unknown; tools: ManagedTool[]; revision: number };
 export type ServerPage = { items: MCPServer[]; next_offset: number | null; total: number };
 // Backend 096: the review history of a server and the impact of a disable.
-export type ReviewDecision = { tool: string; decision: 'approved' | 'denied' | 'change_trusted' | 'kept_disabled' | 'disabled_changed' | 'disabled_removed'; contract: ToolContract; contract_sha256: string };
+export type ReviewDecision = { tool: string; decision: 'approved' | 'denied' | 'change_trusted' | 'kept_disabled' | 'disabled_changed' | 'disabled_removed' | 'level_corrected'; contract: ToolContract; contract_sha256: string;
+ // Backend 097: a level correction names its leg and level (empty when the correction was removed).
+ leg?: TrifectaLeg; level?: TrifectaLevel | '' };
 export type ReviewEvent = { id: number; kind: 'review' | 'rediscovery'; server_revision: number; reviewer_id?: string; reviewer_name?: string; occurred_at: string; decisions: ReviewDecision[] };
 export type ReviewHistoryPage = { items: ReviewEvent[]; next_offset: number | null };
 export type Impact = { tools: number; agents: { id: string; name: string }[]; allowed_calls_24h: number };
@@ -28,7 +37,8 @@ export const mcpApi = {
  reviewHistory: (s: EnvironmentScope, id: string, offset: number, signal: AbortSignal) => httpClient<ReviewHistoryPage>(`${path(s)}/${id}/review-history?offset=${offset}`, { signal }),
  impact: (s: EnvironmentScope, id: string, signal: AbortSignal) => httpClient<Impact>(`${path(s)}/${id}/impact`, { signal }),
  discover: (s: EnvironmentScope, id: string | undefined, input: Connection, signal: AbortSignal) => httpClient<Preview>(`${path(s)}${id ? `/${id}` : ''}/discover`, { method: 'POST', json: input, signal }),
- confirm: (s: EnvironmentScope, id: string | undefined, preview: Preview, selected: string[], enable: boolean, signal: AbortSignal) => httpClient<MCPServer>(`${path(s)}${id ? `/${id}/confirm` : ''}`, { method: 'POST', json: { preview_id: preview.preview_id, selected_tools: selected, enable }, signal }),
+ // Backend 097: the lethal trifecta levels corrected in the review travel with it.
+ confirm: (s: EnvironmentScope, id: string | undefined, preview: Preview, selected: string[], enable: boolean, signal: AbortSignal, corrections: LevelCorrection[] = []) => httpClient<MCPServer>(`${path(s)}${id ? `/${id}/confirm` : ''}`, { method: 'POST', json: { preview_id: preview.preview_id, selected_tools: selected, enable, ...(corrections.length ? { trifecta_corrections: corrections } : {}) }, signal }),
  disable: (s: EnvironmentScope, server: MCPServer, signal: AbortSignal) => httpClient<MCPServer>(`${path(s)}/${server.id}/disable`, { method: 'POST', json: { revision: server.revision }, signal }),
 };
 export function mcpError(error: unknown) {

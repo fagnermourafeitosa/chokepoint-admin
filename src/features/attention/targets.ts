@@ -19,6 +19,11 @@ export function targetPath(signal: Signal): string | undefined {
     }
     return `/investigate?${query}`;
   }
+  // Backend 097: a closed lethal trifecta opens the agent in Access, where its servers and tools are
+  // granted; the calls were allowed, so there is nothing to investigate as a deny (user, 2026-11-16).
+  if (signal.type === 'lethal-trifecta' && signal.target_params.agent_id) {
+    return `/access?${new URLSearchParams({ agent_id: signal.target_params.agent_id, return_to: '/' })}`;
+  }
   // The review date of the mode passed: open the agent (Backend 057).
   if (signal.type === 'report-only-review-due' && signal.target_params.agent_id) {
     return `/access?${new URLSearchParams({ agent_id: signal.target_params.agent_id, return_to: '/' })}`;
@@ -70,6 +75,12 @@ export function contextLines(signal: Signal): [string, string] {
     // Admin 041: the context of the Report-only signals.
     case 'report-only-would-deny': return [c.tool || '', [denyText[c.reason as ReasonLabel] || c.reason || '', c.people ? `${c.people} ${c.people === '1' ? 'person' : 'people'}` : ''].filter(Boolean).join(' · ')];
     case 'report-only-review-due': return [c.agent_name || c.agent || '', c.review_by ? `Review date ${reviewDay(c.review_by)}` : ''];
+    // Admin 058 item 13: the tool, then the agent and how many calls and people closed the trifecta.
+    case 'lethal-trifecta': return [c.tool || '', [
+      (c.agent_name || c.agent || '') + (c.agent_status === 'deleted' ? ' (deleted)' : ''),
+      c.count ? `${c.count} ${c.count === '1' ? 'call' : 'calls'}` : '',
+      c.people ? `${c.people} ${c.people === '1' ? 'person' : 'people'}` : '',
+    ].filter(Boolean).join(' · ')];
     // Backend 088: the server and why the rediscovery failed.
     case 'mcpserver_disconnected': return [c.server || '', c.reason ? disconnectedText[c.reason] ?? c.reason : ''];
     default: return ['', ''];

@@ -43,11 +43,10 @@
 .tr-guide ul { margin: 0 0 var(--cp-admin-space-2); padding-left: 1.2rem; display: grid; gap: var(--cp-admin-space-2); }
 .tr-guide a { white-space: nowrap; }
 
-.tr-decision { display: flex; justify-content: flex-end; gap: var(--cp-admin-space-3); padding-top: var(--cp-admin-space-4); border-top: 1px solid var(--cp-admin-color-border); }
+.tr-decision { display: flex; justify-content: flex-end; gap: var(--cp-admin-space-3); padding-top: var(--cp-admin-space-4); }
 .tr-decision .cp-admin-button--secondary[aria-pressed="true"] { background: var(--cp-admin-color-selected); }
 .tr-footer { position: sticky; bottom: 0; display: flex; align-items: center; justify-content: flex-end; gap: var(--cp-admin-space-4); padding: var(--cp-admin-space-4) 0;
-  /* The fixed Take the tour button sits over the bottom right corner: keep Confirm review clear of it. */
-  padding-right: 4.5rem; background: var(--cp-admin-color-surface); border-top: 1px solid var(--cp-admin-color-border); }
+  background: var(--cp-admin-color-surface); border-top: 1px solid var(--cp-admin-color-border); }
 .tr-footer > div { display: flex; gap: var(--cp-admin-space-3); }
 
 @media (max-width: 900px) {
@@ -72,3 +71,23 @@
 .tr-item-use { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); }
 .tr-bulk { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); }
 .tr-granted { margin: 0; font-weight: var(--cp-admin-weight-semibold); }
+
+/* Admin 058: server and tool names with their icons (Server, Wrench). */
+.tr-icon-title { display: flex; align-items: center; gap: var(--cp-admin-space-2); }
+/* Take the tour is the first item of the footer, on the line of its buttons. */
+.tr-tour-slot { margin-right: auto; }
+.tr-tour-slot:empty { display: none; }
+
+/* Admin 058: the lethal trifecta block, apart from the tool text. */
+.tl-section { display: grid; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-4); background: var(--cp-admin-color-surface-muted); border-radius: var(--cp-admin-radius-control); }
+.tl-head { display: flex; align-items: center; gap: var(--cp-admin-space-2); margin: 0; }
+.tl-legs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--cp-admin-space-4); }
+.tl-legs li { display: grid; align-content: start; gap: var(--cp-admin-space-1); }
+.tl-leg-head { display: flex; align-items: center; gap: var(--cp-admin-space-2); white-space: nowrap; }
+.tl-means { margin: 0; color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); }
+.tl-why { margin: 0; color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); }
+.tl-failed { display: flex; align-items: center; gap: var(--cp-admin-space-2); margin: 0; }
+.tl-link { border: 0; background: none; padding: 0; font: inherit; color: var(--cp-admin-color-text); text-decoration: underline; cursor: pointer; }
+@media (max-width: 900px) {
+  .tl-legs { grid-template-columns: 1fr; }
+}

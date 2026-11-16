@@ -18,6 +18,8 @@ const labels: Record<ReviewDecision['decision'], { text: string; tone: 'success'
   kept_disabled: { text: 'Kept disabled', tone: 'danger' },
   disabled_changed: { text: 'Disabled: changed', tone: 'warning' },
   disabled_removed: { text: 'Disabled: removed', tone: 'warning' },
+  // Backend 097: a lethal trifecta level that the reviewer corrected.
+  level_corrected: { text: 'Level corrected', tone: 'warning' },
 };
 // A rediscovery event comes from a manual Discover or from the automatic rediscovery (Backend 096):
 // the backend records both the same way, so the title names what happened, not who started it.

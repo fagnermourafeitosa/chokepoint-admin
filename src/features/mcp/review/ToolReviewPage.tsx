@@ -1,9 +1,11 @@
 import { useState, type ReactNode } from 'react';
-import { ArrowLeft, ChevronRight, TriangleAlert } from 'lucide-react';
+import { ArrowLeft, ChevronRight, TriangleAlert, Wrench } from 'lucide-react';
 import { Link } from 'react-router';
 import { ToolAnnotations } from '../../access/components/ToolAnnotations';
 import { Notice } from '../../../components/ui/notice/Notice';
-import type { ManagedTool } from '../api';
+import type { LevelCorrection, ManagedTool, TrifectaLeg, TrifectaLevel } from '../api';
+import { TrifectaLevels } from './TrifectaLevels';
+import type { ToolCorrections } from '../trifecta';
 import { changesOf, params, type Param } from './toolDiff';
 import '../mcp.css';
 import '../../access/delegation/delegation.css';
@@ -25,6 +27,8 @@ const guide: { text: string; owasp: string; name: string; page: number; changedO
   { text: 'Tells the model to call another tool, or to send data or secrets to another place.', owasp: 'ASI02', name: 'Tool Misuse and Exploitation', page: 12 },
   { text: 'Changed since you approved it, and you do not know why.', owasp: 'ASI04', name: 'Agentic Supply Chain Vulnerabilities', page: 18, changedOnly: true },
 ];
+// Admin 058: the guide also explains the lethal trifecta of the levels above it.
+const trifectaUrl = 'https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/';
 
 function Field({ label, now }: { label: ReactNode; now?: string }) {
   return <div className="tr-field"><div className="tr-field-label">{label}</div><p className="tr-text">{now || <span className="cp-admin-muted">No description.</span>}</p></div>;
@@ -40,17 +44,18 @@ function StateLabel({ tool, decision }: { tool: ManagedTool; decision?: Decision
 }
 
 function Guide({ changed }: { changed: boolean }) {
-  return <details className="cp-admin-accordion tr-guide">
+  return <details className="cp-admin-accordion cp-admin-accordion--warning tr-guide">
     <summary><TriangleAlert size={16} aria-hidden="true" />Before you decide</summary>
     <div>
       <p>Read the text above as the model will. Deny the tool if the text:</p>
-      <ul>{guide.filter(g => changed || !g.changedOnly).map(g => <li key={g.text}><span>{g.text}</span> <a href={owaspUrl} target="_blank" rel="noopener noreferrer">OWASP {g.owasp} · {g.name}, p. {g.page} ↗</a></li>)}</ul>
+      <ul>{guide.filter(g => changed || !g.changedOnly).map(g => <li key={g.text}><span>{g.text}</span> <a href={owaspUrl} target="_blank" rel="noopener noreferrer">OWASP {g.owasp} · {g.name}, p. {g.page} ↗</a></li>)}
+        <li><span>Shows two High legs in the lethal trifecta block: with another tool that brings the third leg, it can send private data out after reading an injected instruction.</span> <a href={trifectaUrl} target="_blank" rel="noopener noreferrer">The lethal trifecta for AI agents, Simon Willison ↗</a></li></ul>
       <p className="cp-admin-muted">You cannot edit this text. Agents get it exactly as you approve it.</p>
     </div>
   </details>;
 }
 
-function ToolDetail({ tool, decision, busy, decide }: { tool: ManagedTool; decision?: Decision; busy: boolean; decide: (d: Decision) => void }) {
+function ToolDetail({ tool, decision, busy, decide, corrections, onCorrect }: { tool: ManagedTool; decision?: Decision; busy: boolean; decide: (d: Decision) => void; corrections: ToolCorrections; onCorrect: (leg: TrifectaLeg, level: TrifectaLevel | null) => void }) {
   const changed = tool.change === 'changed';
   const removed = tool.change === 'removed';
   const wasDenied = !!tool.denied_before;
@@ -59,7 +64,7 @@ function ToolDetail({ tool, decision, busy, decide }: { tool: ManagedTool; decis
   const label = (p: Param) => <><code>{p.name}</code><span className="cp-admin-muted">{p.type}{p.required ? ' · required' : ''}</span></>;
   return <>
     <header className="tr-detail-head">
-      <div><h2>{tool.contract.title || tool.name}</h2><code>{tool.name}</code></div>
+      <div><h2 className="tr-icon-title"><Wrench size={18} aria-hidden="true" />{tool.contract.title || tool.name}</h2><code>{tool.name}</code></div>
       <StateLabel tool={tool} decision={decision} />
     </header>
     {removed ? <Notice tone="info">The server no longer returns this tool. It stays disabled, and agents cannot call it. There is nothing to decide. Below, the text that you last approved.</Notice> : null}
@@ -74,6 +79,7 @@ function ToolDetail({ tool, decision, busy, decide }: { tool: ManagedTool; decis
     {!touched.has('Description') ? <Field label="Description" now={tool.contract.description} /> : null}
     {params(tool.contract).filter(p => !touched.has(`Parameter ${p.name}`)).map(p => <Field key={p.name} label={label(p)} now={p.description} />)}
     <ToolAnnotations annotations={tool.contract.annotations} />
+    {removed ? null : <TrifectaLevels key={tool.name} tool={tool} corrections={corrections} onCorrect={onCorrect} />}
     {needsDecision(tool) ? <>
       <Guide changed={changed} />
       <div className="tr-decision">
@@ -100,6 +106,16 @@ export function selectedAfterReview(tools: ManagedTool[], decisions: Record<stri
   return tools.filter(t => t.change !== 'removed' && (needsDecision(t) ? decisions[t.name] === 'approved' : t.selected)).map(t => t.name);
 }
 
+// correctionList is the corrections to send: one for each leg that the reviewer changed, a null level
+// removing a stored correction (Backend 097).
+function correctionList(tools: ManagedTool[], corrections: Record<string, ToolCorrections>): LevelCorrection[] {
+  return tools.filter(t => t.change !== 'removed' && t.trifecta).flatMap(t => Object.entries(corrections[t.name] ?? {}).flatMap(([leg, level]) => {
+    const key = leg as TrifectaLeg;
+    const stored = t.trifecta?.operator?.[key] ?? null;
+    return (level ?? null) === stored ? [] : [{ tool: t.name, leg: key, level: level ?? null }];
+  }));
+}
+
 export type ToolReviewPageProps = {
   heading: ReactNode;
   backTo: string;
@@ -110,7 +126,8 @@ export type ToolReviewPageProps = {
   initialTool?: string;
   busy: boolean;
   error?: string;
-  onConfirm: (selected: string[]) => void;
+  // Backend 097: the lethal trifecta levels corrected in this review travel with the confirmation.
+  onConfirm: (selected: string[], corrections: LevelCorrection[]) => void;
   // Only for an existing server that is disabled: the review is where it is enabled again.
   enableOption?: { checked: boolean; onChange: (checked: boolean) => void };
 };
@@ -122,6 +139,8 @@ export function ToolReviewPage({ heading, backTo, backLabel, registryName, tools
   const unchanged = tools.filter(t => t.change === 'unchanged');
   const removed = tools.filter(t => t.change === 'removed');
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
+  const [corrections, setCorrections] = useState<Record<string, ToolCorrections>>({});
+  const correct = (name: string) => (leg: TrifectaLeg, level: TrifectaLevel | null) => setCorrections(prev => ({ ...prev, [name]: { ...prev[name], [leg]: level } }));
   const first = (initialTool && tools.some(t => t.name === initialTool) ? initialTool : undefined) ?? toReview[0]?.name ?? removed[0]?.name ?? 'server';
   const [shown, setShown] = useState(first);
   const [showUnchanged, setShowUnchanged] = useState(() => unchanged.some(t => t.name === first));
@@ -166,10 +185,11 @@ export function ToolReviewPage({ heading, backTo, backLabel, registryName, tools
           {showUnchanged ? <ul>{unchanged.map(item)}</ul> : null}</> : null}
       </nav>
       <section className="tr-detail" aria-label="Reviewing">
-        {shown === 'server' ? <ServerDetail serverInfo={serverInfo} registryName={registryName} /> : tool ? <ToolDetail tool={tool} decision={decisions[tool.name]} busy={busy} decide={decide} /> : null}
+        {shown === 'server' ? <ServerDetail serverInfo={serverInfo} registryName={registryName} /> : tool ? <ToolDetail tool={tool} decision={decisions[tool.name]} busy={busy} decide={decide} corrections={corrections[tool.name] ?? {}} onCorrect={correct(tool.name)} /> : null}
       </section>
     </div>
     {error ? <p role="alert" className="cp-admin-notice cp-admin-notice--danger">{error}</p> : null}
-    <footer className="tr-footer">{enableOption ? <label className="mcp-select-all tr-enable"><input type="checkbox" checked={enableOption.checked} disabled={busy} onChange={e => enableOption.onChange(e.target.checked)} />Enable server after review</label> : null}<div><Link className="cp-admin-button cp-admin-button--secondary" to={backTo}>Cancel</Link><button type="button" className="cp-admin-button" disabled={busy || done < toReview.length} onClick={() => onConfirm(selectedAfterReview(tools, decisions))}>{busy ? 'Saving…' : 'Confirm review'}</button></div></footer>
+    {/* Admin 058: Take the tour shares the line of the footer buttons (FirstAccessTour renders into the slot). */}
+    <footer className="tr-footer"><span className="tr-tour-slot" data-tour-slot />{enableOption ? <label className="mcp-select-all tr-enable"><input type="checkbox" checked={enableOption.checked} disabled={busy} onChange={e => enableOption.onChange(e.target.checked)} />Enable server after review</label> : null}<div><Link className="cp-admin-button cp-admin-button--secondary" to={backTo}>Cancel</Link><button type="button" className="cp-admin-button" disabled={busy || done < toReview.length} onClick={() => onConfirm(selectedAfterReview(tools, decisions), correctionList(tools, corrections))}>{busy ? 'Saving…' : 'Confirm review'}</button></div></footer>
   </section>;
 }

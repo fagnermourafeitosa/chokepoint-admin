@@ -47,3 +47,6 @@
 .mcp-history-decisions summary { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-3); cursor: pointer; }
 .mcp-history-contract { display: grid; gap: var(--cp-admin-space-1); padding: 0 var(--cp-admin-space-3) var(--cp-admin-space-3); }
 .mcp-history-contract p { margin: 0; }
+
+/* Admin 058: the lethal trifecta flags of a server, one under the other. */
+.mcp-trifecta { display: grid; justify-items: start; gap: var(--cp-admin-space-1); }

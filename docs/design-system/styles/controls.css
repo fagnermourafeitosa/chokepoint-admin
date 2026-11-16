@@ -30,16 +30,26 @@
 .cp-admin-input-group .cp-admin-button { flex: none; border-radius: 0; }
 .cp-admin-notice { display: flex; align-items: flex-start; gap: var(--cp-admin-space-3); padding: var(--cp-admin-space-4); border: 1px solid var(--cp-admin-color-control-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); font-size: var(--cp-admin-type-small); }
 .cp-admin-notice strong { display: block; margin-bottom: var(--cp-admin-space-1); }
-.cp-admin-notice:is(.cp-admin-notice--success, [data-tone="success"]) { background: var(--cp-admin-color-success-bg); border-color: var(--cp-admin-color-success); color: var(--cp-admin-color-success); }
-.cp-admin-notice:is(.cp-admin-notice--danger, [data-tone="danger"]) { background: var(--cp-admin-color-danger-bg); border-color: var(--cp-admin-color-danger); color: var(--cp-admin-color-danger); }
-.cp-admin-notice:is(.cp-admin-notice--warning, [data-tone="warning"]) { background: var(--cp-admin-color-warning-bg); border-color: var(--cp-admin-color-warning); color: var(--cp-admin-color-warning); }
-.cp-admin-notice:is(.cp-admin-notice--info, [data-tone="info"]) { background: var(--cp-admin-color-info-bg); border-color: var(--cp-admin-color-info); color: var(--cp-admin-color-info); }
+.cp-admin-notice:is(.cp-admin-notice--success, [data-tone="success"]) { background: var(--cp-admin-color-success-bg); border-color: transparent; color: var(--cp-admin-color-success); }
+.cp-admin-notice:is(.cp-admin-notice--danger, [data-tone="danger"]) { background: var(--cp-admin-color-danger-bg); border-color: transparent; color: var(--cp-admin-color-danger); }
+.cp-admin-notice:is(.cp-admin-notice--warning, [data-tone="warning"]) { background: var(--cp-admin-color-warning-bg); border-color: transparent; color: var(--cp-admin-color-warning); }
+.cp-admin-notice:is(.cp-admin-notice--info, [data-tone="info"]) { background: var(--cp-admin-color-info-bg); border-color: transparent; color: var(--cp-admin-color-info); }
 .cp-admin-notice > svg { flex: none; margin-top: 2px; }
 .cp-admin-notice-body { display: grid; gap: var(--cp-admin-space-1); min-width: 0; }
 .cp-admin-notice-body > strong { margin-bottom: 0; font-weight: var(--cp-admin-weight-bold); }
 /* The body is regular wherever the notice sits, also inside a field whose spans are labels. */
 .cp-admin-notice-body, .cp-admin-notice-body > span { font-weight: var(--cp-admin-weight-regular); font-size: var(--cp-admin-type-small); }
 .cp-admin-accordion { border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); }
+/* Toned accordions (Admin 058): a callout that collapses, with the background of its tone and no border, as the toned notices. */
+.cp-admin-accordion.cp-admin-accordion--info { --cp-admin-accordion-tone: var(--cp-admin-color-info); background: var(--cp-admin-color-info-bg); border-color: transparent; }
+.cp-admin-accordion.cp-admin-accordion--warning { --cp-admin-accordion-tone: var(--cp-admin-color-warning); background: var(--cp-admin-color-warning-bg); border-color: transparent; }
+.cp-admin-accordion.cp-admin-accordion--danger { --cp-admin-accordion-tone: var(--cp-admin-color-danger); background: var(--cp-admin-color-danger-bg); border-color: transparent; }
+/* A toned accordion shows that it opens: a chevron at the end of the summary, in the color of its tone, pointing down when closed and up when open. */
+.cp-admin-accordion:is(.cp-admin-accordion--info, .cp-admin-accordion--warning, .cp-admin-accordion--danger) > summary { display: flex; align-items: center; gap: var(--cp-admin-space-2); list-style: none; }
+.cp-admin-accordion:is(.cp-admin-accordion--info, .cp-admin-accordion--warning, .cp-admin-accordion--danger) > summary::-webkit-details-marker { display: none; }
+.cp-admin-accordion:is(.cp-admin-accordion--info, .cp-admin-accordion--warning, .cp-admin-accordion--danger) > summary::after { content: ""; flex: none; width: 7px; height: 7px; margin-left: auto; border-right: 2px solid var(--cp-admin-accordion-tone); border-bottom: 2px solid var(--cp-admin-accordion-tone); transform: translateY(-2px) rotate(45deg); transition: transform var(--cp-admin-motion-fast, 120ms) ease; }
+.cp-admin-accordion:is(.cp-admin-accordion--info, .cp-admin-accordion--warning, .cp-admin-accordion--danger)[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
+@media (prefers-reduced-motion: reduce) { .cp-admin-accordion > summary::after { transition: none; } }
 .cp-admin-accordion summary { min-height: var(--cp-admin-control-height); padding: var(--cp-admin-space-4); font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); cursor: pointer; }
 .cp-admin-accordion > div { padding: 0 var(--cp-admin-space-4) var(--cp-admin-space-4); font-size: var(--cp-admin-type-small); }
 .cp-admin-disclosure { position: relative; }
@@ -178,3 +188,7 @@
   opacity: 0;
   pointer-events: none;
 }
+/* Documentation link (Admin 058): an Admin label that opens the public documentation in a new tab, with ArrowUpRight. */
+.cp-admin-docs-link { display: inline-flex; align-items: center; gap: var(--cp-admin-space-1); color: inherit; text-decoration: none; }
+.cp-admin-docs-link:hover { text-decoration: underline; }
+.cp-admin-docs-link svg { flex: none; }

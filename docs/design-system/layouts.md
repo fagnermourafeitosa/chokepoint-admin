@@ -89,3 +89,7 @@ The CSS supplies dialog appearance only. Use a native modal dialog or the select
 A side panel opens from the right edge over a dimmed page and uses the full window height. The default width is 480px; the wide width is 880px, for a list and a detail side by side (for example the revision history: a timeline on the left, the selected revision on the right). Below 760px a wide panel stacks the list above the detail. On a narrow window the panel takes the full width. Its motion is a slide from the right and is turned off for `prefers-reduced-motion`.
 
 Show the selected navigation item using `aria-current="page"`. An unpublished-change indicator does not replace the normal page title or primary navigation. Avoid recreating the mock's entire application inside the design system.
+
+## Scrollbar space
+
+The page always shows the vertical scrollbar (`overflow-y: scroll` on the document, `styles/base.css`); `scrollbar-gutter: stable` did not reserve the space on the root in the Admin browser. Without it, the scrollbar appears when the content grows past the window, for example when an accordion opens, and the top bar, the logo and the menu shift sideways (user, 2026-11-15, Admin 058).
