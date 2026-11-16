@@ -18,6 +18,26 @@ export const signalTypeLabels: Record<SignalType, string> = {
   'lethal-trifecta': 'Lethal trifecta',
 };
 
+// Backend 100: the category of a signal, set by its type. The Inbox shows one tab per category
+// (Admin 061); a type keeps its category here to offer only its own types in the type filter.
+// This map mirrors `categories` in backend internal/attentionsignals/category.go, the source of
+// truth: a type or a category change there needs the same change here.
+export type SignalCategory = 'security' | 'access' | 'operations';
+export type CategoryFilter = 'all' | SignalCategory;
+export const signalCategories: Record<SignalType, SignalCategory> = {
+  'lethal-trifecta': 'security',
+  'tool-discovery': 'security',
+  'requests-denied': 'access',
+  token_exchange_denied: 'access',
+  'report-only-would-deny': 'access',
+  'report-only-review-due': 'access',
+  mcpserver_disconnected: 'operations',
+};
+// The tabs, in their order: All first and default, then Security (Admin 061 item 1).
+export const categoryTabs: { value: CategoryFilter; label: string }[] = [
+  { value: 'all', label: 'All' }, { value: 'security', label: 'Security' }, { value: 'access', label: 'Access' }, { value: 'operations', label: 'Operations' },
+];
+
 // Backend 088: the severity of a signal, 0 to 3, set by its type. 1 and 0 share the label Low
 // and differ only in the order (Admin 054 item 8).
 export type SeverityFilter = 'all' | 'high' | 'medium' | 'low';
@@ -35,6 +55,7 @@ export type StatusFilter = 'active' | SignalStatus | 'all';
 export type Signal = {
   id: string;
   type: SignalType;
+  category: SignalCategory;
   severity: number;
   subject: string;
   context: Record<string, string>;
@@ -52,7 +73,7 @@ export type Signal = {
   actions: Action[];
 };
 export type SignalPage = { items: Signal[]; total: number; page: number; page_size: number };
-export type SignalCounts = { pending: number; active: number; reviewed: number; resolved: number; by_type: Partial<Record<SignalType, number>> };
+export type SignalCounts = { pending: number; active: number; reviewed: number; resolved: number; by_type: Partial<Record<SignalType, number>>; by_category: Record<SignalCategory, number> };
 
 export const pageSize = 5;
 
@@ -64,8 +85,9 @@ export const attentionKey = (s: EnvironmentScope) => ['attention-signals', s.use
 
 export const attentionApi = {
   // The backend orders by severity, then by time, and filters by severity (Backend 088).
-  list: (s: EnvironmentScope, type: SignalType | 'all', page: number, status: StatusFilter, severity: SeverityFilter, signal: AbortSignal) => {
+  list: (s: EnvironmentScope, category: CategoryFilter, type: SignalType | 'all', page: number, status: StatusFilter, severity: SeverityFilter, signal: AbortSignal) => {
     const query = new URLSearchParams({ page: String(page), page_size: String(pageSize), status });
+    if (category !== 'all') query.set('category', category);
     if (type !== 'all') query.set('type', type);
     if (severity !== 'all') query.set('severity', severity);
     return httpClient<SignalPage>(`${base(s)}?${query}`, { signal });
