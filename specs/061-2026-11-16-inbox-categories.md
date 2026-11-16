@@ -56,7 +56,7 @@ A Behavior drift row and a Requests denied row look alike, although the first ma
 - **Ubiquitous Terms**: category: Access, Security, Operations (Backend 100).
 
 ### 2. Aggregate Root & State Transitions
-No new state. The tab is a view filter, kept in the URL like the other filters.
+No new state. The tab is a view filter, kept in the component state like the other Inbox filters (status, severity, type).
 
 ### 3. Commands, Queries & Domain Ports
 - The list request sends `category` for a tab other than All.
