@@ -3,7 +3,7 @@
 - **Specification ID**: 060
 - **Date**: 2026-11-16
 - **Slug**: behavior-drift-inbox
-- **Status**: Proposed
+- **Status**: In Progress
 - **Owner**: admin / attention, externalapps
 - **Related Specification**: [Backend 099 — Behavior Drift](../../backend/specs/099-2026-11-16-behavior-drift.md), [054 — Cumulative Limits and Signal Severity](054-2026-11-13-cumulative-limits-and-signal-severity.md), [058 — Tool Trifecta Levels](058-2026-11-15-tool-trifecta-levels.md), [059 — Slack Integration](059-2026-11-15-slack-integration.md)
 - **Related Mock Contract**: none
@@ -89,6 +89,9 @@ No new endpoint. The Inbox list and the Slack settings already carry the signal 
 6. **Target**: Investigate, filtered by agent, tool and hour, as Requests denied.
 7. **Slack**: Behavior drift joins the signal type list of Slack settings, off by default.
 8. **No product name** in any label or note (project rule).
+9. **Response that ran** (Backend 099, Implementation Decisions 16b to 16d): when the context has `response`, the note adds "The tool was suspended for this agent." or "The agent was disabled.", and the action opens the agent in Access.
+10. **Suspended tool in Access** (user decisions Q1 and Q2, 2026-11-16): on the agent, a suspended tool shows a **Suspended** chip and a **Restore** action, with the time of the suspension. Restore asks for confirmation, removes the suspension and refreshes the agent. It never expires by itself.
+11. **Investigate** names the reason `tool_suspended` of a denied call.
 
 ---
 
@@ -116,8 +119,10 @@ The rows of the other signal types do not change.
 - [ ] 4. The type filter offers Behavior drift.
 - [ ] 5. The action opens Investigate filtered by agent, tool and hour.
 - [ ] 6. Slack settings list Behavior drift, off by default.
-- [ ] 7. `npm run check` and `npm run build` pass.
-- [ ] 8. Functional test: [060-2026-11-16-behavior-drift-inbox.md](functional-tests/060-2026-11-16-behavior-drift-inbox.md)
+- [ ] 7. A response that ran shows in the note, and the action opens the agent.
+- [ ] 8. A suspended tool shows Suspended and Restore on the agent in Access, and Restore brings it back.
+- [ ] 9. `npm run check` and `npm run build` pass.
+- [ ] 10. Functional test: [060-2026-11-16-behavior-drift-inbox.md](functional-tests/060-2026-11-16-behavior-drift-inbox.md)
 
 ---
 
@@ -125,6 +130,9 @@ The rows of the other signal types do not change.
 
 - The `behavior-drift` signal type, its context keys and its severity: [Backend 099](../../backend/specs/099-2026-11-16-behavior-drift.md), Implementation Decisions 11 to 15.
 - Behavior drift in the Slack signal types: [Backend 099](../../backend/specs/099-2026-11-16-behavior-drift.md), Implementation Decision 15.
+
+- Suspended tools of an agent and their restore: [Backend 099](../../backend/specs/099-2026-11-16-behavior-drift.md), Implementation Decision 16c.
+- The `response` context key and the agent target of a signal whose response ran: Backend 099, Implementation Decision 16d.
 
 ---
 

@@ -4,7 +4,7 @@ title: Behavior Drift in the Inbox
 stack:
   - Demo instance (dev-infra/demo-instance - up.sh, after populate.py once; traffic.py for a recent history), workspace Acme, environment Production
   - Admin on http://acme.localhost:5174, signed in as beatriz@acme.test
-data: The API runs with BEHAVIOR_DRIFT_LEARNING_DAYS=0 and BEHAVIOR_DRIFT_KNOWN_DAYS=1 so that one day of traffic.py history is a pattern. The scenarios add calls with traffic.py runs aimed at one agent; restore by unsetting the two variables.
+data: In Barricade, Acme Production is set to a learning period of 1 day and known after 1 day so that the demo history is a pattern; restore the market defaults (7 and 2) after the run. The scenarios add calls with traffic.py runs aimed at one agent.
 scenarios:
   - id: S1
     title: A spike shows its numbers
@@ -56,8 +56,23 @@ scenarios:
       date: null
       result: not_run
       notes: ""
+  - id: S5
+    title: A suspended tool is restored on the agent
+    criteria: [7, 8, 9]
+    steps:
+      - In Barricade, set the response to New tool to Suspend the tool for the agent for Acme Production.
+      - Call, through one agent, a granted tool it never called, and wait for the hourly job.
+      - Open the Inbox row and its action, then Restore the tool on the agent and confirm.
+    expected:
+      - The note says the tool was suspended and the action opens the agent in Access.
+      - The tool shows Suspended with its time; a call of it is denied with tool_suspended.
+      - After Restore the chip is gone and the next call of the tool runs.
+    last_run:
+      date: null
+      result: not_run
+      notes: ""
 ---
 
 # Functional test: Behavior Drift in the Inbox
 
-The hourly job of Backend 099 needs a pattern; the two environment variables in `data` shorten the learning period and the known rule so that the demo history is enough.
+The hourly job of Backend 099 needs a pattern; the Barricade values in `data` shorten the learning period and the known rule so that the demo history is enough.
