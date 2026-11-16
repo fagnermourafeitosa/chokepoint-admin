@@ -3,7 +3,7 @@
 - **Specification ID**: 061
 - **Date**: 2026-11-16
 - **Slug**: inbox-categories
-- **Status**: Proposed
+- **Status**: In Progress
 - **Owner**: admin / attention, externalapps
 - **Related Specification**: [Backend 100 — Signal Categories](../../backend/specs/100-2026-11-16-signal-categories.md), [054 — Cumulative Limits and Signal Severity](054-2026-11-13-cumulative-limits-and-signal-severity.md), [060 — Behavior Drift in the Inbox](060-2026-11-16-behavior-drift-inbox.md)
 - **Related Mock Contract**: none
