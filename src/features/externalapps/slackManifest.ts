@@ -36,7 +36,7 @@ settings:
 }
 
 // The Inbox signal types that can send a message, with the three on by default (Admin 059).
-// Lethal trifecta is the signal of Backend 097, off by default (user, 2026-11-15).
+// Lethal trifecta is the signal of Backend 097, off by default (user, 2026-11-15); Behavior drift too (Admin 060).
 export const signalChoices: { type: string; label: string; description: string; on: boolean }[] = [
   { type: 'requests-denied', label: 'Requests denied', description: 'Calls were denied, grouped by server, tool and agent for each hour.', on: true },
   { type: 'tool-discovery', label: 'Tool discovery', description: 'A discovery found new or changed tools that wait for review.', on: true },
@@ -45,4 +45,6 @@ export const signalChoices: { type: string; label: string; description: string; 
   { type: 'report-only-would-deny', label: 'Would deny', description: 'An agent in Report-only made calls that would be denied.', on: false },
   { type: 'report-only-review-due', label: 'Review due', description: 'The review date of an agent in Report-only has passed.', on: false },
   { type: 'lethal-trifecta', label: 'Lethal trifecta', description: 'A session of an agent read private data, took in untrusted content and sent data out.', on: false },
+  // Backend 099: off by default (Admin 060 decision 7).
+  { type: 'behavior-drift', label: 'Behavior drift', description: 'An agent left its usage pattern: a spike, a new tool or a new sequence of calls.', on: false },
 ];

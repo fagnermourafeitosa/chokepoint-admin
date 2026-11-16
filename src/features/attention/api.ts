@@ -3,7 +3,7 @@ import { httpClient } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 
 // SignalType mirrors the backend attention_signal_type enum.
-export type SignalType = 'tool-discovery' | 'requests-denied' | 'token_exchange_denied' | 'report-only-would-deny' | 'report-only-review-due' | 'mcpserver_disconnected' | 'lethal-trifecta';
+export type SignalType = 'tool-discovery' | 'requests-denied' | 'token_exchange_denied' | 'report-only-would-deny' | 'report-only-review-due' | 'mcpserver_disconnected' | 'lethal-trifecta' | 'behavior-drift';
 
 export const signalTypeLabels: Record<SignalType, string> = {
   'tool-discovery': 'Tool discovery',
@@ -16,6 +16,8 @@ export const signalTypeLabels: Record<SignalType, string> = {
   mcpserver_disconnected: 'Server disconnected',
   // Backend 097: allowed calls that closed the lethal trifecta; nothing was blocked.
   'lethal-trifecta': 'Lethal trifecta',
+  // Backend 099: an agent left its usage pattern (Admin 060).
+  'behavior-drift': 'Behavior drift',
 };
 
 // Backend 100: the category of a signal, set by its type. The Inbox shows one tab per category
@@ -27,6 +29,7 @@ export type CategoryFilter = 'all' | SignalCategory;
 export const signalCategories: Record<SignalType, SignalCategory> = {
   'lethal-trifecta': 'security',
   'tool-discovery': 'security',
+  'behavior-drift': 'security',
   'requests-denied': 'access',
   token_exchange_denied: 'access',
   'report-only-would-deny': 'access',

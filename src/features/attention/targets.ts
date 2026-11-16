@@ -4,6 +4,7 @@ import type { ReasonLabel } from '../investigate/types';
 import { reviewDay } from '../../components/report-only/ReportOnlyChip';
 import type { ExchangeReasonLabel } from '../investigate/types';
 import { actionPath } from '../access/target-context';
+import { legs } from '../mcp/trifecta';
 export function targetPath(signal: Signal): string | undefined {
   // Backend 057: would-deny calls are decisions, not a problem: open them in
   // All decisions, filtered on the agent, the tool and the closed hour.
@@ -18,6 +19,16 @@ export function targetPath(signal: Signal): string | undefined {
       query.set('to', new Date(from.getTime() + 3600000).toISOString());
     }
     return `/investigate?${query}`;
+  }
+  // Backend 099: a Behavior drift opens the calls of the agent and tool in its hour (Admin 060 decision 6), or the
+  // agent in Access when a response suspended the tool or disabled the agent (decision 9).
+  if (signal.type === 'behavior-drift') {
+    const p = signal.target_params;
+    if (signal.target_route === 'permissions') return p.agent_id ? `/access?${new URLSearchParams({ agent_id: p.agent_id, return_to: '/' })}` : undefined;
+    if (!p.agent || !p.server_id || !p.tool || !p.window_start) return undefined;
+    const from = new Date(p.window_start);
+    return `/investigate?${new URLSearchParams({ view: 'decisions', agent: p.agent, server_id: p.server_id, tool: p.tool,
+      from: from.toISOString(), to: new Date(from.getTime() + 3600000).toISOString(), return_to: '/' })}`;
   }
   // Backend 097: a closed lethal trifecta opens the agent in Access, where its servers and tools are
   // granted; the calls were allowed, so there is nothing to investigate as a deny (user, 2026-11-16).
@@ -81,6 +92,12 @@ export function contextLines(signal: Signal): [string, string] {
       c.count ? `${c.count} ${c.count === '1' ? 'call' : 'calls'}` : '',
       c.people ? `${c.people} ${c.people === '1' ? 'person' : 'people'}` : '',
     ].filter(Boolean).join(' · ')];
+    // Admin 060 decision 4: the tool (the pair of a new sequence), then the agent, the calls and the people.
+    case 'behavior-drift': return [c.departure === 'new-sequence' && c.previous_tool ? `${c.previous_tool} → ${c.tool || ''}` : c.tool || '', [
+      (c.agent_name || c.agent || '') + (c.agent_status === 'deleted' ? ' (deleted)' : ''),
+      c.count ? `${c.count} ${c.count === '1' ? 'call' : 'calls'}` : '',
+      c.people ? `${c.people} ${c.people === '1' ? 'person' : 'people'}` : '',
+    ].filter(Boolean).join(' · ')];
     // Backend 088: the server and why the rediscovery failed.
     case 'mcpserver_disconnected': return [c.server || '', c.reason ? disconnectedText[c.reason] ?? c.reason : ''];
     default: return ['', ''];
@@ -93,11 +110,42 @@ export function subjectLine(signal: Signal): string {
   const agent = signal.context.agent_name || signal.context.agent || 'An agent';
   if (signal.type === 'report-only-would-deny') return `${agent} would be denied on ${signal.context.tool || 'a tool'}`;
   if (signal.type === 'report-only-review-due') return `${agent} is still in Report-only`;
+  if (signal.type === 'behavior-drift') return driftSubject(signal, agent);
   return signal.subject;
 }
 export function noteLine(signal: Signal): string | undefined {
   const c = signal.context;
   if (signal.type === 'report-only-would-deny') return `Report-only agent: ${c.count || 'some'} ${c.count === '1' ? 'call' : 'calls'} ran that its policy denies, in this hour.`;
   if (signal.type === 'report-only-review-due') return `Its review date was ${c.review_by ? reviewDay(c.review_by) : 'set'}. Enforce access, or set a new date.`;
+  if (signal.type === 'behavior-drift') return driftNote(c);
   return signal.note ?? undefined;
+}
+
+// Admin 060 decision 2: the subject of each departure of Backend 099.
+function driftSubject(signal: Signal, agent: string): string {
+  const c = signal.context;
+  const tool = c.tool || 'a tool';
+  if (c.departure === 'spike') return `${agent} called ${tool} far more than usual`;
+  if (c.departure === 'new-tool') return `${agent} called ${tool} for the first time`;
+  if (c.departure === 'new-sequence') return `${agent} chained ${c.previous_tool || 'a tool'} → ${tool} for the first time`;
+  return signal.subject;
+}
+
+const legNames = new Map<string, string>(legs.map(l => [l.key, l.label]));
+
+// Admin 060 decisions 3 and 9: the numbers of the departure, then what makes it stronger, then the response that
+// ran. A missing context key leaves its sentence out.
+function driftNote(c: Record<string, string>): string | undefined {
+  const parts: string[] = [];
+  if (c.departure === 'spike' && c.count && c.pattern_max) parts.push(`${c.count} calls in this hour; its pattern never passed ${c.pattern_max} in an hour.`);
+  if (c.departure === 'new-tool') parts.push(c.first_in_workspace === 'true' ? 'No agent in this environment called this tool in the period.' : 'The tool was granted, but this agent never called it in the period.');
+  if (c.departure === 'new-tool' && c.sensitive_leg) {
+    const names = c.sensitive_leg.split(',').map(leg => legNames.get(leg) ?? leg);
+    parts.push(`The tool is high in ${names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0]}.`);
+  }
+  if (c.departure === 'new-sequence') parts.push('This order of calls was never seen for this agent.');
+  if (c.conditions_elsewhere === 'true') parts.push('Other agents have call conditions on this tool; this one has none.');
+  if (c.response === 'suspend_tool') parts.push('The tool was suspended for this agent.');
+  if (c.response === 'disable_agent') parts.push('The agent was disabled.');
+  return parts.length ? parts.join(' ') : undefined;
 }

@@ -25,7 +25,9 @@ export function useAgentWorkbench(scope: AgentScope, requestedId?: string, conte
 
   function persisted(agent: AgentRecord) {
     if (!alive.current) return;
-    client.setQueryData([...agentKey(scope), 'detail', agent.id], agent);
+    // A change response has no suspended tools (Backend 099): keep the ones read with the agent.
+    const previous = client.getQueryData<AgentRecord>([...agentKey(scope), 'detail', agent.id]);
+    client.setQueryData([...agentKey(scope), 'detail', agent.id], { ...agent, suspended_tools: agent.suspended_tools ?? previous?.suspended_tools });
     void data.refresh();
   }
   function saved(agent: AgentRecord) {

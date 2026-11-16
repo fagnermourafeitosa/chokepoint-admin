@@ -28,8 +28,8 @@ const noIssuers: string[] = [];
 
 
 
-// Steps recorded by the PEP before the PDP decision (Backend 034).
-const preDecisionStep = new Set(['identity', 'tool_review']);
+// Steps recorded by the PEP before the PDP decision (Backend 034, Backend 099).
+const preDecisionStep = new Set(['identity', 'tool_review', 'tool_suspension']);
 
 // accessPath opens the agent editor of Admin 026 at the place of the fix. It
 // only navigates; it never changes permissions (Admin 030 section 3).

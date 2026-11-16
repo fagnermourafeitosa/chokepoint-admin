@@ -1,5 +1,11 @@
 /* The enforcement mode of an agent (Admin 041). Palette: cp-report-only-* in the design system. */
 .agent-report-only-notice { align-items: flex-start; margin: 0 var(--cp-admin-space-4) var(--cp-admin-space-4); }
+/* Admin 060: the tools that a behavior drift response suspended, one row each. */
+.agent-suspended-notice { margin: 0 var(--cp-admin-space-4) var(--cp-admin-space-4); }
+.agent-suspended-list { display: grid; gap: var(--cp-admin-space-2); margin: var(--cp-admin-space-2) 0 0; padding: 0; list-style: none; color: var(--cp-admin-color-text); }
+.agent-suspended-list li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); }
+.agent-suspended-list li strong { display: inline; margin: 0; }
+.agent-suspended-list li button { margin-left: auto; }
 .agent-report-only-notice > div { display: grid; gap: 4px; }
 .report-only-review { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
 .report-only-review strong { display: inline; margin: 0; }
