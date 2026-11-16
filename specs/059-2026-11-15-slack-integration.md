@@ -6,7 +6,7 @@
 - **Status**: Not Implemented
 - **Owner**: Admin — Integrations
 - **Related Specification**: [056 — Remove Enterprise MCP](056-2026-11-15-remove-enterprise-mcp.md)
-- **Related Backend Specification**: Backend 098 — not written yet (see Backend dependencies).
+- **Related Backend Specification**: [Backend 098 — Slack Messages for Inbox Signals](../../backend/specs/098-2026-11-15-slack-signal-messages.md) (Proposed).
 - **Visual reference**: [`specs/prototypes/059-2026-11-15-slack-integration/`](prototypes/059-2026-11-15-slack-integration/), pages `/prototype/external-apps` and `/prototype/external-apps-slack`.
 
 > Layout and specification approved by the user (2026-11-15).
@@ -63,12 +63,12 @@ A Slack app that can read messages, channels or files would expose company conve
 
 ## Backend dependencies
 
-Each item is marked in the prototype with `Waiting backend · 098`. Backend 098 is not written yet: the user decides which backend specification records them.
+Each item is marked in the prototype with `Waiting backend · 098` and defined in [Backend 098](../../backend/specs/098-2026-11-15-slack-signal-messages.md).
 
-1. The list of external apps with the configuration status of each app in the current workspace environment, which sets the logo color, the badge and whether the card opens the configuration or the edit page.
-2. Saving the Slack configuration of the environment: the destination (kind and Slack IDs), the chosen Inbox signal types and the bot token, stored encrypted and never returned.
-3. Send test message: one message to the destination with the token; the result says whether the token, the destination or the channel membership failed.
-4. Sending one message for each new Inbox signal of a chosen type, with a link to it, with `chat.postMessage` (and `conversations.open` with `mpim:write` for a group message), never storing their content.
+1. The Slack configuration status (Backend 098, API `GET`) in the current workspace environment, which sets the logo color, the badge and whether the card opens the configuration or the edit page.
+2. Saving the Slack configuration of the environment (Backend 098, API `PUT`): the destination (kind and Slack IDs), the chosen Inbox signal types and the bot token, stored encrypted and never returned.
+3. Send test message (Backend 098, Test message): one message to the destination with the token; the result says whether the token, the destination or the channel membership failed.
+4. Sending one message for each new Inbox signal (Backend 098, Messages) of a chosen type, with a link to it, with `chat.postMessage` (and `conversations.open` with `mpim:write` for a group message), never storing their content.
 
 ---
 
