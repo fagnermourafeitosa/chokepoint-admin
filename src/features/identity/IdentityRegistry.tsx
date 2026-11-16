@@ -8,8 +8,9 @@ import { useAuth } from '../auth/AuthContext';
 import { identityApi } from './api';
 import { IdentityConnectionForm } from './IdentityConnectionForm';
 import { useIdentityConnections } from './useIdentityConnections';
+import { IntegrationTabs, type IntegrationType } from '../externalapps/IntegrationTabs';
 import './identity.css';
-export function IdentityRegistry({ scope, onCustom }: { scope: EnvironmentScope; onCustom: () => void }) {
+export function IdentityRegistry({ scope, onTab }: { scope: EnvironmentScope; onTab: (type: IntegrationType) => void }) {
  const registry = useIdentityConnections(scope);
  const auth = useAuth();
  const [search, setSearch] = useState('');
@@ -21,7 +22,7 @@ export function IdentityRegistry({ scope, onCustom }: { scope: EnvironmentScope;
  }
  return <section aria-label="Identity providers" className="identity-registry">
   <header className="access-page-heading"><div><h1 className="cp-admin-title">Integrations</h1><p className="cp-admin-muted">Connect services to this environment.</p></div><button className="cp-admin-button" disabled={registry.pending} onClick={() => registry.setEditor('new')}><Plus size={16} />Connect identity provider</button></header>
-  <div className="mcp-types" role="group" aria-label="Integration type"><button onClick={onCustom} aria-pressed="false"><Server size={17} />Custom MCPs</button><button aria-pressed="true"><Users size={17} />Identity providers</button></div>
+  <IntegrationTabs current="identity" onTab={onTab} />
   <div className="identity-list-title"><h2>Identity providers</h2><span className="cp-admin-muted">{registry.connections.length} {registry.hasNextPage ? 'loaded ' : ''}connection{registry.connections.length === 1 ? '' : 's'}</span></div>
   <div className="identity-list-toolbar"><label><span className="identity-sr-only">Search identity connections</span><input type="search" className="cp-admin-input" placeholder="Search by name or issuer" value={search} onChange={e => setSearch(e.target.value)} /></label><label><span className="identity-sr-only">Connection status</span><SelectMenu label="Filter by status" value={status} onChange={setStatus} options={[{ value: 'all', label: 'All statuses' }, { value: 'enabled', label: 'Enabled' }, { value: 'disabled', label: 'Disabled' }]} /></label></div>
   {registry.error ? <p className="cp-admin-notice cp-admin-notice--danger" role="alert">{registry.error}</p> : null}

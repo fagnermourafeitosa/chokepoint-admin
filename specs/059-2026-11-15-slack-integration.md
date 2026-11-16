@@ -3,7 +3,7 @@
 - **Specification ID**: 059
 - **Date**: 2026-11-15
 - **Slug**: slack-integration
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Integrations
 - **Related Specification**: [056 — Remove Enterprise MCP](056-2026-11-15-remove-enterprise-mcp.md)
 - **Related Backend Specification**: [Backend 098 — Slack Messages for Inbox Signals](../../backend/specs/098-2026-11-15-slack-signal-messages.md) (Proposed).
@@ -68,7 +68,7 @@ A Slack app that can read messages, channels or files would expose company conve
 
 Each item is marked in the prototype with `Waiting backend · 098` and defined in [Backend 098](../../backend/specs/098-2026-11-15-slack-signal-messages.md).
 
-1. The Slack configuration status (Backend 098, API `GET`) in the current workspace environment, which sets the logo color, the badge and whether the card opens the configuration or the edit page.
+1. The Slack configuration status (Backend 098, API `GET`) in the current workspace environment, which sets the logo color, the badge and whether the card opens the configuration or the edit page. — browser, copy of the demo database: ink logo and Not configured before saving, color logo and Configured after, click opens Configure Slack then Edit Slack
 2. Saving the Slack configuration of the environment (Backend 098, API `PUT`): the destination (kind and Slack IDs), the chosen Inbox signal types and the bot token, stored encrypted and never returned.
 3. Send test message (Backend 098, Test message): one message to the destination with the token; the result says whether the token, the destination or the channel membership failed.
 4. Sending one message for each new Inbox signal (Backend 098, Messages) of a chosen type, with a link to it, with `chat.postMessage` (and `conversations.open` with `mpim:write` for a group message), never storing their content.
@@ -90,13 +90,13 @@ None.
 
 ## Acceptance Criteria
 
-- [ ] 1. Integrations shows the External apps tab with the Communication category and the Slack card, with no pager; the logo is in ink when not configured and in color when configured, and a click opens the configuration or the edit page.
-- [ ] 2. A click on the Slack card shows the two scopes, Never requested, Nothing is retained, the destination, the token and the collapsible guide with the manifest.
-- [ ] 3. Saving stores the destination and the encrypted token; the list then shows Slack as Configured.
-- [ ] 4. Send test message reaches the chosen channel, group message or person.
-- [ ] 5. `npm run check` and `npm run build` pass.
-- [ ] 6. Functional test: [059-2026-11-15-slack-integration.md](functional-tests/059-2026-11-15-slack-integration.md)
-- [ ] 7. A Slack whose last message failed shows Failing on its card and the reason on the edit page; What to send lists Lethal trifecta, off by default.
+- [x] 1. Integrations shows the External apps tab with the Communication category and the Slack card, with no pager; the logo is in ink when not configured and in color when configured, and a click opens the configuration or the edit page.
+- [x] 2. A click on the Slack card shows the two scopes, Never requested, Nothing is retained, the destination, the token and the collapsible guide with the manifest. — browser: two scopes, Never requested, Nothing is retained, channel warning, manifest with "Acme alerts", chat:write and mpim:write only
+- [x] 3. Saving stores the destination and the encrypted token; the list then shows Slack as Configured. — browser and database: the row holds the destination and a sealed token without the plain text; Edit shows the token behind Change
+- [ ] 4. Send test message reaches the chosen channel, group message or person. — not met: no Slack workspace was available; only the refusal path was seen (a test token answered invalid_auth from slack.com and the page showed it)
+- [x] 5. `npm run check` and `npm run build` pass. — both run on the branch
+- [ ] 6. Functional test: [059-2026-11-15-slack-integration.md](functional-tests/059-2026-11-15-slack-integration.md) — not met: S4 and S5 are blocked without a Slack workspace; S1, S2, S3 and S6 passed
+- [x] 7. A Slack whose last message failed shows Failing on its card and the reason on the edit page; What to send lists Lethal trifecta, off by default. — functional test S7 (passed), `npm run check` and `npm run build`
 
 ---
 

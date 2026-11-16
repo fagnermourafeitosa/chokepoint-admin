@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { Navigate, Outlet } from "react-router";
+import { Navigate, Outlet, useLocation } from "react-router";
+import { keepReturnLink, useReturnLink } from "./returnLink";
 import { AuthContext, useAuth } from "./AuthContext";
 import { useAuthState } from "./useAuthState";
 import { PendingChangesProvider } from "./pending/PendingChanges";
@@ -13,6 +14,7 @@ function SessionProvider({ children }: { children: ReactNode }) {
 }
 export function RequireSession() {
   const a = useAuth();
+  useReturnLink(!!a.session && !a.loading);
   if (a.loading || a.failed || a.signingOut || a.logoutFailed)
     return <AuthStatus />;
   if (!a.session) return <Navigate to="/login" replace />;
@@ -32,8 +34,14 @@ export function RequireSession() {
 // Admin 051: the account area needs a session, not a chosen workspace.
 export function RequireAccount() {
   const a = useAuth();
+  const location = useLocation();
+  useReturnLink(!!a.session && !a.loading);
   if (a.loading || a.failed || a.signingOut || a.logoutFailed)
     return <AuthStatus />;
-  if (!a.session) return <Navigate to="/login" replace />;
+  if (!a.session) {
+    // Admin 059: a Slack link opened while signed out returns after the sign-in.
+    keepReturnLink(location.pathname + location.search);
+    return <Navigate to="/login" replace />;
+  }
   return <Outlet key={a.session.user.id} />;
 }
