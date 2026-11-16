@@ -71,6 +71,21 @@ scenarios:
       date: null
       result: not_run
       notes: null
+  - id: S7
+    title: A failing Slack shows Failing and its reason; Lethal trifecta can be chosen
+    criteria: [7]
+    steps:
+      - With Slack configured, let the last message fail (a final Slack error such as not_in_channel), then open External apps.
+      - Open the Slack card.
+      - Turn on Lethal trifecta and save.
+    expected:
+      - The card shows Failing in the danger tone.
+      - Above the form, an error notice gives the reason in words, the time of the last delivery and that saving or the next accepted message clears it. What to send lists Lethal trifecta, off.
+      - The save is accepted and the card shows Configured.
+    last_run:
+      date: 2026-11-15
+      result: not_run
+      notes: ""
 ---
 
 # Functional test: Slack Integration
