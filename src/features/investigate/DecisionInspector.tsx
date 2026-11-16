@@ -1,8 +1,8 @@
 import './inspector.css';
 import { DecisionBreakdown } from './DecisionBreakdown';
-import { useState, type ReactNode } from 'react';
+import { Fragment, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { ArrowLeft, ArrowRight, Check, CircleHelp, Clock, Eye, X } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, Bot, Braces, Check, CircleHelp, Clock, Eye, Server, ServerCog, User, Wrench, X, type LucideIcon } from 'lucide-react';
 import { Tooltip } from '../../components/ui/tooltip/Tooltip';
 import { QuickIncident } from '../../components/quick-incident/QuickIncident';
 import { useRuleSentence } from './useRuleSentence';
@@ -64,32 +64,32 @@ function reasonAction(d: Decision, detail: DecisionDetail, returnTo: string): { 
   return undefined;
 }
 
-// Admin 049 item 7: the path reads the recorded steps as Delegation, Agent, MCP server, Rules and Tool:
-// the rules are checked before the call runs, so Tool comes last (user, 2026-11-16). The PDP checks
-// agent → tool once: the Agent dot passes (a failed identity check shows as its own step), the MCP
-// server dot passes when the tool step was evaluated, and the Tool dot carries the capability state.
-// The Rules dot names the failed rule. The lethal trifecta is not shown here: it never denies a call
-// and it is followed in the Inbox (Backend 097, user 2026-11-16).
-type PathNode = { key: string; label: string; state: StepState; value?: string };
+// The path reads the recorded steps in the order the PDP checks them: Delegation, Agent, MCP tool
+// (the agent may call <server>#<tool>) and Rules. The last node is the call itself: it passes when the
+// call ran (allowed, or a would deny of Report-only) and fails when the call was denied. The PDP checks agent → tool
+// once: the Agent dot passes (a failed identity check shows as its own step). The Rules dot names the
+// failed rule. The lethal trifecta is not shown here: it never denies a call and it is followed in the
+// Inbox (Backend 097, user 2026-11-16).
+// Each line of a node names one party with the icon that Access uses for it.
+type PathLine = { icon: LucideIcon; text: string };
+type PathNode = { key: string; label: string; state: StepState; lines?: PathLine[] };
 function pathNodes(steps: { key: string; state: StepState }[], d: Decision, failedRules: string[]): PathNode[] {
   const agent = d.agent.name || d.agent.id;
+  const server = d.server_name || d.server_id;
+  const subject: PathLine = { icon: d.subject.kind === 'service' ? ServerCog : User, text: subjectName(d.subject) };
+  const agentLine: PathLine = { icon: Bot, text: agent };
+  const toolLine: PathLine = { icon: Wrench, text: d.tool };
   const nodes = steps.flatMap((step): PathNode[] => {
     if (step.key === 'delegation') return [
-      { key: 'delegation', label: 'Delegation', state: step.state, value: `${subjectName(d.subject)} → ${agent}` },
-      { key: 'agent', label: 'Agent', state: 'passed', value: agent },
+      { key: 'delegation', label: 'Delegation', state: step.state, lines: [subject, agentLine] },
+      { key: 'agent', label: 'Agent', state: 'passed', lines: [agentLine] },
     ];
-    if (step.key === 'capability') return [
-      { key: 'server', label: 'MCP server', state: step.state === 'not_evaluated' ? 'not_evaluated' : 'passed', value: d.server_name || d.server_id },
-      { key: 'tool', label: 'Tool', state: step.state, value: d.tool },
-    ];
-    if (step.key === 'condition') return [{ key: 'condition', label: 'Rules', state: step.state, value: failedRules.join(', ') || undefined }];
+    if (step.key === 'capability') return [{ key: 'tool', label: 'MCP tool', state: step.state, lines: [{ icon: Server, text: server }, toolLine] }];
+    if (step.key === 'condition') return [{ key: 'condition', label: 'Rules', state: step.state, lines: failedRules.length ? [{ icon: Braces, text: failedRules.join(', ') }] : undefined }];
     if (step.key === 'resource' || step.key === 'trifecta') return [];
     return [{ key: step.key, label: stepLabel[step.key] || step.key.replaceAll('_', ' '), state: step.state }];
   });
-  // Tool after Rules.
-  const tool = nodes.findIndex((n) => n.key === 'tool');
-  const rules = nodes.findIndex((n) => n.key === 'condition');
-  if (tool >= 0 && rules > tool) nodes.splice(rules, 0, ...nodes.splice(tool, 1));
+  nodes.push({ key: 'call', label: 'Tool call', state: d.outcome === 'deny' ? 'failed' : 'passed', lines: [toolLine] });
   return nodes;
 }
 
@@ -158,11 +158,16 @@ function InspectorBody({ scope, detail, state, onBack }: { scope: EnvironmentSco
         {steps.length ? (
           <ol className="trace-path trace-path-relations" aria-label="Recorded authorization path">
             {pathNodes(steps, d, rules.filter((r) => !r.permit).map((r) => r.name)).map((node, i) => (
-              <li key={`${node.key}-${i}`} data-state={node.state} data-report-only={wouldDeny && node.state === 'failed' ? '' : undefined} tabIndex={0}>
-                <span className="trace-path-dot" />
+              <li key={`${node.key}-${i}`} data-state={node.state} data-call={node.key === 'call' ? '' : undefined} data-report-only={wouldDeny && node.state === 'failed' ? '' : undefined} tabIndex={0}>
+                <span className="trace-path-dot">{node.state === 'passed' ? <Check size={node.key === 'call' ? 12 : 9} strokeWidth={3} aria-hidden="true" /> : node.state === 'failed' ? <X size={node.key === 'call' ? 12 : 9} strokeWidth={3} aria-hidden="true" /> : null}</span>
                 <strong>{node.label}</strong>
-                <small>{wouldDeny && node.state === 'failed' ? 'Failed · not enforced' : stateText[node.state]}</small>
-                {node.value ? <span className="trace-path-relation">{node.value}</span> : null}
+                {wouldDeny && node.state === 'failed' ? <small>Failed · not enforced</small> : <span className="trace-sr-only">{stateText[node.state]}</span>}
+                {node.state === 'not_applicable' ? <span className="trace-path-relation">Nothing to eval</span> : null}
+                {node.lines?.map(({ icon: Icon, text }, j) => <Fragment key={text}>
+                  {/* The subject delegates to the agent below it; the server offers the tool below it. */}
+                  {(node.key === 'delegation' || node.key === 'tool') && j === 1 ? <span className="trace-path-delegates"><ArrowDown size={13} aria-label={node.key === 'delegation' ? 'delegates to' : 'offers'} /></span> : null}
+                  <span className="trace-path-relation"><Icon size={13} aria-hidden="true" />{text}</span>
+                </Fragment>)}
               </li>
             ))}
           </ol>

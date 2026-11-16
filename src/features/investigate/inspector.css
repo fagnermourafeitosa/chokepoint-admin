@@ -55,20 +55,30 @@
   color: var(--cp-admin-color-text-muted);
   font-size: 0.6875rem;
 }
-/* Path states use the outcome palette; the state label beside each dot carries the meaning. */
+/* Path states use the outcome palette: a passed or failed dot has a white border and a white check or
+   cross, so the state does not rest on color alone. */
 .trace-path-dot {
-  width: 12px;
-  height: 12px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
   flex: none;
   border: var(--cp-admin-border-width) solid var(--cp-admin-color-text);
   border-radius: 50%;
   background: var(--cp-admin-color-surface);
+  color: var(--cp-admin-color-text-inverse);
 }
 .trace-path [data-state='passed'] .trace-path-dot {
+  border: 2px solid var(--cp-admin-color-text-inverse);
   background: var(--cp-admin-color-allow);
 }
 .trace-path [data-state='failed'] .trace-path-dot {
+  border: 2px solid var(--cp-admin-color-text-inverse);
   background: var(--cp-admin-color-deny);
+}
+.trace-path [data-state='not_applicable'] .trace-path-dot {
+  border: 2px solid var(--cp-admin-color-text-inverse);
+  background: var(--cp-admin-color-text-muted);
 }
 .trace-path [data-state='not_evaluated'] .trace-path-dot {
   border-style: dashed;
@@ -230,7 +240,7 @@
 .trace-revision-link:hover { color: var(--cp-admin-color-text-muted); }
 /* Admin 041: a would-deny decision. The notice sits under the title; the failed step is dashed in the Report-only palette. */
 .trace-report-only-notice { margin: 0 var(--cp-admin-space-6) var(--cp-admin-space-4); }
-.trace-path [data-report-only] .trace-path-dot { background: var(--cp-admin-color-warning-bg); border: 2px dashed var(--cp-admin-color-warning); }
+.trace-path [data-report-only] .trace-path-dot { background: var(--cp-admin-color-warning-bg); border: 2px dashed var(--cp-admin-color-warning); box-shadow: none; color: var(--cp-admin-color-warning); }
 .trace-path [data-report-only] small { color: var(--cp-admin-color-warning); }
 .trace-outcome-large.cp-would-deny { gap: var(--cp-admin-space-2); }
 @media (max-width: 720px) { .trace-report-only-notice { margin-inline: var(--cp-admin-space-4); } }
@@ -268,3 +278,22 @@
 .trace-reference { font-family: var(--cp-admin-font-mono); }
 /* The window line, close under the title of the decisions of the problem. */
 .trace-breakdown .trace-window { margin: -12px 20px 16px; }
+/* The last node of the path is the call itself: a larger filled dot with a check and a halo, so it
+   reads as the tool running, not as one more check. Each state keeps a hidden text for screen readers. */
+.trace-path [data-call] .trace-path-dot {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--cp-admin-color-text-inverse);
+  background: var(--cp-admin-color-allow);
+  color: var(--cp-admin-color-text-inverse);
+  box-shadow: 0 0 0 2px var(--cp-admin-color-allow);
+}
+.trace-path [data-call][data-state='failed'] .trace-path-dot {
+  background: var(--cp-admin-color-deny);
+  box-shadow: 0 0 0 2px var(--cp-admin-color-deny);
+}
+.trace-path [data-call] strong { font-weight: var(--cp-admin-weight-semibold); }
+.trace-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.trace-path-relations .trace-path-relation { display: flex; align-items: center; gap: var(--cp-admin-space-1); }
+.trace-path-relation svg { flex: none; }
+.trace-path-delegates { display: flex; flex-basis: 100%; color: var(--cp-admin-color-text-muted); }
