@@ -1,0 +1,34 @@
+/* Admin 062: the Barricade page. The scope sits in the heading; a rail of security modules
+   sits beside the editor of the chosen module, so the page grows by adding modules to the rail. */
+.barricade-page { display: grid; gap: 20px; }
+.barricade-heading { align-items: flex-end; gap: 24px; flex-wrap: wrap; }
+.barricade-scope { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.barricade-scope .cp-admin-field { min-width: 200px; }
+.barricade-history-button { display: inline-flex; align-items: center; gap: 6px; }
+.barricade-layout { display: grid; grid-template-columns: 245px minmax(0, 1fr); gap: 14px; align-items: start; }
+.barricade-rail { display: flex; flex-direction: column; gap: 4px; padding: 8px; }
+.barricade-rail button { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 10px 12px; text-align: start; background: none; border: 0; border-inline-start: 3px solid transparent; border-radius: 6px; cursor: pointer; color: inherit; }
+.barricade-rail button svg { margin-top: 2px; flex: none; }
+.barricade-rail button span { display: grid; gap: 2px; }
+.barricade-rail button small { color: var(--cp-admin-color-text-muted); }
+.barricade-rail button[aria-current] { background: var(--cp-admin-color-surface); border-inline-start-color: var(--cp-admin-color-text); }
+.barricade-module-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-bottom: 8px; }
+.barricade-module-head h2 { margin: 0; }
+.barricade-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px 24px; align-items: start; }
+.barricade-fields .cp-admin-field { display: grid; align-content: start; gap: 6px; }
+.barricade-input { display: flex; align-items: center; gap: 8px; }
+.barricade-input input { width: 96px; }
+.barricade-detail { display: block; margin-top: 2px; }
+.barricade-table { width: 100%; }
+.barricade-table td { vertical-align: middle; }
+.barricade-table td:last-child { width: 48%; }
+@media (max-width: 990px) { .barricade-layout { grid-template-columns: 1fr; } .barricade-rail { flex-direction: row; overflow-x: auto; } }
+/* Inside the module editor the section title sits above its fields, so the fields and the response
+   table use the whole width beside the rail instead of a narrow second column. */
+.barricade-layout .identity-form-section { grid-template-columns: minmax(0, 1fr); gap: var(--cp-admin-space-4); }
+.barricade-layout .identity-section-heading p { max-width: none; }
+.barricade-history-body { display: grid; gap: 12px; padding: 16px 24px; }
+.barricade-history-body .cp-admin-notice { margin: 0; }
+.barricade-author { display: grid; gap: 2px; }
+.barricade-change { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+.identity-form-actions.barricade-footer { gap: var(--cp-admin-space-3); border-top: 0; }

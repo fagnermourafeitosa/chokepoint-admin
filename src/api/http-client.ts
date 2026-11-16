@@ -11,19 +11,22 @@ type RequestOptions = Omit<RequestInit, "body" | "redirect"> & {
 };
 
 export class HttpError extends Error {
-  constructor(readonly status: number, readonly code?: string) {
+  // field: the refused field, when the error body names one (Backend 101).
+  constructor(readonly status: number, readonly code?: string, readonly field?: string) {
     super(`Backend request failed (${status})`);
     this.name = "HttpError";
   }
 }
 
-// errorCode reads the backend error code, when the error body has one.
-async function errorCode(response: Response): Promise<string | undefined> {
+// errorBody reads the backend error code and refused field, when the error body has them.
+async function errorBody(response: Response): Promise<{ code?: string; field?: string }> {
   try {
     const body: unknown = await response.json();
-    return typeof body === "object" && body !== null && "code" in body && typeof body.code === "string" ? body.code : undefined;
+    if (typeof body !== "object" || body === null) return {};
+    const text = (key: string) => (key in body && typeof (body as Record<string, unknown>)[key] === "string" ? (body as Record<string, string>)[key] : undefined);
+    return { code: text("code"), field: text("field") };
   } catch {
-    return undefined;
+    return {};
   }
 }
 
@@ -62,7 +65,10 @@ export async function httpClient<T>(
 
   if (response.status === 401 && path !== "/v1/auth/session")
     window.dispatchEvent(new Event("auth-expired"));
-  if (!response.ok) throw new HttpError(response.status, await errorCode(response));
+  if (!response.ok) {
+    const { code, field } = await errorBody(response);
+    throw new HttpError(response.status, code, field);
+  }
   if (response.status === 204) return undefined as T;
   return (responseType === "blob" ? response.blob() : response.json()) as Promise<T>;
 }

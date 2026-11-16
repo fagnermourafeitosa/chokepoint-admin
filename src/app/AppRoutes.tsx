@@ -8,6 +8,7 @@ import { WorkspaceDetailPage } from '../features/account/WorkspaceDetailPage';
 import { AccountInfoPage } from '../features/account/AccountInfoPage';
 import { EventsExportPage } from '../features/account/EventsExportPage';
 import { EventsExportFormPage } from '../features/account/EventsExportFormPage';
+import { BarricadePage } from '../features/account/BarricadePage';
 import { lazy, Suspense } from 'react';
 import { navigation } from './navigation';
 import { SignalLinkPage } from '../features/attention/SignalLinkPage';
@@ -36,9 +37,8 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path="events-export" element={<EventsExportPage />} />
       <Route path="events-export/new" element={<EventsExportFormPage />} />
       <Route path="events-export/:id" element={<EventsExportFormPage />} />
+      <Route path="barricade" element={<BarricadePage />} />
       <Route path="info" element={<AccountInfoPage />} />
-      {/* Layout prototypes of the account area (Admin 062): development server only, inside the account layout. */}
-      {PrototypePage ? <Route path="prototype/*" element={<Suspense fallback={null}><PrototypePage /></Suspense>} /> : null}
     </Route></Route>
     <Route element={<RequireSession />}><Route element={<AdminLayout />}>
       {navigation.map(({ path, Page, children }) => <Route key={path} path={path} element={<Page />}>

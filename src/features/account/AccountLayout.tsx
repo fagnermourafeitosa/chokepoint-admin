@@ -1,5 +1,6 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 import { Building2, Send, UserRound } from 'lucide-react';
+import { BarricadeIcon } from './BarricadeIcon';
 import { Wordmark } from '../../components/brand/Wordmark';
 import { ProfileMenu } from '../../components/header/ProfileMenu';
 import { useAuth } from '../auth/AuthContext';
@@ -12,7 +13,7 @@ import './account.css';
 export function AccountLayout() {
   const auth = useAuth();
   const { pathname } = useLocation();
-  const title = pathname.startsWith('/account/info') ? 'Account info' : pathname.startsWith('/account/events-export') ? 'Events export' : 'Workspaces';
+  const title = pathname.startsWith('/account/info') ? 'Account info' : pathname.startsWith('/account/events-export') ? 'Events export' : pathname.startsWith('/account/barricade') ? 'Barricade' : 'Workspaces';
   return (
     <div className="admin-layout">
       <title>{`${title} | Account | Xokepoint`}</title>
@@ -36,13 +37,14 @@ export function AccountLayout() {
 export function AccountTabs() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const current = pathname.startsWith('/account/info') ? 'info' : pathname.startsWith('/account/events-export') ? 'events-export' : 'workspaces';
+  const current = pathname.startsWith('/account/info') ? 'info' : pathname.startsWith('/account/events-export') ? 'events-export' : pathname.startsWith('/account/barricade') ? 'barricade' : 'workspaces';
   const page = (tab: string) => (current === tab ? 'page' : undefined);
-  // Admin 053: Events export sits between Workspaces and Account info.
+  // Admin 053: Events export sits between Workspaces and Account info. Admin 062: Barricade follows it.
   return (
     <div className="cp-admin-inner-tabs account-tabs" role="group" aria-label="Account sections">
       <button type="button" aria-current={page('workspaces')} onClick={() => navigate('/account/workspaces')}><Building2 size={17} aria-hidden="true" />Workspaces</button>
       <button type="button" aria-current={page('events-export')} onClick={() => navigate('/account/events-export')}><Send size={17} aria-hidden="true" />Events export</button>
+      <button type="button" aria-current={page('barricade')} onClick={() => navigate('/account/barricade')}><BarricadeIcon />Barricade</button>
       <button type="button" aria-current={page('info')} onClick={() => navigate('/account/info')}><UserRound size={17} aria-hidden="true" />Account info</button>
     </div>
   );
