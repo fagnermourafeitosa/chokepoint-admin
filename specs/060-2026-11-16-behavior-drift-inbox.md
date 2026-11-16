@@ -92,6 +92,8 @@ No new endpoint. The Inbox list and the Slack settings already carry the signal 
 9. **Response that ran** (Backend 099, Implementation Decisions 16b to 16d): when the context has `response`, the note adds "The tool was suspended for this agent." or "The agent was disabled.", and the action opens the agent in Access.
 10. **Suspended tool in Access** (user decisions Q1 and Q2, 2026-11-16): on the agent, a suspended tool shows a **Suspended** chip and a **Restore** action, with the time of the suspension. Restore asks for confirmation, removes the suspension and refreshes the agent. It never expires by itself.
 11. **Investigate** names the reason `tool_suspended` of a denied call.
+12. **Where the suspended tools show** (2026-11-16): a warning notice under the agent heading in Access, in the pattern of the Report-only notice: one row for each suspended tool with its name, its server, the **Suspended** chip, the time and **Restore**. Restore asks for confirmation in the confirmation dialog.
+13. **An agent disabled by a response** (user decision, 2026-11-16, Backend 099 Implementation Decision 16c): when `status_changed_source` is `barricade`, the agent says "Disabled by Barricade after a behavior drift" instead of naming a person.
 
 ---
 
