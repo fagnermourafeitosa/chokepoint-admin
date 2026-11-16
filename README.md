@@ -160,7 +160,7 @@ Agent initial-letter blocks and the repeated environment label in details are re
 | 055 | [Tool Review Text](specs/055-2026-11-14-tool-review-text.md) | Implemented |
 | 056 | [Remove Enterprise MCP](specs/056-2026-11-15-remove-enterprise-mcp.md) | Implemented |
 | 057 | [Tool Review History and Remembered Denials](specs/057-2026-11-15-tool-review-history.md) | Implemented |
-| 059 | [Slack Integration](specs/059-2026-11-15-slack-integration.md) | Not Implemented |
+| 059 | [Slack Integration](specs/059-2026-11-15-slack-integration.md) | In Progress |
 
 The customer OIDC management contract is coordinated with [Backend 007 — MCP Request and Identity Validation](../backend/specs/007-2026-10-25-mcp-request-and-identity-validation.md) (Implemented). Both contracts have reviewed implementations approved for publication to main. Signed JWT validation is operational; future introspection and grant/exchange capabilities have explicit not-implemented code. Platform login remains separate. See [the canonical architecture decisions](../backend/ARCHITECTURE.md#customer-identity-and-mcp-ingress).
 

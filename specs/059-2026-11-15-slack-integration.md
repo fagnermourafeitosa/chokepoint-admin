@@ -3,7 +3,7 @@
 - **Specification ID**: 059
 - **Date**: 2026-11-15
 - **Slug**: slack-integration
-- **Status**: Not Implemented
+- **Status**: In Progress
 - **Owner**: Admin — Integrations
 - **Related Specification**: [056 — Remove Enterprise MCP](056-2026-11-15-remove-enterprise-mcp.md)
 - **Related Backend Specification**: [Backend 098 — Slack Messages for Inbox Signals](../../backend/specs/098-2026-11-15-slack-signal-messages.md) (Proposed).
