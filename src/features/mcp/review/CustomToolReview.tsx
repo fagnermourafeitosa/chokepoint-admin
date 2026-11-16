@@ -3,8 +3,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router';
 import { usePendingChanges } from '../../auth/pending/PendingChanges';
 import type { EnvironmentScope } from '../../access/environment-scope';
-import { mcpApi, mcpError, mcpKey, type Connection, type MCPServer, type Preview } from '../api';
+import { Server } from 'lucide-react';
+import { mcpApi, mcpError, mcpKey, type Connection, type LevelCorrection, type MCPServer, type Preview } from '../api';
 import { ToolReviewPage } from './ToolReviewPage';
+import { Loader } from '../../../components/ui/loader/Loader';
 
 // Admin 055: the entry of the review page for a Custom MCP. It discovers the server (a new one with the
 // connection that the Connect dialog collected, an existing one with its stored connection or the edited
@@ -29,12 +31,12 @@ export function CustomToolReview({ scope, serverId, initialTool, enable, backTo,
   });
   const preview: Preview | undefined = discovery.data;
   usePendingChanges(!!preview);
-  async function confirm(selected: string[]) {
+  async function confirm(selected: string[], corrections: LevelCorrection[]) {
     if (!preview) return;
     setBusy(true); setError('');
     try {
       const enable = selected.length > 0 && (server.data ? server.data.enabled || enableAfter : true);
-      const saved = await mcpApi.confirm(scope, serverId, preview, selected, enable, new AbortController().signal);
+      const saved = await mcpApi.confirm(scope, serverId, preview, selected, enable, new AbortController().signal, corrections);
       await cache.invalidateQueries({ queryKey: mcpKey(scope) });
       await cache.invalidateQueries({ queryKey: ['mcp-summaries', scope.userId, scope.tenantId, scope.environmentId] });
       onSaved(saved);
@@ -44,10 +46,10 @@ export function CustomToolReview({ scope, serverId, initialTool, enable, backTo,
   if (!serverId && !state.connection) return <section className="tr-page" role="alert"><h1 className="cp-admin-title">Review discovered tools</h1><p>This review was not started from Connect custom MCP, or the page was reloaded. Connect the server again.</p></section>;
   if (server.isError) return <section className="tr-page" role="alert"><h1 className="cp-admin-title">Review discovered tools</h1><p>{mcpError(server.error)}</p></section>;
   if (discovery.isError) return <section className="tr-page"><p role="alert" className="cp-admin-notice cp-admin-notice--danger">{mcpError(discovery.error)}</p></section>;
-  if (!preview) return <section className="tr-page"><p role="status">Discovering the tools of {name}…</p></section>;
+  if (!preview) return <Loader>{connection?.name ?? server.data?.name ? `Discovering the tools of ${connection?.name ?? server.data?.name}…` : 'Discovering the tools…'}</Loader>;
   return <ToolReviewPage
-    heading={<div><span className="cp-admin-label">{name} · Custom MCP</span><h1 className="cp-admin-title">Review discovered tools</h1><p className="cp-admin-muted">Decide each new or changed tool. Unchanged tools keep their settings.</p></div>}
+    heading={<div><span className="cp-admin-label tr-icon-title"><Server size={14} aria-hidden="true" />{name}</span><h1 className="cp-admin-title">Review discovered tools</h1><p className="cp-admin-muted">Decide each new or changed tool. Unchanged tools keep their settings.</p></div>}
     backTo={backTo} backLabel={backLabel} registryName={name} tools={preview.tools} serverInfo={preview.server_info}
-    initialTool={initialTool} busy={busy} error={error} onConfirm={selected => void confirm(selected)}
+    initialTool={initialTool} busy={busy} error={error} onConfirm={(selected, corrections) => void confirm(selected, corrections)}
     enableOption={server.data && !server.data.enabled ? { checked: enableAfter, onChange: setEnableAfter } : undefined} />;
 }

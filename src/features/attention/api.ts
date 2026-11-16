@@ -3,7 +3,7 @@ import { httpClient } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 
 // SignalType mirrors the backend attention_signal_type enum.
-export type SignalType = 'tool-discovery' | 'requests-denied' | 'token_exchange_denied' | 'report-only-would-deny' | 'report-only-review-due' | 'mcpserver_disconnected';
+export type SignalType = 'tool-discovery' | 'requests-denied' | 'token_exchange_denied' | 'report-only-would-deny' | 'report-only-review-due' | 'mcpserver_disconnected' | 'lethal-trifecta';
 
 export const signalTypeLabels: Record<SignalType, string> = {
   'tool-discovery': 'Tool discovery',
@@ -14,6 +14,8 @@ export const signalTypeLabels: Record<SignalType, string> = {
   'report-only-review-due': 'Review due',
   // Backend 088: an automatic rediscovery could not reach the server.
   mcpserver_disconnected: 'Server disconnected',
+  // Backend 097: allowed calls that closed the lethal trifecta; nothing was blocked.
+  'lethal-trifecta': 'Lethal trifecta',
 };
 
 // Backend 088: the severity of a signal, 0 to 3, set by its type. 1 and 0 share the label Low

@@ -64,14 +64,16 @@ function reasonAction(d: Decision, detail: DecisionDetail, returnTo: string): { 
   return undefined;
 }
 
-// Admin 049 item 7: the path reads the recorded steps as Delegation, Agent, MCP server, Tool and Rules.
-// The PDP checks agent → tool once: the Agent dot passes (a failed identity check shows as its own
-// step), the MCP server dot passes when the tool step was evaluated, and the Tool dot carries the
-// capability state. The Rules dot names the failed rule.
+// Admin 049 item 7: the path reads the recorded steps as Delegation, Agent, MCP server, Rules and Tool:
+// the rules are checked before the call runs, so Tool comes last (user, 2026-11-16). The PDP checks
+// agent → tool once: the Agent dot passes (a failed identity check shows as its own step), the MCP
+// server dot passes when the tool step was evaluated, and the Tool dot carries the capability state.
+// The Rules dot names the failed rule. The lethal trifecta is not shown here: it never denies a call
+// and it is followed in the Inbox (Backend 097, user 2026-11-16).
 type PathNode = { key: string; label: string; state: StepState; value?: string };
 function pathNodes(steps: { key: string; state: StepState }[], d: Decision, failedRules: string[]): PathNode[] {
   const agent = d.agent.name || d.agent.id;
-  return steps.flatMap((step): PathNode[] => {
+  const nodes = steps.flatMap((step): PathNode[] => {
     if (step.key === 'delegation') return [
       { key: 'delegation', label: 'Delegation', state: step.state, value: `${subjectName(d.subject)} → ${agent}` },
       { key: 'agent', label: 'Agent', state: 'passed', value: agent },
@@ -81,9 +83,14 @@ function pathNodes(steps: { key: string; state: StepState }[], d: Decision, fail
       { key: 'tool', label: 'Tool', state: step.state, value: d.tool },
     ];
     if (step.key === 'condition') return [{ key: 'condition', label: 'Rules', state: step.state, value: failedRules.join(', ') || undefined }];
-    if (step.key === 'resource') return [];
+    if (step.key === 'resource' || step.key === 'trifecta') return [];
     return [{ key: step.key, label: stepLabel[step.key] || step.key.replaceAll('_', ' '), state: step.state }];
   });
+  // Tool after Rules.
+  const tool = nodes.findIndex((n) => n.key === 'tool');
+  const rules = nodes.findIndex((n) => n.key === 'condition');
+  if (tool >= 0 && rules > tool) nodes.splice(rules, 0, ...nodes.splice(tool, 1));
+  return nodes;
 }
 
 function Help({ text, label }: { text: string; label: string }) {

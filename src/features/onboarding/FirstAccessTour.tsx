@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router';
 import { ACTIONS, EVENTS, Joyride, STATUS, type EventData, type Step, type TooltipRenderProps } from 'react-joyride';
-import { Check, CircleHelp, Copy, X } from 'lucide-react';
+import { Check, Copy, Route, X } from 'lucide-react';
 import { Tooltip } from '../../components/ui/tooltip/Tooltip';
 import { tourStops, type StopAction } from './tourStops';
 import './first-access.css';
@@ -149,7 +150,22 @@ export function FirstAccessTour({ sandbox }: { sandbox: boolean }) {
       tooltipComponent={TourTooltip}
       options={{ overlayColor: 'rgba(21, 22, 27, 0.55)', spotlightRadius: 4, zIndex: 120, targetWaitTimeout: 3000, scrollOffset: 100 /* the Admin header is fixed and 75px tall */ }}
     />
-    {/* Admin 057: a small icon button, so it no longer covers Confirm review or the Next of a pager. */}
-    {run ? null : <span className="first-access-restart"><Tooltip content="Take the tour"><button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small first-access-restart-button" aria-label="Take the tour" onClick={() => void go(0, 1)}><CircleHelp size={18} aria-hidden="true" /></button></Tooltip></span>}
+    {/* Admin 058: bottom left, the height of the footer buttons, with a tour icon. A page with a footer of
+        actions (the tool review) gives it a slot, so it shares the line of its buttons. */}
+    {run ? null : <TourSlot><span className="first-access-restart"><Tooltip content="Take the tour"><button type="button" className="cp-admin-button cp-admin-button--secondary first-access-restart-button" aria-label="Take the tour" onClick={() => void go(0, 1)}><Route size={18} aria-hidden="true" /></button></Tooltip></span></TourSlot>}
   </>;
+}
+
+// TourSlot renders the button into the [data-tour-slot] of the page when there is one (Admin 058), and
+// in place otherwise. It follows the slot as pages mount and unmount.
+function TourSlot({ children }: { children: ReactNode }) {
+  const [slot, setSlot] = useState<Element | null>(() => document.querySelector('[data-tour-slot]'));
+  useEffect(() => {
+    const find = () => setSlot(document.querySelector('[data-tour-slot]'));
+    const observer = new MutationObserver(find);
+    observer.observe(document.body, { childList: true, subtree: true });
+    find();
+    return () => observer.disconnect();
+  }, []);
+  return slot ? createPortal(children, slot) : <>{children}</>;
 }

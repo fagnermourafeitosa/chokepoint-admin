@@ -1,6 +1,8 @@
 /* Admin 052: the tooltip of the first-access tour and the button that opens it again. */
-.first-access-restart { position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: var(--cp-admin-z-floating); }
-.first-access-restart-button { min-width: var(--cp-admin-control-compact-height); padding-inline: var(--cp-admin-space-2); }
+.first-access-restart { position: fixed; left: 1.5rem; bottom: var(--cp-admin-space-4); z-index: var(--cp-admin-z-floating); }
+/* Admin 058: inside a footer of actions (the tool review), the button is the first item of its line. */
+[data-tour-slot] .first-access-restart { position: static; }
+.first-access-restart-button { min-width: var(--cp-admin-control-height); min-height: var(--cp-admin-control-height); padding-inline: var(--cp-admin-space-2); justify-content: center; }
 
 .tour-tooltip { width: min(22rem, calc(100vw - 2rem)); padding: 1rem 1.125rem; background: var(--cp-admin-color-surface); color: var(--cp-admin-color-text); border: var(--cp-admin-border-width) solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-panel); font-family: var(--cp-admin-font-body); font-size: var(--cp-admin-type-body); line-height: var(--cp-admin-leading-ui); }
 .tour-tooltip-header { display: flex; align-items: center; justify-content: space-between; }

@@ -1,4 +1,7 @@
 /* Scoped document defaults. Set the module data attribute on body. */
+/* The page always shows the vertical scrollbar, so the top bar and the layout never shift sideways when
+   content grows past the window and the scrollbar appears (an accordion opening, a list loading). */
+html:has(body[data-cp-admin]) { overflow-y: scroll; }
 [data-cp-admin] {
   margin: 0;
   min-height: 100dvh;
