@@ -16,9 +16,9 @@ scenarios:
       - Each tab shows its open count, and All shows the total.
       - Security lists only Lethal trifecta, Behavior drift and Tool discovery; Access only Requests denied, Token exchange denied, Would deny and Review due; Operations only Server disconnected; All lists every signal.
     last_run:
-      date: null
-      result: not_run
-      notes: ""
+      date: 2026-11-16
+      result: passed
+      notes: Run in Acme Sandbox, where the demo Inbox had signals (6 open). Tabs All (6), Security (1), Access (5), Operations (0). Security listed Lethal trifecta and Tool discovery; Access listed Token exchange denied, Would deny and Requests denied; Operations showed the empty state. API from backend-100, Admin from admin-061.
   - id: S2
     title: The type filter follows the tab
     criteria: [3, 4]
@@ -28,9 +28,9 @@ scenarios:
     expected:
       - The type filter resets to All types and offers only the Security types.
     last_run:
-      date: null
-      result: not_run
-      notes: ""
+      date: 2026-11-16
+      result: passed
+      notes: Run in Acme Sandbox. With Requests denied selected in All, clicking Security reset the type filter to All types and listed only Lethal trifecta and Tool discovery.
 ---
 
 # Functional test: Inbox Categories

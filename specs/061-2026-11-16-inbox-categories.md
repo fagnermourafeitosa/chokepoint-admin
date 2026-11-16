@@ -3,7 +3,7 @@
 - **Specification ID**: 061
 - **Date**: 2026-11-16
 - **Slug**: inbox-categories
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: admin / attention, externalapps
 - **Related Specification**: [Backend 100 — Signal Categories](../../backend/specs/100-2026-11-16-signal-categories.md), [054 — Cumulative Limits and Signal Severity](054-2026-11-13-cumulative-limits-and-signal-severity.md), [060 — Behavior Drift in the Inbox](060-2026-11-16-behavior-drift-inbox.md)
 - **Related Mock Contract**: none
@@ -94,11 +94,11 @@ All lists what the Inbox listed before; the severity order does not change.
 
 ## Acceptance Criteria
 
-- [ ] 1. The Inbox shows All, Security, Access and Operations with their open counts.
-- [ ] 2. Each tab lists only the signals of its category; All lists every signal.
-- [ ] 3. The type filter lists only the types of the open tab.
-- [ ] 4. `npm run check` and `npm run build` pass.
-- [ ] 5. Functional test: [061-2026-11-16-inbox-categories.md](functional-tests/061-2026-11-16-inbox-categories.md)
+- [x] 1. The Inbox shows All, Security, Access and Operations with their open counts. Evidence: S1, 2026-11-16.
+- [x] 2. Each tab lists only the signals of its category; All lists every signal. Evidence: S1, 2026-11-16.
+- [x] 3. The type filter lists only the types of the open tab. Evidence: S2, 2026-11-16.
+- [x] 4. `npm run check` and `npm run build` pass. Evidence: run on the task branch, 2026-11-16.
+- [x] 5. Functional test: [061-2026-11-16-inbox-categories.md](functional-tests/061-2026-11-16-inbox-categories.md)
 
 ---
 

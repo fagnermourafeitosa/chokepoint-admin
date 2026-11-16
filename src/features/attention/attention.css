@@ -252,3 +252,6 @@
 .severity-chip--high { border-color: var(--cp-admin-color-danger); background: var(--cp-admin-color-danger-bg); color: var(--cp-admin-color-danger); }
 .severity-chip--medium { border-color: var(--cp-admin-color-warning); background: var(--cp-admin-color-warning-bg); color: var(--cp-admin-color-warning); }
 .severity-chip--low { background: var(--cp-admin-color-surface-muted); color: var(--cp-admin-color-text-muted); }
+
+/* Admin 061: the category tabs between the Inbox header and its table. */
+.attention-categories { margin-block-end: var(--cp-admin-space-4, 16px); }
