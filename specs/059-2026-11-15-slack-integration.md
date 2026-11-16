@@ -58,6 +58,8 @@ A Slack app that can read messages, channels or files would expose company conve
    5. **App credentials**: the Bot User OAuth Token (`xoxb-`), stored encrypted and never shown again, and **Send test message**, which sends one message to the destination to check the token, the destination and that the app is in the channel.
    6. **Footer**: Cancel and Save on the right, as the editor of one item in `docs/design-system/layouts.md` (user, 2026-11-15). No separator line under App credentials nor above the buttons (user, 2026-11-15).
 6. **Copy** of the manifest uses the design system `CopyButton`.
+7. **Link of a message** (implementation, 2026-11-15). A Slack message links to `/inbox/<signal ID>?workspace=<tenant>&environment=<environment>`. The route opens that workspace and environment, reads the signal and opens its target with the Inbox logic (`targetPath`), or the Overview when it has none. A signal that no longer exists, or a workspace the person cannot open, shows a short message with a link to the Overview.
+8. **Slack app name.** The manifest, the invite step and the channel warning use the workspace name and "alerts" (for example "Acme alerts"), at most 35 characters, the Slack limit.
 
 ---
 
