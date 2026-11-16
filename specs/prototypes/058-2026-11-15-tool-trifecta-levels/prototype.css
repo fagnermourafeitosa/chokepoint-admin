@@ -1,0 +1,42 @@
+/* Admin 058 prototype: the trifecta levels of a tool in the review. */
+.tr-item-use { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); }
+.tr-granted { display: flex; align-items: center; gap: var(--cp-admin-space-2); margin: 0; font-weight: var(--cp-admin-weight-semibold); }
+.tl-section { display: grid; gap: var(--cp-admin-space-3); margin-top: var(--cp-admin-space-4); padding: var(--cp-admin-space-4); background: var(--cp-admin-color-surface-muted); border-radius: var(--cp-admin-radius-control); }
+.tl-description { margin: 0; color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-body); }
+.tl-head { display: flex; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-3); }
+.tl-head h3 { display: flex; align-items: center; gap: var(--cp-admin-space-2); margin: 0; }
+.tl-line { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--cp-admin-space-3); }
+.tl-line { display: block; }
+.tl-legs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--cp-admin-space-4); }
+.tl-legs li { display: grid; align-content: start; gap: var(--cp-admin-space-1); font-size: var(--cp-admin-type-body); }
+.tl-leg-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); }
+.tl-means { margin: 0; color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); }
+.tl-legs small { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); }
+.tl-undo { border: 0; background: none; padding: 0; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
+/* No rule above the decision buttons. */
+.tr-decision { border-top: 0; }
+.tl-why { margin: 0; color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); }
+.tl-link { border: 0; background: none; padding: 0; font: inherit; color: var(--cp-admin-color-text); text-decoration: underline; cursor: pointer; }
+/* Integrations list: the trifecta of a server, result chip and its High legs. */
+.tli-cell { display: grid; gap: 2px; justify-items: start; }
+.tli-cell small { color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-label); }
+.il-name { display: flex; align-items: center; gap: var(--cp-admin-space-3); }
+.il-name > span { display: grid; gap: 2px; }
+.il-name small { color: var(--cp-admin-color-text-muted); }
+.cp-admin-table.mcp-servers th.il-actions-head { text-align: right; }
+.il-row-actions { justify-content: flex-end; }
+.il-row-actions .cp-admin-button { min-width: 5.5rem; justify-content: center; }
+.il-row-actions .identity-menu summary { min-width: var(--cp-admin-control-compact-height); min-height: var(--cp-admin-control-compact-height); }
+.il-status { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); white-space: nowrap; }
+.il-pager { display: grid; gap: var(--cp-admin-space-1); justify-items: start; }
+.il-pager > nav { width: 100%; }
+.tli-line { display: grid; justify-items: start; gap: var(--cp-admin-space-1); }
+/* Take the tour: bottom left corner, the same height as the footer buttons and centered on their line, with a
+   tour icon (user, 2026-11-15). The real button is hidden here; the prototype shows its own (TourButton.tsx). */
+.first-access-restart { display: none; }
+.tl-tour { position: fixed; left: 1.5rem; bottom: var(--cp-admin-space-4); z-index: var(--cp-admin-z-floating); }
+.tl-tour-button { min-width: var(--cp-admin-control-height); min-height: var(--cp-admin-control-height); padding-inline: var(--cp-admin-space-2); justify-content: center; }
+.tl-tour--inline { position: static; margin-right: auto; }
+.tr-footer { padding-right: 0; }
+/* Server then tool, each with its icon (Server, Wrench), as in the rest of the Admin (user, 2026-11-15). */
+.tl-icon-title { display: flex; align-items: center; gap: var(--cp-admin-space-2); }
