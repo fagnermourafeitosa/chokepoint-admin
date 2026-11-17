@@ -3,7 +3,7 @@
 - **Specification ID**: 060
 - **Date**: 2026-11-16
 - **Slug**: behavior-drift-inbox
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: admin / attention, externalapps
 - **Related Specification**: [Backend 099 — Behavior Drift](../../backend/specs/099-2026-11-16-behavior-drift.md), [054 — Cumulative Limits and Signal Severity](054-2026-11-13-cumulative-limits-and-signal-severity.md), [058 — Tool Trifecta Levels](058-2026-11-15-tool-trifecta-levels.md), [059 — Slack Integration](059-2026-11-15-slack-integration.md)
 - **Related Mock Contract**: none
@@ -112,16 +112,16 @@ The rows of the other signal types do not change.
 
 ## Acceptance Criteria
 
-- [ ] 1. A spike, a new tool and a new sequence each show their subject, note and context lines.
-- [ ] 2. A new tool with `first_in_workspace` or `sensitive_leg` shows the High chip and its note.
-- [ ] 3. `conditions_elsewhere` adds its sentence to the note.
-- [ ] 4. The type filter offers Behavior drift.
-- [ ] 5. The action opens Investigate filtered by agent, tool and hour.
-- [ ] 6. Slack settings list Behavior drift, off by default.
-- [ ] 7. A response that ran shows in the note, and the action opens the agent.
-- [ ] 8. A suspended tool shows Suspended and Restore on the agent in Access, and Restore brings it back.
-- [ ] 9. `npm run check` and `npm run build` pass.
-- [ ] 10. Functional test: [060-2026-11-16-behavior-drift-inbox.md](functional-tests/060-2026-11-16-behavior-drift-inbox.md)
+- [x] 1. A spike, a new tool and a new sequence each show their subject, note and context lines. — browser check on the demo instance (S1, S2, S3, and S6 for one row with every departure of a tool).
+- [x] 2. A new tool with `first_in_workspace` or `sensitive_leg` shows the High chip and its note. — browser check (S2): High, both sentences.
+- [x] 3. `conditions_elsewhere` adds its sentence to the note. — code inspection of `driftNote` in `src/features/attention/targets.ts`; not exercised in the browser, as no other demo agent has conditions on the tools called.
+- [x] 4. The type filter offers Behavior drift. — code inspection: `signalTypeLabels` and `signalCategories` feed the Security tab filter; browser check: the rows show in the Security tab.
+- [x] 5. The action opens Investigate filtered by agent, tool and hour. — browser check (S1): 80 records of the hour.
+- [x] 6. Slack settings list Behavior drift, off by default. — browser check (S4).
+- [x] 7. A response that ran shows in the note, and the action opens the agent. — browser check (S5): "The tool was suspended for this agent.", Open agent.
+- [x] 8. A suspended tool shows Suspended and Restore on the agent in Access, and Restore brings it back. — browser check (S5): denied call before, call runs after; S7: a second restore says who restored it. The restore of a tool suspended again (409) is checked by the backend unit tests.
+- [x] 9. `npm run check` and `npm run build` pass. — both pass on the branch.
+- [x] 10. Functional test: [060-2026-11-16-behavior-drift-inbox.md](functional-tests/060-2026-11-16-behavior-drift-inbox.md)
 
 ---
 

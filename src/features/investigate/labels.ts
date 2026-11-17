@@ -9,6 +9,8 @@ export const denyText: Record<ReasonLabel, string> = {
   // Backend 087: a rule that reads earlier calls of the agent (a limit) was not met.
   reach_limit: 'A limit of this agent · server · tool was reached.',
   tool_not_reviewed: 'The tool has not been reviewed (blocked before the PDP).',
+  // Backend 099: a behavior drift response suspended the tool for the agent (Admin 060 decision 11).
+  tool_suspended: 'The tool is suspended for this agent (blocked before the PDP).',
 };
 
 // Token exchange reasons (Admin 030 section 4, Admin 037).
@@ -46,6 +48,8 @@ export const exchangeText: Record<ExchangeReasonLabel, string> = {
 export const stepLabel: Record<string, string> = {
   identity: 'Identity',
   tool_review: 'Tool review',
+  // Backend 099: the suspension check, recorded only when the tool is suspended.
+  tool_suspension: 'Tool suspension',
   delegation: 'Delegation',
   capability: 'Tool',
   resource: 'Resource',
