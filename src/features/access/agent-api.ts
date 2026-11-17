@@ -29,7 +29,9 @@ export type AgentRecord = {
   // Backend 099: the tools that a behavior drift response suspended for the agent; only in the read of one agent.
   suspended_tools?: SuspendedTool[];
 };
-export type SuspendedTool = { server_id: string; tool: string; suspended_at: string; signal_id: string | null };
+export type SuspendedTool = { id: string; server_id: string; tool: string; suspended_at: string; signal_id: string | null };
+// Backend 099: the restore of one suspension; already_restored when someone else restored it first.
+export type ToolRestore = { suspension_id: string; restored_at: string; restored_by: string; already_restored: boolean };
 export type AgentStatus = 'active' | 'disabled';
 export type Enforcement = 'enforce' | 'report_only';
 export type EnforcementChange = { enforcement: Enforcement; review_by?: string; note?: string };
@@ -54,6 +56,7 @@ export const agentApi = {
   // Backend 057: the mode applies at the next call; a change is an event in the history.
   setEnforcement: (scope: AgentScope, id: string, revision: number, change: EnforcementChange) => httpClient<AgentRecord>(`${agentPath(scope)}/${encodeURIComponent(id)}/enforcement`, { method: 'POST', json: { revision, ...change } }),
   // Backend 099: an administrator restores a suspended tool; it never expires by itself.
-  restoreTool: (scope: AgentScope, id: string, serverId: string, tool: string) => httpClient<void>(`${agentPath(scope)}/${encodeURIComponent(id)}/suspended-tools/${encodeURIComponent(serverId)}/${encodeURIComponent(tool)}`, { method: 'DELETE' }),
+  // The suspension is named by its id, so a stale screen never restores a newer suspension (409 suspension_changed).
+  restoreTool: (scope: AgentScope, id: string, suspensionId: string) => httpClient<ToolRestore>(`${agentPath(scope)}/${encodeURIComponent(id)}/suspended-tools/${encodeURIComponent(suspensionId)}`, { method: 'DELETE' }),
   image: (scope: AgentScope, id: string, signal: AbortSignal) => httpClient<Blob>(`${agentPath(scope)}/${encodeURIComponent(id)}/image`, { signal, responseType: 'blob' }),
 };

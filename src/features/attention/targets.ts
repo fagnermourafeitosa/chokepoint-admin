@@ -93,7 +93,7 @@ export function contextLines(signal: Signal): [string, string] {
       c.people ? `${c.people} ${c.people === '1' ? 'person' : 'people'}` : '',
     ].filter(Boolean).join(' · ')];
     // Admin 060 decision 4: the tool (the pair of a new sequence), then the agent, the calls and the people.
-    case 'behavior-drift': return [c.departure === 'new-sequence' && c.previous_tool ? `${c.previous_tool} → ${c.tool || ''}` : c.tool || '', [
+    case 'behavior-drift': return [c.tool || '', [
       (c.agent_name || c.agent || '') + (c.agent_status === 'deleted' ? ' (deleted)' : ''),
       c.count ? `${c.count} ${c.count === '1' ? 'call' : 'calls'}` : '',
       c.people ? `${c.people} ${c.people === '1' ? 'person' : 'people'}` : '',
@@ -121,29 +121,38 @@ export function noteLine(signal: Signal): string | undefined {
   return signal.note ?? undefined;
 }
 
-// Admin 060 decision 2: the subject of each departure of Backend 099.
+// The departures of one Behavior drift signal: one agent, tool and hour (Backend 099 Implementation Decision 12).
+const driftDepartures = (c: Record<string, string>) => new Set((c.departures || '').split(',').filter(Boolean));
+const listOf = (items: string[]) => items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}` : items[0] ?? '';
+
+// Admin 060 decision 2: the subject names the strongest departure of the signal.
 function driftSubject(signal: Signal, agent: string): string {
   const c = signal.context;
+  const kinds = driftDepartures(c);
   const tool = c.tool || 'a tool';
-  if (c.departure === 'spike') return `${agent} called ${tool} far more than usual`;
-  if (c.departure === 'new-tool') return `${agent} called ${tool} for the first time`;
-  if (c.departure === 'new-sequence') return `${agent} chained ${c.previous_tool || 'a tool'} → ${tool} for the first time`;
+  if (kinds.has('new-tool')) return `${agent} called ${tool} for the first time`;
+  if (kinds.has('spike')) return `${agent} called ${tool} far more than usual`;
+  if (kinds.has('new-sequence')) return `${agent} chained ${listOf((c.previous_tools || '').split(',').filter(Boolean)) || 'a tool'} → ${tool} for the first time`;
   return signal.subject;
 }
 
 const legNames = new Map<string, string>(legs.map(l => [l.key, l.label]));
 
-// Admin 060 decisions 3 and 9: the numbers of the departure, then what makes it stronger, then the response that
-// ran. A missing context key leaves its sentence out.
+// Admin 060 decisions 3 and 9: one sentence for each departure, in the order new tool, spike, new sequence, then
+// the conditions of other agents and the response that ran. A missing context key leaves its sentence out.
 function driftNote(c: Record<string, string>): string | undefined {
+  const kinds = driftDepartures(c);
   const parts: string[] = [];
-  if (c.departure === 'spike' && c.count && c.pattern_max) parts.push(`${c.count} calls in this hour; its pattern never passed ${c.pattern_max} in an hour.`);
-  if (c.departure === 'new-tool') parts.push(c.first_in_workspace === 'true' ? 'No agent in this environment called this tool in the period.' : 'The tool was granted, but this agent never called it in the period.');
-  if (c.departure === 'new-tool' && c.sensitive_leg) {
-    const names = c.sensitive_leg.split(',').map(leg => legNames.get(leg) ?? leg);
-    parts.push(`The tool is high in ${names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0]}.`);
+  if (kinds.has('new-tool')) {
+    parts.push(c.first_in_workspace === 'true' ? 'No agent in this environment called this tool in the period.' : 'The tool was granted, but this agent never called it in the period.');
+    if (c.sensitive_leg) parts.push(`The tool is high in ${listOf(c.sensitive_leg.split(',').map(leg => legNames.get(leg) ?? leg))}.`);
   }
-  if (c.departure === 'new-sequence') parts.push('This order of calls was never seen for this agent.');
+  if (kinds.has('spike') && c.count) {
+    if (c.baseline === 'agent' && c.pattern_max) parts.push(`${c.count} calls in this hour; its pattern never passed ${c.pattern_max} in an hour.`);
+    else if (c.baseline === 'peers' && c.pattern_max) parts.push(`${c.count} calls in this hour; no other agent passed ${c.pattern_max} in an hour.`);
+    else if (c.baseline === 'none') parts.push(`${c.count} calls in this hour, and nobody called this tool before.`);
+  }
+  if (kinds.has('new-sequence') && c.previous_tools) parts.push(`This agent never called ${c.tool || 'this tool'} after ${listOf(c.previous_tools.split(','))}.`);
   if (c.conditions_elsewhere === 'true') parts.push('Other agents have call conditions on this tool; this one has none.');
   if (c.response === 'suspend_tool') parts.push('The tool was suspended for this agent.');
   if (c.response === 'disable_agent') parts.push('The agent was disabled.');

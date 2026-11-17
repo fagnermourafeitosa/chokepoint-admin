@@ -158,6 +158,6 @@ Hooks live apart from JSX, one file per concern.
 | 057 | [Tool Review History and Remembered Denials](specs/057-2026-11-15-tool-review-history.md) | Implemented |
 | 058 | [Tool Trifecta Levels](specs/058-2026-11-15-tool-trifecta-levels.md) | Implemented |
 | 059 | [Slack Integration](specs/059-2026-11-15-slack-integration.md) | Implemented |
-| 060 | [Behavior Drift in the Inbox](specs/060-2026-11-16-behavior-drift-inbox.md) | Waiting Approve |
+| 060 | [Behavior Drift in the Inbox](specs/060-2026-11-16-behavior-drift-inbox.md) | Implemented |
 | 061 | [Inbox Categories](specs/061-2026-11-16-inbox-categories.md) | Implemented |
 | 062 | [Barricade](specs/062-2026-11-16-barricade.md) | Implemented |
