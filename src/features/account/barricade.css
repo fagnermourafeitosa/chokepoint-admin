@@ -20,6 +20,9 @@
 .barricade-input input { width: 96px; }
 .barricade-detail { display: block; margin-top: 2px; }
 .barricade-table { width: 100%; }
+/* No line between the response table and the actions. */
+.barricade-last-section { border-bottom: 0; }
+.barricade-table tbody tr:last-child td { border-bottom: 0; }
 .barricade-table td { vertical-align: middle; }
 .barricade-table td:last-child { width: 48%; }
 @media (max-width: 990px) { .barricade-layout { grid-template-columns: 1fr; } .barricade-rail { flex-direction: row; overflow-x: auto; } }

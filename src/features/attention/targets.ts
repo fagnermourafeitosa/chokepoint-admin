@@ -26,9 +26,11 @@ export function targetPath(signal: Signal): string | undefined {
     const p = signal.target_params;
     if (signal.target_route === 'permissions') return p.agent_id ? `/access?${new URLSearchParams({ agent_id: p.agent_id, return_to: '/' })}` : undefined;
     if (!p.agent || !p.server_id || !p.tool || !p.window_start) return undefined;
+    // The detection window is configured per environment (hotfix of Backend 099); its end comes with the signal.
     const from = new Date(p.window_start);
+    const to = p.window_end ? new Date(p.window_end) : new Date(from.getTime() + 3600000);
     return `/investigate?${new URLSearchParams({ view: 'decisions', agent: p.agent, server_id: p.server_id, tool: p.tool,
-      from: from.toISOString(), to: new Date(from.getTime() + 3600000).toISOString(), return_to: '/' })}`;
+      from: from.toISOString(), to: to.toISOString(), return_to: '/' })}`;
   }
   // Backend 097: a closed lethal trifecta opens the agent in Access, where its servers and tools are
   // granted; the calls were allowed, so there is nothing to investigate as a deny (user, 2026-11-16).
@@ -148,9 +150,13 @@ function driftNote(c: Record<string, string>): string | undefined {
     if (c.sensitive_leg) parts.push(`The tool is high in ${listOf(c.sensitive_leg.split(',').map(leg => legNames.get(leg) ?? leg))}.`);
   }
   if (kinds.has('spike') && c.count) {
-    if (c.baseline === 'agent' && c.pattern_max) parts.push(`${c.count} calls in this hour; its pattern never passed ${c.pattern_max} in an hour.`);
-    else if (c.baseline === 'peers' && c.pattern_max) parts.push(`${c.count} calls in this hour; no other agent passed ${c.pattern_max} in an hour.`);
-    else if (c.baseline === 'none') parts.push(`${c.count} calls in this hour, and nobody called this tool before.`);
+    // The detection window of the environment (hotfix of Backend 099): one hour unless configured otherwise.
+    const hours = Number(c.detection_window_hours) || 1;
+    const period = hours === 1 ? 'this hour' : `these ${hours} hours`;
+    const same = hours === 1 ? 'an hour' : `${hours} hours`;
+    if (c.baseline === 'agent' && c.pattern_max) parts.push(`${c.count} calls in ${period}; its pattern never passed ${c.pattern_max} in ${same}.`);
+    else if (c.baseline === 'peers' && c.pattern_max) parts.push(`${c.count} calls in ${period}; no other agent passed ${c.pattern_max} in ${same}.`);
+    else if (c.baseline === 'none') parts.push(`${c.count} calls in ${period}, and nobody called this tool before.`);
   }
   if (kinds.has('new-sequence') && c.previous_tools) parts.push(`This agent never called ${c.tool || 'this tool'} after ${listOf(c.previous_tools.split(','))}.`);
   if (c.conditions_elsewhere === 'true') parts.push('Other agents have call conditions on this tool; this one has none.');

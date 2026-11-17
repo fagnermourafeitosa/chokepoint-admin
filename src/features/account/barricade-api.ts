@@ -5,7 +5,9 @@ import type { EnvironmentRecord } from '../auth/AuthContext';
 export type BarricadeResponse = 'alert' | 'suspend_tool' | 'disable_agent';
 export type Heuristic = 'learning_days' | 'pattern_days' | 'known_days' | 'spike_factor' | 'spike_floor';
 export type Anomaly = 'spike' | 'new_tool' | 'new_sequence';
-export type BehaviorDrift = Record<Heuristic, number> & { responses: Record<Anomaly, BarricadeResponse> };
+// The detection window names its unit, hours, so that the stored document says what the number is (hotfix of Backend 099).
+export type DetectionWindow = { length: number; unit: 'hours' };
+export type BehaviorDrift = Record<Heuristic, number> & { detection_window: DetectionWindow; responses: Record<Anomaly, BarricadeResponse> };
 export type BarricadeSetting = { version: 1; behavior_drift: BehaviorDrift };
 export type Author = { name: string; email: string };
 // updated_by is null while the environment keeps the market defaults it was created with.
