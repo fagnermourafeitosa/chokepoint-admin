@@ -10,16 +10,16 @@ scenarios:
     title: A spike shows its numbers
     criteria: [1, 5, 7]
     steps:
-      - Run more than 5 times the largest hourly count of one tool of one agent, and at least 20 calls, in one hour.
+      - Run more than 5 times the p90 of the hourly windows with calls of one tool of one agent, and at least 20 calls, in one hour (Backend 104).
       - After the next hourly job, open the Inbox and filter by Behavior drift.
       - Click the action of the row.
     expected:
-      - A Medium row says "{agent} called {tool} far more than usual" and its note gives the count and the busiest hour of its pattern.
+      - A Medium row says "{agent} called {tool} far more than usual" and its note gives the count and the p90 of its pattern.
       - Investigate opens filtered by the agent, the tool and the hour.
     last_run:
-      date: 2026-11-16
+      date: 2026-11-18
       result: passed
-      notes: "80 get_ticket calls of support-assistant in one hour: Medium row \"called get_ticket far more than usual\", note \"80 calls in this hour; its pattern never passed 1 in an hour.\"; Investigate opened All decisions filtered by agent, tool and 22:00-23:00, 80 records. The hour was detected at once by a one-off run of the job against the demo database, not by waiting for the hourly tick."
+      notes: "40 get_order calls of rafael through refunds-assistant in one hour: Medium row \"refunds-assistant called get_order far more than usual\", note \"40 calls in this hour; its p90 in an hour is 4.\" (Backend 104). Investigate opened All decisions filtered by agent, tool and 19:00-20:00, 40 records. The hour was detected at once by a one-off run of the job against the demo database."
   - id: S2
     title: A new tool nobody called is High
     criteria: [1, 2, 3, 7]

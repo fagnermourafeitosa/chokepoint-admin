@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { CircleHelp } from 'lucide-react';
 import { HttpError } from '../../api/http-client';
 import { SelectMenu } from '../../components/ui/dropdown/SelectMenu';
 import { Notice } from '../../components/ui/notice/Notice';
+import { Tooltip } from '../../components/ui/tooltip/Tooltip';
 import { barricadeApi, barricadeKey, type BarricadeCurrent, type BehaviorDrift, type Heuristic } from './barricade-api';
 import { anomalies, detectionWindow, fieldLabel, heuristics, responses, utc } from './barricade-terms';
 
@@ -50,7 +52,7 @@ export function BehaviorDriftEditor({ tenantId, environmentId, environmentLabel,
             onChange={e => { const value = e.target.value; setDraft(d => ({ ...d, detection_window: { ...d.detection_window, length: value === '' ? Number.NaN : Number(value) } })); }} /><span className="cp-admin-muted">{detectionWindow.unit}</span></span>
           <small>{detectionWindow.help}</small></label>
         {heuristics.map(h => <label key={h.key} className="cp-admin-field">{h.label}
-          <span className="barricade-input"><input className="cp-admin-input" type="number" required min={1} step={1} value={Number.isNaN(draft[h.key]) ? '' : draft[h.key]} onChange={e => setNumber(h.key, e.target.value)} /><span className="cp-admin-muted">{h.unit}</span></span>
+          <span className="barricade-input"><input className="cp-admin-input" type="number" required min={1} step={1} value={Number.isNaN(draft[h.key]) ? '' : draft[h.key]} onChange={e => setNumber(h.key, e.target.value)} /><span className="cp-admin-muted">{h.unit}</span>{h.tooltip ? <Tooltip content={h.tooltip}><CircleHelp size={14} aria-label={`About ${h.label}`} /></Tooltip> : null}</span>
           <small>{h.help}</small></label>)}
       </div>
     </div>

@@ -5,11 +5,13 @@ export const detectionWindow = { label: 'Detection window', unit: 'hours', help:
 export const windowHours = (hours: number) => `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
 
 // Admin 062: the names of the Barricade setting in security terms, shared by the editor and the history.
-export const heuristics: { key: Heuristic; label: string; unit: string; help: string }[] = [
+// tooltip explains a value that the help line cannot (Backend 104 Implementation Decision 3).
+export const heuristics: { key: Heuristic; label: string; unit: string; help: string; tooltip?: string }[] = [
   { key: 'learning_days', label: 'Learning period', unit: 'days', help: 'No drift signal until an agent has this much history.' },
   { key: 'pattern_days', label: 'Pattern period', unit: 'days', help: 'The calls that each detection window is compared with. At most the trace retention.' },
   { key: 'known_days', label: 'Known after', unit: 'distinct days', help: 'A tool or an order of calls joins the pattern after it appears on this many days.' },
-  { key: 'spike_factor', label: 'Spike factor', unit: '× the busiest window', help: 'The calls of a tool in one detection window above this multiple of its busiest window in the pattern.' },
+  { key: 'spike_factor', label: 'Spike factor', unit: '× a usual busy window', help: 'The calls of a tool in one detection window above this multiple of a usual busy window in the pattern.',
+    tooltip: 'The reference is a usual busy window of the agent on this tool in the pattern period: 9 in 10 of its windows with calls have at most this many calls. One unusual peak does not raise it. Without a history of the agent, the windows of the other agents on the tool are used.' },
   { key: 'spike_floor', label: 'Spike floor', unit: 'calls in a window', help: 'Fewer calls than this in one detection window never count as a spike.' },
 ];
 

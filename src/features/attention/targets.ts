@@ -100,6 +100,11 @@ export function contextLines(signal: Signal): [string, string] {
       c.count ? `${c.count} ${c.count === '1' ? 'call' : 'calls'}` : '',
       c.people ? `${c.people} ${c.people === '1' ? 'person' : 'people'}` : '',
     ].filter(Boolean).join(' · ')];
+    // Backend 104 Implementation Decision 5: the tool without a label and its calls without the check.
+    case 'trifecta-check-incomplete': return [c.tool || '', [
+      c.count ? `${c.count} ${c.count === '1' ? 'call' : 'calls'} without the check` : '',
+      'The tool has no trifecta levels',
+    ].filter(Boolean).join(' · ')];
     // Backend 088: the server and why the rediscovery failed.
     case 'mcpserver_disconnected': return [c.server || '', c.reason ? disconnectedText[c.reason] ?? c.reason : ''];
     default: return ['', ''];
@@ -154,8 +159,9 @@ function driftNote(c: Record<string, string>): string | undefined {
     const hours = Number(c.detection_window_hours) || 1;
     const period = hours === 1 ? 'this hour' : `these ${hours} hours`;
     const same = hours === 1 ? 'an hour' : `${hours} hours`;
-    if (c.baseline === 'agent' && c.pattern_max) parts.push(`${c.count} calls in ${period}; its pattern never passed ${c.pattern_max} in ${same}.`);
-    else if (c.baseline === 'peers' && c.pattern_max) parts.push(`${c.count} calls in ${period}; no other agent passed ${c.pattern_max} in ${same}.`);
+    // Backend 104 Implementation Decision 3: the reference is the p90 of the windows with calls.
+    if (c.baseline === 'agent' && c.p90_window_calls) parts.push(`${c.count} calls in ${period}; its p90 in ${same} is ${c.p90_window_calls}.`);
+    else if (c.baseline === 'peers' && c.p90_window_calls) parts.push(`${c.count} calls in ${period}; the p90 of the other agents in ${same} is ${c.p90_window_calls}.`);
     else if (c.baseline === 'none') parts.push(`${c.count} calls in ${period}, and nobody called this tool before.`);
   }
   if (kinds.has('new-sequence') && c.previous_tools) parts.push(`This agent never called ${c.tool || 'this tool'} after ${listOf(c.previous_tools.split(','))}.`);
