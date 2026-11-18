@@ -41,7 +41,7 @@ scenarios:
     last_run:
       date: 2026-11-18
       result: passed
-      notes: 'Both paths listed with both values; before Backend 104 the root description was dropped from the comparison. Restored with Trust this change and the levels High, OK, OK; the stored contract is the discovered one. Not run: the reverted notice for equal contracts (no stored pending change that went back) and the items.type of an array parameter (no demo tool has one); both follow from the same comparison, by code inspection.'
+      notes: 'Both paths listed with both values; before Backend 104 the root description was dropped from the comparison. Restored with Trust this change and the levels High, OK, OK; the stored contract is the discovered one. The array case is S7 and the reverted notice is S8.'
   - id: S3
     title: A tool without a label raises one coverage signal, resolved when it gets levels
     criteria: [5]
@@ -110,6 +110,18 @@ scenarios:
       date: 2026-11-18
       result: passed
       notes: 'First run failed: the path was listed, but the previous value read Not set, because valueAt did not descend into arrays. Fixed on fix/104-diff-array-values; rerun showed "number" removed and "string" added. servers.py restored, columns removed with a confirmed review (levels High, OK, OK).'
+  - id: S8
+    title: A change that went back to the approved contract shows the reverted notice
+    criteria: [2]
+    steps:
+      - In chokepoint.mcp_servers, mark Acme Helpdesk close_ticket as a pending change - previous the approved contract, contract an intermediate description, change changed, disabled.
+      - Open the review of Acme Helpdesk; the server still sends the approved contract.
+    expected:
+      - close_ticket is Changed, To review, ~0 changed, with "The server went back to the text that you approved".
+    last_run:
+      date: 2026-11-18
+      result: passed
+      notes: Notice shown with ~0 changed. Restored with Trust this change and the levels OK, OK, OK; close_ticket unchanged and enabled.
 ---
 
 # Functional test: Detection Heuristics Fixes
