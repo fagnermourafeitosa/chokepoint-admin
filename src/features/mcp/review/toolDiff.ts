@@ -43,8 +43,9 @@ function canonical(value: unknown): string {
 type Json = unknown;
 const isObject = (v: Json): v is Record<string, Json> => !!v && typeof v === 'object' && !Array.isArray(v);
 
+// valueAt reads the value at a path; a key of an array is its position, as leaves() names it.
 function valueAt(value: Json, at: string[]): Json {
-  return at.reduce<Json>((v, key) => (isObject(v) ? v[key] : undefined), value);
+  return at.reduce<Json>((v, key) => (Array.isArray(v) ? v[Number(key)] : isObject(v) ? v[key] : undefined), value);
 }
 
 // setAt writes value at a path of a copy made by structuredClone, creating the missing objects on the

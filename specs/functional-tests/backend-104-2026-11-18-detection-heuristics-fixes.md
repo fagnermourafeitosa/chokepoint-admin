@@ -85,6 +85,31 @@ scenarios:
       date: 2026-11-18
       result: passed
       notes: The signal context carries p90_window_calls 4 and baseline agent.
+  - id: S6
+    title: A drift window with calls only in its first hour is evaluated when it ends
+    criteria: [1]
+    steps:
+      - Set the detection window of Acme Production to 2 hours.
+      - In the hour 22:00 UTC, the first of the window 22:00 to 24:00, run 220 get_order calls of rafael through refunds-assistant; make no call in the hour 23:00.
+      - Run the drift job for the hours 22:00 and 23:00, then open the Inbox.
+    expected:
+      - No signal after the hour 22:00; after the hour 23:00, one behavior drift spike signal for the window 22:00 to 24:00.
+    last_run:
+      date: 2026-11-18
+      result: passed
+      notes: 'Signal at 2026-11-19 00:00 UTC, get_order, count 220, departures spike, p90_window_calls 40, detection_window_hours 2, target window 22:00 to 00:00. A first run with 100 calls raised nothing, as expected: the 2-hour pattern windows of rafael have a p90 of 40, so the threshold is 5 x 40 = 200. Window set back to 1 hour after the run.'
+  - id: S7
+    title: A change inside an array of the schema shows both values
+    criteria: [2]
+    steps:
+      - Add a parameter columns (list of strings or null, which the SDK writes as anyOf) to Acme Analytics run_report in servers.py, restart the server, review, trust and set the levels.
+      - Set the approved items type of columns to number in chokepoint.mcp_servers and open the review of Acme Analytics.
+    expected:
+      - One item INPUTSCHEMA.PROPERTIES.COLUMNS.ANYOF[0].ITEMS.TYPE with "number" removed and "string" added.
+    last_run:
+      date: 2026-11-18
+      result: passed
+      notes: 'First run failed: the path was listed, but the previous value read Not set, because valueAt did not descend into arrays. Fixed on fix/104-diff-array-values; rerun showed "number" removed and "string" added. servers.py restored, columns removed with a confirmed review (levels High, OK, OK).'
 ---
 
 # Functional test: Detection Heuristics Fixes
