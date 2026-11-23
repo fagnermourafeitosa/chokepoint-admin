@@ -39,6 +39,8 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path="events-export/:id" element={<EventsExportFormPage />} />
       <Route path="barricade" element={<BarricadePage />} />
       <Route path="info" element={<AccountInfoPage />} />
+      {/* Layout prototypes of the account area (Admin 063): development server only, inside the account layout. */}
+      {PrototypePage ? <Route path="prototype/*" element={<Suspense fallback={null}><PrototypePage /></Suspense>} /> : null}
     </Route></Route>
     <Route element={<RequireSession />}><Route element={<AdminLayout />}>
       {navigation.map(({ path, Page, children }) => <Route key={path} path={path} element={<Page />}>

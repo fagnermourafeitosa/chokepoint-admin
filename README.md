@@ -161,3 +161,4 @@ Hooks live apart from JSX, one file per concern.
 | 060 | [Behavior Drift in the Inbox](specs/060-2026-11-16-behavior-drift-inbox.md) | Implemented |
 | 061 | [Inbox Categories](specs/061-2026-11-16-inbox-categories.md) | Implemented |
 | 062 | [Barricade](specs/062-2026-11-16-barricade.md) | Implemented |
+| 063 | [PII Policies](specs/063-2026-11-22-pii-policies.md) | Not Implemented |

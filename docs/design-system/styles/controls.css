@@ -12,6 +12,12 @@
 .cp-admin-switch::before { content: ""; position: absolute; width: var(--cp-admin-switch-thumb); height: var(--cp-admin-switch-thumb); top: var(--cp-admin-switch-inset); left: var(--cp-admin-switch-inset); border-radius: 50%; background: var(--cp-admin-color-text-muted); transition: transform var(--cp-admin-duration-fast) var(--cp-admin-ease-out); }
 .cp-admin-switch:checked { background: var(--cp-admin-color-accent-text); border-color: var(--cp-admin-color-accent-text); }
 .cp-admin-switch:checked::before { background: var(--cp-admin-color-surface); transform: translateX(var(--cp-admin-switch-thumb)); }
+/* Status switch (Admin 063): a switch whose state is on or off of a protection, such as the PII filter. Off is the
+   danger color and on the success color, so the switch carries its state with no dot beside it. */
+.cp-admin-switch--status { background: var(--cp-admin-color-danger); border-color: var(--cp-admin-color-danger); }
+.cp-admin-switch--status::before { background: var(--cp-admin-color-surface); }
+.cp-admin-switch--status:checked { background: var(--cp-admin-color-success); border-color: var(--cp-admin-color-success); }
+.cp-admin-switch--status:disabled { opacity: 0.45; }
 .cp-admin-segmented { display: flex; flex-wrap: wrap; gap: var(--cp-admin-space-1); padding: var(--cp-admin-space-1); background: var(--cp-admin-color-surface-muted); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); }
 .cp-admin-segment { position: relative; display: flex; flex: 1 1 auto; justify-content: center; align-items: center; min-height: var(--cp-admin-control-height); padding: var(--cp-admin-space-2) var(--cp-admin-space-3); border-radius: var(--cp-admin-radius-sm); color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); cursor: pointer; }
 .cp-admin-segment input { position: absolute; width: 1px; height: 1px; padding: 0; clip-path: inset(50%); overflow: hidden; }
@@ -39,16 +45,19 @@
 .cp-admin-notice-body > strong { margin-bottom: 0; font-weight: var(--cp-admin-weight-bold); }
 /* The body is regular wherever the notice sits, also inside a field whose spans are labels. */
 .cp-admin-notice-body, .cp-admin-notice-body > span { font-weight: var(--cp-admin-weight-regular); font-size: var(--cp-admin-type-small); }
-.cp-admin-accordion { border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); }
+.cp-admin-accordion { --cp-admin-accordion-tone: var(--cp-admin-color-text); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); }
 /* Toned accordions (Admin 058): a callout that collapses, with the background of its tone and no border, as the toned notices. */
 .cp-admin-accordion.cp-admin-accordion--info { --cp-admin-accordion-tone: var(--cp-admin-color-info); background: var(--cp-admin-color-info-bg); border-color: transparent; }
 .cp-admin-accordion.cp-admin-accordion--warning { --cp-admin-accordion-tone: var(--cp-admin-color-warning); background: var(--cp-admin-color-warning-bg); border-color: transparent; }
 .cp-admin-accordion.cp-admin-accordion--danger { --cp-admin-accordion-tone: var(--cp-admin-color-danger); background: var(--cp-admin-color-danger-bg); border-color: transparent; }
-/* A toned accordion shows that it opens: a chevron at the end of the summary, in the color of its tone, pointing down when closed and up when open. */
-.cp-admin-accordion:is(.cp-admin-accordion--info, .cp-admin-accordion--warning, .cp-admin-accordion--danger) > summary { display: flex; align-items: center; gap: var(--cp-admin-space-2); list-style: none; }
-.cp-admin-accordion:is(.cp-admin-accordion--info, .cp-admin-accordion--warning, .cp-admin-accordion--danger) > summary::-webkit-details-marker { display: none; }
-.cp-admin-accordion:is(.cp-admin-accordion--info, .cp-admin-accordion--warning, .cp-admin-accordion--danger) > summary::after { content: ""; flex: none; width: 7px; height: 7px; margin-left: auto; border-right: 2px solid var(--cp-admin-accordion-tone); border-bottom: 2px solid var(--cp-admin-accordion-tone); transform: translateY(-2px) rotate(45deg); transition: transform var(--cp-admin-motion-fast, 120ms) ease; }
-.cp-admin-accordion:is(.cp-admin-accordion--info, .cp-admin-accordion--warning, .cp-admin-accordion--danger)[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
+/* Every accordion shows that it opens: a chevron at the end of the summary, in the color of its tone (the text color
+   for the neutral accordion, Admin 063), pointing down when closed and up when open. */
+.cp-admin-accordion > summary { display: flex; align-items: center; gap: var(--cp-admin-space-2); list-style: none; }
+.cp-admin-accordion > summary::-webkit-details-marker { display: none; }
+.cp-admin-accordion > summary::after { content: ""; flex: none; width: 7px; height: 7px; margin-left: auto; border-right: 2px solid var(--cp-admin-accordion-tone); border-bottom: 2px solid var(--cp-admin-accordion-tone); transform: translateY(-2px) rotate(45deg); transition: transform var(--cp-admin-motion-fast, 120ms) ease; }
+.cp-admin-accordion[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
+/* The neutral accordion is an item inside an outlined group: its summary takes color-hover, as section navigation does (Admin 063). */
+.cp-admin-accordion:not(.cp-admin-accordion--info, .cp-admin-accordion--warning, .cp-admin-accordion--danger) > summary:hover { background: var(--cp-admin-color-hover); }
 @media (prefers-reduced-motion: reduce) { .cp-admin-accordion > summary::after { transition: none; } }
 .cp-admin-accordion summary { min-height: var(--cp-admin-control-height); padding: var(--cp-admin-space-4); font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); cursor: pointer; }
 .cp-admin-accordion > div { padding: 0 var(--cp-admin-space-4) var(--cp-admin-space-4); font-size: var(--cp-admin-type-small); }

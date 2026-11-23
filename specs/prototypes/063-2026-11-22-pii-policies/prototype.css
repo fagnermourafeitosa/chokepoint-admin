@@ -1,0 +1,41 @@
+/* Admin 063 prototype: the PII policies module of Barricade. The masked types are one switch table
+   with a header row per group; the agents follow as a list table. */
+/* The security modules are design-system inner tabs above the module editor, not a rail. */
+.barricade-layout.pii-modules { grid-template-columns: minmax(0, 1fr); }
+.pii-modules > .cp-admin-inner-tabs { justify-self: start; }
+.pii-switch-table { max-width: none; }
+.pii-switch-table table { min-width: 0; width: 100%; }
+.pii-switch-table td:nth-child(2), .pii-switch-table th:nth-child(2) { width: 14rem; text-align: left; }
+.pii-switch-table td:last-child, .pii-switch-table th:last-child { width: 6rem; }
+/* On a narrow screen the type name keeps its room: the other columns take only what they need. */
+@media (max-width: 650px) {
+  .pii-switch-table td:nth-child(2), .pii-switch-table th:nth-child(2),
+  .pii-panel-body .pii-switch-table td:nth-child(2), .pii-panel-body .pii-switch-table th:nth-child(2) { width: auto; }
+  .pii-switch-table td:last-child, .pii-switch-table th:last-child { width: 4rem; }
+}
+/* One design-system accordion per category; the table sits flush inside it. */
+.pii-groups { display: grid; gap: 10px; }
+.pii-group-count { font-weight: 400; }
+/* The summary of a category: its name and count, then its description. */
+.pii-group-title { display: grid; gap: 2px; }
+.pii-group-title small { font-weight: 400; }
+.pii-group > .pii-switch-table { padding: 0; border: 0; border-top: 1px solid var(--cp-admin-color-border); border-radius: 0; }
+.pii-detail { display: block; margin-top: 2px; }
+.pii-agents-table { width: 100%; }
+.pii-agents-table td { vertical-align: middle; }
+.pii-agent { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+/* On a narrow screen the agents table scrolls inside its region, as the account tables do. */
+.pii-agents-table { min-width: 48rem; }
+.pii-actions { text-align: right; width: 1%; white-space: nowrap; }
+.barricade-module-head h2 { display: inline-flex; align-items: center; gap: 10px; }
+.pii-panel-body { display: grid; gap: 16px; padding: 16px 24px; }
+.pii-panel-state { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pii-panel-state > button { margin-left: auto; }
+.pii-panel-body .pii-switch-table td:nth-child(2), .pii-panel-body .pii-switch-table th:nth-child(2) { width: 9rem; }
+.identity-form-actions.pii-panel-footer { gap: var(--cp-admin-space-3); border-top: 0; padding: 0; }
+/* The PII filter dot: no border, the success or danger color of the design system (tokens.md). */
+.pii-dot { display: inline-block; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--cp-admin-color-danger); }
+.pii-dot[data-on="true"] { background: var(--cp-admin-color-success); }
+.pii-option { display: inline-flex; align-items: center; gap: 8px; }
+.pii-toggle { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.pii-env-toggles { display: grid; gap: 8px; }
