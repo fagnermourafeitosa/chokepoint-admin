@@ -18,6 +18,11 @@
 .cp-admin-switch--status::before { background: var(--cp-admin-color-surface); }
 .cp-admin-switch--status:checked { background: var(--cp-admin-color-success); border-color: var(--cp-admin-color-success); }
 .cp-admin-switch--status:disabled { opacity: 0.45; }
+/* Status dot (Admin 063): the same on and off colors, with no border, before an option of a select that has no
+   switch of its own, such as the PII filter of a workspace or an environment. Its text is in the label for readers. */
+.cp-admin-status-dot { display: inline-block; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--cp-admin-color-danger); }
+.cp-admin-status-dot[data-on="true"] { background: var(--cp-admin-color-success); }
+.admin-select-status { display: inline-flex; align-items: center; gap: var(--cp-admin-space-2); }
 .cp-admin-segmented { display: flex; flex-wrap: wrap; gap: var(--cp-admin-space-1); padding: var(--cp-admin-space-1); background: var(--cp-admin-color-surface-muted); border: 1px solid var(--cp-admin-color-border); border-radius: var(--cp-admin-radius-control); }
 .cp-admin-segment { position: relative; display: flex; flex: 1 1 auto; justify-content: center; align-items: center; min-height: var(--cp-admin-control-height); padding: var(--cp-admin-space-2) var(--cp-admin-space-3); border-radius: var(--cp-admin-radius-sm); color: var(--cp-admin-color-text-muted); font-size: var(--cp-admin-type-small); font-weight: var(--cp-admin-weight-semibold); cursor: pointer; }
 .cp-admin-segment input { position: absolute; width: 1px; height: 1px; padding: 0; clip-path: inset(50%); overflow: hidden; }

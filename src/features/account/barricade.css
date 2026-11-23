@@ -1,17 +1,12 @@
-/* Admin 062: the Barricade page. The scope sits in the heading; a rail of security modules
-   sits beside the editor of the chosen module, so the page grows by adding modules to the rail. */
+/* Admin 062 and 063: the Barricade page. The scope sits in the heading; the security modules are
+   design-system inner tabs above the editor of the chosen module, which takes the full width. */
 .barricade-page { display: grid; gap: 20px; }
 .barricade-heading { align-items: flex-end; gap: 24px; flex-wrap: wrap; }
 .barricade-scope { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
 .barricade-scope .cp-admin-field { min-width: 200px; }
 .barricade-history-button { display: inline-flex; align-items: center; gap: 6px; }
-.barricade-layout { display: grid; grid-template-columns: 245px minmax(0, 1fr); gap: 14px; align-items: start; }
-.barricade-rail { display: flex; flex-direction: column; gap: 4px; padding: 8px; }
-.barricade-rail button { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 10px 12px; text-align: start; background: none; border: 0; border-inline-start: 3px solid transparent; border-radius: 6px; cursor: pointer; color: inherit; }
-.barricade-rail button svg { margin-top: 2px; flex: none; }
-.barricade-rail button span { display: grid; gap: 2px; }
-.barricade-rail button small { color: var(--cp-admin-color-text-muted); }
-.barricade-rail button[aria-current] { background: var(--cp-admin-color-surface); border-inline-start-color: var(--cp-admin-color-text); }
+.barricade-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+.barricade-layout > .cp-admin-inner-tabs { justify-self: start; }
 .barricade-module-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-bottom: 8px; }
 .barricade-module-head h2 { margin: 0; }
 .barricade-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px 24px; align-items: start; }
@@ -25,9 +20,8 @@
 .barricade-table tbody tr:last-child td { border-bottom: 0; }
 .barricade-table td { vertical-align: middle; }
 .barricade-table td:last-child { width: 48%; }
-@media (max-width: 990px) { .barricade-layout { grid-template-columns: 1fr; } .barricade-rail { flex-direction: row; overflow-x: auto; } }
-/* Inside the module editor the section title sits above its fields, so the fields and the response
-   table use the whole width beside the rail instead of a narrow second column. */
+/* Inside the module editor the section title sits above its fields, so the fields and the tables
+   use the whole width instead of a narrow second column. */
 .barricade-layout .identity-form-section { grid-template-columns: minmax(0, 1fr); gap: var(--cp-admin-space-4); }
 .barricade-layout .identity-section-heading p { max-width: none; }
 .barricade-history-body { display: grid; gap: 12px; padding: 16px 24px; }
@@ -35,3 +29,30 @@
 .barricade-author { display: grid; gap: 2px; }
 .barricade-change { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
 .identity-form-actions.barricade-footer { gap: var(--cp-admin-space-3); border-top: 0; }
+/* Admin 063: PII Policies. One design-system accordion per category of types; the table sits flush inside it. */
+.pii-switch-table { max-width: none; }
+.pii-switch-table table { min-width: 0; width: 100%; }
+.pii-switch-table td:nth-child(2), .pii-switch-table th:nth-child(2) { width: 14rem; text-align: left; }
+.pii-switch-table td:last-child, .pii-switch-table th:last-child { width: 6rem; }
+@media (max-width: 650px) {
+  .pii-switch-table td:nth-child(2), .pii-switch-table th:nth-child(2),
+  .pii-panel-body .pii-switch-table td:nth-child(2), .pii-panel-body .pii-switch-table th:nth-child(2) { width: auto; }
+  .pii-switch-table td:last-child, .pii-switch-table th:last-child { width: 4rem; }
+}
+.pii-groups { display: grid; gap: 10px; }
+.pii-group-count { font-weight: 400; }
+.pii-group-title { display: grid; gap: 2px; }
+.pii-group-title small { font-weight: 400; }
+.pii-group > .pii-switch-table { padding: 0; border: 0; border-top: 1px solid var(--cp-admin-color-border); border-radius: 0; }
+.pii-detail { display: block; margin-top: 2px; }
+/* On a narrow screen the agents table scrolls inside its region, as the account tables do. */
+.pii-agents-table { width: 100%; min-width: 48rem; }
+.pii-agents-table td { vertical-align: middle; }
+.pii-agent { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.pii-actions { text-align: right; width: 1%; white-space: nowrap; }
+.pii-panel-body { display: grid; gap: 16px; padding: 16px 24px; }
+.pii-panel-body .cp-admin-notice { margin: 0; }
+.pii-panel-state { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pii-panel-state > button { margin-left: auto; }
+.pii-panel-body .pii-switch-table td:nth-child(2), .pii-panel-body .pii-switch-table th:nth-child(2) { width: 9rem; }
+.identity-form-actions.pii-panel-footer { gap: var(--cp-admin-space-3); border-top: 0; padding: 0; }

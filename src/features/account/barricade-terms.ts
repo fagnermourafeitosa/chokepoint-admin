@@ -1,4 +1,5 @@
-import type { Anomaly, BarricadeResponse, BarricadeSetting, Heuristic } from './barricade-api';
+import type { Anomaly, BarricadeResponse, Heuristic, StoredSetting } from './barricade-api';
+import { describePii } from './pii-terms';
 
 // The detection window of Backend 099 (hotfix 2026-11-16): the period that each check compares with the pattern.
 export const detectionWindow = { label: 'Detection window', unit: 'hours', help: 'Each check reads this many hours of calls and compares them with periods of the same length in the pattern. From 1 to 24.' };
@@ -38,9 +39,15 @@ export function fieldLabel(field: string | undefined) {
 // utc shows an RFC 3339 instant as "2026-11-16 14:02 UTC".
 export const utc = (value: string) => `${value.slice(0, 10)} ${value.slice(11, 16)} UTC`;
 
-// describeChange lists what a change altered, as "Spike floor 20 → 30".
-export function describeChange(before: BarricadeSetting | null, after: BarricadeSetting): string[] {
+// describeChange lists what a change altered, each line after its module (Admin 063, item 12):
+// "Behavior drift · Spike floor 20 → 30", "PII Policies · Email: not masked → masked".
+export function describeChange(before: StoredSetting | null, after: StoredSetting, agentName: (id: string) => string = id => id): string[] {
   if (!before) return ['Created with the market defaults'];
+  const lines = [...describeDrift(before, after).map(l => `Behavior drift · ${l}`), ...describePii(before, after, agentName).map(l => `PII Policies · ${l}`)];
+  return lines.length ? lines : ['Saved with no change'];
+}
+
+function describeDrift(before: StoredSetting, after: StoredSetting): string[] {
   const was = before.behavior_drift;
   const now = after.behavior_drift;
   const short = (value: BarricadeResponse) => responses.find(r => r.value === value)?.short ?? value;
@@ -53,5 +60,5 @@ export function describeChange(before: BarricadeSetting | null, after: Barricade
   for (const a of anomalies) {
     if (was.responses[a.key] !== now.responses[a.key]) lines.push(`${a.label}: ${short(was.responses[a.key])} → ${short(now.responses[a.key])}`);
   }
-  return lines.length ? lines : ['Saved with no change'];
+  return lines;
 }

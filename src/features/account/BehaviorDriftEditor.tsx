@@ -28,7 +28,8 @@ export function BehaviorDriftEditor({ tenantId, environmentId, environmentLabel,
   const stored = current.setting.behavior_drift;
   const [draft, setDraft] = useState<BehaviorDrift>(stored);
   const save = useMutation({
-    mutationFn: () => barricadeApi.save(tenantId, environmentId, { version: 1, behavior_drift: draft }),
+    // Version 2 (Backend 105): the PII policies go back as they are stored.
+    mutationFn: () => barricadeApi.save(tenantId, environmentId, { ...current.setting, version: 2, behavior_drift: draft }),
     onSuccess: next => {
       client.setQueryData(barricadeKey(tenantId, environmentId), next);
       void client.invalidateQueries({ queryKey: [...barricadeKey(tenantId, environmentId), 'changes'] });
