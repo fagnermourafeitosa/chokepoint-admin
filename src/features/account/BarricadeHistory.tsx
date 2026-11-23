@@ -7,7 +7,7 @@ import { describeChange, utc } from './barricade-terms';
 
 // Admin 062, item 5: every change of the environment's Barricade setting, newest first (Backend 101,
 // Implementation Decision 2). The page size comes from the backend.
-export function BarricadeHistory({ tenantId, environmentId, scope, onClose }: { tenantId: string; environmentId: string; scope: string; onClose: () => void }) {
+export function BarricadeHistory({ tenantId, environmentId, scope, agentName, onClose }: { tenantId: string; environmentId: string; scope: string; agentName: (id: string) => string; onClose: () => void }) {
   const [page, setPage] = useState(1);
   const changes = useQuery({
     queryKey: [...barricadeKey(tenantId, environmentId), 'changes', page],
@@ -24,7 +24,7 @@ export function BarricadeHistory({ tenantId, environmentId, scope, onClose }: { 
             <tbody>{items.map(item => <tr key={item.changed_at + JSON.stringify(item.after)}>
               <td>{utc(item.changed_at)}</td>
               <td>{item.changed_by ? <span className="barricade-author"><strong>{item.changed_by.name}</strong>{item.changed_by.email ? <small className="cp-admin-muted">{item.changed_by.email}</small> : null}</span> : 'Platform'}</td>
-              <td><ul className="barricade-change">{describeChange(item.before, item.after).map(line => <li key={line}>{line}</li>)}</ul></td>
+              <td><ul className="barricade-change">{describeChange(item.before, item.after, agentName).map(line => <li key={line}>{line}</li>)}</ul></td>
             </tr>)}</tbody>
           </table>}
       <TracePager page={page} size={changes.data?.page_size ?? 20} total={changes.data?.total ?? 0} onPage={setPage} busy={changes.isFetching} />

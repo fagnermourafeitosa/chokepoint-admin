@@ -25,3 +25,6 @@
 .account-delete-list { display: grid; gap: var(--cp-admin-space-2); margin: 0; padding: 0; list-style: none; }
 .account-delete-list li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cp-admin-space-2); padding: var(--cp-admin-space-3); border: 1px solid var(--cp-admin-color-danger); border-radius: var(--cp-admin-radius-control); background: var(--cp-admin-color-surface); }
 .account-delete-list li > svg { color: var(--cp-admin-color-danger); }
+/* Admin 063: the PII filter switches of the environments of a workspace, and of an agent in Barricade. */
+.pii-toggle { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.pii-env-toggles { display: grid; gap: 8px; }

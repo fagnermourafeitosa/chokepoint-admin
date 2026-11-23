@@ -25,8 +25,6 @@ function prototype(file: string, name: string): ReactElement {
 }
 
 const pages: Record<string, { path: string; element: ReactElement }> = {
-  '063': { path: 'pii-policies', element: prototype('063-2026-11-22-pii-policies/PiiPoliciesPrototype.tsx', 'PiiPoliciesPrototype') },
-  '063-workspaces': { path: 'pii-workspaces', element: prototype('063-2026-11-22-pii-policies/WorkspacesPrototype.tsx', 'WorkspacesPrototype') },
 };
 
 // The index notes are Markdown: show `code` spans as code, the rest as text.
