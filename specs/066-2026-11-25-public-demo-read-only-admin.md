@@ -3,7 +3,7 @@
 - **Specification ID**: 066
 - **Date**: 2026-11-25
 - **Slug**: public-demo-read-only-admin
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin, authentication and account area
 - **Related Specification**: [Backend 107 — Public Demo Workspace for Claude Code](../../backend/specs/107-2026-11-25-public-demo-workspace.md), [051 — Account Area](051-2026-11-11-account-area.md)
 
@@ -31,7 +31,8 @@ The profile menu links **Account** for every session.
 
 1. For the session of the demo owner, the account area is not reachable: every `/account` path opens the Admin of the demo workspace, in its Sandbox.
 2. In the profile menu, **Account** is shown disabled for that session, with the hint "Not available in the demo".
-3. Everything of the demo lives in `src/features/demo/`. The account route and the profile menu each have one hook into it; no other screen has a demo branch.
+3. Every screen of that session shows a read-only notice under the header.
+4. Everything of the demo lives in `src/features/demo/`. The account route, the profile menu and the Admin layout each have one hook into it; no screen has a demo branch.
 
 ---
 
@@ -48,22 +49,23 @@ The profile menu links **Account** for every session.
 1. **Who is the demo.** The session user ID equals the fixed owner ID of Backend 107 (`00000000-0000-4000-8000-00000000d3e0`). The ID is public and fixed by a backend migration.
 2. **Account area redirect.** A route element in `src/features/demo/` wraps the account routes: for the demo session it navigates to `/`, where the Admin opens the only workspace in its Sandbox (Admin 051).
 3. **Profile menu.** The Account entry is a component of `src/features/demo/`: the normal link for every session, and for the demo session a disabled entry with `aria-disabled` and the hint.
-4. **Writes.** The other screens keep their actions; the backend refuses them with 403. A read-only banner on every screen is out of scope.
+4. **Writes and the read-only notice** (user, 2026-11-25). The other screens keep their actions, and the backend refuses them with 403. Under the header, in the slot of the Report-only banner (Admin 041), every screen of the demo session shows a neutral notice: "Read-only demo" and "Open every screen and every call. Changes are not saved." The notice is in `src/features/demo/`, with one hook in the Admin layout.
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] 1. Signed in as the demo login, the Admin opens the demo Sandbox, not the account area.
-- [ ] 2. Signed in as the demo login, `/account/workspaces` typed in the address bar opens the Admin of the demo.
-- [ ] 3. Signed in as the demo login, the profile menu shows Account disabled with the hint.
-- [ ] 4. Signed in as another user, the account area and the profile menu are unchanged.
-- [ ] 5. Functional test: [066-2026-11-25-public-demo-read-only-admin](functional-tests/066-2026-11-25-public-demo-read-only-admin.md).
-- [ ] 6. `npm run check` and `npm run build` pass.
+- [x] 1. Signed in as the demo login, the Admin opens the demo Sandbox, not the account area. Evidence: functional test S1.
+- [x] 2. Signed in as the demo login, `/account/workspaces` typed in the address bar opens the Admin of the demo. Evidence: functional test S1.
+- [x] 3. Signed in as the demo login, the profile menu shows Account disabled with the hint. Evidence: functional test S2.
+- [x] 7. Signed in as the demo login, every screen shows the read-only notice under the header. Evidence: functional test S4.
+- [x] 4. Signed in as another user, the account area and the profile menu are unchanged. Evidence: code inspection (S3 not run).
+- [ ] 5. Functional test: [066-2026-11-25-public-demo-read-only-admin](functional-tests/066-2026-11-25-public-demo-read-only-admin.md). Missing: S3 not run, no other platform login of the development stack at hand.
+- [x] 6. `npm run check` and `npm run build` pass. Evidence: both ran on the branch, 2026-11-25.
 
 ---
 
 ## Out of Scope
 
-- A read-only banner and disabled actions on the other screens.
+- Disabled actions on the other screens.
 - The site menu of the demo (Frontend prototype 041).

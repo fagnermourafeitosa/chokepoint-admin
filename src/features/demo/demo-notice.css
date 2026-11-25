@@ -1,0 +1,6 @@
+/* Admin 066: the read-only notice of the demo session, under the header on every screen, in the
+   slot of the Report-only banner (Admin 041 section 3). */
+.demo-notice-slot { width: 100%; max-width: var(--cp-admin-layout-max); margin-inline: auto; padding: var(--cp-admin-space-4) var(--cp-admin-layout-gutter) 0; box-sizing: border-box; }
+.demo-notice { padding: var(--cp-admin-space-3) var(--cp-admin-space-4); }
+.demo-notice > svg { flex: none; }
+.demo-notice span { display: block; }

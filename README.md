@@ -163,4 +163,4 @@ Hooks live apart from JSX, one file per concern.
 | 062 | [Barricade](specs/062-2026-11-16-barricade.md) | Implemented |
 | 063 | [PII Policies](specs/063-2026-11-22-pii-policies.md) | Implemented |
 | 065 | [Generic OIDC Connection](specs/065-2026-11-25-generic-oidc-connection.md) | Implemented |
-| 066 | [Read-only Admin of the Public Demo](specs/066-2026-11-25-public-demo-read-only-admin.md) | In Progress |
+| 066 | [Read-only Admin of the Public Demo](specs/066-2026-11-25-public-demo-read-only-admin.md) | Implemented |

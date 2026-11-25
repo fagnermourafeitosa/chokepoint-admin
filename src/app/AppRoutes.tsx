@@ -12,6 +12,7 @@ import { BarricadePage } from '../features/account/BarricadePage';
 import { lazy, Suspense } from 'react';
 import { navigation } from './navigation';
 import { SignalLinkPage } from '../features/attention/SignalLinkPage';
+import { DemoAccountGate } from '../features/demo/DemoAccountGate';
 
 // Layout prototypes exist only in the development server: a production build has no
 // /prototype route and no prototype code (the dead branch and its chunk are removed).
@@ -30,7 +31,8 @@ const router = createBrowserRouter(createRoutesFromElements(
     {/* Admin 059: the link of a Slack message. It needs a session, not a chosen workspace:
         it opens the workspace and the environment of the signal itself. */}
     <Route element={<RequireAccount />}><Route path="/inbox/:signalId" element={<SignalLinkPage />} /></Route>
-    <Route element={<RequireAccount />}><Route path="/account" element={<AccountLayout />}>
+    {/* Admin 066: the account area is not part of the public demo. */}
+    <Route element={<RequireAccount />}><Route element={<DemoAccountGate />}><Route path="/account" element={<AccountLayout />}>
       <Route index element={<Navigate to="/account/workspaces" replace />} />
       <Route path="workspaces" element={<WorkspacesPage />} />
       <Route path="workspaces/:tenantId" element={<WorkspaceDetailPage />} />
@@ -41,7 +43,7 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path="info" element={<AccountInfoPage />} />
       {/* Layout prototypes of the account area (Admin 063): development server only, inside the account layout. */}
       {PrototypePage ? <Route path="prototype/*" element={<Suspense fallback={null}><PrototypePage /></Suspense>} /> : null}
-    </Route></Route>
+    </Route></Route></Route>
     <Route element={<RequireSession />}><Route element={<AdminLayout />}>
       {navigation.map(({ path, Page, children }) => <Route key={path} path={path} element={<Page />}>
         {children?.map(({ path: childPath, Page: ChildPage }) => childPath ? <Route key={childPath} path={childPath} element={<ChildPage />} /> : <Route key="index" index element={<ChildPage />} />)}
