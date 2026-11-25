@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Ban, CircleHelp, Search, ShieldAlert, TriangleAlert } from 'lucide-react';
+import { Ban, CircleHelp, Plus, Search, ShieldAlert, TriangleAlert } from 'lucide-react';
 import { Tooltip } from '../../../components/ui/tooltip/Tooltip';
 import { SelectMenu } from '../../../components/ui/dropdown/SelectMenu';
-import { identityApi, type DirectoryGroup } from '../../identity/api';
+import { everyoneGroupID, identityApi, type DirectoryGroup } from '../../identity/api';
 import { useCatalog } from './catalog';
 import { idpName, idpSubjects, isBlocked, type ConsentGroup, type Doc, type IdpScope } from './model';
 import './harness.css';
@@ -39,6 +39,19 @@ function GroupPicker({ issuer, chosen, onChange, disabled }: { issuer: string; c
   </div>;
 }
 
+// Group names typed as they come in the groups claim of a Generic OIDC connection, which has no
+// directory to search (Admin 065 Solution 5, Backend 106 Resolved Decision 5).
+function TypedGroups({ chosen, onChange, claim }: { chosen: ConsentGroup[]; onChange: (groups: ConsentGroup[]) => void; claim?: string }) {
+  const [value, setValue] = useState('');
+  const add = () => { const name = value.trim(); if (name && name !== everyoneGroupID && !chosen.some(g => g.id === name)) onChange([...chosen, { id: name, name }]); setValue(''); };
+  return <div className="relation-field">
+    {chosen.length ? <div className="harness-groups">{chosen.map(g => <label key={g.id} data-on="true"><input type="checkbox" checked onChange={() => onChange(chosen.filter(x => x.id !== g.id))} />{g.name}</label>)}</div> : null}
+    <div className="harness-add"><input className="cp-admin-input" placeholder={`A value of the ${claim || 'groups'} claim`} value={value} maxLength={512} onChange={e => setValue(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); add(); } }} />
+      <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" disabled={!value.trim()} onClick={add}><Plus size={14} aria-hidden="true" />Add group</button></div>
+    <small className="cp-admin-muted">Type the group exactly as the provider sends it; the case matters.</small>
+  </div>;
+}
+
 // Harness login of one identity provider of the agent (Admin 036 section 1): who can log in
 // from a harness (eligible groups), the consent validity, and who is vetoed (blocked).
 export function HarnessAccess({ doc, scope, agentName, onChange }: { doc: Doc; scope: IdpScope; agentName: string; onChange: (d: Doc) => void }) {
@@ -55,25 +68,45 @@ export function HarnessAccess({ doc, scope, agentName, onChange }: { doc: Doc; s
   const subjectName = (subject: string) => idpSubjects(catalog, issuer, ['person']).find(x => x.subject === subject)?.name ?? subject;
   // A blocked person leaves the delegations of the draft (Backend 045 Administration API 4).
   const block = (subject: string) => onChange({ ...doc, blocked: [...doc.blocked, { issuer, subject, reason: 'Blocked by administrator' }], delegations: doc.delegations.filter(d => !(d.issuer === issuer && d.subject === subject)) });
-  const none = !!consent && consent.groups.length === 0;
+  // A Generic OIDC connection in the mode everyone or approved opens the agent to every person that
+  // the connection admits, through one group (Backend 106 Resolved Decision 6).
+  const generic = idp?.provider === 'oidc';
+  const wholeConnection = generic && idp?.eligibility !== 'groups';
+  const everyone = [{ id: everyoneGroupID, name: 'Everyone of the connection' }];
+  // The groups saved in the agent can come from the other mode of the connection: the card shows
+  // what is published, not what the mode would choose (Admin 065 Implementation Decision 6).
+  const typed = generic ? (consent?.groups ?? []).filter(g => g.id !== everyoneGroupID) : (consent?.groups ?? []);
+  const opened = !!consent?.groups.some(g => g.id === everyoneGroupID);
+  const none = !!consent && typed.length === 0;
+  const connectionPeople = idp?.eligibility === 'approved' ? `the people approved in ${name}` : `everyone of ${name}`;
   return <section className="harness-block" aria-label="Harness login">
     <span className="relation-label">Harness login{tip('People of this identity provider log in from a coding harness and consent themselves. You choose which groups can.')}</span>
     {idp && !idp.groups ? <p className="cp-admin-muted">{name} can not list groups yet, so harness login is not available for it.</p>
       : !people ? <p className="cp-admin-muted">Include People above to let people log in from a harness.</p> : <>
-        <label className="harness-switch"><input type="checkbox" checked={!!consent} onChange={e => setConsent(e.target.checked ? defaultConsent : undefined)} /><span><strong>People in chosen groups can log in from a harness</strong><small>They consent at login. You do not list them one by one.</small></span></label>
-        {consent ? <>
-          <div className="harness-rule" data-tone={none ? 'danger' : 'warning'} role={none ? 'alert' : 'note'}>
+        {wholeConnection
+          ? <label className="harness-switch"><input type="checkbox" checked={opened} onChange={e => setConsent(e.target.checked ? { ...(consent ?? defaultConsent), groups: everyone } : undefined)} /><span><strong>{idp?.eligibility === 'approved' ? 'People approved in this connection can log in from a harness' : 'Everyone who signs in with this provider can log in from a harness'}</strong><small>They consent at login. {name} sets who can log in{idp?.eligibility === 'approved' ? ': approve people in its People page.' : '.'}</small></span></label>
+          : <label className="harness-switch"><input type="checkbox" checked={!!consent} onChange={e => setConsent(e.target.checked ? defaultConsent : undefined)} /><span><strong>People in chosen groups can log in from a harness</strong><small>They consent at login. You do not list them one by one.</small></span></label>}
+        {wholeConnection && consent && !opened ? <div className="harness-rule" data-tone="warning" role="note">
+          <ShieldAlert size={18} aria-hidden="true" />
+          <div><strong>Only {typed.map(g => g.name).join(', ')} can log in.</strong><small>These groups were chosen while {name} used People in chosen groups. Switch on to open {agentName} to {connectionPeople}.</small>
+            <button type="button" className="rule-switch" onClick={() => setConsent(undefined)}>Remove these groups</button></div>
+        </div> : null}
+        {consent && (!wholeConnection || opened) ? <>
+          {wholeConnection ? null : <div className="harness-rule" data-tone={none ? 'danger' : 'warning'} role={none ? 'alert' : 'note'}>
             <ShieldAlert size={18} aria-hidden="true" />
             <div><strong>Only members of these groups can log in.</strong><small>{none ? 'Choose at least one group. Without a group, harness login stays off.' : `A person of ${name} outside these groups is refused at login and never sees ${agentName}.`}</small></div>
-          </div>
+          </div>}
           {idp && !idp.harnessLogin ? <p className="resource-warning"><TriangleAlert size={14} aria-hidden="true" />Harness login is off in the {name} connection. Turn it on in Identity providers, with its login client.</p> : null}
-          <GroupPicker issuer={issuer} chosen={consent.groups} onChange={groups => setConsent({ ...consent, groups })} />
+          {wholeConnection ? null : generic ? <TypedGroups chosen={typed} onChange={groups => setConsent({ ...consent, groups })} />
+            : <GroupPicker issuer={issuer} chosen={consent.groups} onChange={groups => setConsent({ ...consent, groups })} />}
           <div className="harness-days">
             <label className="relation-field"><span>Consent lasts</span><span className="harness-number"><input className="cp-admin-input" type="number" min={1} max={consent.maxDays} value={consent.defaultDays} onChange={e => setConsent({ ...consent, defaultDays: Math.max(1, Number(e.target.value) || 1) })} />days</span></label>
             <label className="relation-field"><span>At most</span><span className="harness-number"><input className="cp-admin-input" type="number" min={consent.defaultDays} max={365} value={consent.maxDays} onChange={e => setConsent({ ...consent, maxDays: Math.min(365, Number(e.target.value) || 1) })} />days</span></label>
           </div>
           {consent.defaultDays > consent.maxDays ? <p role="alert" className="cp-admin-notice" data-tone="danger">Consent lasts must be at most the maximum.</p> : null}
-          <p className="resource-warning"><TriangleAlert size={14} aria-hidden="true" />Removing someone from a group in {name} does not cut access at once. It ends after 24 hours without use or when the consent ends. To cut access now, block the person.</p>
+          <p className="resource-warning"><TriangleAlert size={14} aria-hidden="true" />{generic
+            ? `A change in ${name} applies at the next login: a harness session of this connection lasts at most 24 hours. To cut access now, block the person.`
+            : `Removing someone from a group in ${name} does not cut access at once. It ends after 24 hours without use or when the consent ends. To cut access now, block the person.`}</p>
         </> : null}
       </>}
     <div className="relation-field"><span className="relation-label">Blocked · {blocked.length}{tip('A blocked person can not use this agent, whatever their groups or consent. Blocking revokes their machines at once when you publish.')}</span>

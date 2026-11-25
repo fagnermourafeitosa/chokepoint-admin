@@ -44,14 +44,27 @@ async function loadCatalog(scope: EnvironmentScope, signal: AbortSignal) {
   const bindings = approvedBindings(sources.items);
   return {
     servers: withTools.map(s => ({ id: s.id, name: s.name })),
-    tools, bindings, idps: identities.map(i => ({ id: i.id, name: i.name, enabled: i.enabled, provider: i.provider, groups: !!providers.find(p => p.provider === i.provider)?.groups, harnessLogin: !!i.login?.enabled })),
+    tools, bindings, idps: identities.map(i => ({ id: i.id, name: i.name, enabled: i.enabled, provider: i.provider, groups: !!providers.find(p => p.provider === i.provider)?.groups || i.provider === 'oidc', harnessLogin: !!i.login?.enabled, eligibility: i.eligibility })),
   };
 }
 
 const subject = (u: DirectoryUser): Subject => ({ subject: u.identity.subject, name: u.display_name || u.user_name || u.identity.subject, kind: u.kind });
 
+// The people of a Generic OIDC connection, which has no directory: those seen at a harness login or a
+// token exchange (Admin 065 Solution 5, Backend 106 Protocol contract 7).
+async function loadPeople(scope: EnvironmentScope, id: string, signal: AbortSignal): Promise<Directory> {
+  const people: Subject[] = []; let cursor = '';
+  do {
+    const page = await identityApi.people(scope, id, { cursor }, signal);
+    people.push(...page.items.map(p => ({ subject: p.subject, name: p.name || p.email || p.subject, kind: 'person' as const })));
+    cursor = page.next_cursor ?? '';
+  } while (cursor);
+  return { subjects: people, truncated: false };
+}
+
 // Every subject listed now in the directory: all pages of people, then the services (Admin 026 section 5, Select all).
-async function loadDirectory(scope: EnvironmentScope, id: string, signal: AbortSignal): Promise<Directory> {
+async function loadDirectory(scope: EnvironmentScope, id: string, provider: string | undefined, signal: AbortSignal): Promise<Directory> {
+  if (provider === 'oidc') return loadPeople(scope, id, signal);
   const people: Subject[] = []; let cursor = '';
   do { const page = await identityApi.users(scope, id, '', cursor, signal); people.push(...page.items.map(subject)); cursor = page.next_cursor ?? ''; } while (cursor);
   try {
@@ -75,7 +88,9 @@ export function CatalogProvider({ scope, issuers, children }: { scope: Environme
   const request = useCallback((id: string) => setExtra(v => (v.includes(id) ? v : [...v, id])), []);
   const wanted = useMemo(() => [...new Set([...issuers, ...extra])], [issuers, extra]);
   // combine keeps the result stable between renders, so the catalog and the graph layout are rebuilt only when a directory changes.
-  const directories = useQueries({ queries: wanted.map(id => ({ queryKey: ['delegation-directory', scope.userId, scope.tenantId, scope.environmentId, id], queryFn: ({ signal }: { signal: AbortSignal }) => loadDirectory(scope, id, signal), retry: false, staleTime: 60_000 })), combine: combineDirectories });
+  // The provider of each connection says where its people come from, so the reads wait for the catalog.
+  const providerOf = (id: string) => query.data?.idps.find(i => i.id === id)?.provider;
+  const directories = useQueries({ queries: wanted.map(id => ({ queryKey: ['delegation-directory', scope.userId, scope.tenantId, scope.environmentId, id], enabled: !!query.data, queryFn: ({ signal }: { signal: AbortSignal }) => loadDirectory(scope, id, providerOf(id), signal), retry: false, staleTime: 60_000 })), combine: combineDirectories });
   const value = useMemo<CatalogState>(() => {
     const byIssuer = new Map(wanted.map((id, i) => [id, directories[i]]));
     const data = query.data;

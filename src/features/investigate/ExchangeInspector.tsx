@@ -28,6 +28,8 @@ const hints: Record<ExchangeReasonLabel, { hint: string; label: string }> = {
   refresh_reuse: { hint: 'Check if the refresh token was copied from the computer of the person. The machine was revoked; the person must log in again.', label: 'Open the harness sessions' },
   dpop_invalid: { hint: 'Check if the token was copied from the harness that holds the key.', label: 'Open the harness sessions' },
   login_error: { hint: 'Check the cause below.', label: 'Open the agent identity' },
+  // Backend 106: approve the person in People of the Generic OIDC connection.
+  approval_pending: { hint: 'Approve this person in People of the connection if they must use the agent.', label: 'Open the identity provider' },
 };
 
 // What to check for each cause of a login_error (Admin 039). The first

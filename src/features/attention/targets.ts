@@ -57,6 +57,10 @@ export function targetPath(signal: Signal): string | undefined {
     if (p.subject) query.set('q', p.subject);
     return `/investigate?${query}`;
   }
+  // Backend 106: people of a Generic OIDC connection wait for approval; open its People (Admin 065).
+  if (signal.target_route === 'identity-people' && signal.target_params.connection_id) {
+    return `/access/integrations?${new URLSearchParams({ type: 'identity', people: signal.target_params.connection_id })}`;
+  }
   if (signal.target_route === 'tool-catalog') {
     const path = actionPath({ label: signal.target_label, route: signal.target_route, params: signal.target_params, available: true }, '/');
     // A tool discovery opens the review page of its server, at the first tool that needs a decision
@@ -88,6 +92,8 @@ export function contextLines(signal: Signal): [string, string] {
     // Admin 041: the context of the Report-only signals.
     case 'report-only-would-deny': return [c.tool || '', [denyText[c.reason as ReasonLabel] || c.reason || '', c.people ? `${c.people} ${c.people === '1' ? 'person' : 'people'}` : ''].filter(Boolean).join(' · ')];
     case 'report-only-review-due': return [c.agent_name || c.agent || '', c.review_by ? `Review date ${reviewDay(c.review_by)}` : ''];
+    // Admin 065: the connection and how many people wait.
+    case 'identity_approval_pending': return [c.connection || '', c.count ? `${c.count} waiting · Generic OIDC` : 'Generic OIDC'];
     // Admin 058 item 13: the tool, then the agent and how many calls and people closed the trifecta.
     case 'lethal-trifecta': return [c.tool || '', [
       (c.agent_name || c.agent || '') + (c.agent_status === 'deleted' ? ' (deleted)' : ''),

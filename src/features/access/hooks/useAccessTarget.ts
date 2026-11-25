@@ -40,6 +40,10 @@ export function useAccessTarget(scope: AgentScope) {
     select: (id: string | null) =>
       setParams((previous) => {
         const next = new URLSearchParams(previous);
+        // A deep-link target (section, connection, tool, decision) belongs to the agent it named:
+        // another agent opens without it, or its panel opens empty.
+        if (id !== previous.get('agent_id'))
+          for (const key of ['section', 'server_id', 'tool', 'policy_id', 'connection_id', 'view', 'decision_id']) next.delete(key);
         if (id) next.set('agent_id', id);
         else next.delete('agent_id');
         return next;

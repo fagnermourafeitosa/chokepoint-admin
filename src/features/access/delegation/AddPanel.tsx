@@ -20,6 +20,9 @@ function AddIdentityProvider({ agentName, doc, onChange, onDone }: Omit<Props, '
   const [consent, setConsent] = useState(false);
   if (!free.length) return <p className="cp-admin-muted">Every enabled identity provider is already in this list. Open one to change who can delegate, or connect another in Identity providers.</p>;
   const picked = idpSubjects(catalog, issuer, kinds).filter(x => chosen.has(x.subject));
+  // A Generic OIDC connection lists people only after their first login, so it can join the agent with
+  // nobody chosen yet, for harness login (Admin 065 Solution 5).
+  const generic = catalog.idps.find(i => i.id === issuer)?.provider === 'oidc';
   function add() {
     onChange({ ...doc, scopes: [...doc.scopes, { issuer, kinds, expiresAt: expires, confirmed: true }], delegations: [...doc.delegations, ...picked.map(x => ({ id: delegationId(issuer, x.subject), issuer, subject: x.subject, kind: x.kind }))] }); onDone();
   }
@@ -29,7 +32,7 @@ function AddIdentityProvider({ agentName, doc, onChange, onDone }: Omit<Props, '
     <IncludesField value={kinds} onChange={setKinds} />
     <SubjectList key={issuer} issuer={issuer} kinds={kinds} chosen={chosen} onSet={(subjects, on) => setChosen(c => { const n = new Set(c); subjects.forEach(x => (on ? n.add(x.subject) : n.delete(x.subject))); return n; })} />
     <label className="relation-consent"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /><span>I confirm that these subjects agreed to let <strong>{agentName}</strong> act for them.<small>{idpName(catalog, issuer)} can not record this consent itself, so Xokepoint records your name and the time when you publish.</small></span></label>
-    <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!consent || !picked.length} onClick={add}>Add {picked.length || ''} to draft</button>
+    <button type="button" className="cp-admin-button cp-admin-button--small" disabled={!consent || (!picked.length && !generic)} onClick={add}>Add {picked.length || ''} to draft</button>
   </>;
 }
 

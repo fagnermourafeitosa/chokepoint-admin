@@ -27,6 +27,8 @@ export function useIdentityConnections(scope: EnvironmentScope) {
   if (saved) { setEditor(null); setNotice('Identity connection saved.'); await refresh(); }
  }
  async function toggle(connection: IdentityConnection) { await save(connection.id, { provider: connection.provider, name: connection.name, issuer: connection.issuer, audiences: connection.audiences, directory: connection.directory, revision: connection.revision, enabled: !connection.enabled,
+  // A Generic OIDC connection keeps its settings (Backend 106).
+  manual_endpoints: connection.manual_endpoints, email_claim: connection.email_claim, groups_claim: connection.groups_claim, extra_scopes: connection.extra_scopes, eligibility: connection.eligibility,
   // The login client stays; an omitted secret keeps the stored one (Backend 045).
   login: connection.login?.client_id ? { enabled: connection.login.enabled, client_id: connection.login.client_id } : null }); }
  async function check(connection: IdentityConnection) {

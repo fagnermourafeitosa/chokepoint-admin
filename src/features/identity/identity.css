@@ -41,3 +41,25 @@
 .identity-row-actions .identity-menu summary { min-width: var(--cp-admin-control-compact-height); min-height: var(--cp-admin-control-compact-height); }
 .cp-admin-table th.identity-actions-head { text-align: right; }
 .identity-row-actions { justify-content: flex-end; }
+
+/* Admin 065: the Generic OIDC form, its discovery read and who can log in. */
+.oidc-discovery{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--cp-admin-space-2) var(--cp-admin-space-4);margin:0;padding:var(--cp-admin-space-4);border:1px solid var(--cp-admin-color-border);border-radius:var(--cp-admin-radius-control);background:var(--cp-admin-color-surface)}
+.oidc-discovery dt{font-weight:600;font-size:var(--cp-admin-type-small)}
+.oidc-discovery dd{margin:0;display:flex;flex-wrap:wrap;gap:var(--cp-admin-space-2);align-items:center;min-width:0;overflow-wrap:anywhere}
+.oidc-discovery code,.generic-oidc-form .cp-admin-choice-copy code{font-family:var(--cp-admin-font-mono);font-size:var(--cp-admin-type-label)}
+.generic-oidc-form .cp-admin-notice:has(>svg){display:flex;gap:var(--cp-admin-space-3);align-items:flex-start}
+.generic-oidc-form .cp-admin-notice>div{display:grid;gap:var(--cp-admin-space-1)}
+.generic-oidc-form .cp-admin-choice-group{margin:0;gap:var(--cp-admin-space-2)}
+.generic-oidc-form .cp-admin-choice input[type="radio"]{width:var(--cp-admin-choice-size)}
+.identity-value.oidc-step-value{grid-template-columns:minmax(0,1fr) auto;margin-top:var(--cp-admin-space-2)}
+@media(max-width:740px){.oidc-discovery{grid-template-columns:1fr}}
+/* Admin 065: the People of a Generic OIDC connection and its pending badge. */
+.identity-status-cell{display:flex;flex-wrap:wrap;gap:var(--cp-admin-space-2)}
+.identity-people-back{width:fit-content}
+.identity-people-title{display:flex;align-items:center;gap:.45rem}
+.identity-people-notice{display:grid;gap:var(--cp-admin-space-1)}
+.identity-people-table{min-width:68rem}
+.identity-people-table th.identity-people-check,.identity-people-table td.identity-people-check{width:2.5rem}
+.identity-people-check input{width:var(--cp-admin-choice-size);height:var(--cp-admin-choice-size);accent-color:var(--cp-admin-color-accent-text)}
+.identity-people-groups{display:flex;flex-wrap:wrap;gap:var(--cp-admin-space-1)}
+.identity-people-bulk{margin-inline-start:auto}

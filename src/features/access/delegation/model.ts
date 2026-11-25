@@ -25,7 +25,8 @@ export type CatalogServer = { id: string; name: string };
 export type CatalogTool = { serverId: string; tool: string; args: Record<string, string>; schema: Record<string, string>; mapping?: Mapping };
 export type CatalogBinding = { id: string; source: string; entity: 'subject' | 'resource'; attributes: { name: string; type: string }[] };
 // groups: the provider reads directory groups, which harness login needs (Backend 045).
-export type CatalogIdp = { id: string; name: string; enabled: boolean; provider: string; groups: boolean; harnessLogin: boolean };
+// eligibility: who can log in from a harness through a Generic OIDC connection (Backend 106).
+export type CatalogIdp = { id: string; name: string; enabled: boolean; provider: string; groups: boolean; harnessLogin: boolean; eligibility?: 'groups' | 'everyone' | 'approved' };
 export type Subject = { subject: string; name: string; kind: SubjectKind };
 export type Directory = { subjects: Subject[]; truncated: boolean };
 export type Catalog = {

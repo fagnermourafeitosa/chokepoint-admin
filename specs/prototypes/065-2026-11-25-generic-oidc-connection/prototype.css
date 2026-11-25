@@ -1,0 +1,23 @@
+/* Admin 065 prototype: the discovery read of a Generic OIDC connection. */
+.oidc-discovery{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--cp-admin-space-2) var(--cp-admin-space-4);margin:0;padding:var(--cp-admin-space-4);border:1px solid var(--cp-admin-color-border);border-radius:var(--cp-admin-radius-control);background:var(--cp-admin-color-surface-muted, var(--cp-admin-color-surface))}
+.oidc-discovery dt{font-weight:600;font-size:var(--cp-admin-type-small)}
+.oidc-discovery dd{margin:0;display:flex;flex-wrap:wrap;gap:var(--cp-admin-space-2);align-items:center;min-width:0;overflow-wrap:anywhere}
+.oidc-discovery code{font-family:var(--cp-admin-font-mono);font-size:var(--cp-admin-type-label)}
+.identity-editor .cp-admin-notice:has(>svg){display:flex;gap:var(--cp-admin-space-3);align-items:flex-start}
+.identity-editor .cp-admin-notice>div{display:grid;gap:var(--cp-admin-space-1)}
+.identity-editor legend{display:flex;align-items:center;gap:var(--cp-admin-space-2)}
+@media(max-width:740px){.oidc-discovery{grid-template-columns:1fr}}
+.identity-editor .cp-admin-choice-group{margin:0;gap:var(--cp-admin-space-2)}
+.identity-editor .cp-admin-choice input[type="radio"]{width:var(--cp-admin-choice-size)}
+.identity-editor .cp-admin-choice-copy code{font-family:var(--cp-admin-font-mono);font-size:var(--cp-admin-type-label)}
+.oidc-step-value{grid-template-columns:minmax(0,1fr) auto;margin-top:var(--cp-admin-space-2)}
+.identity-people-back{width:fit-content}
+.identity-people-table{min-width:68rem}
+.identity-people-table th.identity-people-check,.identity-people-table td.identity-people-check{width:2.5rem}
+.identity-people-check input{width:var(--cp-admin-choice-size);height:var(--cp-admin-choice-size);accent-color:var(--cp-admin-color-accent-text)}
+.identity-people-groups{display:flex;flex-wrap:wrap;gap:var(--cp-admin-space-1)}
+.identity-people-bulk{margin-inline-start:auto}
+.identity-registry .access-page-heading h1{display:flex;align-items:center;gap:.45rem}
+.identity-people-notice{display:grid;gap:var(--cp-admin-space-1)}
+.oidc-entry-points{display:grid;gap:var(--cp-admin-space-8, 2.5rem)}
+.oidc-status-cell{display:flex;flex-wrap:wrap;gap:var(--cp-admin-space-2)}

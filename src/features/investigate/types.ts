@@ -25,7 +25,9 @@ export type ExchangeReasonLabel =
   | 'refresh_reuse'
   | 'dpop_invalid'
   // A harness login that ended on the generic error page (Backend 053).
-  | 'login_error';
+  | 'login_error'
+  // Backend 106: a Generic OIDC person waits for approval.
+  | 'approval_pending';
 // The closed cause of a login_error (Backend 053). Only the Admin shows it.
 export type LoginErrorCause =
   | 'invalid_request'

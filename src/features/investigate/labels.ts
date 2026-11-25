@@ -28,6 +28,7 @@ export const exchangeShort: Record<ExchangeReasonLabel, string> = {
   refresh_reuse: 'Refresh token used twice',
   dpop_invalid: 'DPoP proof not valid',
   login_error: 'Sign-in could not continue',
+  approval_pending: 'Waits for approval',
 };
 export const exchangeText: Record<ExchangeReasonLabel, string> = {
   invalid_client: 'The agent key did not match. The file may be old or exposed.',
@@ -43,6 +44,7 @@ export const exchangeText: Record<ExchangeReasonLabel, string> = {
   refresh_reuse: 'A refresh token was used twice. The machine was revoked.',
   dpop_invalid: 'The DPoP proof is missing, not valid or from another key.',
   login_error: 'Harness login: the sign-in stopped before consent. The person saw a generic page with the reference code.',
+  approval_pending: 'Harness login: the person waits for an administrator to approve them in People of the connection.',
 };
 
 export const stepLabel: Record<string, string> = {

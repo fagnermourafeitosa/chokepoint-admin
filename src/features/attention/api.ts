@@ -3,7 +3,7 @@ import { httpClient } from '../../api/http-client';
 import type { EnvironmentScope } from '../access/environment-scope';
 
 // SignalType mirrors the backend attention_signal_type enum.
-export type SignalType = 'tool-discovery' | 'requests-denied' | 'token_exchange_denied' | 'report-only-would-deny' | 'report-only-review-due' | 'mcpserver_disconnected' | 'lethal-trifecta' | 'behavior-drift' | 'trifecta-check-incomplete' | 'pii-detection-failed';
+export type SignalType = 'tool-discovery' | 'requests-denied' | 'token_exchange_denied' | 'report-only-would-deny' | 'report-only-review-due' | 'mcpserver_disconnected' | 'lethal-trifecta' | 'behavior-drift' | 'trifecta-check-incomplete' | 'pii-detection-failed' | 'identity_approval_pending';
 
 export const signalTypeLabels: Record<SignalType, string> = {
   'tool-discovery': 'Tool discovery',
@@ -22,6 +22,8 @@ export const signalTypeLabels: Record<SignalType, string> = {
   'trifecta-check-incomplete': 'Trifecta check incomplete',
   // Backend 105: responses passed unmasked because the PII detection failed (Admin 063).
   'pii-detection-failed': 'PII detection failed',
+  // Backend 106 Protocol contract 8.
+  identity_approval_pending: 'Approval pending',
 };
 
 // Backend 100: the category of a signal, set by its type. The Inbox shows one tab per category
@@ -36,6 +38,7 @@ export const signalCategories: Record<SignalType, SignalCategory> = {
   'behavior-drift': 'security',
   'trifecta-check-incomplete': 'security',
   'pii-detection-failed': 'security',
+  identity_approval_pending: 'access',
   'requests-denied': 'access',
   token_exchange_denied: 'access',
   'report-only-would-deny': 'access',

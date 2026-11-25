@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { SelectMenu } from '../../components/ui/dropdown/SelectMenu';
-import { ArrowLeft, Check, Plus, X } from 'lucide-react';
+import { ArrowLeft, Check, KeyRound, Plus, X } from 'lucide-react';
 import { usePendingChanges } from '../auth/pending/PendingChanges';
 import { useAuth } from '../auth/AuthContext';
 import type { DirectoryCheck, DirectorySettings, IdentityConnection, IdentityFields, IssuingClient, ProviderCapability } from './api';
 import { EntraConnectionForm } from './EntraConnectionForm';
 import { GoogleConnectionForm } from './GoogleConnectionForm';
 import { OktaConnectionForm } from './OktaConnectionForm';
+import { GenericOidcConnectionForm } from './GenericOidcConnectionForm';
 import { Help } from './Help';
 import { HarnessLoginSection, initialLogin, loginInput } from './HarnessLoginSection';
 import './identity.css';
@@ -15,7 +16,11 @@ type Props = {
  connection?: IdentityConnection; providers: ProviderCapability[]; providerError: boolean; pending: boolean; error: string;
  onSave: (fields: IdentityFields) => Promise<void>; onCheck: (fields: IdentityFields) => Promise<boolean>;
  onDirectoryCheck: (fields: IdentityFields) => Promise<DirectoryCheck | undefined>; onCancel: () => void;
+ // The check of a Generic OIDC connection returns what it read (Backend 106 Protocol contract 2).
+ onCheckGeneric: (fields: IdentityFields) => Promise<IdentityConnection | undefined>;
 };
+// OIDC integrations: Google Workspace, then Generic OIDC (Admin 065).
+const oidcProviders = ['google', 'oidc'];
 const emptyDirectory = (): DirectorySettings => ({ client_id: '', issuing_client_id: '', client_secret: '', has_secret: false, check_status: 'not_checked', checked_at: null });
 const checkHelp = 'Check connection verifies the issuer metadata and signing keys, then reads the directory with the service account and loads the realm clients.\n\nThe directory must contain at least one user. The token subject (sub) must match the user\'s user ID: new associations are checked with a Keycloak example token for the issuing client.\n\nThe check does not verify a real login, the token audience, later mapper changes, or permission to use a tool.';
 function SectionHeading({ title, description, help }: { title: string; description: string; help: string }) {
@@ -23,7 +28,7 @@ function SectionHeading({ title, description, help }: { title: string; descripti
 }
 // Identity provider cards: Keycloak, then Microsoft Entra ID (Admin 042), then the others in catalog order (Okta, Admin 043).
 const cardOrder = (item: ProviderCapability) => item.provider === 'keycloak' ? 0 : item.provider === 'entra' ? 1 : 2;
-export function IdentityConnectionForm({ connection, providers, providerError, pending, error, onSave, onCheck, onDirectoryCheck, onCancel }: Props) {
+export function IdentityConnectionForm({ connection, providers, providerError, pending, error, onSave, onCheck, onDirectoryCheck, onCancel, onCheckGeneric }: Props) {
  const auth = useAuth();
  const [provider, setProvider] = useState(connection?.provider ?? '');
  const [name, setName] = useState(connection?.name ?? '');
@@ -78,7 +83,7 @@ export function IdentityConnectionForm({ connection, providers, providerError, p
  const clientOptions = clients?.items ?? (directory.issuing_client_id ? [{ client_id: directory.issuing_client_id }] : []);
  const choice = (item: ProviderCapability) => <span key={item.provider} className="identity-provider-slot" data-tip={item.available ? undefined : 'Not available yet'}><button type="button" className="identity-provider-choice" data-selected={provider === item.provider || undefined} aria-pressed={provider === item.provider} disabled={pending || !item.available || (lockedProvider && item.provider !== connection?.provider)} onClick={() => { setProvider(item.provider); changedCredentials(); }}>
     {provider === item.provider ? <Check className="identity-provider-tick" size={16} aria-hidden="true" /> : null}
-    <img src={`/idp-icons/${item.provider}.svg`} alt="" width="24" height="24" /><strong>{item.name}</strong>
+    {item.provider === 'oidc' ? <KeyRound size={24} aria-hidden="true" /> : <img src={`/idp-icons/${item.provider}.svg`} alt="" width="24" height="24" />}<strong>{item.name}</strong>
    </button></span>;
  return <section className="identity-editor" aria-label={connection ? 'Edit identity provider' : 'Connect identity provider'}>
   <button className="identity-back" type="button" onClick={onCancel} disabled={pending}><ArrowLeft size={16} />Identity providers</button>
@@ -86,17 +91,18 @@ export function IdentityConnectionForm({ connection, providers, providerError, p
   {providerError ? <p role="alert" className="cp-admin-notice cp-admin-notice--danger">Provider capabilities are unavailable. Reload and try again.</p> : null}
   <div className="identity-provider-groups">
    <div className="identity-provider-choices" role="group" aria-label="Identity provider">
-    {providers.filter(item => item.provider !== 'google').sort((a, b) => cardOrder(a) - cardOrder(b)).map(item => choice(item))}
+    {providers.filter(item => !oidcProviders.includes(item.provider)).sort((a, b) => cardOrder(a) - cardOrder(b)).map(item => choice(item))}
    </div>
-   {providers.some(item => item.provider === 'google') ? <div className="identity-provider-category"><span className="identity-field-label">OIDC integrations</span>
-    <div className="identity-provider-choices" role="group" aria-label="OIDC integration">{providers.filter(item => item.provider === 'google').map(item => choice(item))}</div>
+   {providers.some(item => oidcProviders.includes(item.provider)) ? <div className="identity-provider-category"><span className="identity-field-label">OIDC integrations</span>
+    <div className="identity-provider-choices" role="group" aria-label="OIDC integration">{oidcProviders.flatMap(id => providers.filter(item => item.provider === id)).map(item => choice(item))}</div>
    </div> : null}
   </div>
   {provider && selected && !selected.available ? <p className="cp-admin-notice" role="status">{selected.name} is not available yet.</p> : null}
   {provider === 'entra' && selected?.available ? <EntraConnectionForm key={connection?.id ?? 'new'} connection={connection} groupsCapable={!!selected.groups} workspaceLabel={`${auth.workspace?.name} / ${auth.environment?.name === 'production' ? 'Production' : 'Sandbox'}`} pending={pending} error={error} onSave={onSave} onCheck={onCheck} onDirectoryCheck={onDirectoryCheck} onCancel={onCancel} /> : null}
   {provider === 'okta' && selected?.available ? <OktaConnectionForm key={connection?.id ?? 'new'} connection={connection} groupsCapable={!!selected.groups} workspaceLabel={`${auth.workspace?.name} / ${auth.environment?.name === 'production' ? 'Production' : 'Sandbox'}`} pending={pending} error={error} onSave={onSave} onCheck={onCheck} onDirectoryCheck={onDirectoryCheck} onCancel={onCancel} /> : null}
   {provider === 'google' && selected?.available ? <GoogleConnectionForm key={connection?.id ?? 'new'} connection={connection} groupsCapable={!!selected.groups} workspaceLabel={`${auth.workspace?.name} / ${auth.environment?.name === 'production' ? 'Production' : 'Sandbox'}`} pending={pending} error={error} onSave={onSave} onCheck={onCheck} onDirectoryCheck={onDirectoryCheck} onCancel={onCancel} /> : null}
-  {selected?.available && provider !== 'google' && provider !== 'entra' && provider !== 'okta' ? <form className="cp-admin-panel identity-form identity-form-redesign" onSubmit={event => { event.preventDefault(); if (validate()) { void onSave(fields()); } }}>
+  {provider === 'oidc' && selected?.available ? <GenericOidcConnectionForm key={connection?.id ?? 'new'} connection={connection} workspaceLabel={`${auth.workspace?.name} / ${auth.environment?.name === 'production' ? 'Production' : 'Sandbox'}`} pending={pending} error={error} onSave={onSave} onCheck={onCheckGeneric} onCancel={onCancel} /> : null}
+  {selected?.available && provider !== 'google' && provider !== 'entra' && provider !== 'okta' && provider !== 'oidc' ? <form className="cp-admin-panel identity-form identity-form-redesign" onSubmit={event => { event.preventDefault(); if (validate()) { void onSave(fields()); } }}>
    <fieldset disabled={pending || checking}>
     <div className="identity-form-section"><SectionHeading title="Connection" description="Identify this connection in your workspace." help="The connection belongs to the selected workspace and environment." /><div className="identity-form-fields"><label className="cp-admin-field">Connection name<input className="cp-admin-input" required maxLength={80} value={name} onChange={e => { setName(e.target.value); changedAuthentication(); }} /></label><small>{auth.workspace?.name} / {auth.environment?.name === 'production' ? 'Production' : 'Sandbox'}</small>
      <label className="cp-admin-choice identity-enable"><input className="cp-admin-switch" type="checkbox" role="switch" checked={enabled} onChange={e => setEnabled(e.target.checked)} /><span className="cp-admin-choice-copy"><strong>Enable connection</strong><small>Accept valid access tokens from this issuer in the selected environment.</small></span></label></div></div>

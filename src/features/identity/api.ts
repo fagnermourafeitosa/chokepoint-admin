@@ -12,8 +12,21 @@ export type DirectoryCheck = DirectorySettings & { issuing_clients?: IssuingClie
 // the read returns has_secret and the redirect URI to register at the provider. null removes the client.
 export type LoginSettings = { enabled: boolean; client_id: string; client_secret?: string; has_secret?: boolean; redirect_uri?: string };
 // token_issuer is the custom authorization server of an Okta connection (Backend 059, 060); the backend derives it for Entra.
-export type IdentityFields = { provider: string; name: string; issuer: string; audiences: string[]; enabled: boolean; revision: number; directory: DirectorySettings | null; login: LoginSettings | null; token_issuer?: string };
-export type IdentityConnection = Omit<IdentityFields, 'login'> & { login: LoginSettings | null; id: string; created_at: string; updated_at: string; checked_at: string | null; check_status: 'not_checked' | 'verified' | 'failed' };
+// Generic OIDC settings (Backend 106 Protocol contract 1): typed endpoints for a server without discovery,
+// the claim names and who can log in from a harness.
+export type ManualEndpoints = { authorization_endpoint: string; token_endpoint: string; jwks_uri: string };
+export type Eligibility = 'groups' | 'everyone' | 'approved';
+export type GenericSettings = { manual_endpoints?: ManualEndpoints | null; email_claim?: string; groups_claim?: string; extra_scopes?: string; eligibility?: Eligibility };
+export type IdentityFields = { provider: string; name: string; issuer: string; audiences: string[]; enabled: boolean; revision: number; directory: DirectorySettings | null; login: LoginSettings | null; token_issuer?: string } & GenericSettings;
+// What the check of a Generic OIDC connection read (Backend 106 Protocol contract 2); only in a check response.
+export type DiscoveryResult = { authorization_endpoint?: string; token_endpoint?: string; jwks_uri: string; algorithms: string[]; keys: number; claims?: string[] };
+export type IdentityConnection = Omit<IdentityFields, 'login'> & { login: LoginSettings | null; id: string; created_at: string; updated_at: string; checked_at: string | null; check_status: 'not_checked' | 'verified' | 'failed'; discovery?: DiscoveryResult };
+// The people of a Generic OIDC connection (Backend 106 Protocol contract 7). email is set only when verified.
+export type PersonStatus = 'seen' | 'pending' | 'approved' | 'revoked';
+export type ConnectionPerson = { subject: string; name: string; email: string; groups: string[]; status: PersonStatus; first_seen_at: string; first_seen_via: 'harness_login' | 'token_exchange'; last_seen_at: string };
+export type PeoplePage = { items: ConnectionPerson[]; total: number; next_cursor: string | null };
+// The group that every person of a Generic OIDC connection gets in the modes everyone and approved (Backend 106).
+export const everyoneGroupID = 'oidc:everyone';
 export type IdentityPage = { items: IdentityConnection[]; next_offset: number | null };
 export type ProviderCapability = { provider: string; name: string; available: boolean; directory: boolean; runtime_identity: boolean; groups: boolean };
 // A directory group (Backend 045 Resolved Decision 26). id is the match key; path is set for nested groups (Keycloak).
@@ -48,6 +61,14 @@ export const identityApi = {
   if (query.ids?.length) params.set('ids', query.ids.join(','));
   return httpClient<GroupPage>(`${path(s)}/${encodeURIComponent(id)}/groups?${params}`, { signal });
  },
+ // The people of a Generic OIDC connection (Backend 106 Protocol contract 7).
+ people: (s: EnvironmentScope, id: string, query: { status?: string; q?: string; cursor?: string }, signal: AbortSignal) => {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) if (value) params.set(key, value);
+  return httpClient<PeoplePage>(`${path(s)}/${encodeURIComponent(id)}/people?${params}`, { signal });
+ },
+ approve: (s: EnvironmentScope, id: string, subjects: string[], signal: AbortSignal) => httpClient<{ items: ConnectionPerson[] }>(`${path(s)}/${encodeURIComponent(id)}/people/approve`, { method: 'POST', json: { subjects }, signal }),
+ revokeApproval: (s: EnvironmentScope, id: string, subject: string, signal: AbortSignal) => httpClient<void>(`${path(s)}/${encodeURIComponent(id)}/people/revoke`, { method: 'POST', json: { subject }, signal }),
  remove: (s: EnvironmentScope, c: IdentityConnection, signal: AbortSignal) => httpClient<void>(`${path(s)}/${encodeURIComponent(c.id)}`, { method: 'DELETE', json: { revision: c.revision }, signal }),
 };
 const entraErrors: Record<string, string> = {
@@ -66,6 +87,14 @@ const oktaErrors: Record<string, string> = {
  okta_scope_missing: 'A scope is not granted. Grant okta.users.read and okta.groups.read (step 3).',
  okta_role_missing: 'The app can not read users. Assign it the Read-only Administrator role (step 4).',
 };
+// Generic OIDC check errors (Backend 106 Protocol contract 2).
+const genericErrors: Record<string, string> = {
+ oidc_discovery_not_found: 'Could not read the discovery document of this issuer, or its issuer differs. Check the issuer URL, or enter the endpoints manually.',
+ oidc_discovery_incomplete: 'The discovery document has no authorization endpoint, token endpoint or jwks_uri. Enter the endpoints manually.',
+ oidc_symmetric_only: 'This provider signs tokens only with a shared secret. Enable RS256 or ES256 in the provider and check again.',
+ oidc_jwks_not_found: 'Could not read the public keys. Check the JWKS URL.',
+ oidc_unavailable: 'Could not reach the provider. Check the address and retry.',
+};
 export function identityError(error: unknown): string {
  if (error instanceof HttpError) {
   if (error.status === 422 && error.code === 'directory_api_disabled') return 'The Admin SDK API is not enabled in the Google Cloud project of the service account. Enable it, then check the connection again.';
@@ -75,6 +104,9 @@ export function identityError(error: unknown): string {
   if (entra) return entra;
   const okta = error.status === 422 && error.code ? oktaErrors[error.code] : undefined;
   if (okta) return okta;
+  const generic = error.code ? genericErrors[error.code] : undefined;
+  if (generic) return generic;
+  if (error.status === 409 && error.code === 'people_unsupported') return 'This identity provider has a directory: choose people from it.';
   if (error.status === 422 && error.code === 'clients_unavailable') return 'Cannot read the Keycloak clients. Grant the service account the realm-management role view-clients, then check the connection again.';
   if (error.status === 422) return 'Cannot verify Keycloak directory and administrative access. Check the connection and network, grant the service account the realm-management roles view-users and view-clients (or equivalent), and ensure the directory contains a user.';
   if (error.status === 409 && error.code === 'groups_unsupported') return 'This identity provider can not list groups yet, so harness login is not available for it.';
