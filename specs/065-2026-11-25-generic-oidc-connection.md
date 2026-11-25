@@ -3,7 +3,7 @@
 - **Specification ID**: 065
 - **Date**: 2026-11-25
 - **Slug**: generic-oidc-connection
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Access and Integrations
 - **Related Specification**: [Backend 106 — Generic OIDC Connection](../../backend/specs/106-2026-11-25-generic-oidc-connection.md)
 - **Related Specification**: [043 — Okta Connection Form](043-2026-11-05-okta-connection-form.md)
@@ -67,14 +67,14 @@ Backend 106 adds the provider `oidc`, Generic OIDC: any OpenID Connect provider 
 
 ## User Stories
 
-- [ ] 1. As an administrator, I see Generic OIDC under OIDC integrations and start a connection with an issuer.
-- [ ] 2. As an administrator, I type the three endpoints when my server has no discovery document.
-- [ ] 3. As an administrator, I read why a provider is refused when it signs only with a shared secret.
-- [ ] 4. As an administrator, I understand from the three steps what to register in my login server, and that it is done once for everyone.
-- [ ] 5. As an administrator, I choose who can log in from a harness: chosen groups, everyone, or approved people only.
-- [ ] 6. As an administrator, I open the People of a connection from its row in Identity providers or from the Inbox item.
-- [ ] 7. As an administrator, I approve several people at once and revoke an approval when I need to stop someone.
-- [ ] 8. As an administrator, I pick the people of a Generic OIDC connection as delegates in an agent, and type group names in its harness login card.
+- [x] 1. As an administrator, I see Generic OIDC under OIDC integrations and start a connection with an issuer.
+- [x] 2. As an administrator, I type the three endpoints when my server has no discovery document.
+- [x] 3. As an administrator, I read why a provider is refused when it signs only with a shared secret.
+- [x] 4. As an administrator, I understand from the three steps what to register in my login server, and that it is done once for everyone.
+- [x] 5. As an administrator, I choose who can log in from a harness: chosen groups, everyone, or approved people only.
+- [x] 6. As an administrator, I open the People of a connection from its row in Identity providers or from the Inbox item.
+- [x] 7. As an administrator, I approve several people at once and revoke an approval when I need to stop someone.
+- [x] 8. As an administrator, I pick the people of a Generic OIDC connection as delegates in an agent, and type group names in its harness login card.
 
 ## Architecture Gate
 
@@ -124,17 +124,17 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`, t
 
 ## Acceptance Criteria
 
-- [ ] 1. Generic OIDC is under OIDC integrations, after Google Workspace, when the backend catalog lists it as available.
-- [ ] 2. The form has the fields of Solution 2; manual endpoints show only with their switch on.
-- [ ] 3. The check shows the discovered endpoints, algorithms and keys, and the danger notice for a provider that signs only with a symmetric algorithm.
-- [ ] 4. The three login client steps and the redirect URI with copy show in Harness login; the secret is never shown after save.
-- [ ] 5. Who can log in offers the three modes; chosen groups is disabled without a groups claim; Everyone shows its warning.
-- [ ] 6. The People page lists the people with their status, filters by status, approves one or several, and revokes an approval with its confirmation.
-- [ ] 7. The People action and the pending badge show on the row of an `oidc` connection only, and the Inbox item opens the People page.
-- [ ] 8. The delegation editor lists the people of an `oidc` connection, and the harness login card of an agent follows the mode of the connection.
-- [ ] 9. The other provider forms behave as before.
-- [ ] 10. `npm run check` and `npm run build` pass.
-- [ ] 11. Functional test: [065-2026-11-25-generic-oidc-connection](functional-tests/065-2026-11-25-generic-oidc-connection.md).
+- [x] 1. Generic OIDC is under OIDC integrations, after Google Workspace, when the backend catalog lists it as available. Evidence: functional test, scenario Create a Generic OIDC connection with discovery (2026-11-25).
+- [x] 2. The form has the fields of Solution 2; manual endpoints show only with their switch on. Evidence: functional test, scenarios Create a Generic OIDC connection and Typed endpoints (2026-11-25).
+- [x] 3. The check shows the discovered endpoints, algorithms and keys, and the danger notice for a provider that signs only with a symmetric algorithm. Evidence: functional test, scenario Typed endpoints and the refusal of symmetric signatures (2026-11-25).
+- [x] 4. The three login client steps and the redirect URI with copy show in Harness login; the secret is never shown after save. Evidence: functional test, scenario Create a Generic OIDC connection; the capture identity-provider-oidc shows the steps and the masked secret (2026-11-25).
+- [x] 5. Who can log in offers the three modes; chosen groups is disabled without a groups claim; Everyone shows its warning. Evidence: functional test, scenario Who can log in, mode by mode (2026-11-25).
+- [x] 6. The People page lists the people with their status, filters by status, approves one or several, and revokes an approval with its confirmation. Evidence: functional test, scenario Approval, Inbox item and revoke; Approve selected exercised with one person, several by code inspection of ConnectionPeople.tsx (2026-11-25).
+- [x] 7. The People action and the pending badge show on the row of an `oidc` connection only, and the Inbox item opens the People page. Evidence: functional test, scenarios Approval, Inbox item and revoke and Other providers unchanged (2026-11-25).
+- [x] 8. The delegation editor lists the people of an `oidc` connection, and the harness login card of an agent follows the mode of the connection. Evidence: functional test, scenario Who can log in, mode by mode, including the card after a mode change (2026-11-25).
+- [x] 9. The other provider forms behave as before. Evidence: functional test, scenario Other providers unchanged (2026-11-25).
+- [x] 10. `npm run check` and `npm run build` pass. Evidence: `npm run check` and `npm run build` passed (2026-11-25).
+- [x] 11. Functional test: [065-2026-11-25-generic-oidc-connection](functional-tests/065-2026-11-25-generic-oidc-connection.md). Evidence: every scenario passed on 2026-11-25.
 
 ## Out of Scope
 

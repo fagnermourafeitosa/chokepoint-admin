@@ -35,22 +35,25 @@ scenarios:
     last_run:
       date: 2026-11-25
       result: passed
-      notes: "Claude Code 2.1.323, branches feat/generic-oidc (backend API on 127.0.0.1:8083 behind a local TLS front https://gen.xokepoint.localhost:8443, Admin on http://acme.xokepoint.localhost:5177) on the demo database, Production, local Keycloak realm acme-oidc (marina in finance, email verified; lucas in ops, email not verified). A static discovery that lists only HS256 (http://127.0.0.1:8190/realms/hs): the danger notice 'This provider signs tokens only with a shared secret…' and Create connection disabled. Typed endpoints were checked on the Sandbox test connection earlier the same day (Check endpoints read the keys); not repeated in Production."
+      notes: "Claude Code 2.1.323, branches feat/generic-oidc (backend API on 127.0.0.1:8083 behind a local TLS front https://gen.xokepoint.localhost:8443, Admin on http://acme.xokepoint.localhost:5177) on the demo database, Production, local Keycloak realm acme-oidc (marina in finance, email verified; lucas in ops, email not verified). A static discovery that lists only HS256 (http://127.0.0.1:8190/realms/hs): the danger notice 'This provider signs tokens only with a shared secret…' and Create connection disabled. Typed endpoints in a new Production form (authorization, token and certs of the realm): Check endpoints showed 'Public keys read.', 1 key, RS256; the form was cancelled without saving."
   - id: S3
     title: Who can log in, mode by mode
     criteria: [5, 8]
     steps:
       - With a groups claim, choose People in chosen groups; in an agent, turn on harness login and type a group name of one test user
       - Log in from Claude Code with each test user (dev-infra/functional-tests/harness-cli.md)
-      - Change to Everyone who signs in with this provider and log in with the second user
+      - Change the connection to Everyone who signs in with this provider and open the harness login card of the agent; log in with the second user
+      - Switch the card on, publish and log in with the second user again
     expected:
       - Chosen groups is disabled while the groups claim is empty; Everyone shows its warning
-      - In chosen groups, only the user of the typed group can consent; in Everyone, both can
+      - In chosen groups, only the user of the typed group can consent
+      - After the change to Everyone, the card shows its switch off and "Only <group> can log in" with Remove these groups, and the second user is refused; after the switch is on and published, the second user can consent
+      - The consent page says "Valid for 24 hours"
       - The delegation editor of the agent lists the people of the connection
     last_run:
       date: 2026-11-25
-      result: failed
-      notes: "Claude Code 2.1.323, branches feat/generic-oidc (backend API on 127.0.0.1:8083 behind a local TLS front https://gen.xokepoint.localhost:8443, Admin on http://acme.xokepoint.localhost:5177) on the demo database, Production, local Keycloak realm acme-oidc (marina in finance, email verified; lucas in ops, email not verified). With the groups claim cleared in the form, People in chosen groups was disabled; Everyone showed 'Anyone with an account can log in'. Chosen groups: finance typed in the agent card (revision 98); marina got the consent page 'group finance' and Claude Code said Authenticated; lucas was refused with 'not in a group that your administrator allowed' (5jah-ft2d). Everyone: after the connection was saved as Everyone, the agent card showed 'Everyone who signs in with this provider can log in from a harness' switched on, but the published document still held the group finance, and lucas was refused (qhka-ano2). Defect: the card of an agent does not show that its groups come from the mode People in chosen groups. After the card was switched off and on and published (revision 100, group oidc:everyone), lucas got the consent page and Authenticated. The consent page of the Generic OIDC connection said 'Valid for 7 days' while the grant ends after 24 hours; fixed in Backend 106 during the run, then 'Valid for 24 hours, until Nov 26, 2026 17:05 UTC'. The delegation editor listed the people of the connection (Lucas Prado, Marina Lopes)."
+      result: passed
+      notes: "Claude Code 2.1.323, branches feat/generic-oidc (backend API on 127.0.0.1:8083 behind a local TLS front https://gen.xokepoint.localhost:8443, Admin on http://acme.xokepoint.localhost:5177) on the demo database, Production, local Keycloak realm acme-oidc (marina in finance, email verified; lucas in ops, email not verified). With the groups claim cleared in the form, People in chosen groups was disabled; Everyone showed 'Anyone with an account can log in'. Chosen groups: finance typed in the agent card (revision 98); marina got the consent page 'group finance' and Claude Code said Authenticated; lucas was refused (5jah-ft2d). With finance published again (revision 102), the connection changed to Everyone: the card showed the switch off and 'Only finance can log in. These groups were chosen while Acme login used People in chosen groups.' with Remove these groups; lucas was refused (befz-zmcb). Switch on and publish (revision 104): lucas got the consent page 'group Everyone of the connection', 'Valid for 24 hours, until Nov 26, 2026 19:34 UTC', and Claude Code said Authenticated. The delegation editor listed Lucas Prado and Marina Lopes. An earlier run the same day failed before the card fix (Admin 065 Implementation Decision 7) and the consent page fix (Backend 106 Implementation Note 8)."
   - id: S4
     title: Approval, Inbox item and revoke
     criteria: [6, 7]
