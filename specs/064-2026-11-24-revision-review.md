@@ -3,7 +3,7 @@
 - **Specification ID**: 064
 - **Date**: 2026-11-24
 - **Slug**: revision-review
-- **Status**: Not Implemented
+- **Status**: In Progress
 - **Owner**: Admin — Access and Permissions (Delegation and access, publication bar, revision history)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md) (publication bar)
 - **Related Specification**: [032 — Revision History](032-2026-11-02-revision-history.md) (history panel and its diff)

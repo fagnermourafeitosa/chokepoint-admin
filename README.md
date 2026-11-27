@@ -162,6 +162,6 @@ Hooks live apart from JSX, one file per concern.
 | 061 | [Inbox Categories](specs/061-2026-11-16-inbox-categories.md) | Implemented |
 | 062 | [Barricade](specs/062-2026-11-16-barricade.md) | Implemented |
 | 063 | [PII Policies](specs/063-2026-11-22-pii-policies.md) | Implemented |
-| 064 | [Revision Review](specs/064-2026-11-24-revision-review.md) | Not Implemented |
+| 064 | [Revision Review](specs/064-2026-11-24-revision-review.md) | In Progress |
 | 065 | [Generic OIDC Connection](specs/065-2026-11-25-generic-oidc-connection.md) | Implemented |
 | 066 | [Read-only Admin of the Public Demo](specs/066-2026-11-25-public-demo-read-only-admin.md) | Implemented |
