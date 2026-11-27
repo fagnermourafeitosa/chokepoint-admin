@@ -21,9 +21,9 @@ export function RequireSession() {
   if (a.contextLoading || a.contextFailed) return <AuthStatus />;
   // Admin 005: a person with no workspace creates the first one on the onboarding page.
   if (!a.workspaces.length) return <Navigate to="/onboarding/workspace" replace />;
-  // Admin 051: with no chosen workspace, the account area lists them.
-  if (!a.workspace || !a.environment)
-    return <Navigate to="/account/workspaces" replace />;
+  // Admin 067: the first listed workspace and its Sandbox open when none is chosen; a workspace
+  // always has a Sandbox, so this only narrows the types.
+  if (!a.workspace || !a.environment) return <AuthStatus />;
   return (
     <Outlet
       key={`${a.session.user.id}:${a.workspace.tenant_id}:${a.environment.id}`}

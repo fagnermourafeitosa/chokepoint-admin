@@ -3,7 +3,7 @@
 - **Specification ID**: 067
 - **Date**: 2026-11-27
 - **Slug**: direct-sign-in-and-landing
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin, authentication
 - **Related Specification**: [Backend 108 — Sign-in Lands on the Admin Root](../../backend/specs/108-2026-11-27-sign-in-lands-on-admin-root.md), [004 — Login and Authorized Workspace Selection](004-2026-10-24-login-and-authorized-workspace-selection.md), [051 — Account Area](051-2026-11-11-account-area.md), [066 — Read-only Admin of the Public Demo](066-2026-11-25-public-demo-read-only-admin.md)
 
@@ -55,13 +55,13 @@ The backend sends the browser to `/workspaces` after the callback, and the Admin
 
 ## User Stories
 
-- [ ] 1. As a platform administrator, I want **Sign in** on the site to open the sign-in of the identity provider, so that I do not confirm twice.
-- [ ] 2. As a visitor, I want **Sign up** on the site to open the registration of the identity provider, so that I do not confirm twice.
-- [ ] 3. As a platform administrator with workspaces, I want to land on the Overview after the sign-in, so that I see the state of my environment at once.
-- [ ] 4. As a new account with no workspace, I want to land on the first-workspace onboarding, so that I create my workspace.
-- [ ] 5. As a platform administrator whose sign-in failed, I want to see the error and try again, so that the browser does not loop.
-- [ ] 6. As a platform administrator, I want the sign-out to end my session and take me to the site, so that another account can sign in in the same browser.
-- [ ] 7. As a visitor of the public demo, I want to land on the demo workspace in its Sandbox, so that I see the demo at once.
+- [x] 1. As a platform administrator, I want **Sign in** on the site to open the sign-in of the identity provider, so that I do not confirm twice.
+- [x] 2. As a visitor, I want **Sign up** on the site to open the registration of the identity provider, so that I do not confirm twice.
+- [x] 3. As a platform administrator with workspaces, I want to land on the Overview after the sign-in, so that I see the state of my environment at once.
+- [x] 4. As a new account with no workspace, I want to land on the first-workspace onboarding, so that I create my workspace.
+- [x] 5. As a platform administrator whose sign-in failed, I want to see the error and try again, so that the browser does not loop.
+- [x] 6. As a platform administrator, I want the sign-out to end my session and take me to the site, so that another account can sign in in the same browser.
+- [x] 7. As a visitor of the public demo, I want to land on the demo workspace in its Sandbox, so that I see the demo at once.
 
 ---
 
@@ -107,15 +107,15 @@ This module has no automated tests (`AGENTS.md`, Verification). The change is ve
 
 ## Acceptance Criteria
 
-- [ ] 1. With no session, `/login` opens the Keycloak sign-in with no click, and `/signup` opens the Keycloak registration with no click.
-- [ ] 2. `/login?error=authentication_failed` shows the error and **Try again**, and does not leave the page by itself.
-- [ ] 3. After the sign-in, a person with workspaces lands on the Overview of the first listed workspace, in its Sandbox.
-- [ ] 4. After the sign-in, a person with no workspace lands on `/onboarding/workspace`.
-- [ ] 5. After a confirmed sign-out, Keycloak ends its session with no confirmation page and the browser opens the home of the site; a sign-in with another account then succeeds.
-- [ ] 6. The demo login lands on the Overview of the demo workspace, in its Sandbox, with the read-only notice.
-- [ ] 7. A link of a Slack message opened while signed out opens the signal after the sign-in.
-- [ ] 8. `npm run check` and `npm run build` pass.
-- [ ] 9. Functional test: [067-2026-11-27-direct-sign-in-and-landing](functional-tests/067-2026-11-27-direct-sign-in-and-landing.md).
+- [x] 1. With no session, `/login` opens the Keycloak sign-in with no click, and `/signup` opens the Keycloak registration with no click. Evidence: functional test S1 and S2.
+- [x] 2. `/login?error=authentication_failed` shows the error and **Try again**, and does not leave the page by itself. Evidence: functional test S3.
+- [x] 3. After the sign-in, a person with workspaces lands on the Overview of the first listed workspace, in its Sandbox. Evidence: functional test S1 (one workspace and two workspaces).
+- [x] 4. After the sign-in, a person with no workspace lands on `/onboarding/workspace`. Evidence: functional test S4.
+- [x] 5. After a confirmed sign-out, Keycloak ends its session with no confirmation page and the browser opens the home of the site; a sign-in with another account then succeeds. Evidence: functional test S5.
+- [x] 6. The demo login lands on the Overview of the demo workspace, in its Sandbox, with the read-only notice. Evidence: functional test S6.
+- [x] 7. A link of a Slack message opened while signed out opens the signal after the sign-in. Evidence: functional test S7.
+- [x] 8. `npm run check` and `npm run build` pass. Evidence: both ran on the branch; the build also fails without VITE_SITE_ORIGIN, as intended.
+- [x] 9. Functional test: [067-2026-11-27-direct-sign-in-and-landing](functional-tests/067-2026-11-27-direct-sign-in-and-landing.md). Evidence: S1 to S8 passed on 2026-11-27.
 
 ---
 

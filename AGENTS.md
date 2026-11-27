@@ -171,7 +171,7 @@ Each specification that changes a screen has its functional test in `specs/funct
 Run functional tests by hand in the built-in browser, where the user can watch. Do not automate them. Always run them on the demo instance ([`dev-infra/demo-instance`](../dev-infra/demo-instance/README.md)), never on the development seed: its Acme data is the realistic data of the product.
 
 1. Start it with `dev-infra/demo-instance/up.sh` (the development stack `dev-infra/up.sh` must be up). The first time, run `prepare.sh` and `populate.py`; run `traffic.py --once` for recent calls.
-2. Open `http://acme.localhost:5174` and click **Continue to sign in**. Sign in as `beatriz@acme.test`.
+2. Open `http://acme.localhost:5174`: the Keycloak sign-in opens by itself. Sign in as `beatriz@acme.test`.
 3. Password: `admin_password` in `dev-infra/demo-instance/.local/credentials.json`. Do not print it in a reply.
 4. One-time code: run `dev-infra/demo-instance/totp.py`. It prints the seconds left; type the code at once.
 5. The Admin opens in Sandbox: switch to **Production**, where the Acme data is. A full page load opens Sandbox again.

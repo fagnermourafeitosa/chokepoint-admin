@@ -72,7 +72,7 @@ Every private screen works in the workspace and environment chosen in the header
 
 - **Login.** The login and signup pages post to the backend, which runs the OIDC exchange with Keycloak and sets an HttpOnly session cookie. The Admin never sees passwords, provider tokens or the cookie. Mutations send the session-bound CSRF token, kept in memory only.
 - **Server state.** TanStack Query holds every backend response. Private query keys include the user, workspace and environment, so switching context drops the old data. A pending-changes guard asks before unsaved edits are discarded.
-- **Errors.** A 401 returns to the login page; other failures show a retry. Logout and session expiry clear private state. Nothing private is kept in browser storage.
+- **Errors.** A 401 returns to `/login`, which opens the Keycloak sign-in by itself (Admin 067); other failures show a retry. Logout ends the Keycloak session too and opens the site; session expiry clears private state. Nothing private is kept in browser storage.
 
 ## Source Organization
 
@@ -165,4 +165,4 @@ Hooks live apart from JSX, one file per concern.
 | 064 | [Revision Review](specs/064-2026-11-24-revision-review.md) | Implemented |
 | 065 | [Generic OIDC Connection](specs/065-2026-11-25-generic-oidc-connection.md) | Implemented |
 | 066 | [Read-only Admin of the Public Demo](specs/066-2026-11-25-public-demo-read-only-admin.md) | Implemented |
-| 067 | [Direct Sign-in and Landing](specs/067-2026-11-27-direct-sign-in-and-landing.md) | In Progress |
+| 067 | [Direct Sign-in and Landing](specs/067-2026-11-27-direct-sign-in-and-landing.md) | Implemented |

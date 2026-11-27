@@ -25,8 +25,8 @@ const router = createBrowserRouter(createRoutesFromElements(
   <Route element={<AuthProvider><Outlet /></AuthProvider>}>
     <Route path="/login" element={<LoginPage />} />
     <Route path="/signup" element={<LoginPage signup />} />
-    {/* Admin 051: the account area replaces the workspace page. The first-workspace onboarding stays (Admin 005). */}
-    <Route path="/workspaces" element={<Navigate to="/account/workspaces" replace />} />
+    {/* Admin 067: old links of the workspace page open the Admin root. The first-workspace onboarding stays (Admin 005). */}
+    <Route path="/workspaces" element={<Navigate to="/" replace />} />
     <Route path="/onboarding/workspace" element={<WorkspaceOnboarding />} />
     {/* Admin 059: the link of a Slack message. It needs a session, not a chosen workspace:
         it opens the workspace and the environment of the signal itself. */}

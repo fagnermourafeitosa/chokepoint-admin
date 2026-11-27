@@ -50,14 +50,10 @@ export function useAuthState(): AuthState {
       httpClient<{ items: Workspace[] }>("/v1/workspaces", { signal }),
     retry: false,
   });
-  const selectedId =
-    workspaceId ??
-    (workspaces.data?.items.length === 1
-      ? workspaces.data.items[0].tenant_id
-      : undefined);
-  const workspace = workspaces.data?.items.find(
-    (item) => item.tenant_id === selectedId,
-  );
+  // Admin 067: with no chosen workspace, or one that is no longer listed, the first listed one opens.
+  const workspace =
+    workspaces.data?.items.find((item) => item.tenant_id === workspaceId) ??
+    workspaces.data?.items[0];
   const environments = useQuery({
     queryKey: ["auth", "environments", userId, workspace?.tenant_id],
     enabled: !!workspace && !session.isFetching && !signingOut && !logoutFailed,
@@ -68,11 +64,10 @@ export function useAuthState(): AuthState {
       ),
     retry: false,
   });
+  // Admin 067: with no chosen environment, or one that is no longer listed, the Sandbox opens.
   const environment =
     environments.data?.items.find((item) => item.id === environmentId) ??
-    (environmentId
-      ? undefined
-      : environments.data?.items.find((item) => item.name === "sandbox"));
+    environments.data?.items.find((item) => item.name === "sandbox");
   useEffect(() => {
     setCSRFToken(session.data?.csrf_token);
   }, [session.data]);
@@ -141,18 +136,19 @@ export function useAuthState(): AuthState {
       q.queryKey[0] !== "auth" || q.queryKey[1] !== "session";
     await client.cancelQueries({ predicate: privateQuery });
     client.removeQueries({ predicate: privateQuery });
+    let logoutUrl: string;
     try {
-      await httpClient("/v1/auth/logout", { method: "POST" });
-      await client.cancelQueries({ predicate: privateQuery });
-      client.setQueryData(["auth", "session"], null);
-      setCSRFToken(undefined);
-      setWorkspaceId(undefined);
-      setEnvironmentId(undefined);
+      ({ logout_url: logoutUrl } = await httpClient<{ logout_url: string }>("/v1/auth/logout", { method: "POST" }));
     } catch {
       setLogoutFailed(true);
-    } finally {
       setSigningOut(false);
+      return;
     }
+    // Admin 067: a confirmed sign-out opens the end-session page of Keycloak, which ends its session
+    // and returns to the site (Backend 108). The page stays on "Signing out…" until it unloads, so
+    // /login never starts a new sign-in in between.
+    setCSRFToken(undefined);
+    window.location.assign(logoutUrl);
   }
   async function refreshWorkspaces() {
     await client.invalidateQueries({ queryKey: ["auth", "workspaces"] });
