@@ -37,7 +37,7 @@ The backend sends the browser to `/workspaces` after the callback, and the Admin
 3. After the sign-in, the backend sends the browser to `/` (Backend 108). `/` opens the Overview.
 4. With no chosen workspace, the Admin chooses the first workspace of the list that `GET /v1/workspaces` returns (ordered by name), and its Sandbox, as today. The user decided (2026-11-27) that any listed workspace is fine; the Admin does not remember the last one.
 5. A person with no workspace goes to the first-workspace onboarding (`/onboarding/workspace`, Admin 005), as `RequireSession` does today. A person with a workspace never sees it (user, 2026-11-27). This replaces Admin 051 criterion 3, where a new account landed on the empty workspace list.
-6. After a confirmed sign-out, the browser goes to the home of the site. Keycloak keeps its own session (the backend sign-out ends only the Admin session), so a sign-in within the Keycloak session lifetime (15 minutes idle, 8 hours at most) does not ask for the password again. The user chose this over an OpenID Connect RP-Initiated Logout (2026-11-27).
+6. After a confirmed sign-out, the browser goes to the `logout_url` that the backend answers (Backend 108): the end-session page of Keycloak, which ends the Keycloak session and sends the browser to the home of the site. Another account can then sign in in the same browser. The user decided this on 2026-11-27, after the code review found that a sign-in with another account after a sign-out failed in Keycloak; it replaces the first choice, which ended only the Admin session.
 7. The demo login of Backend 107 lands on `/` like everyone: the demo owner has one workspace, so the Admin opens it in its Sandbox. `DemoAccountGate` stays for `/account` paths.
 
 ---
@@ -60,7 +60,7 @@ The backend sends the browser to `/workspaces` after the callback, and the Admin
 - [ ] 3. As a platform administrator with workspaces, I want to land on the Overview after the sign-in, so that I see the state of my environment at once.
 - [ ] 4. As a new account with no workspace, I want to land on the first-workspace onboarding, so that I create my workspace.
 - [ ] 5. As a platform administrator whose sign-in failed, I want to see the error and try again, so that the browser does not loop.
-- [ ] 6. As a platform administrator, I want the sign-out to take me to the site, so that the Admin does not sign me in again at once.
+- [ ] 6. As a platform administrator, I want the sign-out to end my session and take me to the site, so that another account can sign in in the same browser.
 - [ ] 7. As a visitor of the public demo, I want to land on the demo workspace in its Sandbox, so that I see the demo at once.
 
 ---
@@ -88,7 +88,7 @@ No new API. `GET /v1/workspaces`, `GET /v1/workspaces/{id}/environments`, `POST 
 2. The heading and text of the login page show only while the sign-in starts ("Opening sign-in…") or with the error. **Continue to sign in** and **Continue to sign up** become **Try again**, shown only with the error.
 3. The authentication state chooses the first listed workspace when none is chosen, instead of only when the list has one item. The branch of `RequireSession` that sends a person with workspaces and no chosen workspace to `/account/workspaces` is removed: it can no longer happen.
 4. `/workspaces` stays as a route and redirects to `/`, for old links. The backend no longer sends the sign-in there (Backend 108).
-5. The site origin reaches the Admin build as the public variable `VITE_SITE_ORIGIN`, the way the site gets `NEXT_PUBLIC_ADMIN_ORIGIN`: in `.env.example`, `.env.local`, the Admin Dockerfile as a build argument, and the Terraform roots of the Admin (local and production) as `build_args`. The Terraform roots are in `backend/infra/terraform`; they change with this specification, not with Backend 108. After a confirmed sign-out the Admin sets `window.location` to it.
+5. The sign-out reads `logout_url` from the answer of `POST /v1/auth/logout` and sets `window.location` to it. The page stays on "Signing out…" until it unloads, so `/login` never starts a new sign-in in between. The Admin needs no site origin of its own: the backend builds the address.
 6. A link of a Slack message opened while signed out (Admin 059) still returns to the signal after the sign-in: `keepReturnLink` runs before the redirect to `/login`, and the return happens after the session loads, on any route.
 7. The Local Functional Test of `AGENTS.md` changes with the code: step 2 no longer clicks **Continue to sign in**.
 
@@ -111,7 +111,7 @@ This module has no automated tests (`AGENTS.md`, Verification). The change is ve
 - [ ] 2. `/login?error=authentication_failed` shows the error and **Try again**, and does not leave the page by itself.
 - [ ] 3. After the sign-in, a person with workspaces lands on the Overview of the first listed workspace, in its Sandbox.
 - [ ] 4. After the sign-in, a person with no workspace lands on `/onboarding/workspace`.
-- [ ] 5. After a confirmed sign-out, the browser opens the home of the site.
+- [ ] 5. After a confirmed sign-out, Keycloak ends its session with no confirmation page and the browser opens the home of the site; a sign-in with another account then succeeds.
 - [ ] 6. The demo login lands on the Overview of the demo workspace, in its Sandbox, with the read-only notice.
 - [ ] 7. A link of a Slack message opened while signed out opens the signal after the sign-in.
 - [ ] 8. `npm run check` and `npm run build` pass.
@@ -121,7 +121,6 @@ This module has no automated tests (`AGENTS.md`, Verification). The change is ve
 
 ## Out of Scope
 
-- Ending the Keycloak session on sign-out (OpenID Connect RP-Initiated Logout).
 - Remembering the last workspace or environment.
 - The Keycloak session lifetimes and brute-force settings.
 
