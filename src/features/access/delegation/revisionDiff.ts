@@ -38,7 +38,8 @@ function compare<T>(before: T[], after: T[], id: (v: T) => string) {
 // What changed in an identity provider that stays: its kinds, its expiry, the consent or its harness login.
 function scopeChange(was: ScopeRecord, now: ScopeRecord) {
   const parts: string[] = [];
-  if (kindsText(was.kinds) !== kindsText(now.kinds)) parts.push(`${kindsText(was.kinds)} → ${kindsText(now.kinds)}`);
+  // A provider left with no kind reads as none, not as an empty side of the arrow.
+  if (kindsText(was.kinds) !== kindsText(now.kinds)) parts.push(`${kindsText(was.kinds) || 'none'} → ${kindsText(now.kinds) || 'none'}`);
   if (day(was.expires_at) !== day(now.expires_at)) parts.push(now.expires_at ? `until ${day(now.expires_at)}` : 'no expiry');
   if (recordKey(was.consent) !== recordKey(now.consent)) parts.push('consent');
   if (recordKey(was.person_consent ?? null) !== recordKey(now.person_consent ?? null)) parts.push('harness login');
