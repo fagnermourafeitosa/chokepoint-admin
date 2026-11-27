@@ -38,7 +38,7 @@ scenarios:
     last_run:
       date: 2026-11-27
       result: passed
-      notes: "Removed Rafael Souza and the tool get_order of Acme Billing 106: Acme Identity Changed (2 → 1 people, Rafael under it), get_order Removed; the warning had the people line and the tool line in that order. Expiry 2026-12-31 on list_refunds: the expiry line. Added the rule Only order A-1 on list_refunds: the added rule line with its sentence. Removed the rule Refund up to 500: Rules −1 with its sentence, no warning. The UI has no in-place edit of a rule, so a changed rule (before → after) was checked by code inspection; blocked person, narrowed kinds and removed allowed value were checked by code inspection. Discarded each draft."
+      notes: "Removed Rafael Souza and the tool get_order of Acme Billing 106: Acme Identity Changed (2 → 1 people, Rafael under it), get_order Removed; the warning had the people line and the tool line in that order. Expiry 2026-12-31 on list_refunds: the expiry line. Added the rule Only order A-1 on list_refunds: the added rule line with its sentence. Run again after the review fixes in one draft: four lines in the order of the change list (people, expiry, tool, rule), Publish 4 changes. Removed the rule Refund up to 500: Rules −1 with its sentence, no warning. The UI has no in-place edit of a rule, so a changed rule (before → after) was checked by code inspection; blocked person, narrowed kinds and removed allowed value were checked by code inspection. Discarded each draft."
   - id: S3
     title: A change that only gives access has no warning
     criteria: [2]
@@ -79,7 +79,7 @@ scenarios:
     last_run:
       date: 2026-11-27
       result: passed
-      notes: "With the draft of S3, History, Draft, Publish: dialog Publish 1 change to refunds-assistant? with no warning; note Admin 064 functional test: add Camila; revision 106 published with that note. Restored through the review panel: the warning named Camila Rocha; revision 108 published with the note Admin 064 functional test: restore."
+      notes: "With the draft of S3, History, Draft, Publish: dialog Publish 1 change to refunds-assistant? with no warning; note Admin 064 functional test: add Camila; revision 106 published with that note. Restored through the review panel: the warning named Camila Rocha; revision 108 published with the note Admin 064 functional test: restore. Run again after the review fixes, watched by the user: revisions 110 (add Camila, from the history) and 112 (restore, from the review panel)."
   - id: S6
     title: A blocker disables both Publish buttons
     criteria: [10]
