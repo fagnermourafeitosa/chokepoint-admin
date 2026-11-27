@@ -84,13 +84,16 @@ export const isBlocked = (doc: Doc, issuer: string, subject: string) => doc.bloc
 // A scope with harness login on and no group can not be published (Backend 045 Resolved Decision 24).
 export const harnessWithoutGroups = (doc: Doc) => doc.scopes.some(s => s.kinds.includes('person') && s.personConsent && s.personConsent.groups.length === 0);
 
+// The comparison key of a record of the permission document. An absent person_consent equals null:
+// documents published before Backend 045 do not have it. An empty or absent usage list is the same:
+// rules without limits (Backend 087). Object keys are sorted: the backend can return the fields of a
+// record in another order than the Admin builds them.
+const sorted = (x: unknown) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([a], [b]) => a.localeCompare(b))) : x);
+export const recordKey = (v: unknown) => JSON.stringify(v, (k, x) => (k === 'recorded_by_name' || (k === 'person_consent' && x == null) || (k === 'usage' && (x == null || (Array.isArray(x) && x.length === 0))) ? undefined : sorted(x)));
+
 // Unpublished changes: the items of each collection that differ from the published document.
 export function countChanges(next: PermissionDocument, published: PermissionDocument) {
-  // An absent person_consent equals null: documents published before Backend 045 do not have it.
-  // An empty or absent usage list is the same: rules without limits (Backend 087).
-  // Object keys are sorted: the backend can return the fields of a record in another order than the Admin builds them.
-  const sorted = (x: unknown) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([a], [b]) => a.localeCompare(b))) : x);
-  const key = (v: unknown) => JSON.stringify(v, (k, x) => (k === 'recorded_by_name' || (k === 'person_consent' && x == null) || (k === 'usage' && (x == null || (Array.isArray(x) && x.length === 0))) ? undefined : sorted(x)));
+  const key = recordKey;
   const diff = <T,>(a: T[], b: T[]) => { const left = new Set(a.map(key)), right = new Set(b.map(key)); return [...left].filter(x => !right.has(x)).length + [...right].filter(x => !left.has(x)).length; };
   return diff(next.scopes, published.scopes) + diff(next.delegations, published.delegations) + diff(next.capabilities, published.capabilities) + diff(next.resources, published.resources) + diff(next.conditions, published.conditions) + diff(next.blocked ?? [], published.blocked ?? []);
 }

@@ -3,7 +3,7 @@
 - **Specification ID**: 064
 - **Date**: 2026-11-24
 - **Slug**: revision-review
-- **Status**: In Progress
+- **Status**: Implemented
 - **Owner**: Admin — Access and Permissions (Delegation and access, publication bar, revision history)
 - **Related Specification**: [026 — Agent Delegation Editor](026-2026-10-31-agent-delegation-editor.md) (publication bar)
 - **Related Specification**: [032 — Revision History](032-2026-11-02-revision-history.md) (history panel and its diff)
@@ -84,17 +84,17 @@ The layout and the specification were approved by the user on 2026-11-27.
 
 ## User Stories
 
-- [ ] 1. As an administrator, I want Review & publish to list what the draft changes, so that I know what I publish.
-- [ ] 2. As an administrator, I want a warning when a publication takes access away, with who loses what, so that I do not cut an agent off by mistake.
-- [ ] 3. As an administrator, I want each warning line to name the deny reason that the calls will get, so that I recognize it later in Investigate.
-- [ ] 4. As an administrator, I want a changed rule to show its sentence before and after, so that I see what the rule now asks.
-- [ ] 5. As an administrator, I want the people of a removed identity provider under the provider, counted once, so that one action reads as one change.
-- [ ] 6. As an administrator, I want added, removed and changed rows marked in the Draft view, so that I see my edits where I made them.
-- [ ] 7. As an administrator, I want a removed row to stay visible until I publish or discard, so that I can still see what I took out.
-- [ ] 8. As an administrator, I want the draft at the top of the history, so that I read unpublished changes the same way as published ones.
-- [ ] 9. As an administrator, I want to publish from the history with a short confirmation, so that I do not review the same list twice.
-- [ ] 10. As an administrator, I want the history to say why revision numbers skip, so that I do not look for a missing revision.
-- [ ] 11. As an administrator, I want a revision with the same access to say what stayed the same, so that I know the history is not broken.
+- [x] 1. As an administrator, I want Review & publish to list what the draft changes, so that I know what I publish.
+- [x] 2. As an administrator, I want a warning when a publication takes access away, with who loses what, so that I do not cut an agent off by mistake.
+- [x] 3. As an administrator, I want each warning line to name the deny reason that the calls will get, so that I recognize it later in Investigate.
+- [x] 4. As an administrator, I want a changed rule to show its sentence before and after, so that I see what the rule now asks.
+- [x] 5. As an administrator, I want the people of a removed identity provider under the provider, counted once, so that one action reads as one change.
+- [x] 6. As an administrator, I want added, removed and changed rows marked in the Draft view, so that I see my edits where I made them.
+- [x] 7. As an administrator, I want a removed row to stay visible until I publish or discard, so that I can still see what I took out.
+- [x] 8. As an administrator, I want the draft at the top of the history, so that I read unpublished changes the same way as published ones.
+- [x] 9. As an administrator, I want to publish from the history with a short confirmation, so that I do not review the same list twice.
+- [x] 10. As an administrator, I want the history to say why revision numbers skip, so that I do not look for a missing revision.
+- [x] 11. As an administrator, I want a revision with the same access to say what stayed the same, so that I know the history is not broken.
 
 ---
 
@@ -141,19 +141,19 @@ No automated tests (see `AGENTS.md`). Run `npm run check` and `npm run build`, t
 
 ## Acceptance Criteria
 
-- [ ] 1. Review & publish opens the review panel with the summary, the change list, the note, Back to the draft and Publish N changes; the inline review step of the bar is gone.
-- [ ] 2. Removing the only identity provider of an agent shows the warning "Access is lost" with the line of the last identity provider; adding a tool alone shows no warning.
-- [ ] 3. A draft with several losses shows one warning with one line per loss, in the order of the change list, for each type of the table of Solution item 2.
-- [ ] 4. The people of a removed identity provider sit under it and the change counts once in the panel, in the history and in the publication bar.
-- [ ] 5. A changed rule shows its sentence before and after.
-- [ ] 6. The List view of the Draft marks added, removed and changed rows; a removed row stays struck through with Open only; the Graph view marks the same boxes and dashes their relations in the neutral colour, with one Unpublished chip on the canvas; the Published view has no marks.
-- [ ] 7. The history opened from the publication bar shows the draft first with its change list and Publish; Publish opens the confirmation with the warning and the note, and publishes.
-- [ ] 8. The history opened from the Report-only notice shows no draft.
-- [ ] 9. The history shows the numbering note, and a revision with the same permission document names what stayed the same.
-- [ ] 10. A blocker disables Publish in the review panel and in the history confirmation.
-- [ ] 11. The losses, their texts and the warning live in three separate files; the deny reason texts are read from the Investigate labels.
-- [ ] 12. Functional test: [064-2026-11-24-revision-review](functional-tests/064-2026-11-24-revision-review.md).
-- [ ] 13. `npm run check` and `npm run build` pass.
+- [x] 1. Review & publish opens the review panel with the summary, the change list, the note, Back to the draft and Publish N changes; the inline review step of the bar is gone.
+- [x] 2. Removing the only identity provider of an agent shows the warning "Access is lost" with the line of the last identity provider; adding a tool alone shows no warning.
+- [x] 3. A draft with several losses shows one warning with one line per loss, in the order of the change list, for each type of the table of Solution item 2. Browser: people, tool, expiry, added rule; code inspection: blocked person, narrowed kinds, allowed value, changed rule.
+- [x] 4. The people of a removed identity provider sit under it and the change counts once in the panel, in the history and in the publication bar.
+- [x] 5. A changed rule shows its sentence before and after. Code inspection: the Admin has no in-place edit of a rule; added and removed rules show their sentence in the browser.
+- [x] 6. The List view of the Draft marks added, removed and changed rows; a removed row stays struck through with Open only; the Graph view marks the same boxes and dashes their relations in the neutral colour, with one Unpublished chip on the canvas; the Published view has no marks.
+- [x] 7. The history opened from the publication bar shows the draft first with its change list and Publish; Publish opens the confirmation with the warning and the note, and publishes.
+- [x] 8. The history opened from the Report-only notice shows no draft. Code inspection: no agent of the demo is in Report-only.
+- [x] 9. The history shows the numbering note, and a revision with the same permission document names what stayed the same. The second part by code inspection: no such revision in the demo history.
+- [x] 10. A blocker disables Publish in the review panel and in the history confirmation.
+- [x] 11. The losses, their texts and the warning live in three separate files; the deny reason texts are read from the Investigate labels.
+- [x] 12. Functional test: [064-2026-11-24-revision-review](functional-tests/064-2026-11-24-revision-review.md).
+- [x] 13. `npm run check` and `npm run build` pass.
 
 ---
 

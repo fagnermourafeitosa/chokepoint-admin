@@ -1,16 +1,14 @@
-import { useState } from 'react';
 import { CircleCheck, History, RefreshCw } from 'lucide-react';
 import type { Configuration } from './api';
 
-type Props = { config: Configuration; changes: number; busy: boolean; blocker?: string; onPublish: (note: string) => Promise<boolean>; onDiscard: () => void; onHistory: () => void };
+type Props = { config: Configuration; changes: number; busy: boolean; onReview: () => void; onDiscard: () => void; onHistory: () => void };
 
 const utc = (at: string) => new Date(at).toLocaleString('en', { timeZone: 'UTC', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }) + ' UTC';
 
 // Draft and runtime state side by side. Reconciliation is automatic; there is no repair action (Backend 033 Solution 5).
 // The author, time and note of the latest revision open the history (Admin 032 section 1).
-export function PublishBar({ config, changes, busy, blocker, onPublish, onDiscard, onHistory }: Props) {
-  const [review, setReview] = useState(false);
-  const [note, setNote] = useState('');
+// changes: the changes of the diff, each counted once (Admin 064 Solution 3). Review & publish opens the review panel.
+export function PublishBar({ config, changes, busy, onReview, onDiscard, onHistory }: Props) {
   const pending = config.reconciliation.state === 'pending' && config.published_revision > config.effective_revision;
   const hasDraft = changes > 0 || !!config.draft;
   const author = config.published_by_name || config.published_by?.slice(0, 8);
@@ -25,14 +23,8 @@ export function PublishBar({ config, changes, busy, blocker, onPublish, onDiscar
       {config.published_revision ? <button type="button" className="rule-switch" onClick={onHistory}><History size={14} aria-hidden="true" />History</button> : null}
     </div>
     <div className="delegation-publish-actions">
-      {review ? <>
-        <label className="delegation-publish-note"><span className="cp-admin-muted">Publish {changes} {changes === 1 ? 'change' : 'changes'}? New calls use them once OpenFGA confirms.</span><input className="cp-admin-input" maxLength={500} placeholder="Why this change? (optional)" value={note} onChange={e => setNote(e.target.value)} /></label>
-        <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" disabled={busy} onClick={() => setReview(false)}>Back</button>
-        <button type="button" className="cp-admin-button cp-admin-button--small" disabled={busy} onClick={() => void onPublish(note).then(ok => { if (ok) { setReview(false); setNote(''); } })}>{busy ? 'Publishing…' : 'Publish'}</button>
-      </> : <>
-        <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" disabled={busy || !hasDraft} onClick={onDiscard}>Discard draft</button>
-        <button type="button" className="cp-admin-button cp-admin-button--small" disabled={busy || !changes || !!blocker} title={blocker} onClick={() => setReview(true)}>Review &amp; publish</button>
-      </>}
+      <button type="button" className="cp-admin-button cp-admin-button--secondary cp-admin-button--small" disabled={busy || !hasDraft} onClick={onDiscard}>Discard draft</button>
+      <button type="button" className="cp-admin-button cp-admin-button--small" disabled={busy || !changes} onClick={onReview}>Review &amp; publish</button>
     </div>
   </div>;
 }

@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { Bot, Braces, Clock, Database, Layers, Maximize2, Minimize2, Plus, ScanSearch, ServerCog, User, Users, Wrench, ZoomIn, ZoomOut } from 'lucide-react';
 import { nodeH, nodeW, sameSelection, type delegationLayout, type LayoutNode, type Selection } from './layout';
+import type { ChangeKind } from './revisionDiff';
 import './graph.css';
 
 type Layout = ReturnType<typeof delegationLayout>;
@@ -20,10 +21,16 @@ function zoomAt(o: View, factor: number, px: number, py: number, limit: number):
   return { x: px - (px - o.x) * r, y: py - (py - o.y) * r, width, height: o.height * r };
 }
 
-type Props = { layout: Layout; selected?: Selection; onSelect: (s: Selection) => void; onMove: (key: string, x: number, y: number) => void; readOnly: boolean; maximized: boolean; onMaximize: () => void };
+type Props = { layout: Layout; selected?: Selection; onSelect: (s: Selection) => void; onMove: (key: string, x: number, y: number) => void; readOnly: boolean; maximized: boolean; onMaximize: () => void; marks?: Map<string, ChangeKind> };
+
+// The mark of a box or a relation in the Draft view (Admin 064 Solution 4): the badge of the List view
+// on the box; a changed relation is dashed in the neutral line colour, never red.
+const badge: Record<ChangeKind, { tone: string; text: string }> = { added: { tone: 'success', text: 'Added' }, removed: { tone: 'danger', text: 'Removed' }, changed: { tone: 'warning', text: 'Changed' } };
+export const markKey = (s: Selection) => (s.type === 'idp' ? `idp:${s.issuer}` : s.type === 'capability' ? `tool:${s.id}` : undefined);
 
 // The graph is the map: a node or an edge opens its editor in the side panel. Boxes can be moved.
-export function DelegationGraph({ layout, selected, onSelect, onMove, readOnly, maximized, onMaximize }: Props) {
+export function DelegationGraph({ layout, selected, onSelect, onMove, readOnly, maximized, onMaximize, marks }: Props) {
+  const mark = (s: Selection) => { const k = markKey(s); return k ? marks?.get(k) : undefined; };
   const fit: View = { x: 0, y: 0, width: layout.width, height: layout.height };
   const [view, setView] = useState(fit);
   const svg = useRef<SVGSVGElement>(null);
@@ -90,9 +97,9 @@ export function DelegationGraph({ layout, selected, onSelect, onMove, readOnly, 
         const mx = (x + tx) / 2, my = b ?? (y + ty) / 2;
         const active = sameSelection(selected, edge.select), group = edge.select.type === 'group', toResource = edge.to.column === 'resources', empty = !group && !toResource && !edge.expires && !edge.conditions;
         if (edge.mapping !== undefined) return <g key={edge.key} className="delegation-edge delegation-edge--mapping" aria-hidden="true"><path d={d} /><text x={tx - 8} y={ty - 6} textAnchor="end">reads {edge.mapping}</text></g>;
-        return <g key={edge.key} className="delegation-edge" data-active={active}>
+        return <g key={edge.key} className="delegation-edge" data-active={active} data-change={mark(edge.select)}>
           <path d={d} />
-          {(readOnly && empty) || (toResource && !group) ? null : <foreignObject x={mx - 40} y={my - 12} width={80} height={24}><button type="button" className="delegation-edge-handle" aria-pressed={active} aria-label={empty ? `Add rule to ${edge.from.title} to ${edge.to.title}` : `Edit relation ${edge.from.title} to ${edge.to.title}`} title={empty ? 'Add a rule' : 'Open'} onClick={() => onSelect(empty && 'id' in edge.select ? { ...edge.select, addCondition: true } : edge.select)}>
+          {((readOnly || mark(edge.select) === 'removed') && empty) || (toResource && !group) ? null : <foreignObject x={mx - 40} y={my - 12} width={80} height={24}><button type="button" className="delegation-edge-handle" aria-pressed={active} aria-label={empty ? `Add rule to ${edge.from.title} to ${edge.to.title}` : `Edit relation ${edge.from.title} to ${edge.to.title}`} title={empty ? 'Add a rule' : 'Open'} onClick={() => onSelect(empty && 'id' in edge.select ? { ...edge.select, addCondition: true } : edge.select)}>
             {group ? <strong>{edge.count}</strong> : null}
             {edge.expires ? <Clock size={12} aria-label="Has expiration" /> : null}
             {edge.conditions ? <><Braces size={12} aria-label="Call conditions" />{edge.conditions}</> : null}
@@ -100,15 +107,16 @@ export function DelegationGraph({ layout, selected, onSelect, onMove, readOnly, 
           </button></foreignObject>}
         </g>;
       })}
-      {layout.nodes.map(node => <foreignObject key={node.key} x={node.x} y={node.y} width={nodeW} height={nodeH}>
+      {layout.nodes.map(node => { const change = mark(node.select); return <foreignObject key={node.key} x={node.x} y={node.y} width={nodeW} height={nodeH}>
         <div className="delegation-node-drag" onPointerDown={e => nodeDown(e, node)} onPointerMove={nodeMove} onPointerUp={() => { const m = move.current; move.current = null; if (m && !m.moved) onSelect(node.select); }} onPointerCancel={() => { move.current = null; }}>
-          <button type="button" className="agent-graph-node delegation-node" data-column={node.column} data-group={!!node.count} aria-pressed={sameSelection(selected, node.select)} onClick={e => { if (e.detail === 0) onSelect(node.select); }}>
+          <button type="button" className="agent-graph-node delegation-node" data-column={node.column} data-group={!!node.count} data-change={change} aria-pressed={sameSelection(selected, node.select)} onClick={e => { if (e.detail === 0) onSelect(node.select); }}>
             <span className="agent-graph-node-icon"><NodeIcon node={node} /></span>
-            <span className="agent-graph-node-copy"><strong title={node.title}>{node.title}</strong><small>{node.subtitle}</small></span>
+            <span className="agent-graph-node-copy"><strong title={node.title}>{node.title}</strong><small>{change ? <span className="mcp-badge" data-tone={badge[change].tone}>{badge[change].text}</span> : null}{node.subtitle}</small></span>
           </button>
         </div>
-      </foreignObject>)}
+      </foreignObject>; })}
     </svg>
     <p className="agent-graph-pan-hint">Drag a box to move it · Drag the background to pan · Scroll to zoom</p>
+    {marks?.size ? <p className="delegation-graph-legend"><span className="mcp-badge" data-tone="warning">Unpublished</span><svg width="28" height="8" aria-hidden="true"><path d="M 0 4 L 28 4" /></svg>Dashed: changed in the draft, not published yet.</p> : null}
   </div>;
 }

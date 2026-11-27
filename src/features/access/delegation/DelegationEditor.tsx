@@ -10,13 +10,16 @@ import { delegationKey, permissionApi } from './api';
 import { CatalogProvider, useCatalog } from './catalog';
 import { AddPanel } from './AddPanel';
 import { AgentPanel, type AgentView } from './AgentPanel';
-import { DelegationGraph } from './DelegationGraph';
+import { DelegationGraph, markKey } from './DelegationGraph';
 import { FilterBar, filterDoc, isFiltered, noFilters, type Filters } from './FilterBar';
 import { GraphHelp } from './GraphHelp';
 import { GroupPanel } from './GroupPanel';
 import { IdentityProvidersPanel } from './IdentityProvidersPanel';
 import { IdpPanel } from './IdpPanel';
-import { capabilityId, harnessWithoutGroups, idpName, serverName, type Catalog, type Doc } from './model';
+import { capabilityId, harnessWithoutGroups, idpName, serverName, toDocument, type Catalog, type Doc } from './model';
+import { accessLosses } from './accessLoss';
+import { relationMarks, revisionDiff } from './revisionDiff';
+import { ReviewPanel, type DraftReview } from './ReviewPanel';
 import { delegationLayout, type LayoutEdge, type LayoutNode, type Positions, type Selection } from './layout';
 import { ListView } from './ListView';
 import { PublishBar } from './PublishBar';
@@ -127,13 +130,27 @@ function Editor({ scope, agentId, agentName, reportOnly, mode, version, onView, 
   const [maximized, setMaximized] = useState(false);
   const [help, setHelp] = useState(false);
   const [history, setHistory] = useState(false);
+  const [reviewing, setReviewing] = useState(false);
   const [selected, setSelected] = useState<Selection | undefined>(() => targetSelection(target, state.draft));
   const [filters, setFilters] = useState<Filters>(noFilters);
   const readOnly = version === 'published';
   const doc: Doc = readOnly ? state.published : state.draft;
   const view = useMemo(() => (isFiltered(filters) ? filterDoc(doc, filters, catalog) : doc), [doc, filters, catalog]);
   const count = (d: Doc) => d.scopes.length + d.capabilities.length;
-  const layout = useMemo(() => rulesLayout(agentName, view, catalog, positions), [agentName, view, catalog, positions]);
+  // The draft against the published revision (Admin 064): one diff for the review panel, the history,
+  // the marks of the Draft view and the count of the publication bar.
+  const diff = useMemo(() => revisionDiff(state.config?.published, toDocument(state.draft), catalog), [state.config?.published, state.draft, catalog]);
+  const losses = useMemo(() => accessLosses(diff), [diff]);
+  const marks = useMemo(() => (readOnly ? undefined : relationMarks(diff.changes)), [readOnly, diff]);
+  // Removed relations stay in the Draft view, from the published document, while no filter is set.
+  const removed = useMemo<Doc | undefined>(() => {
+    if (!marks || isFiltered(filters)) return undefined;
+    const gone = (k: string) => marks.get(k) === 'removed';
+    const scopes = state.published.scopes.filter(s => gone(`idp:${s.issuer}`));
+    return { ...state.published, scopes, delegations: state.published.delegations.filter(d => scopes.some(s => s.issuer === d.issuer)), capabilities: state.published.capabilities.filter(c => gone(`tool:${c.id}`)), resources: [], blocked: [] };
+  }, [marks, filters, state.published]);
+  const drawn = useMemo(() => (removed ? { ...view, scopes: [...view.scopes, ...removed.scopes], delegations: [...view.delegations, ...removed.delegations], capabilities: [...view.capabilities, ...removed.capabilities] } : view), [view, removed]);
+  const layout = useMemo(() => rulesLayout(agentName, drawn, catalog, positions), [agentName, drawn, catalog, positions]);
   const select = (s: Selection, parent?: Selection) => { setFrom(parent); setSelected(s); };
   const close = () => { setSelected(undefined); setFrom(undefined); };
   // A version switch closes the panel; the first run is skipped, so a panel opened by a URL target stays.
@@ -166,7 +183,13 @@ function Editor({ scope, agentId, agentName, reportOnly, mode, version, onView, 
   }, [maximized]);
   if (state.query.isError || error) return <div role="alert" className="cp-admin-notice" data-tone="danger">Could not load the delegation and access of this agent. <button type="button" className="cp-admin-button cp-admin-button--ghost" onClick={() => { void state.reload(); retry(); }}>Retry</button></div>;
   if (!state.config || loading) return <p role="status" className="cp-admin-muted">Loading delegation and access…</p>;
-  const head = selected ? panelHead(selected, doc, catalog, agentName) : undefined;
+  // A removed relation opens in the published document, read only (Admin 064 Solution 4).
+  const selectedKey = selected ? markKey(selected) : undefined;
+  const removedOpen = !!selectedKey && marks?.get(selectedKey) === 'removed';
+  const panelDoc = removedOpen ? state.published : doc;
+  const head = selected ? panelHead(selected, panelDoc, catalog, agentName) : undefined;
+  const blocker = harnessWithoutGroups(state.draft) ? 'Harness login is on without a group. Choose at least one group, or turn it off.' : undefined;
+  const review: DraftReview = { changes: diff.changes, losses, base: state.config.published_revision, busy: state.busy, error: state.error || undefined, conflict: state.conflict, blocker, onPublish: state.publish, onReload: () => { void state.reload(); } };
   // Add trusted attributes leaves for Context sources with the tool, so that its page can return here.
   const toContextSources = (id: string) => {
     const c = doc.capabilities.find(x => x.id === id);
@@ -184,17 +207,18 @@ function Editor({ scope, agentId, agentName, reportOnly, mode, version, onView, 
     {state.error ? <div role="alert" className="cp-admin-notice" data-tone="danger">{state.error}{state.conflict ? <button type="button" className="cp-admin-button cp-admin-button--ghost" disabled={state.busy} onClick={() => void state.reload()}>Reload</button> : null}</div> : null}
     <div className="delegation-body" data-panel={false}>
       {mode === 'graph'
-        ? <DelegationGraph layout={layout} selected={selected} onSelect={s => select(s)} onMove={(key, x, y) => setPositions(p => ({ ...p, [key]: { x, y } }))} readOnly={readOnly} maximized={maximized} onMaximize={() => setMaximized(v => !v)} />
-        : <ListView doc={view} source={doc} selected={selected} onSelect={s => select(s)} onChange={state.edit} readOnly={readOnly} />}
+        ? <DelegationGraph layout={layout} selected={selected} onSelect={s => select(s)} onMove={(key, x, y) => setPositions(p => ({ ...p, [key]: { x, y } }))} readOnly={readOnly} maximized={maximized} onMaximize={() => setMaximized(v => !v)} marks={marks} />
+        : <ListView doc={view} source={doc} selected={selected} onSelect={s => select(s)} onChange={state.edit} readOnly={readOnly} marks={marks} removed={removed} />}
     </div>
     {help ? <GraphHelp onClose={() => setHelp(false)} /> : null}
-    <PublishBar config={state.config} changes={state.changes} busy={state.busy} blocker={harnessWithoutGroups(state.draft) ? 'Harness login is on without a group. Choose at least one group, or turn it off.' : undefined} onPublish={state.publish} onDiscard={() => { void state.discard(); close(); }} onHistory={() => setHistory(true)} />
-    {history ? <RevisionHistory scope={scope} agentId={agentId} agentName={agentName} onClose={() => setHistory(false)} /> : null}
+    <PublishBar config={state.config} changes={state.changes ? Math.max(diff.changes.length, 1) : 0} busy={state.busy} onReview={() => { close(); setReviewing(true); }} onDiscard={() => { void state.discard(); close(); }} onHistory={() => { close(); setHistory(true); }} />
+    {reviewing ? <ReviewPanel agentName={agentName} review={review} onClose={() => setReviewing(false)} /> : null}
+    {history ? <RevisionHistory scope={scope} agentId={agentId} agentName={agentName} draft={state.changes ? review : undefined} onClose={() => setHistory(false)} /> : null}
     {selected && head ? <SidePanel eyebrow={head.eyebrow} title={head.heading ?? head.title} onClose={close}>
       {from ? <button type="button" className="rule-switch panel-back" onClick={() => { setSelected(from); setFrom(undefined); }}><ArrowLeft size={14} aria-hidden="true" />Back to {panelHead(from, doc, catalog, agentName).title}</button> : null}
-      <fieldset ref={panel} key={JSON.stringify(selected) + version} className="relation-side-panel" disabled={readOnly || state.busy}>
+      <fieldset ref={panel} key={JSON.stringify(selected) + version} className="relation-side-panel" disabled={readOnly || removedOpen || state.busy}>
         {selected.type === 'capability'
-          ? <ToolPanel published={state.published} id={selected.id} start={!!selected.addCondition} agentName={agentName} doc={doc} onChange={state.edit} onClose={close} onContextSources={() => toContextSources(selected.id)} />
+          ? <ToolPanel published={state.published} id={selected.id} start={!!selected.addCondition} agentName={agentName} doc={panelDoc} onChange={state.edit} onClose={close} onContextSources={() => toContextSources(selected.id)} />
           : selected.type === 'agent'
           ? <AgentPanel agentName={agentName} reportOnly={reportOnly} doc={doc} onSelect={s => select(s, selected)} onView={v => { close(); onView(v); }} />
           : selected.type === 'add' && selected.what === 'delegator'
@@ -202,7 +226,7 @@ function Editor({ scope, agentId, agentName, reportOnly, mode, version, onView, 
           : selected.type === 'add'
           ? <aside className="relation-panel" aria-label="Selected relation"><AddPanel what={selected.what} agentName={agentName} doc={doc} onChange={state.edit} onDone={close} /></aside>
           : selected.type === 'idp'
-          ? <aside className="relation-panel" aria-label="Selected relation"><IdpPanel doc={doc} issuer={selected.issuer} agentName={agentName} onChange={state.edit} onClose={close} onSelect={s => select(s, selected)} /></aside>
+          ? <aside className="relation-panel" aria-label="Selected relation"><IdpPanel doc={panelDoc} issuer={selected.issuer} agentName={agentName} onChange={state.edit} onClose={close} onSelect={s => select(s, selected)} /></aside>
           : selected.type === 'group'
           ? <aside className="relation-panel" aria-label="Selected relation"><GroupPanel doc={doc} group={selected.group} groupKey={selected.key} label={selected.label} onSelect={s => select(s, selected)} /></aside>
           : null}

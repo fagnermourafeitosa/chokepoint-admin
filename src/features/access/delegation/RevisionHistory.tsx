@@ -1,22 +1,21 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { Database, Eye, FileCode2, User, Wrench } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { reviewDay } from '../../../components/report-only/ReportOnlyChip';
 import { SidePanel } from '../../../components/ui/side-panel/SidePanel';
 import type { AgentScope } from '../agent-api';
 import { permissionApi, revisionsKey, type Revision } from './api';
 import { useCatalog } from './catalog';
-import { revisionDiff, type Change, type Section } from './revisionDiff';
+import { revisionDiff, type Change } from './revisionDiff';
+import { ChangeList, ChangeSummary } from './ChangeList';
+import { PublishDialog } from './PublishDialog';
+import type { DraftReview } from './ReviewPanel';
 
 // The published revisions of an agent as a timeline, and what each one changed from the
 // revision before it (Admin 032 section 3, Backend 038). It needs a CatalogProvider for names.
-const sections: { key: Section; label: string; Icon: typeof User }[] = [
-  { key: 'delegator', label: 'Who can delegate', Icon: User },
-  { key: 'tool', label: 'Servers and tools', Icon: Wrench },
-  { key: 'resource', label: 'Allowed values', Icon: Database },
-  { key: 'rule', label: 'Rules', Icon: FileCode2 },
-];
-const sign = { added: '+', removed: '−', changed: '~' };
+// draft: the unpublished changes, first in the timeline, when the history opens from the
+// publication bar (Admin 064 Solution 5).
+const DRAFT = 'draft';
 const utc = (at: string) => new Date(at).toLocaleString('en', { timeZone: 'UTC', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }) + ' UTC';
 // An entry is a permission revision or a mode change (Backend 057), which has no number.
 const isMode = (r: Revision) => r.kind === 'enforcement';
@@ -25,9 +24,9 @@ const modeName = (m?: string) => (m === 'report_only' ? 'Report-only' : 'Enforce
 const author = (r: Revision) => r.published_by_name || r.published_by.slice(0, 8);
 const initials = (r: Revision) => (r.published_by_name ? r.published_by_name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase() : '');
 
-type Props = { scope: AgentScope; agentId: string; agentName: string; initial?: number; onClose: () => void };
+type Props = { scope: AgentScope; agentId: string; agentName: string; initial?: number; draft?: DraftReview; onClose: () => void };
 
-export function RevisionHistory({ scope, agentId, agentName, initial, onClose }: Props) {
+export function RevisionHistory({ scope, agentId, agentName, initial, draft, onClose }: Props) {
   const { catalog } = useCatalog();
   const list = useInfiniteQuery({
     queryKey: revisionsKey(scope, agentId),
@@ -37,7 +36,9 @@ export function RevisionHistory({ scope, agentId, agentName, initial, onClose }:
   });
   const items = useMemo(() => list.data?.pages.flatMap(p => p.items) ?? [], [list.data]);
   const [chosen, setChosen] = useState<string | undefined>(initial !== undefined ? `revision-${initial}` : undefined);
-  const selected = chosen ?? (items[0] ? entryId(items[0]) : undefined);
+  const [publishing, setPublishing] = useState(false);
+  const hasDraft = !!draft?.changes.length;
+  const selected = chosen === DRAFT && !hasDraft ? (items[0] ? entryId(items[0]) : undefined) : chosen ?? (hasDraft ? DRAFT : items[0] ? entryId(items[0]) : undefined);
   const index = items.findIndex(r => entryId(r) === selected);
   const current = index >= 0 ? items[index] : undefined;
   // The revision before the selected one is the next permission revision of the timeline:
@@ -56,8 +57,7 @@ export function RevisionHistory({ scope, agentId, agentName, initial, onClose }:
   const after = useQuery(snapshot(current && !isMode(current) ? current.revision : undefined));
   const before = useQuery(snapshot(previous?.revision));
   const waitingBefore = index >= 0 && previousIndex < 0 && list.hasNextPage;
-  const changes: Change[] | undefined = after.data && (!previous || before.data) && !waitingBefore ? revisionDiff(before.data?.document, after.data.action === 'revoke' ? undefined : after.data.document, catalog) : undefined;
-  const count = (k: Change['kind']) => changes?.filter(c => c.kind === k).length ?? 0;
+  const changes: Change[] | undefined = after.data && (!previous || before.data) && !waitingBefore ? revisionDiff(before.data?.document, after.data.action === 'revoke' ? undefined : after.data.document, catalog).changes : undefined;
 
   return <SidePanel title="Revision history" eyebrow={agentName} width="wide" onClose={onClose}><section className="history">
     <nav className="history-timeline" aria-label="Published revisions">
@@ -65,7 +65,11 @@ export function RevisionHistory({ scope, agentId, agentName, initial, onClose }:
       {list.isError ? <p role="alert" className="history-sample">The history could not be loaded. <button type="button" className="rule-switch" onClick={() => void list.refetch()}>Retry</button></p>
         : list.isPending ? <p role="status" className="history-sample">Loading the history…</p>
           : !items.length ? <p className="history-sample">Nothing was published yet.</p>
-            : <ol>{items.map(x => <li key={entryId(x)} data-kind={isMode(x) ? 'mode' : undefined} data-state={isMode(x) ? 'mode' : x.action === 'revoke' ? 'revoked' : !x.effective_at ? 'skipped' : x.revision === effective ? 'current' : 'past'}>
+            : <ol>{hasDraft ? <li data-state="draft"><button type="button" aria-current={selected === DRAFT || undefined} onClick={() => setChosen(DRAFT)}>
+              <span className="history-dot history-dot--draft" aria-hidden="true" />
+              <span className="history-entry"><span className="history-entry-head"><strong>Draft</strong><span className="mcp-badge" data-tone="warning">Not published</span></span>
+                <span className="history-entry-note">{draft!.changes.length} unpublished {draft!.changes.length === 1 ? 'change' : 'changes'}</span></span>
+            </button></li> : null}{items.map(x => <li key={entryId(x)} data-kind={isMode(x) ? 'mode' : undefined} data-state={isMode(x) ? 'mode' : x.action === 'revoke' ? 'revoked' : !x.effective_at ? 'skipped' : x.revision === effective ? 'current' : 'past'}>
               <button type="button" aria-current={entryId(x) === selected || undefined} onClick={() => setChosen(entryId(x))}>
                 {isMode(x) ? <span className="history-dot history-dot--mode" aria-hidden="true"><Eye size={12} /></span> : <span className="history-dot" aria-hidden="true" />}
                 <span className="history-entry">
@@ -76,9 +80,15 @@ export function RevisionHistory({ scope, agentId, agentName, initial, onClose }:
                 </span>
               </button>
             </li>)}</ol>}
+      <p className="history-sample">Revision numbers skip: saving a draft also takes a number.</p>
       {list.hasNextPage ? <p className="history-sample"><button type="button" className="rule-switch" disabled={list.isFetchingNextPage} onClick={() => void list.fetchNextPage()}>{list.isFetchingNextPage ? 'Loading…' : 'Load older entries'}</button></p> : null}
     </nav>
-    {current && isMode(current) ? <article className="history-detail" aria-label="Mode changed">
+    {selected === DRAFT && draft ? <article className="history-detail" aria-label="Draft">
+      <header className="history-detail-head"><div><span className="cp-admin-label">Not published</span><h4>Draft</h4></div></header>
+      <ChangeSummary title={draft.base ? `Changes from revision ${draft.base}` : 'Nothing is published yet'} changes={draft.changes} />
+      <ChangeList changes={draft.changes} />
+      <div><button type="button" className="cp-admin-button cp-admin-button--small" disabled={draft.busy || !!draft.blocker} title={draft.blocker} onClick={() => setPublishing(true)}>Publish</button></div>
+    </article> : current && isMode(current) ? <article className="history-detail" aria-label="Mode changed">
       <header className="history-detail-head">
         <div><span className="cp-admin-label">Event</span><h4>Mode changed</h4></div>
         <dl className="history-facts">
@@ -109,19 +119,14 @@ export function RevisionHistory({ scope, agentId, agentName, initial, onClose }:
       {after.isError || before.isError ? <p role="alert">The changes could not be loaded. <button type="button" className="rule-switch" onClick={() => { void after.refetch(); void before.refetch(); }}>Retry</button></p>
         : !changes ? <p role="status" className="cp-admin-muted">Loading the changes…</p>
           : <>
-            <div className="history-summary"><span>{previous ? `Changes from revision ${previous.revision}` : 'First revision'}</span><span className="history-count" data-kind="added">+{count('added')} added</span><span className="history-count" data-kind="removed">−{count('removed')} removed</span><span className="history-count" data-kind="changed">~{count('changed')} changed</span></div>
-            {changes.length ? <div className="history-diff">{sections.map(({ key, label, Icon }) => {
-              const rows = changes.filter(c => c.section === key);
-              if (!rows.length) return null;
-              return <section key={key}>
-                <h5><Icon size={14} aria-hidden="true" />{label}</h5>
-                <ul>{rows.map((c, i) => <li key={i} data-kind={c.kind}><span className="history-sign" aria-label={c.kind}>{sign[c.kind]}</span><strong>{c.label}</strong>{c.detail ? <code>{c.detail}</code> : null}</li>)}</ul>
-              </section>;
-            })}</div> : <p className="cp-admin-muted">This revision has the same access as the one before it.</p>}
+            <ChangeSummary title={previous ? `Changes from revision ${previous.revision}` : 'First revision'} changes={changes} />
+            {changes.length ? <ChangeList changes={changes} /> : <p className="cp-admin-muted">{previous ? `Who can delegate, the tools and the rules are the same as in revision ${previous.revision}.` : 'This revision has the same access as the one before it.'}</p>}
           </>}
     </article> : <article className="history-detail">
       {/* A revision published before Backend 038 has no event, so it is not in the timeline. */}
       {selected !== undefined && items.length > 0 && !list.hasNextPage && !list.isFetchingNextPage ? <p className="history-note history-note--empty">Revision {selected.replace('revision-', '')} was published before the history existed, so Xokepoint has no author, note or snapshot for it.</p> : null}
     </article>}
-  </section></SidePanel>;
+  </section>
+  {publishing && draft ? <PublishDialog agentName={agentName} review={draft} onClose={() => setPublishing(false)} onPublished={() => { setPublishing(false); setChosen(undefined); }} /> : null}
+  </SidePanel>;
 }
