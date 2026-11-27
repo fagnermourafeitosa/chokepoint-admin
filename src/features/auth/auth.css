@@ -28,9 +28,6 @@
   width: 100%;
   margin-top: var(--cp-admin-space-6);
 }
-.auth-secondary {
-  font-size: var(--cp-admin-type-small);
-}
 .auth-region a {
   color: var(--cp-admin-color-accent-text);
 }

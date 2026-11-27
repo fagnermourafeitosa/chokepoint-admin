@@ -165,4 +165,4 @@ Hooks live apart from JSX, one file per concern.
 | 064 | [Revision Review](specs/064-2026-11-24-revision-review.md) | Implemented |
 | 065 | [Generic OIDC Connection](specs/065-2026-11-25-generic-oidc-connection.md) | Implemented |
 | 066 | [Read-only Admin of the Public Demo](specs/066-2026-11-25-public-demo-read-only-admin.md) | Implemented |
-| 067 | [Direct Sign-in and Landing](specs/067-2026-11-27-direct-sign-in-and-landing.md) | In Progress |
+| 067 | [Direct Sign-in and Landing](specs/067-2026-11-27-direct-sign-in-and-landing.md) | Implemented |

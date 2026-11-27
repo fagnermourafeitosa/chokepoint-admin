@@ -1,8 +1,8 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { PreparingSteps } from "../onboarding/PreparingSteps";
 import { useLoginAction } from "./useLoginAction";
 import { useWorkspaceOnboarding } from "./useWorkspaceOnboarding";
-import { Link, Navigate } from "react-router";
+import { Navigate } from "react-router";
 import { useAuth } from "./AuthContext";
 
 import { Wordmark } from "../../components/brand/Wordmark";
@@ -52,44 +52,65 @@ export function AuthStatus() {
     </AuthFrame>
   );
 }
+// Admin 067, decision 2a: the document of this page was loaded by the Back or Forward button.
+// The navigation entry describes the first load of the document, so it counts only when that
+// load was /login itself, not an Admin page that later routed here.
+function arrivedByBack() {
+  const entry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+  return entry?.type === "back_forward" && new URL(entry.name).pathname === window.location.pathname;
+}
+
+// Admin 067: the page starts the sign-in by itself, with the top-level same-origin POST of
+// Admin 004. After a failed callback (?error) it waits for Try again, so the browser never loops
+// between the Admin and the identity provider.
 export function LoginPage({ signup = false }: { signup?: boolean }) {
   const a = useAuth();
   const { opening, start } = useLoginAction();
+  const form = useRef<HTMLFormElement>(null);
+  const started = useRef(false);
+  const [back, setBack] = useState(arrivedByBack);
+  const failed = new URLSearchParams(window.location.search).has("error");
+  const ready = !a.loading && !a.failed && !a.signingOut && !a.logoutFailed && !a.session;
+  useEffect(() => {
+    if (!ready || failed || started.current) return;
+    started.current = true;
+    if (back) history.back();
+    else form.current?.requestSubmit();
+  }, [ready, failed, back]);
+  // A page restored from the back-forward cache runs no effect again: it goes back the same way.
+  useEffect(() => {
+    const restored = (event: PageTransitionEvent) => {
+      if (!event.persisted || failed) return;
+      setBack(true);
+      history.back();
+    };
+    window.addEventListener("pageshow", restored);
+    return () => window.removeEventListener("pageshow", restored);
+  }, [failed]);
   if (a.loading || a.failed || a.signingOut || a.logoutFailed)
     return <AuthStatus />;
   if (a.session) return <Navigate to="/" replace />;
   return (
     <AuthFrame publicEntry>
-      <h1>{signup ? "Create your account" : "Sign in"}</h1>
-      <p>
-        {signup
-          ? "Create an account to set up your workspace."
-          : "Use your account to access your workspace."}
-      </p>
-      {new URLSearchParams(window.location.search).has("error") ? (
-        <p className="auth-error" role="alert">
-          Sign-in could not be completed. Please try again.
-        </p>
+      {failed ? (
+        <>
+          <h1>{signup ? "Create your account" : "Sign in"}</h1>
+          <p className="auth-error" role="alert">
+            Sign-in could not be completed. Please try again.
+          </p>
+        </>
       ) : null}
       <form
+        ref={form}
         method="post"
         action={`/api/v1/auth/${signup ? "signup" : "login"}`}
         onSubmit={start}
       >
-        <button className="cp-admin-button auth-primary" disabled={opening}>
-          {opening
-            ? "Opening sign-in…"
-            : signup
-              ? "Continue to sign up"
-              : "Continue to sign in"}
+        {/* After Back, the button stays usable in case there is no page before /login to go back to. */}
+        <button className="cp-admin-button auth-primary" disabled={opening || (!failed && !back)}>
+          {opening || (!failed && !back) ? "Opening sign-in…" : failed ? "Try again" : "Sign in"}
         </button>
       </form>
-      <p className="auth-secondary">
-        {signup ? "Already have an account?" : "New to Xokepoint?"}{" "}
-        <Link to={signup ? "/login" : "/signup"}>
-          {signup ? "Sign in" : "Create an account"}
-        </Link>
-      </p>
     </AuthFrame>
   );
 }
