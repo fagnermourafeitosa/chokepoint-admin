@@ -33,6 +33,7 @@ The backend sends the browser to `/workspaces` after the callback, and the Admin
 
 1. `/login` and `/signup` start the sign-in by themselves: on load, with no session and no `error` query parameter, the page submits its form (the same top-level same-origin POST to `/api/v1/auth/login` or `/api/v1/auth/signup` of Admin 004). While the browser leaves, the page shows "Opening sign-in…".
 2. With the `error` query parameter, the page does not start the sign-in. It shows the current error text and one button, **Try again**, that submits the form. This keeps a failed callback from looping between the Admin and Keycloak.
+2a. When the browser comes back to `/login` with its Back button (from Keycloak), the page does not start the sign-in: it goes one more step back, to the page before it, such as the site. Without this, Back from Keycloak starts the sign-in again and the visitor cannot leave (found in the code review, 2026-11-27).
 3. After the sign-in, the backend sends the browser to `/` (Backend 108). `/` opens the Overview.
 4. With no chosen workspace, the Admin chooses the first workspace of the list that `GET /v1/workspaces` returns (ordered by name), and its Sandbox, as today. The user decided (2026-11-27) that any listed workspace is fine; the Admin does not remember the last one.
 5. A person with no workspace goes to the first-workspace onboarding (`/onboarding/workspace`, Admin 005), as `RequireSession` does today. A person with a workspace never sees it (user, 2026-11-27). This replaces Admin 051 criterion 3, where a new account landed on the empty workspace list.
@@ -83,6 +84,7 @@ No new API. `GET /v1/workspaces`, `GET /v1/workspaces/{id}/environments`, `POST 
 ## Implementation Decisions
 
 1. The login page submits its own form once on load (a ref guards a second submit in development Strict Mode). The form, its action and the button stay, so the sign-in still works if the submit is blocked.
+1a. A Back arrival is a page load whose navigation type is `back_forward`, or a page restored from the back-forward cache (`pageshow` with `persisted`).
 2. The heading and text of the login page show only while the sign-in starts ("Opening sign-in…") or with the error. **Continue to sign in** and **Continue to sign up** become **Try again**, shown only with the error.
 3. The authentication state chooses the first listed workspace when none is chosen, instead of only when the list has one item. The branch of `RequireSession` that sends a person with workspaces and no chosen workspace to `/account/workspaces` is removed: it can no longer happen.
 4. `/workspaces` stays as a route and redirects to `/`, for old links. The backend no longer sends the sign-in there (Backend 108).
